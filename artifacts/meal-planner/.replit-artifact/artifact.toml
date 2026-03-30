@@ -1,0 +1,27 @@
+kind = "mobile"
+previewPath = "/meal-planner/"
+title = "Weekly Meal Planner"
+version = "1.0.0"
+id = "artifacts/meal-planner"
+router = "expo-domain"
+
+[[integratedSkills]]
+name = "expo"
+version = "1.0.0"
+
+[[services]]
+ensurePreviewReachable = "/status"
+name = "expo"
+paths = [ "/meal-planner/" ]
+localPort = 23054
+
+[services.development]
+run = "pnpm --filter @workspace/meal-planner run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/meal-planner", "run", "build" ]
+run = [ "pnpm", "--filter", "@workspace/meal-planner", "run", "serve" ]
+
+[services.env]
+PORT = "23054"
+BASE_PATH = "/meal-planner/"

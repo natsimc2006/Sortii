@@ -1,0 +1,14 @@
+uploads = []
+outputs = []
+
+[[generated]]
+id = "QKx8o1Y-iKswGx4lxTxDi"
+uri = "file://artifacts/meal-planner/assets/images/icon.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "4hhyby18mxHgVMbbkHc9T"
+uri = "file://artifacts/meal-planner/assets/images/splash-icon.png"
+type = "image"
+title = "generated_image"

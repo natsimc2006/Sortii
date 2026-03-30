@@ -1,0 +1,294 @@
+Build a responsive full-stack web app for Australian users to plan their weekly meals and generate a combined grocery shopping list.
+
+The app should be a hybrid meal planner, not just a recipe generator. Users must be able to:
+1. enter their own meals into a weekly planner,
+2. get help filling empty meal slots,
+3. or let the app generate the whole week for them.
+
+Core concept:
+This is a weekly meal planning assistant that helps users organise meals and instantly create a shopping list based on household size, preferences, and selected recipes.
+
+Main planning modes:
+- Manual Plan: user selects all meals themselves
+- Mixed Plan: user selects some meals and the app fills the remaining empty slots
+- Auto Plan: app generates the whole week based on filters
+
+Main features required:
+- User sign up and login
+- Guest mode if easy to implement
+- Weekly planner with day-by-day meal slots
+- Search and select meals from an internal recipe database
+- Fill remaining week feature
+- Auto plan feature
+- Shopping list generation
+- Save and reload plans
+- Responsive design for mobile and desktop
+
+Required pages:
+1. Landing page
+2. Login/signup page
+3. Planner setup/preferences page
+4. Weekly planner page
+5. Meal search/select modal or page
+6. Shopping list page
+7. Saved plans page
+8. Account/settings page
+
+Landing page requirements:
+- Headline explaining the app
+- Short subheading
+- Simple 3-step explanation of how it works
+- CTA button: Plan my week
+
+Planner setup/preferences page requirements:
+Allow users to set:
+- planning mode (manual, mixed, auto)
+- household size (custom number input)
+- budget level (budget, standard, premium)
+- health style (standard, healthy, high protein)
+- max cook time (15 mins, 30 mins, 45 mins, mixed)
+- leftovers mode (none, cook once eat twice)
+- meal variety (3, 5, 7 meals)
+- cooking style (mixed, one-pan, air fryer)
+- ingredient exclusions (multi-select checkboxes)
+- meal coverage (dinners only, lunch + dinner)
+- optional difficulty setting (easy, moderate) if practical
+
+Weekly planner page requirements:
+- Show a weekly grid for Monday to Sunday
+- Support dinner slots always
+- Support lunch slots if meal coverage includes lunch + dinner
+- Each slot should allow:
+  - add meal
+  - search meal
+  - select meal from database
+  - swap meal
+  - remove meal
+- Top summary bar should show selected filters
+- Buttons:
+  - Fill remaining meals
+  - Generate shopping list
+  - Save plan
+
+Meal search/select behavior:
+- Users should search meals by name
+- App should return matching recipes from the internal database
+- User selects a recipe from results
+- Do not rely on completely freeform meal parsing for V1
+- Use internal recipe matching to maintain accuracy
+
+Planning mode behavior:
+- Manual Plan: user selects all meals manually
+- Mixed Plan: user selects some meals, then clicking “Fill remaining meals” fills empty slots with matching recipes based on filters
+- Auto Plan: app fills all meal slots using filters only
+
+Recipe generation and matching logic:
+- Use a starter internal recipe database with at least 40 sample recipes
+- Each recipe should have metadata:
+  - name
+  - description
+  - base servings
+  - cook time
+  - difficulty
+  - cooking style
+  - health tags
+  - budget tags
+  - leftovers friendly flag
+  - meal type
+  - ingredients
+  - grocery category for each ingredient
+- Recipes should be filterable by:
+  - budget suitability
+  - health style
+  - cook time
+  - cooking style
+  - exclusions
+  - leftovers suitability
+  - difficulty
+  - meal type
+
+Budget / health logic:
+- For V1, use recipe tags or recipe variants rather than complex live rewriting
+- Budget level should influence which recipes are selected
+- Health style should influence which recipes are selected
+- It is acceptable for similar meals to exist as different recipe variants in the recipe database
+
+Household size logic:
+- Scale ingredient quantities based on selected household size and recipe base servings
+- Formula: scaled quantity = selected household size divided by base servings times base quantity
+- Round sensibly for display
+
+Leftovers logic:
+- If leftovers mode is enabled, prioritise leftovers-friendly meals
+- Allow certain recipes to be reused for another meal slot, especially lunch if lunch + dinner mode is enabled
+
+Meal variety logic:
+- 3 meals means repeat meals strategically through the week
+- 5 meals means moderate variety
+- 7 meals means high variety with minimal repetition
+
+Shopping list page requirements:
+- Collect ingredients from all recipes in the current weekly plan
+- Scale ingredient amounts based on selected servings
+- Merge duplicate ingredients
+- Group ingredients by grocery category such as:
+  - vegetables
+  - proteins
+  - dairy
+  - pantry
+  - herbs/spices
+  - frozen
+- Show checkboxes for each shopping item
+- Show optional note when an ingredient is used in multiple meals
+- Add copy-to-clipboard functionality
+- Add print-friendly view
+
+Saved plans page requirements:
+- Show saved weekly plans
+- Show date created
+- Show summary of filters
+- Buttons:
+  - reopen
+  - duplicate
+  - regenerate
+  - view shopping list
+
+Account/settings page requirements:
+- Save default preferences
+- Save exclusions
+- Save default household size
+- Save default meal coverage
+- Save usual budget and health style
+
+Estimated cost logic:
+- Do not use live supermarket pricing for V1
+- Instead use estimated weekly grocery spend bands such as:
+  - low
+  - medium
+  - high
+  or dollar range examples like $80-$120
+- Estimate should be based on recipe tags, number of meals, household size, and leftovers mode
+
+Tech stack requirements:
+- React frontend
+- Node.js with Express backend
+- PostgreSQL database
+- Tailwind CSS styling
+- Clean modern UI
+- Mobile responsive layout
+- Use a practical structure suitable for Replit deployment
+
+Database tables required:
+- users
+- user_preferences
+- recipes
+- recipe_ingredients
+- weekly_plans
+- weekly_plan_meals
+- shopping_lists
+
+Suggested schema details:
+users:
+- id
+- email
+- password_hash
+- created_at
+
+user_preferences:
+- id
+- user_id
+- household_size
+- budget_level
+- health_style
+- cook_time
+- leftovers_mode
+- meal_variety
+- cooking_style
+- meal_coverage
+- exclusions_json
+- difficulty
+- updated_at
+
+recipes:
+- id
+- name
+- description
+- base_servings
+- cook_time_minutes
+- difficulty
+- cooking_style
+- health_tags_json
+- budget_tags_json
+- leftovers_friendly
+- meal_type
+- instructions_json
+- image_url
+- active
+
+recipe_ingredients:
+- id
+- recipe_id
+- ingredient_name
+- quantity
+- unit
+- category
+- optional
+- substitution_group
+
+weekly_plans:
+- id
+- user_id
+- planning_mode
+- preferences_snapshot_json
+- estimated_cost_band
+- created_at
+
+weekly_plan_meals:
+- id
+- weekly_plan_id
+- day_name
+- meal_slot
+- recipe_id
+- servings
+- version_label
+
+shopping_lists:
+- id
+- weekly_plan_id
+- generated_json
+- created_at
+
+Seed data requirements:
+- Add at least 40 starter recipes
+- Mix of budget, healthy, high-protein, one-pan, air fryer, leftovers-friendly meals
+- Include enough variety to generate realistic weekly plans
+- Use Australian-friendly meal examples and ingredient naming where possible
+
+UI design direction:
+- Friendly, practical, modern
+- Not overly fitness-focused
+- Use pill buttons for filters
+- Use cards for meals
+- Keep onboarding simple and clear
+- Make weekly planning feel easy and low-friction
+
+Important V1 constraints:
+- Do not build live Coles, Woolworths, or Aldi integrations
+- Do not build checkout integrations
+- Do not build advanced nutrition macro tracking
+- Do not build a large pantry inventory system
+- Do not rely on totally custom freeform meal inference
+- Focus on planner flow, recipe matching, shopping list generation, and saved plans
+
+Build order:
+1. Set up app structure, auth, and database
+2. Build landing page and planner setup flow
+3. Build weekly planner grid and meal search/select feature
+4. Seed recipe data
+5. Implement manual, mixed, and auto planning logic
+6. Implement shopping list generation
+7. Implement saved plans
+8. Polish responsive UI
+
+Please generate the full codebase, database schema, seed data, and working front-end screens.
+Also include sample recipe data and make the app runnable in Replit with clear file structure.
