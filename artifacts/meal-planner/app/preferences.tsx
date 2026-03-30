@@ -304,12 +304,12 @@ export default function PreferencesScreen() {
             <TouchableOpacity
               onPress={() => {
                 Haptics.selectionAsync();
-                updateWeekend("enabled", !prefs.weekendOverrides.enabled);
+                updateWeekend("enabled", !(prefs.weekendOverrides?.enabled ?? false));
               }}
               style={[
                 styles.toggle,
                 {
-                  backgroundColor: prefs.weekendOverrides.enabled
+                  backgroundColor: prefs.weekendOverrides?.enabled
                     ? C.primary
                     : C.inputBorder,
                 },
@@ -318,13 +318,13 @@ export default function PreferencesScreen() {
               <View
                 style={[
                   styles.toggleKnob,
-                  prefs.weekendOverrides.enabled && styles.toggleKnobOn,
+                  prefs.weekendOverrides?.enabled && styles.toggleKnobOn,
                 ]}
               />
             </TouchableOpacity>
           </View>
 
-          {prefs.weekendOverrides.enabled && (
+          {prefs.weekendOverrides?.enabled && (
             <>
               <Text style={[styles.weekendSubLabel, { color: C.textSecondary }]}>
                 Weekend cook time
@@ -336,7 +336,7 @@ export default function PreferencesScreen() {
                   { label: "45 min", value: "45" },
                   { label: "Any", value: "mixed" },
                 ]}
-                value={String(prefs.weekendOverrides.cookTime)}
+                value={String(prefs.weekendOverrides?.cookTime ?? "mixed")}
                 onSelect={(v) =>
                   updateWeekend("cookTime", v === "mixed" ? "mixed" : parseInt(v) as 15 | 30 | 45)
                 }
@@ -350,7 +350,7 @@ export default function PreferencesScreen() {
                   { label: "Standard", value: "standard" },
                   { label: "Premium", value: "premium" },
                 ]}
-                value={prefs.weekendOverrides.budgetLevel}
+                value={prefs.weekendOverrides?.budgetLevel ?? "standard"}
                 onSelect={(v) => updateWeekend("budgetLevel", v)}
               />
             </>
