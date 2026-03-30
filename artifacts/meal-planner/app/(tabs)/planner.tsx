@@ -133,6 +133,7 @@ export default function PlannerScreen() {
 
       <ScrollView
         showsVerticalScrollIndicator={false}
+        style={{ flex: 1 }}
         contentContainerStyle={[styles.content]}
       >
         <View style={[styles.progressBar, { backgroundColor: C.chipBg }]}>
