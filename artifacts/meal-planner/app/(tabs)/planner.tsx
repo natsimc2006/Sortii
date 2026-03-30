@@ -31,6 +31,8 @@ export default function PlannerScreen() {
     clearPlan,
     savePlan,
     estimatedCostBand,
+    preferencesDirty,
+    setPreferencesDirty,
   } = usePlanner();
   const router = useRouter();
   const insets = useSafeAreaInsets();
@@ -90,11 +92,13 @@ export default function PlannerScreen() {
   const totalSlots = currentPlan.length;
 
   const budgeLabel =
-    preferences.budgetLevel === "budget"
-      ? "Budget"
-      : preferences.budgetLevel === "standard"
-        ? "Standard"
-        : "Premium";
+    preferences.budgetLevel === "super-budget"
+      ? "Super Budget"
+      : preferences.budgetLevel === "budget"
+        ? "Budget"
+        : preferences.budgetLevel === "standard"
+          ? "Standard"
+          : "Premium";
   const healthLabel =
     preferences.healthStyle === "standard"
       ? "Standard"
@@ -102,8 +106,10 @@ export default function PlannerScreen() {
         ? "Healthy"
         : "High Protein";
 
+  const TAB_BAR_HEIGHT = Platform.OS === "web" ? 60 : 49;
+
   return (
-    <View style={{ flex: 1, backgroundColor: C.background }}>
+    <View style={{ flex: 1, backgroundColor: C.background, marginBottom: TAB_BAR_HEIGHT + insets.bottom }}>
       <View
         style={[
           styles.topBar,
@@ -257,11 +263,29 @@ export default function PlannerScreen() {
         </View>
       )}
 
+      {preferencesDirty && (
+        <View style={[styles.prefsDirtyBar, { backgroundColor: "#FFF3E0", borderTopColor: "#FFB300" + "60" }]}>
+          <Feather name="alert-circle" size={14} color={C.accent} />
+          <Text style={[styles.prefsDirtyText, { color: C.accent }]}>
+            Preferences updated
+          </Text>
+          <TouchableOpacity
+            onPress={() => { autoGeneratePlan(); Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success); }}
+            style={[styles.prefsDirtyBtn, { backgroundColor: C.accent }]}
+          >
+            <Text style={styles.prefsDirtyBtnText}>Regenerate</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => setPreferencesDirty(false)}>
+            <Feather name="x" size={16} color={C.accent} />
+          </TouchableOpacity>
+        </View>
+      )}
+
       <View
         style={[
           styles.actionBar,
           {
-            paddingBottom: Platform.OS === "web" ? 16 : insets.bottom + 12,
+            paddingBottom: 10,
             backgroundColor: C.background,
             borderTopColor: C.cardBorder,
           },
@@ -457,6 +481,29 @@ const styles = StyleSheet.create({
   },
   toastText: {
     fontSize: 13,
+    fontFamily: "Inter_600SemiBold",
+    color: "#fff",
+  },
+  prefsDirtyBar: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderTopWidth: 1,
+  },
+  prefsDirtyText: {
+    flex: 1,
+    fontSize: 13,
+    fontFamily: "Inter_500Medium",
+  },
+  prefsDirtyBtn: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 8,
+  },
+  prefsDirtyBtnText: {
+    fontSize: 12,
     fontFamily: "Inter_600SemiBold",
     color: "#fff",
   },

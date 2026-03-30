@@ -2501,13 +2501,13 @@ export interface MealPlanEntry {
 export interface WeekendOverrides {
   enabled: boolean;
   cookTime: 15 | 30 | 45 | "mixed";
-  budgetLevel: "budget" | "standard" | "premium";
+  budgetLevel: "super-budget" | "budget" | "standard" | "premium";
 }
 
 export interface PlanPreferences {
   planningMode: "manual" | "mixed" | "auto";
   householdSize: number;
-  budgetLevel: "budget" | "standard" | "premium";
+  budgetLevel: "super-budget" | "budget" | "standard" | "premium";
   healthStyle: "standard" | "healthy" | "high-protein";
   cookTime: 15 | 30 | 45 | "mixed";
   leftoversMode: "none" | "cook-once";
@@ -2597,6 +2597,7 @@ export function filterRecipes(
     if (prefs.cookingStyle !== "mixed" && r.cookingStyle !== prefs.cookingStyle) return false;
     if (prefs.difficulty !== "mixed" && r.difficulty !== prefs.difficulty) return false;
     if (prefs.healthStyle !== "standard" && !r.healthTags.includes(prefs.healthStyle)) return false;
+    if (effectiveBudget === "super-budget" && r.estimatedCostBand !== "low") return false;
     if (effectiveBudget === "budget" && !r.budgetTags.includes("budget")) return false;
     if (prefs.leftoversMode === "cook-once" && !r.leftoversFriendly) return false;
     if (!exclusionOk(r)) return false;
@@ -2610,6 +2611,7 @@ export function filterRecipes(
     if (prefs.cookingStyle !== "mixed" && r.cookingStyle !== prefs.cookingStyle) return false;
     if (prefs.difficulty !== "mixed" && r.difficulty !== prefs.difficulty) return false;
     if (prefs.healthStyle !== "standard" && !r.healthTags.includes(prefs.healthStyle)) return false;
+    if (effectiveBudget === "super-budget" && r.estimatedCostBand !== "low") return false;
     if (effectiveBudget === "budget" && !r.budgetTags.includes("budget")) return false;
     if (prefs.leftoversMode === "cook-once" && !r.leftoversFriendly) return false;
     if (!exclusionOk(r)) return false;

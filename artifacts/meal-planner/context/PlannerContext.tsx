@@ -40,11 +40,13 @@ interface PlannerContextType {
   getRecipeById: (id: string) => Recipe | undefined;
   setMealSlot: (day: string, slot: MealSlot, recipeId: string | null) => void;
   fillRemainingSlots: () => void;
-  autoGeneratePlan: () => void;
+  autoGeneratePlan: (newPrefs?: PlanPreferences) => void;
   clearPlan: () => void;
   estimatedCostBand: string;
   isOnboarded: boolean;
   setIsOnboarded: (val: boolean) => void;
+  preferencesDirty: boolean;
+  setPreferencesDirty: (v: boolean) => void;
 }
 
 const PlannerContext = createContext<PlannerContextType | null>(null);
@@ -74,11 +76,13 @@ function estimateCost(
   const filledMeals = plan.filter((m) => m.recipeId);
   const count = filledMeals.length;
   const basePerMeal =
-    prefs.budgetLevel === "budget"
-      ? 12
-      : prefs.budgetLevel === "standard"
-        ? 18
-        : 28;
+    prefs.budgetLevel === "super-budget"
+      ? 6
+      : prefs.budgetLevel === "budget"
+        ? 12
+        : prefs.budgetLevel === "standard"
+          ? 18
+          : 28;
   const total = Math.round(
     (basePerMeal * count * prefs.householdSize) /
       (prefs.leftoversMode === "cook-once" ? 1.4 : 1)
@@ -96,6 +100,7 @@ export function PlannerProvider({ children }: { children: React.ReactNode }) {
   );
   const [savedPlans, setSavedPlans] = useState<SavedPlan[]>([]);
   const [isOnboarded, setIsOnboardedState] = useState(false);
+  const [preferencesDirty, setPreferencesDirtyState] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -123,7 +128,12 @@ export function PlannerProvider({ children }: { children: React.ReactNode }) {
 
   const setPreferences = useCallback(async (prefs: PlanPreferences) => {
     setPreferencesState(prefs);
+    setPreferencesDirtyState(true);
     await AsyncStorage.setItem(STORAGE_KEYS.preferences, JSON.stringify(prefs));
+  }, []);
+
+  const setPreferencesDirty = useCallback((v: boolean) => {
+    setPreferencesDirtyState(v);
   }, []);
 
   const setCurrentPlan = useCallback(async (plan: MealPlanEntry[]) => {
@@ -172,23 +182,26 @@ export function PlannerProvider({ children }: { children: React.ReactNode }) {
     setCurrentPlan(updatedPlan);
   }, [currentPlan, preferences, setCurrentPlan]);
 
-  const autoGeneratePlan = useCallback(() => {
-    const fresh = buildEmptyPlan(preferences);
+  const autoGeneratePlan = useCallback((newPrefs?: PlanPreferences) => {
+    const p = newPrefs ?? preferences;
+    const fresh = buildEmptyPlan(p);
     const filledIds: string[] = [];
     const generated = fresh.map((entry) => {
-      const pool = filterRecipes(preferences, entry.slot, entry.day);
-      const picks = pickRecipes(pool, 1, preferences.mealVariety, filledIds);
+      const pool = filterRecipes(p, entry.slot, entry.day);
+      const picks = pickRecipes(pool, 1, p.mealVariety, filledIds);
       if (picks.length > 0) {
-        if (preferences.leftoversMode === "none") filledIds.push(picks[0].id);
+        if (p.leftoversMode === "none") filledIds.push(picks[0].id);
         return { ...entry, recipeId: picks[0].id };
       }
       return entry;
     });
     setCurrentPlan(generated);
+    setPreferencesDirtyState(false);
   }, [preferences, setCurrentPlan]);
 
   const clearPlan = useCallback(() => {
     setCurrentPlan(buildEmptyPlan(preferences));
+    setPreferencesDirtyState(false);
   }, [preferences, setCurrentPlan]);
 
   const savePlan = useCallback(
@@ -257,6 +270,8 @@ export function PlannerProvider({ children }: { children: React.ReactNode }) {
         estimatedCostBand,
         isOnboarded,
         setIsOnboarded,
+        preferencesDirty,
+        setPreferencesDirty,
       }}
     >
       {children}

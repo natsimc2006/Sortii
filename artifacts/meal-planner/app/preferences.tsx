@@ -203,6 +203,7 @@ export default function PreferencesScreen() {
         <Section title="Budget Level">
           <OptionRow
             options={[
+              { label: "Super Budget", value: "super-budget" },
               { label: "Budget", value: "budget" },
               { label: "Standard", value: "standard" },
               { label: "Premium", value: "premium" },
@@ -210,6 +211,11 @@ export default function PreferencesScreen() {
             value={prefs.budgetLevel}
             onSelect={(v) => update("budgetLevel", v)}
           />
+          {prefs.budgetLevel === "super-budget" && (
+            <Text style={[styles.hint, { color: C.textMuted }]}>
+              Meals under ~$5 per person — the cheapest meals in the collection.
+            </Text>
+          )}
         </Section>
 
         <Section title="Health Style">
@@ -346,6 +352,7 @@ export default function PreferencesScreen() {
               </Text>
               <OptionRow
                 options={[
+                  { label: "Super Budget", value: "super-budget" },
                   { label: "Budget", value: "budget" },
                   { label: "Standard", value: "standard" },
                   { label: "Premium", value: "premium" },
