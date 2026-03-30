@@ -15,8 +15,10 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Colors from "@/constants/Colors";
 import {
   DEFAULT_PREFERENCES,
+  DEFAULT_WEEKEND_OVERRIDES,
   EXCLUSION_OPTIONS,
   PlanPreferences,
+  WeekendOverrides,
 } from "@/constants/recipes";
 import { usePlanner } from "@/context/PlannerContext";
 import { PillButton } from "@/components/PillButton";
@@ -59,11 +61,22 @@ export default function PreferencesScreen() {
   const insets = useSafeAreaInsets();
   const C = Colors.light;
 
-  const [prefs, setPrefs] = useState<PlanPreferences>({ ...preferences });
+  const [prefs, setPrefs] = useState<PlanPreferences>({
+    ...DEFAULT_PREFERENCES,
+    ...preferences,
+    weekendOverrides: preferences.weekendOverrides ?? { ...DEFAULT_WEEKEND_OVERRIDES },
+  });
   const [householdInput, setHouseholdInput] = useState(String(preferences.householdSize));
 
   const update = (key: keyof PlanPreferences, value: any) => {
     setPrefs((p) => ({ ...p, [key]: value }));
+  };
+
+  const updateWeekend = (key: keyof WeekendOverrides, value: any) => {
+    setPrefs((p) => ({
+      ...p,
+      weekendOverrides: { ...p.weekendOverrides, [key]: value },
+    }));
   };
 
   const toggleExclusion = (ex: string) => {
@@ -278,6 +291,72 @@ export default function PreferencesScreen() {
           />
         </Section>
 
+        <Section title="Weekend Overrides">
+          <View style={styles.weekendToggle}>
+            <View style={styles.weekendToggleLeft}>
+              <Text style={[styles.weekendToggleTitle, { color: C.text }]}>
+                Different settings for weekends
+              </Text>
+              <Text style={[styles.weekendToggleSub, { color: C.textMuted }]}>
+                Saturday &amp; Sunday can have longer cook times or a bigger budget
+              </Text>
+            </View>
+            <TouchableOpacity
+              onPress={() => {
+                Haptics.selectionAsync();
+                updateWeekend("enabled", !prefs.weekendOverrides.enabled);
+              }}
+              style={[
+                styles.toggle,
+                {
+                  backgroundColor: prefs.weekendOverrides.enabled
+                    ? C.primary
+                    : C.inputBorder,
+                },
+              ]}
+            >
+              <View
+                style={[
+                  styles.toggleKnob,
+                  prefs.weekendOverrides.enabled && styles.toggleKnobOn,
+                ]}
+              />
+            </TouchableOpacity>
+          </View>
+
+          {prefs.weekendOverrides.enabled && (
+            <>
+              <Text style={[styles.weekendSubLabel, { color: C.textSecondary }]}>
+                Weekend cook time
+              </Text>
+              <OptionRow
+                options={[
+                  { label: "15 min", value: "15" },
+                  { label: "30 min", value: "30" },
+                  { label: "45 min", value: "45" },
+                  { label: "Any", value: "mixed" },
+                ]}
+                value={String(prefs.weekendOverrides.cookTime)}
+                onSelect={(v) =>
+                  updateWeekend("cookTime", v === "mixed" ? "mixed" : parseInt(v) as 15 | 30 | 45)
+                }
+              />
+              <Text style={[styles.weekendSubLabel, { color: C.textSecondary }]}>
+                Weekend budget
+              </Text>
+              <OptionRow
+                options={[
+                  { label: "Budget", value: "budget" },
+                  { label: "Standard", value: "standard" },
+                  { label: "Premium", value: "premium" },
+                ]}
+                value={prefs.weekendOverrides.budgetLevel}
+                onSelect={(v) => updateWeekend("budgetLevel", v)}
+              />
+            </>
+          )}
+        </Section>
+
         <Section title="Ingredient Exclusions">
           <View style={styles.exclusionGrid}>
             {EXCLUSION_OPTIONS.map((ex) => (
@@ -397,6 +476,47 @@ const styles = StyleSheet.create({
   resetText: {
     fontSize: 13,
     fontFamily: "Inter_400Regular",
+  },
+  weekendToggle: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+  },
+  weekendToggleLeft: {
+    flex: 1,
+    gap: 3,
+  },
+  weekendToggleTitle: {
+    fontSize: 14,
+    fontFamily: "Inter_600SemiBold",
+  },
+  weekendToggleSub: {
+    fontSize: 12,
+    fontFamily: "Inter_400Regular",
+    lineHeight: 17,
+  },
+  toggle: {
+    width: 48,
+    height: 28,
+    borderRadius: 14,
+    justifyContent: "center",
+    paddingHorizontal: 3,
+    flexShrink: 0,
+  },
+  toggleKnob: {
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    backgroundColor: "#fff",
+    alignSelf: "flex-start",
+  },
+  toggleKnobOn: {
+    alignSelf: "flex-end",
+  },
+  weekendSubLabel: {
+    fontSize: 13,
+    fontFamily: "Inter_600SemiBold",
+    marginTop: 4,
   },
   footer: {
     position: "absolute",

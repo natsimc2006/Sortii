@@ -1514,12 +1514,20 @@ export const DAYS = [
   "Sunday",
 ];
 
+export const WEEKEND_DAYS = ["Saturday", "Sunday"];
+
 export type MealSlot = "lunch" | "dinner";
 
 export interface MealPlanEntry {
   day: string;
   slot: MealSlot;
   recipeId: string | null;
+}
+
+export interface WeekendOverrides {
+  enabled: boolean;
+  cookTime: 15 | 30 | 45 | "mixed";
+  budgetLevel: "budget" | "standard" | "premium";
 }
 
 export interface PlanPreferences {
@@ -1534,7 +1542,14 @@ export interface PlanPreferences {
   exclusions: string[];
   mealCoverage: "dinner-only" | "lunch-dinner";
   difficulty: "easy" | "moderate" | "mixed";
+  weekendOverrides: WeekendOverrides;
 }
+
+export const DEFAULT_WEEKEND_OVERRIDES: WeekendOverrides = {
+  enabled: false,
+  cookTime: "mixed",
+  budgetLevel: "standard",
+};
 
 export const DEFAULT_PREFERENCES: PlanPreferences = {
   planningMode: "mixed",
@@ -1548,7 +1563,17 @@ export const DEFAULT_PREFERENCES: PlanPreferences = {
   exclusions: [],
   mealCoverage: "dinner-only",
   difficulty: "mixed",
+  weekendOverrides: { ...DEFAULT_WEEKEND_OVERRIDES },
 };
+
+export function getApproxCostPerServe(recipe: Recipe): number {
+  switch (recipe.estimatedCostBand) {
+    case "low": return 3.50;
+    case "medium": return 7.00;
+    case "high": return 12.00;
+    default: return 7.00;
+  }
+}
 
 export const EXCLUSION_OPTIONS = [
   "Pork",
@@ -1563,21 +1588,26 @@ export const EXCLUSION_OPTIONS = [
 
 export function filterRecipes(
   prefs: PlanPreferences,
-  mealType: MealSlot = "dinner"
+  mealType: MealSlot = "dinner",
+  dayName?: string
 ): Recipe[] {
+  const isWeekend = dayName ? WEEKEND_DAYS.includes(dayName) : false;
+  const overrides = prefs.weekendOverrides ?? DEFAULT_WEEKEND_OVERRIDES;
+  const effectiveCookTime =
+    isWeekend && overrides.enabled ? overrides.cookTime : prefs.cookTime;
+  const effectiveBudget =
+    isWeekend && overrides.enabled ? overrides.budgetLevel : prefs.budgetLevel;
+
   return RECIPES.filter((r) => {
     if (mealType === "lunch" && r.mealType === "dinner") return false;
     if (mealType === "dinner" && r.mealType === "lunch") return false;
 
-    if (prefs.cookTime !== "mixed") {
-      if (r.cookTimeMinutes > prefs.cookTime) return false;
+    if (effectiveCookTime !== "mixed") {
+      if (r.cookTimeMinutes > effectiveCookTime) return false;
     }
     if (prefs.cookingStyle !== "mixed" && r.cookingStyle !== prefs.cookingStyle)
       return false;
-    if (
-      prefs.difficulty !== "mixed" &&
-      r.difficulty !== prefs.difficulty
-    )
+    if (prefs.difficulty !== "mixed" && r.difficulty !== prefs.difficulty)
       return false;
     if (
       prefs.healthStyle !== "standard" &&
@@ -1585,14 +1615,11 @@ export function filterRecipes(
     )
       return false;
     if (
-      prefs.budgetLevel === "budget" &&
+      effectiveBudget === "budget" &&
       !r.budgetTags.includes("budget")
     )
       return false;
-    if (
-      prefs.leftoversMode === "cook-once" &&
-      !r.leftoversFriendly
-    )
+    if (prefs.leftoversMode === "cook-once" && !r.leftoversFriendly)
       return false;
 
     const lowerExclusions = prefs.exclusions.map((e) => e.toLowerCase());

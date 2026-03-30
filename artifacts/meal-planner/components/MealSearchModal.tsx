@@ -39,7 +39,7 @@ export function MealSearchModal({
   const filteredRecipes = useMemo(() => {
     const base = showAll
       ? RECIPES
-      : filterRecipes(preferences, slot);
+      : filterRecipes(preferences, slot, day);
     if (!search.trim()) return base;
     const q = search.toLowerCase();
     return base.filter(

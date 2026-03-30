@@ -17,6 +17,7 @@ interface MealSlotCardProps {
   onAdd: () => void;
   onRemove: () => void;
   onSwap: () => void;
+  onViewRecipe?: () => void;
 }
 
 export function MealSlotCard({
@@ -26,6 +27,7 @@ export function MealSlotCard({
   onAdd,
   onRemove,
   onSwap,
+  onViewRecipe,
 }: MealSlotCardProps) {
   const C = Colors.light;
   const slotLabel = slot === "lunch" ? "Lunch" : "Dinner";
@@ -76,6 +78,11 @@ export function MealSlotCard({
           </Text>
         </View>
         <View style={styles.slotActions}>
+          {onViewRecipe && (
+            <TouchableOpacity onPress={onViewRecipe} style={styles.actionBtn} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+              <Feather name="book-open" size={14} color={C.primary} />
+            </TouchableOpacity>
+          )}
           <TouchableOpacity onPress={onSwap} style={styles.actionBtn} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
             <Feather name="refresh-cw" size={14} color={C.textSecondary} />
           </TouchableOpacity>

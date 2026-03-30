@@ -13,10 +13,11 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Colors from "@/constants/Colors";
-import { DAYS, MealSlot } from "@/constants/recipes";
+import { DAYS, MealSlot, Recipe, WEEKEND_DAYS } from "@/constants/recipes";
 import { usePlanner } from "@/context/PlannerContext";
 import { MealSlotCard } from "@/components/MealSlotCard";
 import { MealSearchModal } from "@/components/MealSearchModal";
+import { RecipeDetailModal } from "@/components/RecipeDetailModal";
 
 export default function PlannerScreen() {
   const {
@@ -37,6 +38,7 @@ export default function PlannerScreen() {
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedDay, setSelectedDay] = useState<string>(DAYS[0]);
   const [selectedSlot, setSelectedSlot] = useState<MealSlot>("dinner");
+  const [detailRecipe, setDetailRecipe] = useState<Recipe | null>(null);
 
   const openSearch = (day: string, slot: MealSlot) => {
     setSelectedDay(day);
@@ -166,11 +168,24 @@ export default function PlannerScreen() {
             ? getRecipeById(lunchEntry.recipeId) ?? null
             : null;
 
+          const isWeekend = WEEKEND_DAYS.includes(day);
+          const hasWeekendOverride =
+            isWeekend && preferences.weekendOverrides?.enabled;
+
           return (
             <View key={day} style={styles.dayBlock}>
-              <Text style={[styles.dayLabel, { color: C.textSecondary }]}>
-                {day}
-              </Text>
+              <View style={styles.dayLabelRow}>
+                <Text style={[styles.dayLabel, { color: C.textSecondary }]}>
+                  {day}
+                </Text>
+                {hasWeekendOverride && (
+                  <View style={[styles.weekendBadge, { backgroundColor: C.accent + "18" }]}>
+                    <Text style={[styles.weekendBadgeText, { color: C.accent }]}>
+                      weekend
+                    </Text>
+                  </View>
+                )}
+              </View>
               {lunchEntry !== undefined && lunchEntry !== null && (
                 <MealSlotCard
                   day={day}
@@ -179,6 +194,7 @@ export default function PlannerScreen() {
                   onAdd={() => openSearch(day, "lunch")}
                   onRemove={() => setMealSlot(day, "lunch", null)}
                   onSwap={() => openSearch(day, "lunch")}
+                  onViewRecipe={lunchRecipe ? () => setDetailRecipe(lunchRecipe) : undefined}
                 />
               )}
               <MealSlotCard
@@ -188,6 +204,7 @@ export default function PlannerScreen() {
                 onAdd={() => openSearch(day, "dinner")}
                 onRemove={() => setMealSlot(day, "dinner", null)}
                 onSwap={() => openSearch(day, "dinner")}
+                onViewRecipe={dinnerRecipe ? () => setDetailRecipe(dinnerRecipe) : undefined}
               />
             </View>
           );
@@ -232,6 +249,11 @@ export default function PlannerScreen() {
         day={selectedDay}
         slot={selectedSlot}
         onClose={() => setModalVisible(false)}
+      />
+
+      <RecipeDetailModal
+        recipe={detailRecipe}
+        onClose={() => setDetailRecipe(null)}
       />
     </View>
   );
@@ -309,12 +331,28 @@ const styles = StyleSheet.create({
     gap: 8,
     marginBottom: 20,
   },
+  dayLabelRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    marginBottom: 4,
+  },
   dayLabel: {
     fontSize: 13,
     fontFamily: "Inter_700Bold",
     textTransform: "uppercase",
     letterSpacing: 0.8,
-    marginBottom: 4,
+  },
+  weekendBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 8,
+  },
+  weekendBadgeText: {
+    fontSize: 11,
+    fontFamily: "Inter_600SemiBold",
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
   },
   actionBar: {
     position: "absolute",

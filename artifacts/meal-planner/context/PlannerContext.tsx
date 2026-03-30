@@ -9,6 +9,7 @@ import React, {
 import {
   DAYS,
   DEFAULT_PREFERENCES,
+  DEFAULT_WEEKEND_OVERRIDES,
   MealPlanEntry,
   MealSlot,
   PlanPreferences,
@@ -105,7 +106,14 @@ export function PlannerProvider({ children }: { children: React.ReactNode }) {
           AsyncStorage.getItem(STORAGE_KEYS.currentPlan),
           AsyncStorage.getItem(STORAGE_KEYS.onboarded),
         ]);
-        if (prefStr) setPreferencesState(JSON.parse(prefStr));
+        if (prefStr) {
+          const parsed = JSON.parse(prefStr);
+          setPreferencesState({
+            ...DEFAULT_PREFERENCES,
+            ...parsed,
+            weekendOverrides: parsed.weekendOverrides ?? { ...DEFAULT_WEEKEND_OVERRIDES },
+          });
+        }
         if (plansStr) setSavedPlans(JSON.parse(plansStr));
         if (planStr) setCurrentPlanState(JSON.parse(planStr));
         if (onbStr === "true") setIsOnboardedState(true);
@@ -153,7 +161,7 @@ export function PlannerProvider({ children }: { children: React.ReactNode }) {
 
     const updatedPlan = currentPlan.map((entry) => {
       if (entry.recipeId) return entry;
-      const pool = filterRecipes(preferences, entry.slot);
+      const pool = filterRecipes(preferences, entry.slot, entry.day);
       const picks = pickRecipes(pool, 1, preferences.mealVariety, filledIds);
       if (picks.length > 0) {
         if (preferences.leftoversMode === "none") filledIds.push(picks[0].id);
@@ -168,7 +176,7 @@ export function PlannerProvider({ children }: { children: React.ReactNode }) {
     const fresh = buildEmptyPlan(preferences);
     const filledIds: string[] = [];
     const generated = fresh.map((entry) => {
-      const pool = filterRecipes(preferences, entry.slot);
+      const pool = filterRecipes(preferences, entry.slot, entry.day);
       const picks = pickRecipes(pool, 1, preferences.mealVariety, filledIds);
       if (picks.length > 0) {
         if (preferences.leftoversMode === "none") filledIds.push(picks[0].id);
