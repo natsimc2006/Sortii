@@ -3,7 +3,6 @@ import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
-  Alert,
   Platform,
   ScrollView,
   StyleSheet,
@@ -18,6 +17,8 @@ import { usePlanner } from "@/context/PlannerContext";
 import { MealSlotCard } from "@/components/MealSlotCard";
 import { MealSearchModal } from "@/components/MealSearchModal";
 import { RecipeDetailModal } from "@/components/RecipeDetailModal";
+
+type ConfirmAction = "auto" | "clear" | null;
 
 export default function PlannerScreen() {
   const {
@@ -39,6 +40,8 @@ export default function PlannerScreen() {
   const [selectedDay, setSelectedDay] = useState<string>(DAYS[0]);
   const [selectedSlot, setSelectedSlot] = useState<MealSlot>("dinner");
   const [detailRecipe, setDetailRecipe] = useState<Recipe | null>(null);
+  const [confirmAction, setConfirmAction] = useState<ConfirmAction>(null);
+  const [savedToast, setSavedToast] = useState(false);
 
   const openSearch = (day: string, slot: MealSlot) => {
     setSelectedDay(day);
@@ -51,20 +54,7 @@ export default function PlannerScreen() {
 
   const handleAutoGenerate = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    Alert.alert(
-      "Auto-generate week",
-      "This will replace all current meals. Continue?",
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Generate",
-          onPress: () => {
-            autoGeneratePlan();
-            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-          },
-        },
-      ]
-    );
+    setConfirmAction("auto");
   };
 
   const handleFill = () => {
@@ -75,16 +65,25 @@ export default function PlannerScreen() {
 
   const handleClear = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    Alert.alert("Clear plan", "Remove all meals from this week?", [
-      { text: "Cancel", style: "cancel" },
-      { text: "Clear", style: "destructive", onPress: clearPlan },
-    ]);
+    setConfirmAction("clear");
   };
 
   const handleSave = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     savePlan();
-    Alert.alert("Saved", "Your plan has been saved.");
+    setSavedToast(true);
+    setTimeout(() => setSavedToast(false), 2500);
+  };
+
+  const handleConfirm = () => {
+    if (confirmAction === "auto") {
+      autoGeneratePlan();
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    } else if (confirmAction === "clear") {
+      clearPlan();
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+    }
+    setConfirmAction(null);
   };
 
   const filledCount = currentPlan.filter((m) => m.recipeId).length;
@@ -134,10 +133,7 @@ export default function PlannerScreen() {
 
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={[
-          styles.content,
-          { paddingBottom: Platform.OS === "web" ? 100 : insets.bottom + 100 },
-        ]}
+        contentContainerStyle={[styles.content]}
       >
         <View style={[styles.progressBar, { backgroundColor: C.chipBg }]}>
           <View
@@ -211,11 +207,60 @@ export default function PlannerScreen() {
         })}
       </ScrollView>
 
+      {confirmAction && (
+        <View
+          style={[
+            styles.confirmBar,
+            { backgroundColor: C.accent + "14", borderTopColor: C.accent + "40" },
+          ]}
+        >
+          <Text style={[styles.confirmText, { color: C.text }]}>
+            {confirmAction === "auto"
+              ? "Replace all meals with a new auto-generated week?"
+              : "Clear all meals from this week?"}
+          </Text>
+          <View style={styles.confirmBtns}>
+            <TouchableOpacity
+              onPress={() => setConfirmAction(null)}
+              style={[styles.confirmCancel, { borderColor: C.cardBorder }]}
+            >
+              <Text style={[styles.confirmCancelText, { color: C.textSecondary }]}>Cancel</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={handleConfirm}
+              style={[
+                styles.confirmOk,
+                {
+                  backgroundColor:
+                    confirmAction === "clear" ? "#D32F2F" : C.primary,
+                },
+              ]}
+            >
+              <Text style={styles.confirmOkText}>
+                {confirmAction === "auto" ? "Generate" : "Clear"}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      )}
+
+      {savedToast && (
+        <View
+          style={[
+            styles.toast,
+            { backgroundColor: C.primary },
+          ]}
+        >
+          <Feather name="check-circle" size={15} color="#fff" />
+          <Text style={styles.toastText}>Plan saved!</Text>
+        </View>
+      )}
+
       <View
         style={[
           styles.actionBar,
           {
-            paddingBottom: Platform.OS === "web" ? 34 : insets.bottom + 12,
+            paddingBottom: Platform.OS === "web" ? 16 : insets.bottom + 12,
             backgroundColor: C.background,
             borderTopColor: C.cardBorder,
           },
@@ -236,11 +281,18 @@ export default function PlannerScreen() {
           <Text style={[styles.actionBtnText, { color: C.primary }]}>Auto plan</Text>
         </TouchableOpacity>
         <TouchableOpacity
-          onPress={() => router.push("/(tabs)/shopping")}
-          style={[styles.actionBtnPrimary, { backgroundColor: C.primary }]}
+          onPress={handleSave}
+          style={[styles.actionBtn, { backgroundColor: C.chipBg }]}
         >
-          <Feather name="shopping-cart" size={16} color="#fff" />
-          <Text style={styles.actionBtnPrimaryText}>Shopping list</Text>
+          <Feather name="bookmark" size={16} color={C.primary} />
+          <Text style={[styles.actionBtnText, { color: C.primary }]}>Save</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={handleClear}
+          style={[styles.actionBtn, { backgroundColor: "#FFF3E0" }]}
+        >
+          <Feather name="trash-2" size={16} color={C.accent} />
+          <Text style={[styles.actionBtnText, { color: C.accent }]}>Clear</Text>
         </TouchableOpacity>
       </View>
 
@@ -354,15 +406,64 @@ const styles = StyleSheet.create({
     textTransform: "uppercase",
     letterSpacing: 0.5,
   },
-  actionBar: {
+  confirmBar: {
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderTopWidth: 1,
+    gap: 10,
+  },
+  confirmText: {
+    fontSize: 13,
+    fontFamily: "Inter_500Medium",
+    lineHeight: 18,
+  },
+  confirmBtns: {
+    flexDirection: "row",
+    gap: 8,
+  },
+  confirmCancel: {
+    flex: 1,
+    paddingVertical: 10,
+    borderRadius: 10,
+    borderWidth: 1,
+    alignItems: "center",
+  },
+  confirmCancelText: {
+    fontSize: 13,
+    fontFamily: "Inter_600SemiBold",
+  },
+  confirmOk: {
+    flex: 1,
+    paddingVertical: 10,
+    borderRadius: 10,
+    alignItems: "center",
+  },
+  confirmOkText: {
+    fontSize: 13,
+    fontFamily: "Inter_600SemiBold",
+    color: "#fff",
+  },
+  toast: {
     position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
+    top: Platform.OS === "web" ? 80 : 100,
+    alignSelf: "center",
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 24,
+  },
+  toastText: {
+    fontSize: 13,
+    fontFamily: "Inter_600SemiBold",
+    color: "#fff",
+  },
+  actionBar: {
     flexDirection: "row",
     gap: 8,
     paddingHorizontal: 16,
-    paddingTop: 14,
+    paddingTop: 12,
     borderTopWidth: 1,
   },
   actionBtn: {
@@ -370,26 +471,12 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    gap: 6,
-    paddingVertical: 13,
+    gap: 5,
+    paddingVertical: 12,
     borderRadius: 14,
   },
   actionBtnText: {
-    fontSize: 13,
+    fontSize: 12,
     fontFamily: "Inter_600SemiBold",
-  },
-  actionBtnPrimary: {
-    flex: 1.4,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 6,
-    paddingVertical: 13,
-    borderRadius: 14,
-  },
-  actionBtnPrimaryText: {
-    fontSize: 13,
-    fontFamily: "Inter_600SemiBold",
-    color: "#fff",
   },
 });

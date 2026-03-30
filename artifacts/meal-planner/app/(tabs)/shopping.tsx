@@ -3,7 +3,6 @@ import * as Clipboard from "expo-clipboard";
 import * as Haptics from "expo-haptics";
 import React, { useMemo, useState } from "react";
 import {
-  Alert,
   Platform,
   ScrollView,
   Share,
@@ -71,6 +70,7 @@ export default function ShoppingScreen() {
   const insets = useSafeAreaInsets();
   const C = Colors.light;
   const [checked, setChecked] = useState<Set<string>>(new Set());
+  const [copiedToast, setCopiedToast] = useState(false);
 
   const shoppingItems = useMemo(() => {
     const map = new Map<string, ShoppingItem>();
@@ -149,7 +149,8 @@ export default function ShoppingScreen() {
   const handleCopy = async () => {
     await Clipboard.setStringAsync(buildListText());
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    Alert.alert("Copied", "Shopping list copied to clipboard.");
+    setCopiedToast(true);
+    setTimeout(() => setCopiedToast(false), 2000);
   };
 
   const handleShare = async () => {
@@ -190,6 +191,12 @@ export default function ShoppingScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: C.background }}>
+      {copiedToast && (
+        <View style={[styles.toast, { backgroundColor: C.primary }]}>
+          <Feather name="check" size={14} color="#fff" />
+          <Text style={styles.toastText}>Copied to clipboard!</Text>
+        </View>
+      )}
       <View
         style={[
           styles.header,
@@ -492,5 +499,22 @@ const styles = StyleSheet.create({
     textAlign: "center",
     maxWidth: 280,
     lineHeight: 21,
+  },
+  toast: {
+    position: "absolute",
+    top: Platform.OS === "web" ? 80 : 100,
+    alignSelf: "center",
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 24,
+    zIndex: 99,
+  },
+  toastText: {
+    fontSize: 13,
+    fontFamily: "Inter_600SemiBold",
+    color: "#fff",
   },
 });

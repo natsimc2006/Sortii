@@ -1,9 +1,8 @@
 import { Feather } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
-import React from "react";
+import React, { useState } from "react";
 import {
-  Alert,
   FlatList,
   Platform,
   StyleSheet,
@@ -20,6 +19,13 @@ export default function SavedPlansScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const C = Colors.light;
+  const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
+  const [toast, setToast] = useState<string | null>(null);
+
+  const showToast = (msg: string) => {
+    setToast(msg);
+    setTimeout(() => setToast(null), 2500);
+  };
 
   const handleLoad = (plan: SavedPlan) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
@@ -28,24 +34,20 @@ export default function SavedPlansScreen() {
   };
 
   const handleDelete = (plan: SavedPlan) => {
-    Alert.alert("Delete plan", `Delete "${plan.name}"?`, [
-      { text: "Cancel", style: "cancel" },
-      {
-        text: "Delete",
-        style: "destructive",
-        onPress: () => {
-          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-          deletePlan(plan.id);
-        },
-      },
-    ]);
+    if (pendingDeleteId === plan.id) {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      deletePlan(plan.id);
+      setPendingDeleteId(null);
+    } else {
+      setPendingDeleteId(plan.id);
+    }
   };
 
   const handleDuplicate = (plan: SavedPlan) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     loadPlan(plan);
     savePlan(`Copy of ${plan.name}`);
-    Alert.alert("Duplicated", "Plan duplicated successfully.");
+    showToast("Plan duplicated");
   };
 
   const modeLabel = (mode: string) => {
@@ -93,12 +95,29 @@ export default function SavedPlansScreen() {
             <Feather name="copy" size={14} color={C.primary} />
             <Text style={[styles.actionBtnText, { color: C.primary }]}>Duplicate</Text>
           </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => handleDelete(item)}
-            style={[styles.deleteBtn]}
-          >
-            <Feather name="trash-2" size={14} color={C.danger} />
-          </TouchableOpacity>
+          {pendingDeleteId === item.id ? (
+            <View style={styles.deletePending}>
+              <TouchableOpacity
+                onPress={() => setPendingDeleteId(null)}
+                style={[styles.deleteCancelBtn, { borderColor: C.cardBorder }]}
+              >
+                <Text style={[styles.deleteCancelText, { color: C.textSecondary }]}>No</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => handleDelete(item)}
+                style={styles.deleteConfirmBtn}
+              >
+                <Text style={styles.deleteConfirmText}>Delete</Text>
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <TouchableOpacity
+              onPress={() => handleDelete(item)}
+              style={[styles.deleteBtn]}
+            >
+              <Feather name="trash-2" size={14} color={C.danger} />
+            </TouchableOpacity>
+          )}
         </View>
       </View>
     );
@@ -120,6 +139,13 @@ export default function SavedPlansScreen() {
           {savedPlans.length} plan{savedPlans.length !== 1 ? "s" : ""} saved
         </Text>
       </View>
+
+      {toast && (
+        <View style={[styles.toast, { backgroundColor: Colors.light.primary }]}>
+          <Feather name="check-circle" size={14} color="#fff" />
+          <Text style={styles.toastText}>{toast}</Text>
+        </View>
+      )}
 
       <FlatList
         data={savedPlans}
@@ -271,6 +297,50 @@ const styles = StyleSheet.create({
     backgroundColor: "#FEE2E2",
     alignItems: "center",
     justifyContent: "center",
+  },
+  deletePending: {
+    flexDirection: "row",
+    gap: 6,
+  },
+  deleteCancelBtn: {
+    paddingHorizontal: 12,
+    paddingVertical: 9,
+    borderRadius: 10,
+    borderWidth: 1,
+    alignItems: "center",
+  },
+  deleteCancelText: {
+    fontSize: 12,
+    fontFamily: "Inter_600SemiBold",
+  },
+  deleteConfirmBtn: {
+    paddingHorizontal: 12,
+    paddingVertical: 9,
+    borderRadius: 10,
+    backgroundColor: "#D32F2F",
+    alignItems: "center",
+  },
+  deleteConfirmText: {
+    fontSize: 12,
+    fontFamily: "Inter_600SemiBold",
+    color: "#fff",
+  },
+  toast: {
+    position: "absolute",
+    top: Platform.OS === "web" ? 80 : 100,
+    alignSelf: "center",
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 24,
+    zIndex: 99,
+  },
+  toastText: {
+    fontSize: 13,
+    fontFamily: "Inter_600SemiBold",
+    color: "#fff",
   },
   empty: {
     alignItems: "center",
