@@ -1,0 +1,61 @@
+Update the app’s visual design to a warmer, more premium “calm modern pantry” aesthetic while keeping the existing layout, functionality, and component structure unchanged.
+
+Design goals:
+- Feel: calm, organised, modern, premium, family-friendly
+- Less cold grey, less generic mint
+- More warm cream backgrounds, richer sage greens, softer contrast
+- Keep it clean and minimal, with clear hierarchy
+- Do not redesign the UX flow or move elements around unless needed for styling consistency
+
+Apply this colour palette throughout the app:
+- Background / app canvas: #F7F6F2
+- Card background: #FFFDF9
+- Primary green: #5F7C6A
+- Secondary green: #A8C3A0
+- Soft green tint / chips: #E6EFE5
+- Text primary: #2F342F
+- Text secondary: #6B6F69
+- Border / divider: #DDDCD4
+- Accent warm gold: #D6B98C
+- Positive/active highlight: #7E9B78
+- Danger/destructive: #D96B5F
+
+Style rules:
+1. Replace cold grey backgrounds with warm cream tones.
+2. Replace very light mint greens with richer sage greens.
+3. Preserve a soft, airy, uncluttered look.
+4. Increase contrast slightly so text and actions feel more polished and readable.
+5. Use rounded corners consistently for a soft modern feel.
+6. Keep shadows extremely subtle and refined.
+
+Component styling:
+- App/page background should use #F7F6F2.
+- Planner cards should use #FFFDF9 with a 1px border in #DDDCD4 and a very subtle shadow.
+- Section headings (like weekdays) should use text colour #2F342F, semi-bold to bold.
+- Meal titles should use #2F342F.
+- Secondary metadata (e.g. “25 Min · Easy”) should use #6B6F69.
+- Chips/pills (e.g. “3 people”, “Budget”, “Standard”, price range, meal type) should use a soft green-tinted background #E6EFE5, text #5F7C6A, and subtle border if needed.
+- Primary icons should use #5F7C6A.
+- Use #A8C3A0 or #E6EFE5 for softer supporting icon backgrounds.
+
+Buttons:
+- Make button hierarchy clearer.
+- Primary action buttons should use the deeper sage green #5F7C6A with light text.
+- Secondary buttons should use pale green backgrounds #E6EFE5 with text/icon #5F7C6A.
+- Save can be secondary or primary depending on current logic, but Auto plan should feel like the strongest smart-action CTA.
+- Destructive actions like Clear or remove should use very soft warm background with text/icon #D96B5F, not harsh bright red.
+- Hover/focus/pressed states should be consistent and slightly darker/lighter versions of the same colour family.
+
+Specific intent for current screen:
+- Keep the current calm green app identity.
+- Make it feel more premium and less generic.
+- Make the interface warmer and more lifestyle-oriented, like a modern pantry / meal planning brand.
+- Preserve the clean mobile-first design.
+
+Implementation requirements:
+- Update global theme variables/tokens if the project uses them.
+- If the app uses CSS variables, Tailwind config, theme.ts, or a design tokens file, centralise the palette there.
+- Apply styles consistently across planner cards, pills, nav, action buttons, icons, and surfaces.
+- Do not break spacing, responsiveness, or existing functionality.
+- After updating, check for any low-contrast text and fix it.
+- Keep the result production-ready and visually cohesive.
