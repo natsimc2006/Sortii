@@ -400,6 +400,72 @@ export default function PreferencesScreen() {
           </View>
         </Section>
 
+        <View style={[styles.smartHeading, { borderTopColor: C.cardBorder }]}>
+          <Text style={[styles.smartHeadingText, { color: C.primary }]}>Smart Planning</Text>
+        </View>
+
+        <Section title="Prep Style">
+          <OptionRow
+            options={[
+              { label: "Mixed", value: "mixed" },
+              { label: "Batch Cook", value: "batch-cook" },
+              { label: "Quick Assembly", value: "quick-assembly" },
+              { label: "Family Style", value: "family-style" },
+            ]}
+            value={prefs.prepStyle ?? "mixed"}
+            onSelect={(v) => update("prepStyle", v)}
+          />
+          {prefs.prepStyle === "batch-cook" && (
+            <Text style={[styles.hint, { color: C.textMuted }]}>
+              Prefers recipes that make multiple portions — great for cooking once and eating across 2–3 days.
+            </Text>
+          )}
+          {prefs.prepStyle === "quick-assembly" && (
+            <Text style={[styles.hint, { color: C.textMuted }]}>
+              Prefers minimal-prep meals — wraps, salads, bowls, and simple assemblies.
+            </Text>
+          )}
+          {prefs.prepStyle === "family-style" && (
+            <Text style={[styles.hint, { color: C.textMuted }]}>
+              Prefers larger-portion, crowd-pleasing recipes with simple, broadly appealing flavours.
+            </Text>
+          )}
+        </Section>
+
+        <Section title="Minimise Waste">
+          <View style={styles.weekendToggle}>
+            <View style={styles.weekendToggleLeft}>
+              <Text style={[styles.weekendToggleTitle, { color: C.text }]}>
+                Shared ingredients
+              </Text>
+              <Text style={[styles.weekendToggleSub, { color: C.textMuted }]}>
+                Prefer meals that reuse the same ingredients across the week to reduce food waste
+              </Text>
+            </View>
+            <TouchableOpacity
+              onPress={() => {
+                Haptics.selectionAsync();
+                update("minimiseWaste", !(prefs.minimiseWaste ?? false));
+              }}
+              style={[
+                styles.toggle,
+                {
+                  backgroundColor: prefs.minimiseWaste
+                    ? C.primary
+                    : C.inputBorder,
+                },
+              ]}
+            >
+              <View
+                style={[
+                  styles.toggleKnob,
+                  prefs.minimiseWaste && styles.toggleKnobOn,
+                ]}
+              />
+            </TouchableOpacity>
+          </View>
+        </Section>
+
         <TouchableOpacity onPress={handleReset} style={styles.resetRow}>
           <Feather name="rotate-ccw" size={14} color={C.textMuted} />
           <Text style={[styles.resetText, { color: C.textMuted }]}>Reset to defaults</Text>
@@ -495,6 +561,18 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
     gap: 8,
+  },
+  smartHeading: {
+    borderTopWidth: 1,
+    paddingTop: 8,
+    marginTop: -4,
+  },
+  smartHeadingText: {
+    fontSize: 11,
+    fontFamily: "Inter_700Bold",
+    textTransform: "uppercase",
+    letterSpacing: 1,
+    marginBottom: 4,
   },
   resetRow: {
     flexDirection: "row",

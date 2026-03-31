@@ -30,6 +30,9 @@ export interface Recipe {
   ingredients: RecipeIngredient[];
   instructions: string[];
   estimatedCostBand: "low" | "medium" | "high";
+  batchCook?: boolean;
+  quickAssembly?: boolean;
+  familyStyle?: boolean;
 }
 
 export const RECIPES: Recipe[] = [
@@ -3446,6 +3449,8 @@ export interface PlanPreferences {
   exclusions: string[];
   mealCoverage: "dinner-only" | "lunch-dinner";
   weekendOverrides: WeekendOverrides;
+  prepStyle: "mixed" | "batch-cook" | "quick-assembly" | "family-style";
+  minimiseWaste: boolean;
 }
 
 export const DEFAULT_WEEKEND_OVERRIDES: WeekendOverrides = {
@@ -3467,6 +3472,8 @@ export const DEFAULT_PREFERENCES: PlanPreferences = {
   exclusions: [],
   mealCoverage: "dinner-only",
   weekendOverrides: { ...DEFAULT_WEEKEND_OVERRIDES },
+  prepStyle: "mixed",
+  minimiseWaste: false,
 };
 
 export function getApproxCostPerServe(recipe: Recipe): number {
@@ -3488,6 +3495,72 @@ export const EXCLUSION_OPTIONS = [
   "Eggs",
   "Nuts",
 ];
+
+// Pantry staples excluded from ingredient overlap scoring
+export const PANTRY_STAPLES = [
+  "salt", "pepper", "olive oil", "vegetable oil", "oil", "garlic",
+  "onion", "butter", "water", "sugar", "flour", "cumin", "paprika",
+  "oregano", "thyme", "coriander", "chilli", "bay leaf", "mixed herbs",
+  "dried herbs", "seasoning", "stock cube", "chicken stock", "vegetable stock",
+  "beef stock", "vinegar", "soy sauce", "sesame oil",
+];
+
+// Infer prep style tags from recipe properties
+export function getRecipePrepStyles(r: Recipe): {
+  batchCook: boolean;
+  quickAssembly: boolean;
+  familyStyle: boolean;
+} {
+  const name = r.name.toLowerCase();
+  const batchCook =
+    r.batchCook ??
+    (r.leftoversFriendly &&
+      r.cookTimeMinutes >= 25 &&
+      /curry|stew|casserole|soup|bake|bolognese|chilli|dahl|rogan|risotto|cannelloni|pie|slow/.test(name));
+
+  const quickAssembly =
+    r.quickAssembly ??
+    (r.cookTimeMinutes <= 20 ||
+      /salad|bowl|wrap|quesadilla|taco|fritter|omelette|noodle|fried rice|satay noodle/.test(name));
+
+  const familyStyle =
+    r.familyStyle ??
+    (r.difficulty === "easy" &&
+      r.estimatedCostBand !== "high" &&
+      /bolognese|schnitzel|pasta|chicken|taco|fish and chip|sausage|soup|bake|roast|lasagna|mac|pie|burger|pizza|fried rice|nugget|meatball/.test(name));
+
+  return { batchCook, quickAssembly, familyStyle };
+}
+
+export function getPrepStyleLabel(r: Recipe): string | null {
+  const { batchCook, quickAssembly, familyStyle } = getRecipePrepStyles(r);
+  if (batchCook) return "Batch";
+  if (quickAssembly) return "Quick";
+  if (familyStyle) return "Family";
+  return null;
+}
+
+// Greedy ingredient overlap scoring for Minimise Waste mode
+export function ingredientOverlapScore(
+  candidate: Recipe,
+  selectedIngredients: Set<string>
+): number {
+  let score = 0;
+  for (const ing of candidate.ingredients) {
+    const name = ing.name.toLowerCase();
+    const isStaple = PANTRY_STAPLES.some((s) => name.includes(s));
+    if (!isStaple && selectedIngredients.has(name)) score++;
+  }
+  return score;
+}
+
+export function addIngredientsToSet(recipe: Recipe, set: Set<string>): void {
+  for (const ing of recipe.ingredients) {
+    const name = ing.name.toLowerCase();
+    const isStaple = PANTRY_STAPLES.some((s) => name.includes(s));
+    if (!isStaple) set.add(name);
+  }
+}
 
 const HIGH_CARB_INGREDIENTS = [
   "pasta", "spaghetti", "noodle", "rice", "bread", "tortilla",
@@ -3571,6 +3644,16 @@ export function filterRecipes(
     return r.healthTags.includes(hs);
   };
 
+  const prepStyleOk = (r: Recipe) => {
+    const ps = prefs.prepStyle ?? "mixed";
+    if (ps === "mixed") return true;
+    const tags = getRecipePrepStyles(r);
+    if (ps === "batch-cook") return tags.batchCook;
+    if (ps === "quick-assembly") return tags.quickAssembly;
+    if (ps === "family-style") return tags.familyStyle;
+    return true;
+  };
+
   // Full filter pass
   const full = RECIPES.filter((r) => {
     if (!mealTypeOk(r)) return false;
@@ -3578,6 +3661,7 @@ export function filterRecipes(
     if (!cookingStyleOk(r, prefs.cookingStyle ?? "mixed")) return false;
     if (!healthOk(r)) return false;
     if (!matchesCuisine(r, cuisine)) return false;
+    if (!prepStyleOk(r)) return false;
     if (effectiveBudget === "super-budget" && r.estimatedCostBand !== "low") return false;
     if (effectiveBudget === "budget" && !r.budgetTags.includes("budget")) return false;
     if (prefs.leftoversMode === "cook-once" && !r.leftoversFriendly) return false;
@@ -3586,7 +3670,7 @@ export function filterRecipes(
   });
   if (full.length >= 3) return full;
 
-  // Fallback 1: relax cooking effort
+  // Fallback 1: relax cooking effort + prep style
   const relaxed = RECIPES.filter((r) => {
     if (!mealTypeOk(r)) return false;
     if (!cookingStyleOk(r, prefs.cookingStyle ?? "mixed")) return false;

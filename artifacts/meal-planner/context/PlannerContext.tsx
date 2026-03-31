@@ -12,10 +12,13 @@ import {
   DEFAULT_WEEKEND_OVERRIDES,
   MealPlanEntry,
   MealSlot,
+  PANTRY_STAPLES,
   PlanPreferences,
   RECIPES,
   Recipe,
+  addIngredientsToSet,
   filterRecipes,
+  ingredientOverlapScore,
   pickRecipes,
 } from "@/constants/recipes";
 
@@ -186,15 +189,40 @@ export function PlannerProvider({ children }: { children: React.ReactNode }) {
     const p = newPrefs ?? preferences;
     const fresh = buildEmptyPlan(p);
     const filledIds: string[] = [];
+    const selectedIngredients = new Set<string>();
+
     const generated = fresh.map((entry) => {
       const pool = filterRecipes(p, entry.slot, entry.day);
-      const picks = pickRecipes(pool, 1, p.mealVariety, filledIds);
-      if (picks.length > 0) {
-        if (p.leftoversMode === "none") filledIds.push(picks[0].id);
-        return { ...entry, recipeId: picks[0].id };
+
+      let picked: Recipe | undefined;
+
+      if (p.minimiseWaste && selectedIngredients.size > 0) {
+        // Greedy overlap: prefer candidates that share ingredients with already-selected meals
+        const uniquePool = pool.filter(
+          (r) => p.leftoversMode === "none" ? !filledIds.includes(r.id) : true
+        );
+        const scored = uniquePool
+          .map((r) => ({ r, score: ingredientOverlapScore(r, selectedIngredients) }))
+          .sort((a, b) => {
+            if (b.score !== a.score) return b.score - a.score;
+            return Math.random() - 0.5; // break ties randomly
+          });
+        picked = scored[0]?.r;
+      }
+
+      if (!picked) {
+        const picks = pickRecipes(pool, 1, p.mealVariety, filledIds);
+        picked = picks[0];
+      }
+
+      if (picked) {
+        if (p.leftoversMode === "none") filledIds.push(picked.id);
+        addIngredientsToSet(picked, selectedIngredients);
+        return { ...entry, recipeId: picked.id };
       }
       return entry;
     });
+
     setCurrentPlan(generated);
     setPreferencesDirtyState(false);
   }, [preferences, setCurrentPlan]);

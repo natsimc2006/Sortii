@@ -1,7 +1,7 @@
 import { Feather } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
   Platform,
   ScrollView,
@@ -12,7 +12,7 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Colors from "@/constants/Colors";
-import { DAYS, MealSlot, Recipe, WEEKEND_DAYS } from "@/constants/recipes";
+import { DAYS, MealSlot, PANTRY_STAPLES, Recipe, WEEKEND_DAYS } from "@/constants/recipes";
 import { usePlanner } from "@/context/PlannerContext";
 import { MealSlotCard } from "@/components/MealSlotCard";
 import { MealSearchModal } from "@/components/MealSearchModal";
@@ -111,6 +111,28 @@ export default function PlannerScreen() {
             : "Standard";
 
   const TAB_BAR_HEIGHT = Platform.OS === "web" ? 60 : 49;
+
+  const sharedIngredients = useMemo(() => {
+    if (!preferences.minimiseWaste) return [];
+    const allRecipes = currentPlan
+      .filter((e) => e.recipeId)
+      .map((e) => getRecipeById(e.recipeId!))
+      .filter(Boolean) as Recipe[];
+    if (allRecipes.length < 2) return [];
+    const ingredientCount: Record<string, number> = {};
+    for (const r of allRecipes) {
+      for (const ing of r.ingredients) {
+        const key = ing.name.toLowerCase().trim();
+        if (PANTRY_STAPLES.has(key)) continue;
+        ingredientCount[key] = (ingredientCount[key] ?? 0) + 1;
+      }
+    }
+    return Object.entries(ingredientCount)
+      .filter(([, count]) => count >= 2)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 8)
+      .map(([name, count]) => ({ name, count }));
+  }, [currentPlan, preferences.minimiseWaste, getRecipeById]);
 
   return (
     <View style={{ flex: 1, backgroundColor: C.background, marginBottom: TAB_BAR_HEIGHT + insets.bottom }}>
@@ -216,6 +238,32 @@ export default function PlannerScreen() {
             </View>
           );
         })}
+
+        {sharedIngredients.length > 0 && (
+          <View style={[styles.sharedPanel, { backgroundColor: C.card, borderColor: C.cardBorder }]}>
+            <View style={styles.sharedPanelHeader}>
+              <Text style={styles.sharedPanelIcon}>♻️</Text>
+              <View style={{ flex: 1 }}>
+                <Text style={[styles.sharedPanelTitle, { color: C.text }]}>Shared ingredients this week</Text>
+                <Text style={[styles.sharedPanelSub, { color: C.textMuted }]}>
+                  These items appear in multiple meals — buy once, use often
+                </Text>
+              </View>
+            </View>
+            <View style={styles.sharedChipRow}>
+              {sharedIngredients.map(({ name, count }) => (
+                <View key={name} style={[styles.sharedChip, { backgroundColor: C.chipBg }]}>
+                  <Text style={[styles.sharedChipText, { color: C.primary }]}>
+                    {name.charAt(0).toUpperCase() + name.slice(1)}
+                  </Text>
+                  <View style={[styles.sharedChipBadge, { backgroundColor: C.primary }]}>
+                    <Text style={styles.sharedChipBadgeText}>×{count}</Text>
+                  </View>
+                </View>
+              ))}
+            </View>
+          </View>
+        )}
       </ScrollView>
 
       {confirmAction && (
@@ -530,5 +578,62 @@ const styles = StyleSheet.create({
   actionBtnText: {
     fontSize: 12,
     fontFamily: "Inter_600SemiBold",
+  },
+  sharedPanel: {
+    marginHorizontal: 16,
+    marginTop: 8,
+    marginBottom: 4,
+    borderRadius: 16,
+    borderWidth: 1,
+    padding: 14,
+    gap: 10,
+  },
+  sharedPanelHeader: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: 10,
+  },
+  sharedPanelIcon: {
+    fontSize: 20,
+    marginTop: 1,
+  },
+  sharedPanelTitle: {
+    fontSize: 14,
+    fontFamily: "Inter_600SemiBold",
+    marginBottom: 2,
+  },
+  sharedPanelSub: {
+    fontSize: 12,
+    fontFamily: "Inter_400Regular",
+    lineHeight: 17,
+  },
+  sharedChipRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 6,
+  },
+  sharedChip: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    paddingLeft: 10,
+    paddingRight: 4,
+    paddingVertical: 5,
+    borderRadius: 20,
+  },
+  sharedChipText: {
+    fontSize: 12,
+    fontFamily: "Inter_500Medium",
+    textTransform: "capitalize",
+  },
+  sharedChipBadge: {
+    borderRadius: 10,
+    paddingHorizontal: 5,
+    paddingVertical: 1,
+  },
+  sharedChipBadgeText: {
+    fontSize: 10,
+    fontFamily: "Inter_700Bold",
+    color: "#fff",
   },
 });

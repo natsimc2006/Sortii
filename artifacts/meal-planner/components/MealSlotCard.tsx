@@ -8,7 +8,7 @@ import {
   View,
 } from "react-native";
 import Colors from "@/constants/Colors";
-import { Recipe } from "@/constants/recipes";
+import { Recipe, getPrepStyleLabel } from "@/constants/recipes";
 
 interface MealSlotCardProps {
   day: string;
@@ -97,9 +97,18 @@ export function MealSlotCard({
           <Feather name={cookIcon as any} size={16} color={C.primary} />
         </View>
         <View style={styles.recipeInfo}>
-          <Text style={[styles.recipeName, { color: C.text }]} numberOfLines={2}>
-            {recipe.name}
-          </Text>
+          <View style={styles.nameRow}>
+            <Text style={[styles.recipeName, { color: C.text }]} numberOfLines={1}>
+              {recipe.name}
+            </Text>
+            {getPrepStyleLabel(recipe) && (
+              <View style={[styles.prepBadge, { backgroundColor: C.chipBg }]}>
+                <Text style={[styles.prepBadgeText, { color: C.primary }]}>
+                  {getPrepStyleLabel(recipe)}
+                </Text>
+              </View>
+            )}
+          </View>
           <Text style={[styles.recipeMeta, { color: C.textMuted }]}>
             {recipe.cookTimeMinutes} min · {recipe.difficulty}
           </Text>
@@ -191,10 +200,29 @@ const styles = StyleSheet.create({
     flex: 1,
     gap: 2,
   },
+  nameRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    flexWrap: "wrap",
+  },
   recipeName: {
     fontSize: 14,
     fontFamily: "Inter_600SemiBold",
     lineHeight: 19,
+    flexShrink: 1,
+  },
+  prepBadge: {
+    paddingHorizontal: 7,
+    paddingVertical: 2,
+    borderRadius: 6,
+    flexShrink: 0,
+  },
+  prepBadgeText: {
+    fontSize: 10,
+    fontFamily: "Inter_700Bold",
+    textTransform: "uppercase",
+    letterSpacing: 0.4,
   },
   recipeMeta: {
     fontSize: 12,
