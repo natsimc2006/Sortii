@@ -28,11 +28,13 @@ export default function PlannerScreen() {
     setMealSlot,
     fillRemainingSlots,
     autoGeneratePlan,
+    autoSwapSlot,
     clearPlan,
     savePlan,
     estimatedCostBand,
     preferencesDirty,
     setPreferencesDirty,
+    hideRecipe,
   } = usePlanner();
   const router = useRouter();
   const insets = useSafeAreaInsets();
@@ -155,12 +157,21 @@ export default function PlannerScreen() {
             <FilterChip label={estimatedCostBand} icon="shopping-bag" />
           </View>
         </View>
-        <TouchableOpacity
-          onPress={() => router.push("/preferences")}
-          style={[styles.settingsBtn, { backgroundColor: C.chipBg }]}
-        >
-          <Feather name="sliders" size={18} color={C.primary} />
-        </TouchableOpacity>
+        <View style={styles.topBarActions}>
+          <TouchableOpacity
+            onPress={() => router.push({ pathname: "/", params: { splash: "1" } })}
+            style={[styles.homeBtn, { backgroundColor: "transparent" }]}
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+          >
+            <Feather name="home" size={16} color={C.textMuted} />
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => router.push("/preferences")}
+            style={[styles.settingsBtn, { backgroundColor: C.chipBg }]}
+          >
+            <Feather name="sliders" size={18} color={C.primary} />
+          </TouchableOpacity>
+        </View>
       </View>
 
       <ScrollView
@@ -224,6 +235,8 @@ export default function PlannerScreen() {
                   onRemove={() => setMealSlot(day, "lunch", null)}
                   onSwap={() => openSearch(day, "lunch")}
                   onViewRecipe={lunchRecipe ? () => setDetailRecipe(lunchRecipe) : undefined}
+                  onAutoSwap={lunchRecipe ? () => autoSwapSlot(day, "lunch") : undefined}
+                  onHideRecipe={lunchRecipe ? () => hideRecipe(lunchRecipe.id) : undefined}
                   seasonalMode={preferences.seasonalMode ?? false}
                 />
               )}
@@ -235,6 +248,8 @@ export default function PlannerScreen() {
                 onRemove={() => setMealSlot(day, "dinner", null)}
                 onSwap={() => openSearch(day, "dinner")}
                 onViewRecipe={dinnerRecipe ? () => setDetailRecipe(dinnerRecipe) : undefined}
+                onAutoSwap={dinnerRecipe ? () => autoSwapSlot(day, "dinner") : undefined}
+                onHideRecipe={dinnerRecipe ? () => hideRecipe(dinnerRecipe.id) : undefined}
                 seasonalMode={preferences.seasonalMode ?? false}
               />
             </View>
@@ -431,13 +446,25 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontFamily: "Inter_500Medium",
   },
+  topBarActions: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    marginTop: 4,
+  },
+  homeBtn: {
+    width: 32,
+    height: 32,
+    borderRadius: 10,
+    alignItems: "center",
+    justifyContent: "center",
+  },
   settingsBtn: {
     width: 40,
     height: 40,
     borderRadius: 12,
     alignItems: "center",
     justifyContent: "center",
-    marginTop: 4,
   },
   content: {
     padding: 20,

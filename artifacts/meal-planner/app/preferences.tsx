@@ -386,6 +386,28 @@ export default function PreferencesScreen() {
           )}
         </Section>
 
+        <Section title="Diet Type">
+          <OptionRow
+            options={[
+              { label: "Omnivore", value: "omnivore" },
+              { label: "Pescatarian", value: "pescatarian" },
+              { label: "Vegetarian", value: "vegetarian" },
+              { label: "Vegan", value: "vegan" },
+            ]}
+            value={prefs.dietType ?? "omnivore"}
+            onSelect={(v) => update("dietType", v)}
+          />
+          <Text style={[styles.hint, { color: C.textMuted }]}>
+            {prefs.dietType === "vegan"
+              ? "Filters out all meat, seafood, dairy, and eggs."
+              : prefs.dietType === "vegetarian"
+                ? "Filters out meat and seafood. Dairy and eggs allowed."
+                : prefs.dietType === "pescatarian"
+                  ? "Filters out meat. Fish and seafood are included."
+                  : "No dietary restrictions applied."}
+          </Text>
+        </Section>
+
         <Section title="Ingredient Exclusions">
           <View style={styles.exclusionGrid}>
             {EXCLUSION_OPTIONS.map((ex) => (

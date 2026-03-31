@@ -45,12 +45,15 @@ interface PlannerContextType {
   setMealSlot: (day: string, slot: MealSlot, recipeId: string | null) => void;
   fillRemainingSlots: () => void;
   autoGeneratePlan: (newPrefs?: PlanPreferences) => void;
+  autoSwapSlot: (day: string, slot: MealSlot) => void;
   clearPlan: () => void;
   estimatedCostBand: string;
   isOnboarded: boolean;
   setIsOnboarded: (val: boolean) => void;
   preferencesDirty: boolean;
   setPreferencesDirty: (v: boolean) => void;
+  hiddenRecipes: string[];
+  hideRecipe: (id: string) => void;
 }
 
 const PlannerContext = createContext<PlannerContextType | null>(null);
@@ -60,6 +63,7 @@ const STORAGE_KEYS = {
   savedPlans: "@mealplanner_savedplans",
   currentPlan: "@mealplanner_currentplan",
   onboarded: "@mealplanner_onboarded",
+  hiddenRecipes: "@mealplanner_hiddenrecipes",
 };
 
 function buildEmptyPlan(prefs: PlanPreferences): MealPlanEntry[] {
@@ -105,15 +109,17 @@ export function PlannerProvider({ children }: { children: React.ReactNode }) {
   const [savedPlans, setSavedPlans] = useState<SavedPlan[]>([]);
   const [isOnboarded, setIsOnboardedState] = useState(false);
   const [preferencesDirty, setPreferencesDirtyState] = useState(false);
+  const [hiddenRecipes, setHiddenRecipes] = useState<string[]>([]);
 
   useEffect(() => {
     (async () => {
       try {
-        const [prefStr, plansStr, planStr, onbStr] = await Promise.all([
+        const [prefStr, plansStr, planStr, onbStr, hiddenStr] = await Promise.all([
           AsyncStorage.getItem(STORAGE_KEYS.preferences),
           AsyncStorage.getItem(STORAGE_KEYS.savedPlans),
           AsyncStorage.getItem(STORAGE_KEYS.currentPlan),
           AsyncStorage.getItem(STORAGE_KEYS.onboarded),
+          AsyncStorage.getItem(STORAGE_KEYS.hiddenRecipes),
         ]);
         if (prefStr) {
           const parsed = JSON.parse(prefStr);
@@ -126,6 +132,7 @@ export function PlannerProvider({ children }: { children: React.ReactNode }) {
         if (plansStr) setSavedPlans(JSON.parse(plansStr));
         if (planStr) setCurrentPlanState(JSON.parse(planStr));
         if (onbStr === "true") setIsOnboardedState(true);
+        if (hiddenStr) setHiddenRecipes(JSON.parse(hiddenStr));
       } catch (_) {}
     })();
   }, []);
@@ -175,7 +182,7 @@ export function PlannerProvider({ children }: { children: React.ReactNode }) {
 
     const updatedPlan = currentPlan.map((entry) => {
       if (entry.recipeId) return entry;
-      const pool = filterRecipes(preferences, entry.slot, entry.day);
+      const pool = filterRecipes(preferences, entry.slot, entry.day, hiddenRecipes);
       const picks = pickRecipes(pool, 1, preferences.mealVariety, filledIds);
       if (picks.length > 0) {
         if (preferences.leftoversMode === "none") filledIds.push(picks[0].id);
@@ -184,7 +191,7 @@ export function PlannerProvider({ children }: { children: React.ReactNode }) {
       return entry;
     });
     setCurrentPlan(updatedPlan);
-  }, [currentPlan, preferences, setCurrentPlan]);
+  }, [currentPlan, preferences, hiddenRecipes, setCurrentPlan]);
 
   const autoGeneratePlan = useCallback((newPrefs?: PlanPreferences) => {
     const p = newPrefs ?? preferences;
@@ -195,7 +202,7 @@ export function PlannerProvider({ children }: { children: React.ReactNode }) {
     const currentSeason = p.seasonalMode ? getCurrentAustralianSeason() : null;
 
     const generated = fresh.map((entry) => {
-      let pool = filterRecipes(p, entry.slot, entry.day);
+      let pool = filterRecipes(p, entry.slot, entry.day, hiddenRecipes);
 
       if (currentSeason) {
         pool = [...pool].sort((a, b) => {
@@ -235,7 +242,7 @@ export function PlannerProvider({ children }: { children: React.ReactNode }) {
 
     setCurrentPlan(generated);
     setPreferencesDirtyState(false);
-  }, [preferences, setCurrentPlan]);
+  }, [preferences, hiddenRecipes, setCurrentPlan]);
 
   const clearPlan = useCallback(() => {
     setCurrentPlan(buildEmptyPlan(preferences));
@@ -287,6 +294,42 @@ export function PlannerProvider({ children }: { children: React.ReactNode }) {
     [savedPlans]
   );
 
+  const hideRecipe = useCallback(async (id: string) => {
+    const updated = [...new Set([...hiddenRecipes, id])];
+    setHiddenRecipes(updated);
+    await AsyncStorage.setItem(STORAGE_KEYS.hiddenRecipes, JSON.stringify(updated));
+    setCurrentPlanState((prev) => {
+      const newPlan = prev.map((entry) => {
+        if (entry.recipeId !== id) return entry;
+        const filledIds = prev.filter((m) => m.recipeId && m.recipeId !== id).map((m) => m.recipeId as string);
+        const pool = filterRecipes(preferences, entry.slot, entry.day, updated);
+        const picks = pickRecipes(pool, 1, preferences.mealVariety, filledIds);
+        return { ...entry, recipeId: picks[0]?.id ?? null };
+      });
+      AsyncStorage.setItem(STORAGE_KEYS.currentPlan, JSON.stringify(newPlan));
+      return newPlan;
+    });
+  }, [hiddenRecipes, preferences]);
+
+  const autoSwapSlot = useCallback((day: string, slot: MealSlot) => {
+    setCurrentPlanState((prev) => {
+      const currentEntry = prev.find((e) => e.day === day && e.slot === slot);
+      const currentId = currentEntry?.recipeId;
+      const filledIds = prev
+        .filter((m) => m.recipeId && !(m.day === day && m.slot === slot))
+        .map((m) => m.recipeId as string);
+      let pool = filterRecipes(preferences, slot, day, hiddenRecipes);
+      if (currentId) pool = pool.filter((r) => r.id !== currentId);
+      const picks = pickRecipes(pool, 1, preferences.mealVariety, filledIds);
+      if (picks.length === 0) return prev;
+      const newPlan = prev.map((e) =>
+        e.day === day && e.slot === slot ? { ...e, recipeId: picks[0].id } : e
+      );
+      AsyncStorage.setItem(STORAGE_KEYS.currentPlan, JSON.stringify(newPlan));
+      return newPlan;
+    });
+  }, [preferences, hiddenRecipes]);
+
   const estimatedCostBand = estimateCost(currentPlan, preferences);
 
   return (
@@ -304,12 +347,15 @@ export function PlannerProvider({ children }: { children: React.ReactNode }) {
         setMealSlot,
         fillRemainingSlots,
         autoGeneratePlan,
+        autoSwapSlot,
         clearPlan,
         estimatedCostBand,
         isOnboarded,
         setIsOnboarded,
         preferencesDirty,
         setPreferencesDirty,
+        hiddenRecipes,
+        hideRecipe,
       }}
     >
       {children}

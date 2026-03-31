@@ -19,6 +19,8 @@ interface MealSlotCardProps {
   onRemove: () => void;
   onSwap: () => void;
   onViewRecipe?: () => void;
+  onAutoSwap?: () => void;
+  onHideRecipe?: () => void;
   seasonalMode?: boolean;
 }
 
@@ -30,6 +32,8 @@ export function MealSlotCard({
   onRemove,
   onSwap,
   onViewRecipe,
+  onAutoSwap,
+  onHideRecipe,
   seasonalMode = false,
 }: MealSlotCardProps) {
   const C = Colors.light;
@@ -90,9 +94,33 @@ export function MealSlotCard({
               <Feather name="book-open" size={14} color={C.primary} />
             </TouchableOpacity>
           )}
+          {onAutoSwap && (
+            <TouchableOpacity
+              onPress={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                onAutoSwap();
+              }}
+              style={[styles.actionBtn, { backgroundColor: "#EEF6EE" }]}
+              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+            >
+              <Feather name="zap" size={13} color="#4A7C4E" />
+            </TouchableOpacity>
+          )}
           <TouchableOpacity onPress={onSwap} style={styles.actionBtn} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
             <Feather name="refresh-cw" size={14} color={C.textSecondary} />
           </TouchableOpacity>
+          {onHideRecipe && (
+            <TouchableOpacity
+              onPress={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                onHideRecipe();
+              }}
+              style={[styles.actionBtn, { backgroundColor: "#FFF3F3" }]}
+              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+            >
+              <Feather name="eye-off" size={13} color="#C0524A" />
+            </TouchableOpacity>
+          )}
           <TouchableOpacity onPress={handleRemove} style={styles.actionBtn} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
             <Feather name="x" size={14} color={C.danger} />
           </TouchableOpacity>

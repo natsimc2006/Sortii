@@ -3452,6 +3452,7 @@ export interface PlanPreferences {
   prepStyle: "mixed" | "batch-cook" | "quick-assembly" | "family-style";
   minimiseWaste: boolean;
   seasonalMode: boolean;
+  dietType: "omnivore" | "vegetarian" | "vegan" | "pescatarian";
 }
 
 export const DEFAULT_WEEKEND_OVERRIDES: WeekendOverrides = {
@@ -3476,6 +3477,7 @@ export const DEFAULT_PREFERENCES: PlanPreferences = {
   prepStyle: "mixed",
   minimiseWaste: false,
   seasonalMode: false,
+  dietType: "omnivore",
 };
 
 export function getApproxCostPerServe(recipe: Recipe): number {
@@ -3488,6 +3490,7 @@ export function getApproxCostPerServe(recipe: Recipe): number {
 }
 
 export const EXCLUSION_OPTIONS = [
+  "Chicken",
   "Pork",
   "Beef",
   "Lamb",
@@ -3564,6 +3567,43 @@ export function addIngredientsToSet(recipe: Recipe, set: Set<string>): void {
   }
 }
 
+const MEAT_KEYWORDS = [
+  "beef", "lamb", "pork", "chicken", "turkey", "duck", "bacon", "ham",
+  "salami", "prosciutto", "chorizo", "sausage", "steak", "veal", "mince", "meat",
+];
+const SEAFOOD_KEYWORDS = [
+  "fish", "salmon", "tuna", "prawn", "shrimp", "scallop", "crab",
+  "lobster", "barramundi", "cod", "trout", "anchovy", "sardine", "squid", "seafood", "mussel",
+];
+const DAIRY_EGG_KEYWORDS = [
+  "milk", "cream", "cheese", "butter", "yogurt", "yoghurt", "sour cream",
+  "ricotta", "parmesan", "mozzarella", "cheddar", "feta", "halloumi", "egg",
+];
+
+function hasIngredientKeyword(ingredients: RecipeIngredient[], keywords: string[]): boolean {
+  return ingredients.some((ing) => {
+    const name = ing.name.toLowerCase();
+    return keywords.some((kw) => {
+      if (kw === "egg" && name.includes("eggplant")) return false;
+      if (kw === "butter" && /peanut|almond|cashew/.test(name)) return false;
+      return name.includes(kw);
+    });
+  });
+}
+
+function dietTypeOk(r: Recipe, dietType: string): boolean {
+  if (!dietType || dietType === "omnivore") return true;
+  const hasMeat = hasIngredientKeyword(r.ingredients, MEAT_KEYWORDS);
+  const hasSeafood = hasIngredientKeyword(r.ingredients, SEAFOOD_KEYWORDS);
+  if (dietType === "pescatarian") return !hasMeat;
+  if (dietType === "vegetarian") return !hasMeat && !hasSeafood;
+  if (dietType === "vegan") {
+    const hasDairyEgg = hasIngredientKeyword(r.ingredients, DAIRY_EGG_KEYWORDS);
+    return !hasMeat && !hasSeafood && !hasDairyEgg;
+  }
+  return true;
+}
+
 const HIGH_CARB_INGREDIENTS = [
   "pasta", "spaghetti", "noodle", "rice", "bread", "tortilla",
   "naan", "couscous", "flatbread", "taco shell", "pita", "hokkien",
@@ -3611,7 +3651,8 @@ function cookingStyleOk(r: Recipe, style: string): boolean {
 export function filterRecipes(
   prefs: PlanPreferences,
   mealType: MealSlot = "dinner",
-  dayName?: string
+  dayName?: string,
+  hiddenIds?: string[]
 ): Recipe[] {
   const isWeekend = dayName ? WEEKEND_DAYS.includes(dayName) : false;
   const overrides = prefs.weekendOverrides ?? DEFAULT_WEEKEND_OVERRIDES;
@@ -3621,6 +3662,7 @@ export function filterRecipes(
     isWeekend && overrides.enabled ? overrides.budgetLevel : prefs.budgetLevel;
   const cuisine = prefs.cuisinePreference ?? "mixed";
   const lowerExclusions = (prefs.exclusions ?? []).map((e) => e.toLowerCase());
+  const diet = prefs.dietType ?? "omnivore";
 
   const mealTypeOk = (r: Recipe) => {
     if (mealType === "lunch" && r.mealType === "dinner") return false;
@@ -3656,14 +3698,18 @@ export function filterRecipes(
     return true;
   };
 
+  const isHidden = (r: Recipe) => !!(hiddenIds && hiddenIds.includes(r.id));
+
   // Full filter pass
   const full = RECIPES.filter((r) => {
+    if (isHidden(r)) return false;
     if (!mealTypeOk(r)) return false;
     if (!cookingEffortOk(r, effectiveEffort)) return false;
     if (!cookingStyleOk(r, prefs.cookingStyle ?? "mixed")) return false;
     if (!healthOk(r)) return false;
     if (!matchesCuisine(r, cuisine)) return false;
     if (!prepStyleOk(r)) return false;
+    if (!dietTypeOk(r, diet)) return false;
     if (effectiveBudget === "super-budget" && r.estimatedCostBand !== "low") return false;
     if (effectiveBudget === "budget" && !r.budgetTags.includes("budget")) return false;
     if (prefs.leftoversMode === "cook-once" && !r.leftoversFriendly) return false;
@@ -3672,12 +3718,14 @@ export function filterRecipes(
   });
   if (full.length >= 3) return full;
 
-  // Fallback 1: relax cooking effort + prep style
+  // Fallback 1: relax cooking effort + prep style (keep diet + hidden)
   const relaxed = RECIPES.filter((r) => {
+    if (isHidden(r)) return false;
     if (!mealTypeOk(r)) return false;
     if (!cookingStyleOk(r, prefs.cookingStyle ?? "mixed")) return false;
     if (!healthOk(r)) return false;
     if (!matchesCuisine(r, cuisine)) return false;
+    if (!dietTypeOk(r, diet)) return false;
     if (effectiveBudget === "super-budget" && r.estimatedCostBand !== "low") return false;
     if (effectiveBudget === "budget" && !r.budgetTags.includes("budget")) return false;
     if (prefs.leftoversMode === "cook-once" && !r.leftoversFriendly) return false;
@@ -3686,9 +3734,9 @@ export function filterRecipes(
   });
   if (relaxed.length >= 3) return relaxed;
 
-  // Fallback 2: meal-type + exclusions only
-  const minimal = RECIPES.filter((r) => mealTypeOk(r) && exclusionOk(r));
-  return minimal.length > 0 ? minimal : RECIPES.filter(mealTypeOk);
+  // Fallback 2: meal-type + diet + exclusions only (still respect hidden)
+  const minimal = RECIPES.filter((r) => !isHidden(r) && mealTypeOk(r) && dietTypeOk(r, diet) && exclusionOk(r));
+  return minimal.length > 0 ? minimal : RECIPES.filter((r) => !isHidden(r) && mealTypeOk(r));
 }
 
 export function pickRecipes(
