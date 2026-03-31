@@ -1,6 +1,6 @@
 import { Feather } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { useRouter } from "expo-router";
 import React from "react";
 import {
   Platform,
@@ -34,19 +34,19 @@ const STEPS = [
 
 export default function LandingScreen() {
   const router = useRouter();
-  const params = useLocalSearchParams<{ splash?: string }>();
-  const { setIsOnboarded, isOnboarded } = usePlanner();
+  const { setIsOnboarded, isOnboarded, showSplash, setShowSplash } = usePlanner();
   const insets = useSafeAreaInsets();
   const C = Colors.light;
 
   React.useEffect(() => {
-    if (isOnboarded && !params.splash) {
+    if (isOnboarded && !showSplash) {
       router.replace("/(tabs)/planner");
     }
-  }, [isOnboarded, params.splash]);
+  }, [isOnboarded, showSplash]);
 
   const handleStart = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    setShowSplash(false);
     setIsOnboarded(true);
     router.replace("/(tabs)/planner");
   };

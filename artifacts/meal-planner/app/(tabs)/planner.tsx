@@ -35,6 +35,7 @@ export default function PlannerScreen() {
     preferencesDirty,
     setPreferencesDirty,
     hideRecipe,
+    setShowSplash,
   } = usePlanner();
   const router = useRouter();
   const insets = useSafeAreaInsets();
@@ -159,7 +160,10 @@ export default function PlannerScreen() {
         </View>
         <View style={styles.topBarActions}>
           <TouchableOpacity
-            onPress={() => router.push({ pathname: "/", params: { splash: "1" } })}
+            onPress={() => {
+              setShowSplash(true);
+              router.push("/");
+            }}
             style={[styles.homeBtn, { backgroundColor: "transparent" }]}
             hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
           >
