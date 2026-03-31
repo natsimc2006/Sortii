@@ -123,7 +123,7 @@ export default function PlannerScreen() {
     for (const r of allRecipes) {
       for (const ing of r.ingredients) {
         const key = ing.name.toLowerCase().trim();
-        if (PANTRY_STAPLES.has(key)) continue;
+        if (PANTRY_STAPLES.some((s) => key.includes(s))) continue;
         ingredientCount[key] = (ingredientCount[key] ?? 0) + 1;
       }
     }
