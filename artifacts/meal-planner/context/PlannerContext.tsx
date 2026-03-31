@@ -54,8 +54,6 @@ interface PlannerContextType {
   setPreferencesDirty: (v: boolean) => void;
   hiddenRecipes: string[];
   hideRecipe: (id: string) => void;
-  showSplash: boolean;
-  setShowSplash: (val: boolean) => void;
 }
 
 const PlannerContext = createContext<PlannerContextType | null>(null);
@@ -112,7 +110,6 @@ export function PlannerProvider({ children }: { children: React.ReactNode }) {
   const [isOnboarded, setIsOnboardedState] = useState(false);
   const [preferencesDirty, setPreferencesDirtyState] = useState(false);
   const [hiddenRecipes, setHiddenRecipes] = useState<string[]>([]);
-  const [showSplash, setShowSplashState] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -359,8 +356,6 @@ export function PlannerProvider({ children }: { children: React.ReactNode }) {
         setPreferencesDirty,
         hiddenRecipes,
         hideRecipe,
-        showSplash,
-        setShowSplash: setShowSplashState,
       }}
     >
       {children}

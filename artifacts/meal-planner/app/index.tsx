@@ -34,19 +34,18 @@ const STEPS = [
 
 export default function LandingScreen() {
   const router = useRouter();
-  const { setIsOnboarded, isOnboarded, showSplash, setShowSplash } = usePlanner();
+  const { setIsOnboarded, isOnboarded } = usePlanner();
   const insets = useSafeAreaInsets();
   const C = Colors.light;
 
   React.useEffect(() => {
-    if (isOnboarded && !showSplash) {
+    if (isOnboarded) {
       router.replace("/(tabs)/planner");
     }
-  }, [isOnboarded, showSplash]);
+  }, [isOnboarded]);
 
   const handleStart = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    setShowSplash(false);
     setIsOnboarded(true);
     router.replace("/(tabs)/planner");
   };
