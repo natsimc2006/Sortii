@@ -466,6 +466,45 @@ export default function PreferencesScreen() {
           </View>
         </Section>
 
+        <Section title="Seasonal Mode">
+          <View style={styles.weekendToggle}>
+            <View style={styles.weekendToggleLeft}>
+              <Text style={[styles.weekendToggleTitle, { color: C.text }]}>
+                In-season ingredients
+              </Text>
+              <Text style={[styles.weekendToggleSub, { color: C.textMuted }]}>
+                Prefer recipes that use Australian produce currently in season — fresher, cheaper, and more sustainable
+              </Text>
+            </View>
+            <TouchableOpacity
+              onPress={() => {
+                Haptics.selectionAsync();
+                update("seasonalMode", !(prefs.seasonalMode ?? false));
+              }}
+              style={[
+                styles.toggle,
+                {
+                  backgroundColor: prefs.seasonalMode
+                    ? C.primary
+                    : C.inputBorder,
+                },
+              ]}
+            >
+              <View
+                style={[
+                  styles.toggleKnob,
+                  prefs.seasonalMode && styles.toggleKnobOn,
+                ]}
+              />
+            </TouchableOpacity>
+          </View>
+          {prefs.seasonalMode && (
+            <Text style={[styles.hint, { color: C.textMuted }]}>
+              🌿 Seasonal recipes will be prioritised in your auto-generated plan and labelled on each meal card.
+            </Text>
+          )}
+        </Section>
+
         <TouchableOpacity onPress={handleReset} style={styles.resetRow}>
           <Feather name="rotate-ccw" size={14} color={C.textMuted} />
           <Text style={[styles.resetText, { color: C.textMuted }]}>Reset to defaults</Text>

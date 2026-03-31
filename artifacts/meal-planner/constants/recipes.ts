@@ -3451,6 +3451,7 @@ export interface PlanPreferences {
   weekendOverrides: WeekendOverrides;
   prepStyle: "mixed" | "batch-cook" | "quick-assembly" | "family-style";
   minimiseWaste: boolean;
+  seasonalMode: boolean;
 }
 
 export const DEFAULT_WEEKEND_OVERRIDES: WeekendOverrides = {
@@ -3474,6 +3475,7 @@ export const DEFAULT_PREFERENCES: PlanPreferences = {
   weekendOverrides: { ...DEFAULT_WEEKEND_OVERRIDES },
   prepStyle: "mixed",
   minimiseWaste: false,
+  seasonalMode: false,
 };
 
 export function getApproxCostPerServe(recipe: Recipe): number {

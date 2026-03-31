@@ -224,6 +224,7 @@ export default function PlannerScreen() {
                   onRemove={() => setMealSlot(day, "lunch", null)}
                   onSwap={() => openSearch(day, "lunch")}
                   onViewRecipe={lunchRecipe ? () => setDetailRecipe(lunchRecipe) : undefined}
+                  seasonalMode={preferences.seasonalMode ?? false}
                 />
               )}
               <MealSlotCard
@@ -234,6 +235,7 @@ export default function PlannerScreen() {
                 onRemove={() => setMealSlot(day, "dinner", null)}
                 onSwap={() => openSearch(day, "dinner")}
                 onViewRecipe={dinnerRecipe ? () => setDetailRecipe(dinnerRecipe) : undefined}
+                seasonalMode={preferences.seasonalMode ?? false}
               />
             </View>
           );

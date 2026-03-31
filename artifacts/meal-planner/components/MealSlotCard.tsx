@@ -9,6 +9,7 @@ import {
 } from "react-native";
 import Colors from "@/constants/Colors";
 import { Recipe, getPrepStyleLabel } from "@/constants/recipes";
+import { getCurrentAustralianSeason, isRecipeSeasonal } from "@/utils/seasonUtils";
 
 interface MealSlotCardProps {
   day: string;
@@ -18,6 +19,7 @@ interface MealSlotCardProps {
   onRemove: () => void;
   onSwap: () => void;
   onViewRecipe?: () => void;
+  seasonalMode?: boolean;
 }
 
 export function MealSlotCard({
@@ -28,8 +30,13 @@ export function MealSlotCard({
   onRemove,
   onSwap,
   onViewRecipe,
+  seasonalMode = false,
 }: MealSlotCardProps) {
   const C = Colors.light;
+  const currentSeason = seasonalMode ? getCurrentAustralianSeason() : null;
+  const showSeasonalBadge = seasonalMode && recipe != null && currentSeason
+    ? isRecipeSeasonal(recipe, currentSeason)
+    : false;
   const slotLabel = slot === "lunch" ? "Lunch" : "Dinner";
 
   const handleRemove = () => {
@@ -109,9 +116,16 @@ export function MealSlotCard({
               </View>
             )}
           </View>
-          <Text style={[styles.recipeMeta, { color: C.textMuted }]}>
-            {recipe.cookTimeMinutes} min · {recipe.difficulty}
-          </Text>
+          <View style={styles.metaRow}>
+            <Text style={[styles.recipeMeta, { color: C.textMuted }]}>
+              {recipe.cookTimeMinutes} min · {recipe.difficulty}
+            </Text>
+            {showSeasonalBadge && (
+              <View style={[styles.seasonalBadge, { backgroundColor: "#E8F5E0" }]}>
+                <Text style={[styles.seasonalBadgeText, { color: "#4A7C4E" }]}>🌿 Seasonal</Text>
+              </View>
+            )}
+          </View>
         </View>
       </View>
     </View>
@@ -224,9 +238,24 @@ const styles = StyleSheet.create({
     textTransform: "uppercase",
     letterSpacing: 0.4,
   },
+  metaRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    flexWrap: "wrap",
+  },
   recipeMeta: {
     fontSize: 12,
     fontFamily: "Inter_400Regular",
     textTransform: "capitalize",
+  },
+  seasonalBadge: {
+    paddingHorizontal: 7,
+    paddingVertical: 2,
+    borderRadius: 6,
+  },
+  seasonalBadgeText: {
+    fontSize: 10,
+    fontFamily: "Inter_600SemiBold",
   },
 });

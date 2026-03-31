@@ -1,4 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { getCurrentAustralianSeason, getRecipeSeasonalScore } from "@/utils/seasonUtils";
 import React, {
   createContext,
   useCallback,
@@ -191,13 +192,22 @@ export function PlannerProvider({ children }: { children: React.ReactNode }) {
     const filledIds: string[] = [];
     const selectedIngredients = new Set<string>();
 
+    const currentSeason = p.seasonalMode ? getCurrentAustralianSeason() : null;
+
     const generated = fresh.map((entry) => {
-      const pool = filterRecipes(p, entry.slot, entry.day);
+      let pool = filterRecipes(p, entry.slot, entry.day);
+
+      if (currentSeason) {
+        pool = [...pool].sort((a, b) => {
+          const sA = getRecipeSeasonalScore(a, currentSeason);
+          const sB = getRecipeSeasonalScore(b, currentSeason);
+          return sB - sA;
+        });
+      }
 
       let picked: Recipe | undefined;
 
       if (p.minimiseWaste && selectedIngredients.size > 0) {
-        // Greedy overlap: prefer candidates that share ingredients with already-selected meals
         const uniquePool = pool.filter(
           (r) => p.leftoversMode === "none" ? !filledIds.includes(r.id) : true
         );
@@ -205,7 +215,7 @@ export function PlannerProvider({ children }: { children: React.ReactNode }) {
           .map((r) => ({ r, score: ingredientOverlapScore(r, selectedIngredients) }))
           .sort((a, b) => {
             if (b.score !== a.score) return b.score - a.score;
-            return Math.random() - 0.5; // break ties randomly
+            return Math.random() - 0.5;
           });
         picked = scored[0]?.r;
       }

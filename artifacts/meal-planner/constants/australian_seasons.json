@@ -1,0 +1,78 @@
+{
+  "seasons": {
+    "summer": {
+      "months": [12, 1, 2],
+      "vegetables": [
+        "tomato", "cherry tomato", "roma tomato", "zucchini", "eggplant",
+        "capsicum", "corn", "cucumber", "green beans", "sweet potato",
+        "pumpkin", "spinach", "snake beans", "chilli", "okra"
+      ],
+      "fruit": [
+        "mango", "watermelon", "blueberry", "cherry", "peach",
+        "nectarine", "strawberry", "plum", "passionfruit", "lychee",
+        "rockmelon", "honeydew", "banana", "fig"
+      ],
+      "herbs": [
+        "basil", "dill", "mint", "coriander", "Thai basil"
+      ]
+    },
+    "autumn": {
+      "months": [3, 4, 5],
+      "vegetables": [
+        "pumpkin", "sweet potato", "cauliflower", "broccoli", "leek",
+        "parsnip", "silverbeet", "capsicum", "beetroot", "carrot",
+        "butternut squash", "fennel", "witlof"
+      ],
+      "fruit": [
+        "apple", "pear", "grapes", "mandarin", "persimmon",
+        "quince", "feijoa", "pomegranate", "custard apple"
+      ],
+      "herbs": [
+        "thyme", "sage", "rosemary", "oregano", "marjoram"
+      ]
+    },
+    "winter": {
+      "months": [6, 7, 8],
+      "vegetables": [
+        "cauliflower", "broccoli", "potato", "carrot", "leek",
+        "celery", "brussels sprouts", "kale", "cabbage", "parsnip",
+        "turnip", "swede", "celeriac", "Jerusalem artichoke"
+      ],
+      "fruit": [
+        "orange", "lemon", "grapefruit", "mandarin", "lime",
+        "blood orange", "kiwi", "pear", "rhubarb"
+      ],
+      "herbs": [
+        "rosemary", "thyme", "parsley", "chives", "bay leaf"
+      ]
+    },
+    "spring": {
+      "months": [9, 10, 11],
+      "vegetables": [
+        "asparagus", "peas", "broad beans", "lettuce", "spinach",
+        "rocket", "radish", "artichoke", "spring onion", "snow peas",
+        "watercress", "silverbeet", "broccolini"
+      ],
+      "fruit": [
+        "strawberry", "cherry", "apricot", "loquat",
+        "blueberry", "raspberry", "mulberry"
+      ],
+      "herbs": [
+        "chives", "basil", "mint", "dill", "parsley", "tarragon"
+      ]
+    }
+  },
+  "pantry_staples": [
+    "salt", "pepper", "olive oil", "vegetable oil", "oil",
+    "flour", "sugar", "brown sugar", "water", "stock",
+    "chicken stock", "vegetable stock", "beef stock",
+    "soy sauce", "fish sauce", "oyster sauce", "hoisin sauce",
+    "vinegar", "white vinegar", "red wine vinegar", "balsamic vinegar",
+    "butter", "cream", "milk", "eggs", "cheese",
+    "garlic", "onion", "ginger", "cumin", "paprika",
+    "turmeric", "coriander", "chilli flakes", "bay leaf",
+    "dried oregano", "dried thyme", "baking powder", "baking soda",
+    "cornflour", "tomato paste", "coconut milk", "honey",
+    "mustard", "mayonnaise", "breadcrumbs", "rice", "pasta"
+  ]
+}

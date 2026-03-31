@@ -1,0 +1,76 @@
+    FEATURE 1: Seasonal Ingredients Mode
+Add a toggle in user preferences called “Seasonal Mode” (On/Off, default Off).
+When On, the meal planning algorithm should prefer recipes that use ingredients currently in season in Australia.
+Create a static JSON data file called australian_seasons.json that maps common ingredients to the Australian seasons in which they are in season (Summer: Dec–Feb, Autumn: Mar–May, Winter: Jun–Aug, Spring: Sep–Nov). Include at least 40 common Australian produce items across vegetables, fruit, and herbs.
+The planner should detect the current month, determine the current Australian season, and apply a scoring boost to recipes that contain 2 or more in-season ingredients when selecting meals for the weekly plan. Recipes with no in-season ingredients should still be available but ranked lower. Do not hard-exclude any recipes.
+Add a small visual indicator (e.g. a leaf icon or “Seasonal” badge) on any meal card in the planner view where the recipe qualifies as seasonal for the current month. 
+
+I have added a file called australian_seasons.json to the project. Please wire it up to the seasonal scoring logic as follows: 
+    Create a new utility file called seasonUtils.js (or seasonUtils.ts if the project uses TypeScript). This file should export the following functions:
+    
+    // Returns the current Australian season as a string: 
+// "summer" | "autumn" | "winter" | "spring"
+getCurrentAustralianSeason()
+
+// Returns a flat array of all in-season ingredient 
+// names for a given season string
+getSeasonalIngredients(season)
+
+// Takes a recipe object and a season string.
+// Returns the number of the recipe's ingredients 
+// that are in-season, excluding pantry staples.
+// Returns 0 if the recipe has no ingredients 
+// matching the seasonal list.
+getRecipeSeasonalScore(recipe, season)
+
+// Takes a recipe object and a season string.
+// Returns true if the recipe has 2 or more 
+// in-season ingredients.
+isRecipeSeasonal(recipe, season)
+
+Use the following logic inside getCurrentAustralianSeason():
+	∙	Import the months arrays from australian_seasons.json
+	∙	Get the current month using new Date().getMonth() + 1
+	∙	Match it against the months arrays for each season and return the matching season name
+Use the following logic inside getSeasonalIngredients(season):
+	∙	Import australian_seasons.json
+	∙	For the given season, combine the vegetables, fruit, and herbs arrays into a single flat array
+	∙	Return that array with all values lowercased and trimmed
+Use the following logic inside getRecipeSeasonalScore(recipe, season):
+	∙	Get the seasonal ingredients list via getSeasonalIngredients(season)
+	∙	Get the pantry staples list from australian_seasons.json > pantry_staples
+	∙	Extract the ingredient names from the recipe object (use the existing ingredient name field — check the current recipe data structure and confirm the field name before proceeding)
+	∙	Filter out any ingredient names that appear in the pantry staples list
+	∙	Count how many remaining ingredient names appear in the seasonal ingredients list (use lowercase comparison)
+	∙	Return that count as the score
+
+    2. Wire Seasonal Scoring into the Meal Planning Algorithm
+Find the existing function that selects or ranks recipes for the weekly plan (confirm the function name before proceeding).
+Add the following logic to that function, but ONLY when the user has Seasonal Mode toggled On in their preferences:
+	∙	Call getCurrentAustralianSeason() once at the start of the planning function and store the result
+	∙	Call getRecipeSeasonalScore(recipe, season) for each candidate recipe
+	∙	Add the seasonal score as a secondary sort/weighting factor — it should boost recipes with a score of 2 or more, but must not override the user’s primary filters (budget, health style, cook time, exclusions etc)
+	∙	Specifically: apply all existing filters first to produce a filtered recipe pool, then within that pool sort by seasonal score descending before making final selections
+Do not apply any seasonal scoring or sorting when Seasonal Mode is Off. The existing planning logic should be completely unchanged in that case.
+
+3. Add the Seasonal Badge to Meal Cards
+Find the existing meal card component (confirm the component name before proceeding).
+Add the following:
+	∙	Import isRecipeSeasonal and getCurrentAustralianSeason from seasonUtils
+	∙	If the user has Seasonal Mode On AND isRecipeSeasonal(recipe, getCurrentAustralianSeason()) returns true, display a small badge on the meal card
+	∙	The badge should show a 🌿 emoji and the text “Seasonal”
+	∙	Style the badge to match the existing badge/tag style used elsewhere in the app (check existing meal card badges for the current style pattern and replicate it — do not introduce new CSS classes if existing ones can be reused)
+
+4. Confirm Before Proceeding
+Before writing any code:
+	∙	Confirm the name and location of the existing meal planning/recipe selection function
+	∙	Confirm the name and location of the existing meal card component
+	∙	Confirm the field name used for ingredient names in the current recipe data structure
+	∙	Confirm whether the project uses JavaScript or TypeScript
+Report these back to me first, then proceed with implementation.
+
+IMPORTANT CONSTRAINTS:
+	∙	Do not modify australian_seasons.json — treat it as read-only reference data
+	∙	Do not change any existing filter logic — only add to it
+	∙	All new code should follow the existing code style and patterns in the project
+	∙	If any ingredient matching is ambiguous (e.g. recipe says “cherry tomatoes” but the seasonal list has “cherry tomato”) use a contains/includes match rather than exact match to handle minor naming variations.
