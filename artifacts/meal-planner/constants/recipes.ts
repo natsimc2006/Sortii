@@ -3429,7 +3429,7 @@ export interface MealPlanEntry {
 
 export interface WeekendOverrides {
   enabled: boolean;
-  cookTime: 15 | 30 | 45 | "mixed";
+  cookingEffort: "quick" | "balanced" | "any";
   budgetLevel: "super-budget" | "budget" | "standard" | "premium";
 }
 
@@ -3437,20 +3437,20 @@ export interface PlanPreferences {
   planningMode: "manual" | "mixed" | "auto";
   householdSize: number;
   budgetLevel: "super-budget" | "budget" | "standard" | "premium";
-  healthStyle: "standard" | "healthy" | "high-protein";
-  cookTime: 15 | 30 | 45 | "mixed";
+  healthStyle: "standard" | "healthy" | "high-protein" | "low-carb" | "family-friendly";
+  cookingEffort: "quick" | "balanced" | "any";
   leftoversMode: "none" | "cook-once";
   mealVariety: 3 | 5 | 7;
-  cookingStyle: "mixed" | "one-pan" | "air-fryer";
+  cookingStyle: "mixed" | "one-pan" | "air-fryer" | "oven-based" | "no-preference";
+  cuisinePreference: "mixed" | "italian" | "asian" | "mexican" | "aussie";
   exclusions: string[];
   mealCoverage: "dinner-only" | "lunch-dinner";
-  difficulty: "easy" | "moderate" | "mixed";
   weekendOverrides: WeekendOverrides;
 }
 
 export const DEFAULT_WEEKEND_OVERRIDES: WeekendOverrides = {
   enabled: false,
-  cookTime: "mixed",
+  cookingEffort: "any",
   budgetLevel: "standard",
 };
 
@@ -3459,13 +3459,13 @@ export const DEFAULT_PREFERENCES: PlanPreferences = {
   householdSize: 4,
   budgetLevel: "standard",
   healthStyle: "standard",
-  cookTime: "mixed",
+  cookingEffort: "any",
   leftoversMode: "none",
   mealVariety: 5,
   cookingStyle: "mixed",
+  cuisinePreference: "mixed",
   exclusions: [],
   mealCoverage: "dinner-only",
-  difficulty: "mixed",
   weekendOverrides: { ...DEFAULT_WEEKEND_OVERRIDES },
 };
 
@@ -3489,6 +3489,50 @@ export const EXCLUSION_OPTIONS = [
   "Nuts",
 ];
 
+const HIGH_CARB_INGREDIENTS = [
+  "pasta", "spaghetti", "noodle", "rice", "bread", "tortilla",
+  "naan", "couscous", "flatbread", "taco shell", "pita", "hokkien",
+];
+
+function matchesCuisine(r: Recipe, cuisine: string): boolean {
+  if (cuisine === "mixed") return true;
+  const text = (r.name + " " + r.description).toLowerCase();
+  switch (cuisine) {
+    case "italian":
+      return /pasta|risotto|gnocchi|arrabbiata|bolognese|cannelloni|carbonara|pesto|lasagna/.test(text);
+    case "asian":
+      return /stir.fry|noodle|fried rice|teriyaki|pad |laksa|mee |thai|korean|japanese|satay|ramen|sushi|dumpling|wok|aglio|asian|szechuan|prawn.*soy/.test(text);
+    case "mexican":
+      return /taco|burrito|quesadilla|nachos|fajita|enchilada|mexican|jalape/.test(text);
+    case "aussie":
+      return /schnitzel|barramundi|fish.and.chip|fish & chip|sausage.*bake|tray bake.*sausage|schnitzel|pie|fish chip|aussie/.test(text);
+    default:
+      return true;
+  }
+}
+
+function isOvenBased(r: Recipe): boolean {
+  return r.instructions.some((s) => /oven|bak|roast|preheat/.test(s.toLowerCase()));
+}
+
+function isLowCarb(r: Recipe): boolean {
+  return !r.ingredients.some(
+    (i) => !i.optional && HIGH_CARB_INGREDIENTS.some((hc) => i.name.toLowerCase().includes(hc))
+  );
+}
+
+function cookingEffortOk(r: Recipe, effort: "quick" | "balanced" | "any"): boolean {
+  if (effort === "quick") return r.cookTimeMinutes <= 20 && r.difficulty === "easy";
+  if (effort === "balanced") return r.cookTimeMinutes <= 35;
+  return true;
+}
+
+function cookingStyleOk(r: Recipe, style: string): boolean {
+  if (style === "mixed" || style === "no-preference") return true;
+  if (style === "oven-based") return isOvenBased(r);
+  return r.cookingStyle === style;
+}
+
 export function filterRecipes(
   prefs: PlanPreferences,
   mealType: MealSlot = "dinner",
@@ -3496,11 +3540,11 @@ export function filterRecipes(
 ): Recipe[] {
   const isWeekend = dayName ? WEEKEND_DAYS.includes(dayName) : false;
   const overrides = prefs.weekendOverrides ?? DEFAULT_WEEKEND_OVERRIDES;
-  const effectiveCookTime =
-    isWeekend && overrides.enabled ? overrides.cookTime : prefs.cookTime;
+  const effectiveEffort: "quick" | "balanced" | "any" =
+    isWeekend && overrides.enabled ? (overrides.cookingEffort ?? "any") : (prefs.cookingEffort ?? "any");
   const effectiveBudget =
     isWeekend && overrides.enabled ? overrides.budgetLevel : prefs.budgetLevel;
-
+  const cuisine = prefs.cuisinePreference ?? "mixed";
   const lowerExclusions = (prefs.exclusions ?? []).map((e) => e.toLowerCase());
 
   const mealTypeOk = (r: Recipe) => {
@@ -3519,13 +3563,21 @@ export function filterRecipes(
     return true;
   };
 
+  const healthOk = (r: Recipe) => {
+    const hs = prefs.healthStyle ?? "standard";
+    if (hs === "standard") return true;
+    if (hs === "low-carb") return isLowCarb(r);
+    if (hs === "family-friendly") return r.difficulty === "easy";
+    return r.healthTags.includes(hs);
+  };
+
   // Full filter pass
   const full = RECIPES.filter((r) => {
     if (!mealTypeOk(r)) return false;
-    if (effectiveCookTime !== "mixed" && r.cookTimeMinutes > Number(effectiveCookTime)) return false;
-    if (prefs.cookingStyle !== "mixed" && r.cookingStyle !== prefs.cookingStyle) return false;
-    if (prefs.difficulty !== "mixed" && r.difficulty !== prefs.difficulty) return false;
-    if (prefs.healthStyle !== "standard" && !r.healthTags.includes(prefs.healthStyle)) return false;
+    if (!cookingEffortOk(r, effectiveEffort)) return false;
+    if (!cookingStyleOk(r, prefs.cookingStyle ?? "mixed")) return false;
+    if (!healthOk(r)) return false;
+    if (!matchesCuisine(r, cuisine)) return false;
     if (effectiveBudget === "super-budget" && r.estimatedCostBand !== "low") return false;
     if (effectiveBudget === "budget" && !r.budgetTags.includes("budget")) return false;
     if (prefs.leftoversMode === "cook-once" && !r.leftoversFriendly) return false;
@@ -3534,12 +3586,12 @@ export function filterRecipes(
   });
   if (full.length >= 3) return full;
 
-  // Fallback 1: relax cook-time only
+  // Fallback 1: relax cooking effort
   const relaxed = RECIPES.filter((r) => {
     if (!mealTypeOk(r)) return false;
-    if (prefs.cookingStyle !== "mixed" && r.cookingStyle !== prefs.cookingStyle) return false;
-    if (prefs.difficulty !== "mixed" && r.difficulty !== prefs.difficulty) return false;
-    if (prefs.healthStyle !== "standard" && !r.healthTags.includes(prefs.healthStyle)) return false;
+    if (!cookingStyleOk(r, prefs.cookingStyle ?? "mixed")) return false;
+    if (!healthOk(r)) return false;
+    if (!matchesCuisine(r, cuisine)) return false;
     if (effectiveBudget === "super-budget" && r.estimatedCostBand !== "low") return false;
     if (effectiveBudget === "budget" && !r.budgetTags.includes("budget")) return false;
     if (prefs.leftoversMode === "cook-once" && !r.leftoversFriendly) return false;

@@ -189,7 +189,7 @@ export default function PreferencesScreen() {
           </Text>
         </Section>
 
-        <Section title="Meal Coverage">
+        <Section title="Meals to Plan">
           <OptionRow
             options={[
               { label: "Dinners only", value: "dinner-only" },
@@ -224,38 +224,75 @@ export default function PreferencesScreen() {
               { label: "Standard", value: "standard" },
               { label: "Healthy", value: "healthy" },
               { label: "High Protein", value: "high-protein" },
+              { label: "Low Carb", value: "low-carb" },
+              { label: "Family Friendly", value: "family-friendly" },
             ]}
             value={prefs.healthStyle}
             onSelect={(v) => update("healthStyle", v)}
           />
+          {prefs.healthStyle === "low-carb" && (
+            <Text style={[styles.hint, { color: C.textMuted }]}>
+              Filters out pasta, rice, and noodle-based dishes.
+            </Text>
+          )}
+          {prefs.healthStyle === "family-friendly" && (
+            <Text style={[styles.hint, { color: C.textMuted }]}>
+              Easy-to-cook meals the whole family will enjoy.
+            </Text>
+          )}
         </Section>
 
-        <Section title="Max Cook Time">
+        <Section title="Cuisine Preference">
           <OptionRow
             options={[
-              { label: "15 min", value: "15" },
-              { label: "30 min", value: "30" },
-              { label: "45 min", value: "45" },
-              { label: "Any", value: "mixed" },
+              { label: "Mixed", value: "mixed" },
+              { label: "Italian", value: "italian" },
+              { label: "Asian", value: "asian" },
+              { label: "Mexican", value: "mexican" },
+              { label: "Aussie Classics", value: "aussie" },
             ]}
-            value={String(prefs.cookTime)}
-            onSelect={(v) => update("cookTime", v === "mixed" ? "mixed" : parseInt(v))}
+            value={prefs.cuisinePreference ?? "mixed"}
+            onSelect={(v) => update("cuisinePreference", v)}
           />
         </Section>
 
-        <Section title="Cooking Style">
+        <Section title="Cooking Effort">
+          <OptionRow
+            options={[
+              { label: "Quick & Simple", value: "quick" },
+              { label: "Balanced", value: "balanced" },
+              { label: "Don't Mind", value: "any" },
+            ]}
+            value={prefs.cookingEffort ?? "any"}
+            onSelect={(v) => update("cookingEffort", v)}
+          />
+          {prefs.cookingEffort === "quick" && (
+            <Text style={[styles.hint, { color: C.textMuted }]}>
+              Easy meals ready in 20 minutes or less.
+            </Text>
+          )}
+          {prefs.cookingEffort === "balanced" && (
+            <Text style={[styles.hint, { color: C.textMuted }]}>
+              Meals under 35 minutes — some prep, great results.
+            </Text>
+          )}
+        </Section>
+
+        <Section title="Cooking Preference">
           <OptionRow
             options={[
               { label: "Mixed", value: "mixed" },
               { label: "One-Pan", value: "one-pan" },
               { label: "Air Fryer", value: "air-fryer" },
+              { label: "Oven-Based", value: "oven-based" },
+              { label: "No Preference", value: "no-preference" },
             ]}
             value={prefs.cookingStyle}
             onSelect={(v) => update("cookingStyle", v)}
           />
         </Section>
 
-        <Section title="Meal Variety">
+        <Section title="Meals per Week">
           <OptionRow
             options={[
               { label: "3 meals", value: "3" },
@@ -282,18 +319,6 @@ export default function PreferencesScreen() {
             ]}
             value={prefs.leftoversMode}
             onSelect={(v) => update("leftoversMode", v)}
-          />
-        </Section>
-
-        <Section title="Difficulty">
-          <OptionRow
-            options={[
-              { label: "Easy only", value: "easy" },
-              { label: "Moderate", value: "moderate" },
-              { label: "Any", value: "mixed" },
-            ]}
-            value={prefs.difficulty}
-            onSelect={(v) => update("difficulty", v)}
           />
         </Section>
 
@@ -333,19 +358,16 @@ export default function PreferencesScreen() {
           {prefs.weekendOverrides?.enabled && (
             <>
               <Text style={[styles.weekendSubLabel, { color: C.textSecondary }]}>
-                Weekend cook time
+                Weekend cooking effort
               </Text>
               <OptionRow
                 options={[
-                  { label: "15 min", value: "15" },
-                  { label: "30 min", value: "30" },
-                  { label: "45 min", value: "45" },
-                  { label: "Any", value: "mixed" },
+                  { label: "Quick & Simple", value: "quick" },
+                  { label: "Balanced", value: "balanced" },
+                  { label: "Don't Mind", value: "any" },
                 ]}
-                value={String(prefs.weekendOverrides?.cookTime ?? "mixed")}
-                onSelect={(v) =>
-                  updateWeekend("cookTime", v === "mixed" ? "mixed" : parseInt(v) as 15 | 30 | 45)
-                }
+                value={prefs.weekendOverrides?.cookingEffort ?? "any"}
+                onSelect={(v) => updateWeekend("cookingEffort", v as "quick" | "balanced" | "any")}
               />
               <Text style={[styles.weekendSubLabel, { color: C.textSecondary }]}>
                 Weekend budget

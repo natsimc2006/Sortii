@@ -100,11 +100,15 @@ export default function PlannerScreen() {
           ? "Standard"
           : "Premium";
   const healthLabel =
-    preferences.healthStyle === "standard"
-      ? "Standard"
-      : preferences.healthStyle === "healthy"
-        ? "Healthy"
-        : "High Protein";
+    preferences.healthStyle === "healthy"
+      ? "Healthy"
+      : preferences.healthStyle === "high-protein"
+        ? "High Protein"
+        : preferences.healthStyle === "low-carb"
+          ? "Low Carb"
+          : preferences.healthStyle === "family-friendly"
+            ? "Family Friendly"
+            : "Standard";
 
   const TAB_BAR_HEIGHT = Platform.OS === "web" ? 60 : 49;
 
