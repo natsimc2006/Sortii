@@ -165,12 +165,6 @@ export default function PlannerScreen() {
           >
             <Feather name="home" size={16} color={C.textMuted} />
           </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => router.push("/preferences")}
-            style={[styles.settingsBtn, { backgroundColor: C.chipBg }]}
-          >
-            <Feather name="sliders" size={18} color={C.primary} />
-          </TouchableOpacity>
         </View>
       </View>
 
@@ -456,13 +450,6 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 10,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  settingsBtn: {
-    width: 40,
-    height: 40,
-    borderRadius: 12,
     alignItems: "center",
     justifyContent: "center",
   },

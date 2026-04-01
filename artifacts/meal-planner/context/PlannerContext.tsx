@@ -19,6 +19,7 @@ import {
   Recipe,
   addIngredientsToSet,
   filterRecipes,
+  getRecipePrepStyles,
   ingredientOverlapScore,
   pickRecipes,
 } from "@/constants/recipes";
@@ -54,6 +55,7 @@ interface PlannerContextType {
   setPreferencesDirty: (v: boolean) => void;
   hiddenRecipes: string[];
   hideRecipe: (id: string) => void;
+  planHasLimitedVariety: boolean;
 }
 
 const PlannerContext = createContext<PlannerContextType | null>(null);
@@ -110,6 +112,7 @@ export function PlannerProvider({ children }: { children: React.ReactNode }) {
   const [isOnboarded, setIsOnboardedState] = useState(false);
   const [preferencesDirty, setPreferencesDirtyState] = useState(false);
   const [hiddenRecipes, setHiddenRecipes] = useState<string[]>([]);
+  const [planHasLimitedVariety, setPlanHasLimitedVariety] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -196,50 +199,119 @@ export function PlannerProvider({ children }: { children: React.ReactNode }) {
   const autoGeneratePlan = useCallback((newPrefs?: PlanPreferences) => {
     const p = newPrefs ?? preferences;
     const fresh = buildEmptyPlan(p);
-    const filledIds: string[] = [];
+    const usedIds: string[] = [];
     const selectedIngredients = new Set<string>();
-
     const currentSeason = p.seasonalMode ? getCurrentAustralianSeason() : null;
 
-    const generated = fresh.map((entry) => {
-      let pool = filterRecipes(p, entry.slot, entry.day, hiddenRecipes);
+    let lastProteinType: string | null = null;
+    let lastCuisineType: string | null = null;
+    let hadToRepeat = false;
 
-      if (currentSeason) {
-        pool = [...pool].sort((a, b) => {
-          const sA = getRecipeSeasonalScore(a, currentSeason);
-          const sB = getRecipeSeasonalScore(b, currentSeason);
-          return sB - sA;
-        });
+    const scoreRecipe = (r: Recipe): number => {
+      let score = 0;
+
+      // Budget match: 25 pts
+      const budget = p.budgetLevel;
+      if (budget === "super-budget" && r.estimatedCostBand === "low") score += 25;
+      else if (budget === "budget" && (r.estimatedCostBand === "low" || r.budgetTags.includes("budget"))) score += 25;
+      else if (budget === "standard" && r.budgetTags.includes("standard")) score += 25;
+      else if (budget === "premium" && r.budgetTags.includes("premium")) score += 25;
+      else score += 10;
+
+      // Cook time: 20 pts
+      const effort = p.cookingEffort ?? "any";
+      if (effort === "quick" && r.cookTimeMinutes <= 20) score += 20;
+      else if (effort === "balanced" && r.cookTimeMinutes <= 35) score += 20;
+      else if (effort === "any") score += 20;
+      else if (r.cookTimeMinutes <= 35) score += 10;
+
+      // Health style: 20 pts
+      const health = p.healthStyle ?? "standard";
+      if (health === "standard") score += 20;
+      else if (r.healthTags.includes(health as "healthy" | "high-protein")) score += 20;
+      else score += 5;
+
+      // Cooking style: 10 pts
+      const cs = p.cookingStyle ?? "mixed";
+      if (cs === "mixed" || cs === "no-preference") score += 10;
+      else if (r.cookingStyle === cs) score += 10;
+
+      // Prep style: 10 pts
+      const ps = p.prepStyle ?? "mixed";
+      if (ps === "mixed") {
+        score += 10;
+      } else {
+        const tags = getRecipePrepStyles(r);
+        if (ps === "batch-cook" && tags.batchCook) score += 10;
+        else if (ps === "quick-assembly" && tags.quickAssembly) score += 10;
+        else if (ps === "family-style" && tags.familyStyle) score += 10;
+        else score += 3;
       }
 
-      let picked: Recipe | undefined;
+      // Leftovers: 8 pts
+      if (p.leftoversMode === "none" || r.leftoversFriendly) score += 8;
 
+      // Ingredient overlap: 7 pts (minimise waste mode)
       if (p.minimiseWaste && selectedIngredients.size > 0) {
-        const uniquePool = pool.filter(
-          (r) => p.leftoversMode === "none" ? !filledIds.includes(r.id) : true
-        );
-        const scored = uniquePool
-          .map((r) => ({ r, score: ingredientOverlapScore(r, selectedIngredients) }))
-          .sort((a, b) => {
-            if (b.score !== a.score) return b.score - a.score;
-            return Math.random() - 0.5;
-          });
-        picked = scored[0]?.r;
+        const overlap = ingredientOverlapScore(r, selectedIngredients);
+        score += Math.min(7, overlap * 2);
+      } else {
+        score += 7;
       }
 
+      // Seasonal bonus (up to 5 pts)
+      if (currentSeason) {
+        score += getRecipeSeasonalScore(r, currentSeason) * 5;
+      }
+
+      return score;
+    };
+
+    const generated = fresh.map((entry) => {
+      const pool = filterRecipes(p, entry.slot, entry.day, hiddenRecipes);
+
+      // Score all candidates with small random tie-breaker for variety
+      const scored = pool
+        .map((r) => ({ r, score: scoreRecipe(r) + Math.random() * 3 }))
+        .sort((a, b) => b.score - a.score);
+
+      const isDinner = entry.slot === "dinner";
+
+      // Stage 3: diversity-filtered pool (no repeat protein/cuisine on consecutive dinners)
+      const diversePool = scored.filter(({ r }) => {
+        if (usedIds.includes(r.id)) return false;
+        if (isDinner && lastProteinType && r.proteinType === lastProteinType) return false;
+        if (isDinner && lastCuisineType && r.cuisineType === lastCuisineType) return false;
+        return true;
+      });
+
+      let picked: Recipe | undefined = diversePool[0]?.r;
+
+      // Stage 4a: relax diversity — any not-yet-used
       if (!picked) {
-        const picks = pickRecipes(pool, 1, p.mealVariety, filledIds);
-        picked = picks[0];
+        const noRepeat = scored.filter(({ r }) => !usedIds.includes(r.id));
+        picked = noRepeat[0]?.r;
+      }
+
+      // Stage 4b: last resort — allow repeat (very small pool situations)
+      if (!picked) {
+        picked = scored[0]?.r;
+        if (picked) hadToRepeat = true;
       }
 
       if (picked) {
-        if (p.leftoversMode === "none") filledIds.push(picked.id);
+        if (p.leftoversMode === "none") usedIds.push(picked.id);
         addIngredientsToSet(picked, selectedIngredients);
+        if (isDinner) {
+          lastProteinType = picked.proteinType ?? null;
+          lastCuisineType = picked.cuisineType ?? null;
+        }
         return { ...entry, recipeId: picked.id };
       }
       return entry;
     });
 
+    setPlanHasLimitedVariety(hadToRepeat);
     setCurrentPlan(generated);
     setPreferencesDirtyState(false);
   }, [preferences, hiddenRecipes, setCurrentPlan]);
@@ -356,6 +428,7 @@ export function PlannerProvider({ children }: { children: React.ReactNode }) {
         setPreferencesDirty,
         hiddenRecipes,
         hideRecipe,
+        planHasLimitedVariety,
       }}
     >
       {children}

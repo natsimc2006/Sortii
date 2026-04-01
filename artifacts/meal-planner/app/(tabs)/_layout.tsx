@@ -77,6 +77,19 @@ export default function TabLayout() {
           ),
         }}
       />
+      <Tabs.Screen
+        name="preferences"
+        options={{
+          title: "Settings",
+          tabBarIcon: ({ color }) => (
+            <Feather name="sliders" size={22} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="index"
+        options={{ href: null }}
+      />
     </Tabs>
   );
 }

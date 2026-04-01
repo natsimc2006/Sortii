@@ -1,0 +1,401 @@
+Please update the meal planner app with a clean UI restructure, improved action hierarchy, responsive accessibility fixes, safer interactions, updated colour palette, and a temporary brand rename to “Plateful”.
+
+IMPORTANT:
+- Keep the app’s existing functionality and overall clean mobile-first feel.
+- Do not overdesign it or make it feel busy.
+- The goal is a cleaner, smarter, warmer planner app that still feels highly usable and lightweight.
+- Apply all updates cohesively across the app.
+
+==================================================
+1. BRAND NAME UPDATE
+==================================================
+
+Update the visible app branding from the current name to:
+
+Plateful
+
+Where relevant:
+- replace the app name in the header, splash/loading state, and top-level visible labels
+- do not change internal logic names unless needed
+- keep the branding simple and elegant
+- the app should still feel like a weekly household meal planner, not a recipe blog
+
+==================================================
+2. COLOUR PALETTE UPDATE
+==================================================
+
+Apply this palette consistently across the app:
+
+Base / surfaces:
+- App background: #F7F3EB
+- Card background: #FFFDF9
+- Border / divider: #E5E2D8
+
+Primary brand colours:
+- Deep forest green: #1F3D2B
+- Sage green: #5F7C6A
+- Soft green tint: #E6EFE5
+
+Action / CTA accent:
+- Mustard / ochre: #D6A23A
+
+Supporting accent only:
+- Muted plum: #8B5A6B
+- Pale plum tint: #F2E8EC
+
+Text:
+- Primary text: #2F342F
+- Secondary text: #6B6F69
+- Muted text: #8A8D86
+
+Destructive:
+- Soft destructive text/icon: #C56B5C
+- Destructive background tint: #F8E9E6
+
+Colour usage rules:
+- 80% of the UI should remain neutral / cream / white / soft green
+- deep green is the primary brand anchor
+- mustard is the main CTA/highlight colour
+- plum is a supporting accent only, used sparingly
+- do not use plum as the main background, main header colour, or dominant button colour
+
+Use plum only for:
+- smart/enhanced actions
+- premium or locked indicators
+- small selected accent states where appropriate
+- tips / info toast accents
+- selected filter icon or secondary smart action icons
+
+==================================================
+3. CLEAN SCREEN HIERARCHY RESTRUCTURE
+==================================================
+
+Restructure the planner screen so the hierarchy is clearer and more intuitive.
+
+Desired hierarchy:
+
+TOP = context + preferences
+MIDDLE = weekly meal plan
+BOTTOM = plan actions
+
+A. Top section:
+- Show the title clearly at the top:
+“Plateful”
+optionally with a smaller subtitle or context label such as “Weekly Planner” if that fits cleanly
+- Beneath the title, show the existing preference summary chips, for example:
+- 3 people
+- Budget
+- Standard
+- $214–$290
+- Add a filter button/icon to the right of the chips row
+- Filters should remain a top-of-screen control, not part of the bottom action bar
+- The filter button should open the full preference modal/sheet
+
+B. Middle section:
+- Keep the day-by-day planner cards
+- Preserve the clean card structure
+- Improve spacing and hierarchy so each day section is easier to scan
+- Meal cards should remain calm and uncluttered
+- If possible, keep sticky/floating bottom actions separate from the scrollable content
+
+C. Bottom section:
+- Redesign the planner action bar to reflect real hierarchy
+- The bottom action bar should be for actions that change the plan, not for filters
+
+Final desired bottom action structure:
+- Fill Gaps = secondary button
+- Complete My Week or Auto Plan = PRIMARY button
+- Save = secondary button
+- Clear = de-emphasised icon-only destructive action, not a full competing button
+
+Rules:
+- The main CTA should feel clearly primary
+- The primary planner CTA should use mustard
+- Secondary buttons should use soft green styling
+- Clear should be icon-only or very low emphasis
+- Keep the bar clean and not overloaded
+
+Dynamic CTA label:
+- If the week is empty: “Create My Week”
+- If partly filled: “Complete My Week”
+- If full and user regenerates: “Refresh My Plan”
+
+==================================================
+4. RESPONSIVE HEADER / ACCESSIBILITY FIX
+==================================================
+
+Fix the issue where users with browser zoom, accessibility scaling, or narrower viewports lose access to key controls.
+
+Requirements:
+- Do not rely on fixed top-right positioning that can get clipped
+- The top area must be responsive and reflow gracefully
+- Title and filter/settings controls must remain visible at larger zoom levels
+- Chips and actions should wrap cleanly on narrow widths
+- Ensure controls never overflow outside the viewport
+- Ensure touch targets remain large enough
+- Test for browser zoom above 100% and smaller widths
+
+==================================================
+5. FILTERS PLACEMENT + BEHAVIOUR
+==================================================
+
+Keep filters out of the bottom action bar.
+
+Requirements:
+- Filters live in the top section only
+- Existing preference chips should act as a quick-glance summary
+- Tapping the filter icon/button opens a modal, drawer, or sheet for full preference editing
+- Tapping chips can optionally also open the same filter editor
+- If preferences change, show a subtle toast such as:
+“Filters updated — regenerate to apply”
+
+==================================================
+6. SAFER INTERACTIONS: CONFIRMATION + UNDO
+==================================================
+
+Add safer UX for actions that are easy to mis-tap.
+
+A. Clear meals from day:
+- Add confirmation dialog/popover:
+“Clear all meals for this day?”
+- Buttons: Cancel / Clear
+
+B. Replace / guide / regenerate individual recipe:
+- Add confirmation:
+“Replace this meal with another option?”
+- Buttons: Cancel / Replace
+
+C. After successful action, show toast/snackbar with optional Undo
+Examples:
+- “Meals cleared” + Undo
+- “Meal replaced” + Undo
+- “Plan saved”
+- “Filters updated — regenerate to apply”
+
+Keep confirmations lightweight, not heavy-handed.
+
+==================================================
+7. TOAST / SNACKBAR COMPONENT
+==================================================
+
+Create a reusable toast/snackbar component.
+
+Requirements:
+- Appears above the bottom nav / bottom action area
+- Smooth fade or slide in
+- Auto dismiss after about 2.5 to 4 seconds
+- Optional action text such as Undo
+- Non-blocking
+- Responsive
+- Rounded corners, subtle shadow, clean style
+
+Toast variants:
+- success
+- info
+- warning
+- action/undo
+
+Styling:
+- default toast can use neutral or deep green
+- info / smart-tip variant can use pale plum tint with muted plum accents
+- keep text readable and elegant
+
+Support “show once per session” or cooldown behaviour for informational tips.
+
+Example tip:
+- “Tip: Tap a recipe to view ingredients and instructions.”
+
+==================================================
+8. PLUM ACCENT USAGE RULES
+==================================================
+
+Use muted plum sparingly in the current UI.
+
+Best uses:
+- filter icon/button accent
+- smart or enhanced icons (such as auto-plan related iconography)
+- premium or locked feature badge
+- tip/snackbar accent
+- occasional selected chip state if it improves hierarchy
+
+Avoid:
+- all icons becoming plum
+- plum headers
+- plum main CTA
+- plum-heavy cards
+
+Green should remain the default action colour.
+Plum should subtly signal “smart”, “enhanced”, or “guided”.
+
+==================================================
+9. RECIPE IMAGE SUPPORT
+==================================================
+
+Add support for recipe imagery on the recipe detail page.
+
+Requirements:
+- Show a recipe hero image or thumbnail near the top of the recipe page
+- Rounded corners
+- Responsive sizing
+- Optional only
+- If no image exists, hide elegantly or show a clean placeholder
+- Do not force every recipe to require an image
+- Preserve loading performance and readability
+
+==================================================
+10. MEAL VARIETY IMPROVEMENTS
+==================================================
+
+Fix the issue where meals repeat too often when many preferences are selected.
+
+Update the generation logic:
+- Do not repeat the exact same meal within the same generated week unless there are not enough valid options left
+- Avoid too many meals with the same main protein back-to-back where possible
+- Avoid too many meals with the same cuisine type back-to-back where possible
+
+Selection logic should use staged filtering:
+
+Stage 1:
+- Filter by hard exclusions only:
+- excluded ingredients
+- allergens
+- strict dietary restrictions
+
+Stage 2:
+- Score meals using soft preferences:
+- budget level
+- max cook time
+- cooking style
+- health style
+- prep style
+- leftovers mode
+- ingredient overlap / minimise waste mode
+- household suitability
+
+Stage 3:
+- Rank meals by best fit
+
+Stage 4:
+- Build the week from the top-ranked pool while enforcing diversity/no-repeat rules
+
+If the pool becomes too small:
+- relax soft preferences slightly before allowing repeats
+- hard exclusions must always stay enforced
+
+If fallback repeats are still necessary:
+- show a helpful notice:
+“Your current preferences are limiting meal variety this week. Try relaxing one or two filters for more options.”
+
+==================================================
+11. EXPAND RECIPE MATCHING MODEL
+==================================================
+
+Ensure recipes can support richer scoring and selection.
+
+Where possible, include fields/tags such as:
+- title
+- ingredients
+- image
+- protein type
+- cuisine
+- cook time
+- budget tier
+- prep style
+- cooking style
+- health style
+- leftovers suitability
+- family/household suitability
+- ingredient overlap markers
+- difficulty
+- meal type
+
+Use these fields in scoring, diversity rules, and filtering.
+
+==================================================
+12. BOTTOM ACTION BAR FINAL SPEC
+==================================================
+
+Please implement the bottom planner action bar using this hierarchy:
+
+Primary:
+- Complete My Week / Create My Week / Refresh My Plan
+- mustard background (#D6A23A)
+- clear emphasis
+- slightly more visual weight than other buttons
+
+Secondary:
+- Fill Gaps
+- Save
+- soft green or neutral styling
+- green icon/text
+
+Low emphasis destructive:
+- Clear
+- icon-only or reduced emphasis button
+- soft destructive tint only
+- should not visually compete with the primary CTA
+
+Keep it compact, elegant, and clearly action-focused.
+
+==================================================
+13. KEEP THE DESIGN CLEAN
+==================================================
+
+Important design guardrails:
+- Preserve the cleaner feel of the current app
+- Do not make it look like a busy lifestyle poster
+- The planner screen should remain highly practical and readable
+- Favour white/cream space, clean cards, subtle borders, and restrained colour use
+- Keep iconography consistent
+- Maintain calm, premium, food-friendly utility aesthetics
+
+==================================================
+14. FINAL QA / REVIEW
+==================================================
+
+After implementing, please test and verify:
+
+- header responsiveness at larger browser zoom levels
+- chips row wrapping and filter accessibility
+- bottom action bar hierarchy feels clear
+- filter button works from the top area
+- confirmation flows work for clear/replace actions
+- toast/snackbar displays correctly and auto-dismisses
+- recipe page works with and without image
+- meal generation reduces repeated meals across the week
+- soft fallback messaging appears when preferences are too restrictive
+- the new “Plateful” brand name displays cleanly
+- the app still feels lightweight, clean, and production-ready
+
+Please implement all of this as one cohesive update, not as disconnected changes.
+PART 2
+Recipe image display On the recipe detail page:
+•	Display the imageUrl field from the recipe data as a full-width hero image
+•	16:9 aspect ratio, rounded bottom corners only (border-radius 0 0 20px 20px)
+•	If imageUrl is empty or the image errors, show a placeholder: warm gradient using #E6EFE5 to #F7F3EB with the recipe name in #1F3D2B centred, large, and a relevant food emoji above it
+•	Do not make any API calls for images at runtime — use stored imageUrl only
+Confirmation dialogs for destructive/replacement actions:
+•	Clear meal from day:
+•	Show a confirmation bottom sheet or inline popover
+•	Title: "Clear this day?"
+•	Body: "This will remove [Meal Name] from [Day]. You can refill it any time."
+•	Buttons: "Cancel" (ghost) | "Clear" (soft destructive — #C56B5C text on #F8E9E6 background)
+•	After clearing, show toast: "Meal removed · Undo"
+Replace/regenerate individual recipe:
+•	Show a lightweight confirmation
+•	Title: "Replace this meal?"
+•	Body: "We'll swap [Meal Name] for another option that fits your preferences."
+•	Buttons: "Cancel" | "Replace" (mustard)
+•	After replacing, show toast: "Meal replaced · Undo"
+Hide recipe (guide this recipe button):
+•	No confirmation dialog — instead show an immediate undo toast
+•	Toast: "[Recipe Name] hidden · Undo"
+•	Auto-dismiss after 4 seconds
+Limited variety notice
+If the plan generation sets planHasLimitedVariety: true (from the algorithm update in Prompt 1):
+•	Show an info toast after plan generation completes
+•	Toast text: "Your filters are limiting variety this week. Try relaxing one or two preferences for more options."
+•	Use the info/plum toast variant
+•	This toast should not auto-dismiss — it should require a manual tap to dismiss
+•	Include a shortcut action: "Adjust filters" that opens the preferences sheet directly
+
