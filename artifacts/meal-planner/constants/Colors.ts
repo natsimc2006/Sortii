@@ -1,33 +1,35 @@
-const primary = "#5F7C6A";
-const primaryLight = "#7E9B78";
-const primaryDark = "#4A6454";
-const accent = "#D6B98C";
-const accentLight = "#E8CFA8";
+const sage = "#5F7C6A";
+const primaryDark = "#1F3D2B";
+const mustard = "#D6A23A";
+const plum = "#8B5A6B";
 
 export default {
   light: {
-    primary,
-    primaryLight,
+    primary: sage,
     primaryDark,
-    accent,
-    accentLight,
-    background: "#F7F6F2",
+    mustard,
+    plum,
+    plumTint: "#F2E8EC",
+    background: "#F7F3EB",
     card: "#FFFDF9",
-    cardBorder: "#DDDCD4",
+    cardBorder: "#E5E2D8",
     text: "#2F342F",
     textSecondary: "#6B6F69",
-    textMuted: "#9EA39C",
-    tint: primary,
+    textMuted: "#8A8D86",
+    tint: primaryDark,
     tabIconDefault: "#B8BDB7",
-    tabIconSelected: primary,
-    success: "#7E9B78",
-    warning: "#D6B98C",
-    danger: "#D96B5F",
+    tabIconSelected: primaryDark,
+    success: sage,
+    warning: mustard,
+    danger: "#C56B5C",
+    dangerBg: "#F8E9E6",
     chipBg: "#E6EFE5",
-    chipText: "#5F7C6A",
-    chipBgActive: "#5F7C6A",
+    chipText: sage,
+    chipBgActive: primaryDark,
     chipTextActive: "#FFFFFF",
-    inputBorder: "#DDDCD4",
-    shadow: "rgba(47, 52, 47, 0.07)",
+    inputBorder: "#E5E2D8",
+    shadow: "rgba(31, 61, 43, 0.08)",
+    accent: mustard,
+    accentLight: "#E8C87A",
   },
 };

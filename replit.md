@@ -91,6 +91,25 @@ Generated Zod schemas from the OpenAPI spec (e.g. `HealthCheckResponse`). Used b
 
 Generated React Query hooks and fetch client from the OpenAPI spec (e.g. `useHealthCheck`, `healthCheck`).
 
+### `artifacts/meal-planner` (`@workspace/meal-planner`)
+
+Expo / React Native mobile app — **Plateful**, a weekly household meal planner. Frontend-only, all data stored via AsyncStorage, no backend.
+
+**Key design:**
+- Brand: "Plateful" — deep forest green `#1F3D2B`, sage `#5F7C6A`, mustard CTA `#D6A23A`, plum accent `#8B5A6B`, cream bg `#F7F3EB`
+- 250 recipes in `data/recipes.json` with images from TheMealDB (`imageUrl` field)
+- `constants/recipes.ts` — Recipe interface, utility functions, filter/score helpers
+- `context/PlannerContext.tsx` — all plan state, staged-scoring `autoGeneratePlan`, `planHasLimitedVariety` flag
+- `components/Toast.tsx` — reusable animated toast (variants: success, info, undo, warning)
+- `components/RecipeCard.tsx` — recipe thumbnail image with Feather icon fallback
+- `components/MealSlotCard.tsx` — planner slot with thumbnail image
+- `components/RecipeDetailModal.tsx` — full hero image banner + recipe details
+- `app/(tabs)/planner.tsx` — main planner screen with per-meal confirmations, undo, limited variety notice
+- `app/(tabs)/preferences.tsx` — 5th Settings tab with all household/dietary preferences
+
+**Colour palette tokens** (in `constants/Colors.ts`):
+- `primary` = sage `#5F7C6A`, `primaryDark` = `#1F3D2B`, `mustard` = `#D6A23A`, `plum` = `#8B5A6B`, `plumTint` = `#F2E8EC`
+
 ### `scripts` (`@workspace/scripts`)
 
 Utility scripts package. Each script is a `.ts` file in `src/` with a corresponding npm script in `package.json`. Run scripts via `pnpm --filter @workspace/scripts run <script>`. Scripts can import any workspace package (e.g., `@workspace/db`) by adding it as a dependency in `scripts/package.json`.

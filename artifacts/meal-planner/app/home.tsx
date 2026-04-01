@@ -73,10 +73,13 @@ export default function HomeScreen() {
 
       <View style={styles.heroSection}>
         <View style={[styles.logoBox, { backgroundColor: C.chipBg }]}>
-          <Feather name="calendar" size={36} color={C.primary} />
+          <Feather name="calendar" size={36} color={C.primaryDark} />
         </View>
-        <Text style={[styles.headline, { color: C.text }]}>
-          Your weekly meals,{"\n"}sorted.
+        <Text style={[styles.headline, { color: C.primaryDark }]}>
+          Plateful
+        </Text>
+        <Text style={[styles.brandSubtitle, { color: C.textSecondary }]}>
+          Your weekly meals, sorted.
         </Text>
         <Text style={[styles.subheadline, { color: C.textSecondary }]}>
           Plan meals for the whole family, discover new recipes, and generate
@@ -113,7 +116,7 @@ export default function HomeScreen() {
 
       <View style={styles.features}>
         {[
-          ["104 Australian-friendly recipes", "book-open"],
+          ["250 Australian-friendly recipes", "book-open"],
           ["Budget, standard & premium options", "dollar-sign"],
           ["Serves 1–10 people", "users"],
           ["Leftovers-friendly planning", "refresh-cw"],
@@ -133,7 +136,7 @@ export default function HomeScreen() {
         <TouchableOpacity
           onPress={handleBack}
           activeOpacity={0.85}
-          style={[styles.primaryBtn, { backgroundColor: C.primary }]}
+          style={[styles.primaryBtn, { backgroundColor: C.primaryDark }]}
         >
           <Text style={styles.primaryBtnText}>Back to my planner</Text>
           <Feather name="arrow-right" size={20} color="#fff" />
@@ -188,10 +191,16 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   headline: {
-    fontSize: 36,
+    fontSize: 40,
     fontFamily: "Inter_700Bold",
     textAlign: "center",
-    lineHeight: 44,
+    lineHeight: 46,
+  },
+  brandSubtitle: {
+    fontSize: 16,
+    fontFamily: "Inter_500Medium",
+    textAlign: "center",
+    marginTop: -4,
   },
   subheadline: {
     fontSize: 16,
