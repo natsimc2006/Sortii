@@ -1,6 +1,7 @@
 import { Feather } from "@expo/vector-icons";
-import React from "react";
+import React, { useState } from "react";
 import {
+  Image,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -16,14 +17,6 @@ interface RecipeCardProps {
   selected?: boolean;
 }
 
-const TAG_ICONS: Record<string, string> = {
-  healthy: "heart",
-  "high-protein": "zap",
-  budget: "dollar-sign",
-  "one-pan": "layers",
-  "air-fryer": "wind",
-};
-
 export function RecipeCard({
   recipe,
   onPress,
@@ -31,6 +24,7 @@ export function RecipeCard({
   selected = false,
 }: RecipeCardProps) {
   const C = Colors.light;
+  const [imgError, setImgError] = useState(false);
 
   const cookIcon =
     recipe.cookingStyle === "air-fryer"
@@ -38,6 +32,8 @@ export function RecipeCard({
       : recipe.cookingStyle === "one-pan"
         ? "layers"
         : "coffee";
+
+  const showImage = !!recipe.imageUrl && !imgError;
 
   return (
     <TouchableOpacity
@@ -52,7 +48,16 @@ export function RecipeCard({
     >
       <View style={styles.header}>
         <View style={[styles.iconBox, { backgroundColor: C.chipBg }]}>
-          <Feather name={cookIcon as any} size={20} color={C.primary} />
+          {showImage ? (
+            <Image
+              source={{ uri: recipe.imageUrl }}
+              style={styles.thumbnail}
+              resizeMode="cover"
+              onError={() => setImgError(true)}
+            />
+          ) : (
+            <Feather name={cookIcon as any} size={20} color={C.primary} />
+          )}
         </View>
         <View style={styles.titleArea}>
           <Text
@@ -146,12 +151,17 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   iconBox: {
-    width: 40,
-    height: 40,
+    width: 48,
+    height: 48,
     borderRadius: 12,
     alignItems: "center",
     justifyContent: "center",
     flexShrink: 0,
+    overflow: "hidden",
+  },
+  thumbnail: {
+    width: 48,
+    height: 48,
   },
   titleArea: {
     flex: 1,

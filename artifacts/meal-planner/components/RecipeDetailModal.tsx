@@ -1,6 +1,7 @@
 import { Feather } from "@expo/vector-icons";
 import React, { useState } from "react";
 import {
+  Image,
   Modal,
   Platform,
   ScrollView,
@@ -173,6 +174,7 @@ export function RecipeDetailModal({ recipe, onClose }: RecipeDetailModalProps) {
   const insets = useSafeAreaInsets();
   const { preferences } = usePlanner();
   const [expandedSteps, setExpandedSteps] = useState<Set<number>>(new Set());
+  const [heroImgError, setHeroImgError] = useState(false);
 
   if (!recipe) return null;
 
@@ -197,11 +199,27 @@ export function RecipeDetailModal({ recipe, onClose }: RecipeDetailModalProps) {
       onRequestClose={onClose}
     >
       <View style={[styles.container, { backgroundColor: C.background }]}>
+        {recipe.imageUrl && !heroImgError && (
+          <View style={styles.heroBanner}>
+            <Image
+              source={{ uri: recipe.imageUrl }}
+              style={styles.heroImage}
+              resizeMode="cover"
+              onError={() => setHeroImgError(true)}
+            />
+            <TouchableOpacity
+              onPress={onClose}
+              style={[styles.heroCloseBtn, { backgroundColor: "rgba(0,0,0,0.45)" }]}
+            >
+              <Feather name="x" size={20} color="#fff" />
+            </TouchableOpacity>
+          </View>
+        )}
         <View
           style={[
             styles.header,
             {
-              paddingTop: Platform.OS === "web" ? 67 : insets.top + 16,
+              paddingTop: recipe.imageUrl && !heroImgError ? 16 : (Platform.OS === "web" ? 67 : insets.top + 16),
               borderBottomColor: C.cardBorder,
             },
           ]}
@@ -210,12 +228,14 @@ export function RecipeDetailModal({ recipe, onClose }: RecipeDetailModalProps) {
             <Text style={[styles.title, { color: C.text }]} numberOfLines={2}>
               {recipe.name}
             </Text>
-            <TouchableOpacity
-              onPress={onClose}
-              style={[styles.closeBtn, { backgroundColor: C.chipBg }]}
-            >
-              <Feather name="x" size={20} color={C.text} />
-            </TouchableOpacity>
+            {!(recipe.imageUrl && !heroImgError) && (
+              <TouchableOpacity
+                onPress={onClose}
+                style={[styles.closeBtn, { backgroundColor: C.chipBg }]}
+              >
+                <Feather name="x" size={20} color={C.text} />
+              </TouchableOpacity>
+            )}
           </View>
 
           <Text style={[styles.desc, { color: C.textSecondary }]}>
@@ -337,6 +357,26 @@ export function RecipeDetailModal({ recipe, onClose }: RecipeDetailModalProps) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  heroBanner: {
+    width: "100%",
+    height: 220,
+    position: "relative",
+    overflow: "hidden",
+  },
+  heroImage: {
+    width: "100%",
+    height: "100%",
+  },
+  heroCloseBtn: {
+    position: "absolute",
+    top: 12,
+    right: 16,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    alignItems: "center",
+    justifyContent: "center",
   },
   header: {
     paddingHorizontal: 20,

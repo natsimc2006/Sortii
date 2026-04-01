@@ -1,7 +1,8 @@
 import { Feather } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
-import React from "react";
+import React, { useState } from "react";
 import {
+  Image,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -37,6 +38,7 @@ export function MealSlotCard({
   seasonalMode = false,
 }: MealSlotCardProps) {
   const C = Colors.light;
+  const [imgError, setImgError] = useState(false);
   const currentSeason = seasonalMode ? getCurrentAustralianSeason() : null;
   const showSeasonalBadge = seasonalMode && recipe != null && currentSeason
     ? isRecipeSeasonal(recipe, currentSeason)
@@ -79,6 +81,8 @@ export function MealSlotCard({
       : recipe.cookingStyle === "one-pan"
         ? "layers"
         : "coffee";
+
+  const showImage = !!recipe.imageUrl && !imgError;
 
   return (
     <View style={[styles.filledSlot, { backgroundColor: C.card, borderColor: C.cardBorder }]}>
@@ -129,7 +133,16 @@ export function MealSlotCard({
 
       <View style={styles.recipeRow}>
         <View style={[styles.recipeIconBox, { backgroundColor: C.chipBg }]}>
-          <Feather name={cookIcon as any} size={16} color={C.primary} />
+          {showImage ? (
+            <Image
+              source={{ uri: recipe.imageUrl }}
+              style={styles.recipeThumbnail}
+              resizeMode="cover"
+              onError={() => setImgError(true)}
+            />
+          ) : (
+            <Feather name={cookIcon as any} size={16} color={C.primary} />
+          )}
         </View>
         <View style={styles.recipeInfo}>
           <View style={styles.nameRow}>
@@ -231,12 +244,17 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   recipeIconBox: {
-    width: 34,
-    height: 34,
+    width: 40,
+    height: 40,
     borderRadius: 10,
     alignItems: "center",
     justifyContent: "center",
     flexShrink: 0,
+    overflow: "hidden",
+  },
+  recipeThumbnail: {
+    width: 40,
+    height: 40,
   },
   recipeInfo: {
     flex: 1,
