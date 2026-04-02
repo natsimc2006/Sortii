@@ -1,6 +1,7 @@
-const teal = "#2C9797";
-const tealDark = "#1D7070";
-const gold = "#DEA829";
+const teal = "#2A8F88";
+const tealDark = "#257D78";
+const gold = "#D29A22";
+const goldDark = "#B97D12";
 const plum = "#5E3A4C";
 
 export default {
@@ -8,11 +9,12 @@ export default {
     primary: teal,
     primaryDark: tealDark,
     gold,
-    goldTint: "#F7E8BE",
+    goldDark,
+    goldTint: "#F6E6BA",
     mustard: gold,
     plum,
     plumTint: "#F3E8EE",
-    tealTint: "#E7F4F3",
+    tealTint: "#E6F3F0",
     background: "#F7F3EB",
     card: "#FFFDF9",
     cardBorder: "#E6E1D7",
@@ -24,16 +26,22 @@ export default {
     tabIconSelected: teal,
     success: teal,
     warning: gold,
-    danger: "#C56B5C",
-    dangerBg: "#F8E9E6",
-    chipBg: "#E7F4F3",
+    danger: "#B86557",
+    dangerBg: "#F7E9E8",
+    chipBg: "#E6F3F0",
     chipText: "#2B2B2B",
     chipBgActive: teal,
     chipTextActive: "#FFFFFF",
     inputBorder: "#E6E1D7",
     border: "#E6E1D7",
-    shadow: "rgba(44, 151, 151, 0.08)",
+    shadow: "rgba(42, 143, 136, 0.08)",
     accent: gold,
-    accentLight: "#F7E8BE",
+    accentLight: "#F6E6BA",
+    secondaryActionBg: "#EAF4F2",
+    secondaryActionText: "#257D78",
+    clearBg: "#F7E9E8",
+    clearText: "#B86557",
+    seasonalGreen: "#5F7C50",
+    seasonalGreenBg: "#EAF3E2",
   },
 };

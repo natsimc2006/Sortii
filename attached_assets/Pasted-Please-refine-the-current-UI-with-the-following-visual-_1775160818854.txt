@@ -1,0 +1,77 @@
+Please refine the current UI with the following visual and interaction updates.
+
+1. ADJUST BRAND COLOURS
+The current teal is reading too blue. Shift it greener and slightly deeper.
+
+Use:
+- Primary teal-green: #2A8F88
+- Darker teal-green: #257D78
+- Soft teal tint: #E6F3F0
+- Gold primary: #D29A22
+- Gold darker/pressed: #B97D12
+- Soft gold tint: #F6E6BA
+- Deep plum: #5E3A4C
+- Charcoal: #2B2B2B
+- Background: #F7F3EB
+
+2. IMPROVE BOTTOM ACTION BAR CONTRAST
+The secondary buttons are too light and hard to read.
+Increase contrast for Fill Gaps and Save so text/icons are clearer.
+
+Suggested styling:
+- Secondary button background: #EAF4F2
+- Secondary text/icon: #257D78
+- Clear background: #F7E9E8
+- Clear icon: #B86557
+
+Keep the primary button gold but use the updated richer gold.
+
+3. ADD A HOME BUTTON
+Add a Home button/icon to planner/generated screens so users can easily return to the starting/home screen.
+
+Preferred placement:
+- small home icon in the top header area
+
+4. LOGO HIERARCHY
+- On the home/landing screen, use the full Sortii “Dinner… Sorted.” logo lockup
+- On the generated planner screen, use only a small Sortii logo mark/icon in the corner so it does not take too much vertical space
+
+5. RECIPE PAGE ACCESS
+Make the meal card more intuitive:
+- tapping the meal image opens the recipe page
+- tapping the meal name opens the recipe page
+- ideally tapping the main left/content body of the meal card also opens the recipe page
+
+6. ICON DISCOVERY
+Do not add a permanent icon legend/key.
+Instead:
+- support light self-discovery
+- add a one-time tip/toast such as “Tap a meal to open the recipe”
+- optionally show small hover/press labels or first-use helper labels for less obvious icons
+
+7. DIETARY PREFERENCE DEFAULT
+Set “No preference” as the visible default selected option for Dietary Preferences.
+If all specific dietary options are deselected, automatically return to “No preference”.
+
+8. USE PLUM A LITTLE MORE
+The deep plum is currently underused.
+Sprinkle it intentionally into a few more places, but do not overdo it.
+
+Recommended:
+- keep preferences/settings icon in plum
+- use plum for regenerate/swap icon
+- use plum for hide icon
+- use plum in smart tips/snackbars/info states
+- do not recolour all icons plum
+
+Keep colour meaning clear:
+- teal = standard action
+- plum = smart/alternative/subtle action
+- red = destructive
+
+9. KEEP THE UI CLEAN
+Do not clutter the planner page.
+Do not make the brand colours overpower usability.
+The planner screen should remain fast, clear, and practical.
+
+Please apply these updates cohesively and preserve the existing layout style.

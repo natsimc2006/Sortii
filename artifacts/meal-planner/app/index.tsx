@@ -8,10 +8,10 @@ import {
   Platform,
   StyleSheet,
   Text,
-  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
+
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Colors from "@/constants/Colors";
 import {
@@ -23,6 +23,7 @@ import {
 import { usePlanner } from "@/context/PlannerContext";
 
 const C = Colors.light;
+const sortiiLogo = require("@/assets/images/sortii-logo.png");
 
 const ROTATING_MESSAGES = [
   "Sorting your week…",
@@ -127,7 +128,6 @@ export default function OnboardingScreen() {
   const { setPreferences, setIsOnboarded, isOnboarded, autoGeneratePlan } = usePlanner();
   const insets = useSafeAreaInsets();
   const [step, setStep] = useState<OnboardingStep>(0);
-  const [logoError, setLogoError] = useState(false);
 
   const [planningMode, setPlanningMode] = useState<PlanPreferences["planningMode"]>("auto");
   const [householdSize, setHouseholdSize] = useState(4);
@@ -250,21 +250,11 @@ export default function OnboardingScreen() {
     return (
       <View style={[styles.screen, { backgroundColor: C.background, paddingTop, paddingBottom }]}>
         <View style={styles.welcomeContent}>
-          <View style={styles.logoArea}>
-            {!logoError ? (
-              <Image
-                source={{ uri: "/sortii-logo.png" }}
-                style={styles.logo}
-                resizeMode="contain"
-                onError={() => setLogoError(true)}
-              />
-            ) : (
-              <Text style={[styles.logoText, { color: C.primary }]}>Sortii</Text>
-            )}
-          </View>
-          <Text style={[styles.welcomeHeadline, { color: C.text }]}>
-            Dinner… sorted.
-          </Text>
+          <Image
+            source={sortiiLogo}
+            style={styles.logo}
+            resizeMode="contain"
+          />
           <Text style={[styles.welcomeSub, { color: C.textSecondary }]}>
             Let's sort your dinners. Takes 60 seconds.
           </Text>
@@ -532,25 +522,9 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     gap: 20,
   },
-  logoArea: {
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 8,
-  },
   logo: {
-    width: 160,
-    height: 72,
-  },
-  logoText: {
-    fontSize: 52,
-    fontFamily: "Inter_700Bold",
-    letterSpacing: -1,
-  },
-  welcomeHeadline: {
-    fontSize: 36,
-    fontFamily: "Inter_700Bold",
-    textAlign: "center",
-    lineHeight: 42,
+    width: 280,
+    height: 130,
   },
   welcomeSub: {
     fontSize: 16,

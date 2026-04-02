@@ -93,22 +93,34 @@ Generated React Query hooks and fetch client from the OpenAPI spec (e.g. `useHea
 
 ### `artifacts/meal-planner` (`@workspace/meal-planner`)
 
-Expo / React Native mobile app — **Plateful**, a weekly household meal planner. Frontend-only, all data stored via AsyncStorage, no backend.
+Expo / React Native mobile app — **Sortii**, a weekly household meal planner for Australian households. Frontend-only, all data stored via AsyncStorage, no backend.
 
 **Key design:**
-- Brand: "Plateful" — deep forest green `#1F3D2B`, sage `#5F7C6A`, mustard CTA `#D6A23A`, plum accent `#8B5A6B`, cream bg `#F7F3EB`
+- Brand: "Sortii" — teal-green `#2A8F88`, gold CTA `#D29A22`, deep plum `#5E3A4C`, cream bg `#F7F3EB`
+- Logo: `assets/images/sortii-logo.png` — full lockup with "sortii." and "Dinner... Sorted." tagline
 - 250 recipes in `data/recipes.json` with images from TheMealDB (`imageUrl` field)
-- `constants/recipes.ts` — Recipe interface, utility functions, filter/score helpers
-- `context/PlannerContext.tsx` — all plan state, staged-scoring `autoGeneratePlan`, `planHasLimitedVariety` flag
-- `components/Toast.tsx` — reusable animated toast (variants: success, info, undo, warning)
-- `components/RecipeCard.tsx` — recipe thumbnail image with Feather icon fallback
-- `components/MealSlotCard.tsx` — planner slot with thumbnail image
+- `constants/recipes.ts` — Recipe/PlanPreferences interfaces, utility functions, filter/score helpers, kidFriendly support
+- `context/PlannerContext.tsx` — all plan state, staged-scoring `autoGeneratePlan`, `planHasLimitedVariety` flag, kid-friendly scoring
+- `components/Toast.tsx` — animated toast (variants: success, info, undo, warning, smart-tip)
+- `components/MealSlotCard.tsx` — planner slot card with tappable body (opens recipe), colour-coded action icons
 - `components/RecipeDetailModal.tsx` — full hero image banner + recipe details
-- `app/(tabs)/planner.tsx` — main planner screen with per-meal confirmations, undo, limited variety notice
-- `app/(tabs)/preferences.tsx` — 5th Settings tab with all household/dietary preferences
+- `app/index.tsx` — 7-step onboarding flow (welcome → planning mode → household → budget → meals/wk → dietary → exclusions → generating)
+- `app/(tabs)/planner.tsx` — main planner: progress bar, home icon, per-meal confirmations, undo, prefs-dirty bar, bottom action bar
+- `app/(tabs)/preferences.tsx` — 4-tier collapsible accordion settings (Quick Setup / Make it Yours / Make it Smarter / Advanced)
+- `app/(tabs)/shopping.tsx` — grouped shopping list with copy/share
+- `app/home.tsx` — info/about screen with Sortii logo and how-it-works
 
 **Colour palette tokens** (in `constants/Colors.ts`):
-- `primary` = sage `#5F7C6A`, `primaryDark` = `#1F3D2B`, `mustard` = `#D6A23A`, `plum` = `#8B5A6B`, `plumTint` = `#F2E8EC`
+- `primary` = teal `#2A8F88`, `primaryDark` = `#257D78`, `gold` = `#D29A22`, `goldDark` = `#B97D12`
+- `plum` = `#5E3A4C`, `plumTint` = `#F3E8EE`, `tealTint` = `#E6F3F0`, `goldTint` = `#F6E6BA`
+- `secondaryActionBg` = `#EAF4F2`, `secondaryActionText` = `#257D78`, `clearBg` = `#F7E9E8`, `clearText` = `#B86557`
+- `seasonalGreen` = `#5F7C50`, `seasonalGreenBg` = `#EAF3E2`
+
+**Icon/badge colour system:**
+- Teal (`#2A8F88`) = standard action (open recipe, fill gaps, save, meal type badge)
+- Gold (`#D29A22`) = primary/featured action (CTA, auto-swap smart action)
+- Plum (`#5E3A4C`) = smart/alternative action (swap, hide, smart-tip toasts)
+- Warm red (`#B86557`) = destructive (remove, clear, warning toasts)
 
 ### `scripts` (`@workspace/scripts`)
 

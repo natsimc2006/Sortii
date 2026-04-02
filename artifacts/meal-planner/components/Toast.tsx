@@ -26,10 +26,10 @@ interface ToastProps extends ToastState {
 }
 
 const VARIANT_STYLES: Record<ToastVariant, { bg: string; text: string; icon: string; iconColor: string; actionColor: string }> = {
-  success: { bg: "#1D7070", text: "#fff", icon: "check-circle", iconColor: "#A7D8D8", actionColor: "#fff" },
-  info: { bg: "#E7F4F3", text: "#1D7070", icon: "info", iconColor: "#2C9797", actionColor: "#1D7070" },
-  undo: { bg: "#2B2B2B", text: "#fff", icon: "rotate-ccw", iconColor: "#E0E0E0", actionColor: "#DEA829" },
-  warning: { bg: "#F7E8BE", text: "#8B6820", icon: "alert-circle", iconColor: "#DEA829", actionColor: "#8B6820" },
+  success: { bg: "#EAF4F2", text: "#257D78", icon: "check-circle", iconColor: "#257D78", actionColor: "#257D78" },
+  info:    { bg: "#E6F3F0", text: "#2A8F88", icon: "info",         iconColor: "#2A8F88", actionColor: "#2A8F88" },
+  undo:    { bg: "#2B2B2B", text: "#fff",    icon: "rotate-ccw",   iconColor: "#E0E0E0", actionColor: "#D29A22" },
+  warning: { bg: "#F7E9E8", text: "#B86557", icon: "alert-circle", iconColor: "#B86557", actionColor: "#B86557" },
   "smart-tip": { bg: "#F3E8EE", text: "#5E3A4C", icon: "zap", iconColor: "#5E3A4C", actionColor: "#5E3A4C" },
 };
 
@@ -123,9 +123,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 11,
     borderRadius: 14,
-    boxShadow: "0px 2px 8px rgba(0,0,0,0.12)",
+    boxShadow: "0px 2px 8px rgba(0,0,0,0.10)",
     elevation: 4,
-  },
+  } as any,
   message: {
     flex: 1,
     fontSize: 13,

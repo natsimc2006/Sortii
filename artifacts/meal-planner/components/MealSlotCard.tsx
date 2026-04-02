@@ -12,6 +12,24 @@ import Colors from "@/constants/Colors";
 import { Recipe, getPrepStyleLabel } from "@/constants/recipes";
 import { getCurrentAustralianSeason, isRecipeSeasonal } from "@/utils/seasonUtils";
 
+const C = Colors.light;
+
+// Per-icon colour tokens
+const ICON = {
+  recipe:   { icon: "#2A8F88", bg: "#E6F3F0" },
+  autoSwap: { icon: "#D29A22", bg: "#F6E6BA" },
+  swap:     { icon: "#5E3A4C", bg: "#F3E8EE" },
+  hide:     { icon: "#5E3A4C", bg: "#F3E8EE" },
+  remove:   { icon: "#B86557", bg: "#F7E9E8" },
+};
+
+// Per-badge colour tokens
+const BADGE = {
+  mealType:  { text: "#2A8F88", bg: "#E6F3F0" },
+  seasonal:  { text: "#5F7C50", bg: "#EAF3E2" },
+  prep:      { text: "#5E3A4C", bg: "#F3E8EE" },
+};
+
 interface MealSlotCardProps {
   day: string;
   slot: "lunch" | "dinner";
@@ -37,13 +55,13 @@ export function MealSlotCard({
   onHideRecipe,
   seasonalMode = false,
 }: MealSlotCardProps) {
-  const C = Colors.light;
   const [imgError, setImgError] = useState(false);
   const currentSeason = seasonalMode ? getCurrentAustralianSeason() : null;
-  const showSeasonalBadge = seasonalMode && recipe != null && currentSeason
-    ? isRecipeSeasonal(recipe, currentSeason)
-    : false;
-  const slotLabel = slot === "lunch" ? "Lunch" : "Dinner";
+  const showSeasonalBadge =
+    seasonalMode && recipe != null && currentSeason
+      ? isRecipeSeasonal(recipe, currentSeason)
+      : false;
+  const slotLabel = slot === "lunch" ? "LUNCH" : "DINNER";
 
   const handleRemove = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -64,7 +82,7 @@ export function MealSlotCard({
           <Feather name="plus" size={20} color={C.primary} />
         </View>
         <View style={styles.emptyText}>
-          <Text style={[styles.slotLabel, { color: C.textMuted }]}>
+          <Text style={[styles.slotLabelText, { color: C.textMuted }]}>
             {slotLabel}
           </Text>
           <Text style={[styles.addLabel, { color: C.primary }]}>
@@ -83,56 +101,89 @@ export function MealSlotCard({
         : "coffee";
 
   const showImage = !!recipe.imageUrl && !imgError;
+  const prepLabel = getPrepStyleLabel(recipe);
 
   return (
     <View style={[styles.filledSlot, { backgroundColor: C.card, borderColor: C.cardBorder }]}>
+      {/* Header: meal type badge + action icons */}
       <View style={styles.slotHeader}>
-        <View style={[styles.slotBadge, { backgroundColor: slot === "lunch" ? "#FFF8E1" : C.chipBg }]}>
-          <Text style={[styles.slotBadgeText, { color: slot === "lunch" ? C.accent : C.primary }]}>
+        <View style={[styles.slotBadge, { backgroundColor: BADGE.mealType.bg }]}>
+          <Text style={[styles.slotBadgeText, { color: BADGE.mealType.text }]}>
             {slotLabel}
           </Text>
         </View>
+
         <View style={styles.slotActions}>
+          {/* Open recipe */}
           {onViewRecipe && (
-            <TouchableOpacity onPress={onViewRecipe} style={styles.actionBtn} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
-              <Feather name="book-open" size={14} color={C.primary} />
+            <TouchableOpacity
+              onPress={onViewRecipe}
+              style={[styles.actionBtn, { backgroundColor: ICON.recipe.bg }]}
+              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+            >
+              <Feather name="book-open" size={14} color={ICON.recipe.icon} />
             </TouchableOpacity>
           )}
+
+          {/* Auto swap — gold: featured smart action */}
           {onAutoSwap && (
             <TouchableOpacity
               onPress={() => {
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                 onAutoSwap();
               }}
-              style={[styles.actionBtn, { backgroundColor: "#EEF6EE" }]}
+              style={[styles.actionBtn, { backgroundColor: ICON.autoSwap.bg }]}
               hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
             >
-              <Feather name="zap" size={13} color="#4A7C4E" />
+              <Feather name="zap" size={13} color={ICON.autoSwap.icon} />
             </TouchableOpacity>
           )}
-          <TouchableOpacity onPress={onSwap} style={styles.actionBtn} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
-            <Feather name="refresh-cw" size={14} color={C.textSecondary} />
+
+          {/* Swap/regenerate — plum */}
+          <TouchableOpacity
+            onPress={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              onSwap();
+            }}
+            style={[styles.actionBtn, { backgroundColor: ICON.swap.bg }]}
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+          >
+            <Feather name="refresh-cw" size={14} color={ICON.swap.icon} />
           </TouchableOpacity>
+
+          {/* Hide — plum */}
           {onHideRecipe && (
             <TouchableOpacity
               onPress={() => {
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
                 onHideRecipe();
               }}
-              style={[styles.actionBtn, { backgroundColor: "#FFF3F3" }]}
+              style={[styles.actionBtn, { backgroundColor: ICON.hide.bg }]}
               hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
             >
-              <Feather name="eye-off" size={13} color="#C0524A" />
+              <Feather name="eye-off" size={13} color={ICON.hide.icon} />
             </TouchableOpacity>
           )}
-          <TouchableOpacity onPress={handleRemove} style={styles.actionBtn} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
-            <Feather name="x" size={14} color={C.danger} />
+
+          {/* Remove — warm red */}
+          <TouchableOpacity
+            onPress={handleRemove}
+            style={[styles.actionBtn, { backgroundColor: ICON.remove.bg }]}
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+          >
+            <Feather name="x" size={14} color={ICON.remove.icon} />
           </TouchableOpacity>
         </View>
       </View>
 
-      <View style={styles.recipeRow}>
-        <View style={[styles.recipeIconBox, { backgroundColor: C.chipBg }]}>
+      {/* Recipe body — tappable to open recipe */}
+      <TouchableOpacity
+        onPress={onViewRecipe}
+        activeOpacity={onViewRecipe ? 0.6 : 1}
+        disabled={!onViewRecipe}
+        style={styles.recipeRow}
+      >
+        <View style={[styles.recipeIconBox, { backgroundColor: ICON.recipe.bg }]}>
           {showImage ? (
             <Image
               source={{ uri: recipe.imageUrl }}
@@ -141,18 +192,19 @@ export function MealSlotCard({
               onError={() => setImgError(true)}
             />
           ) : (
-            <Feather name={cookIcon as any} size={16} color={C.primary} />
+            <Feather name={cookIcon as any} size={16} color={ICON.recipe.icon} />
           )}
         </View>
+
         <View style={styles.recipeInfo}>
           <View style={styles.nameRow}>
             <Text style={[styles.recipeName, { color: C.text }]} numberOfLines={1}>
               {recipe.name}
             </Text>
-            {getPrepStyleLabel(recipe) && (
-              <View style={[styles.prepBadge, { backgroundColor: C.chipBg }]}>
-                <Text style={[styles.prepBadgeText, { color: C.primary }]}>
-                  {getPrepStyleLabel(recipe)}
+            {prepLabel && (
+              <View style={[styles.prepBadge, { backgroundColor: BADGE.prep.bg }]}>
+                <Text style={[styles.prepBadgeText, { color: BADGE.prep.text }]}>
+                  {prepLabel}
                 </Text>
               </View>
             )}
@@ -162,13 +214,19 @@ export function MealSlotCard({
               {recipe.cookTimeMinutes} min · {recipe.difficulty}
             </Text>
             {showSeasonalBadge && (
-              <View style={[styles.seasonalBadge, { backgroundColor: "#E8F5E0" }]}>
-                <Text style={[styles.seasonalBadgeText, { color: "#4A7C4E" }]}>🌿 Seasonal</Text>
+              <View style={[styles.seasonalBadge, { backgroundColor: BADGE.seasonal.bg }]}>
+                <Text style={[styles.seasonalBadgeText, { color: BADGE.seasonal.text }]}>
+                  🌿 Seasonal
+                </Text>
               </View>
             )}
           </View>
         </View>
-      </View>
+
+        {onViewRecipe && (
+          <Feather name="chevron-right" size={14} color={C.textMuted} style={styles.chevron} />
+        )}
+      </TouchableOpacity>
     </View>
   );
 }
@@ -194,7 +252,7 @@ const styles = StyleSheet.create({
     flex: 1,
     gap: 2,
   },
-  slotLabel: {
+  slotLabelText: {
     fontSize: 11,
     fontFamily: "Inter_500Medium",
     textTransform: "uppercase",
@@ -228,13 +286,12 @@ const styles = StyleSheet.create({
   },
   slotActions: {
     flexDirection: "row",
-    gap: 8,
+    gap: 6,
   },
   actionBtn: {
     width: 28,
     height: 28,
     borderRadius: 8,
-    backgroundColor: "#F5F5F5",
     alignItems: "center",
     justifyContent: "center",
   },
@@ -303,5 +360,9 @@ const styles = StyleSheet.create({
   seasonalBadgeText: {
     fontSize: 10,
     fontFamily: "Inter_600SemiBold",
+  },
+  chevron: {
+    flexShrink: 0,
+    marginLeft: 2,
   },
 });

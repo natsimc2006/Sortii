@@ -3,6 +3,7 @@ import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
 import React from "react";
 import {
+  Image,
   Platform,
   ScrollView,
   StyleSheet,
@@ -10,8 +11,11 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Colors from "@/constants/Colors";
+
+const sortiiLogo = require("@/assets/images/sortii-logo.png");
 
 const STEPS = [
   {
@@ -72,15 +76,11 @@ export default function HomeScreen() {
       </TouchableOpacity>
 
       <View style={styles.heroSection}>
-        <View style={[styles.logoBox, { backgroundColor: C.chipBg }]}>
-          <Feather name="calendar" size={36} color={C.primaryDark} />
-        </View>
-        <Text style={[styles.headline, { color: C.primary }]}>
-          Sortii
-        </Text>
-        <Text style={[styles.brandSubtitle, { color: C.textSecondary }]}>
-          Dinner… sorted.
-        </Text>
+        <Image
+          source={sortiiLogo}
+          style={styles.logoImage}
+          resizeMode="contain"
+        />
         <Text style={[styles.subheadline, { color: C.textSecondary }]}>
           250 dinners. Smart planning. One less thing to think about.
         </Text>
@@ -135,7 +135,7 @@ export default function HomeScreen() {
         <TouchableOpacity
           onPress={handleBack}
           activeOpacity={0.85}
-          style={[styles.primaryBtn, { backgroundColor: C.primaryDark }]}
+          style={[styles.primaryBtn, { backgroundColor: C.gold }]}
         >
           <Text style={styles.primaryBtnText}>Back to my planner</Text>
           <Feather name="arrow-right" size={20} color="#fff" />
@@ -182,24 +182,9 @@ const styles = StyleSheet.create({
     gap: 16,
     paddingTop: 8,
   },
-  logoBox: {
-    width: 80,
-    height: 80,
-    borderRadius: 24,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  headline: {
-    fontSize: 40,
-    fontFamily: "Inter_700Bold",
-    textAlign: "center",
-    lineHeight: 46,
-  },
-  brandSubtitle: {
-    fontSize: 16,
-    fontFamily: "Inter_500Medium",
-    textAlign: "center",
-    marginTop: -4,
+  logoImage: {
+    width: 260,
+    height: 120,
   },
   subheadline: {
     fontSize: 16,
