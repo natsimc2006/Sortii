@@ -1,0 +1,118 @@
+Please update the mobile UI of my Sortii Dinner Sorted app to improve branding scale, reduce wasted whitespace, and tighten the planner header. Keep the existing calm premium look, but make it feel more polished and intentional.
+
+GOALS
+- Make the home screen logo more prominent
+- Reduce unnecessary empty space on the home and planner pages
+- Correct the planner page branding/header
+- Keep the existing soft neutral palette, teal primary, mustard CTA, and plum accent
+- Maintain a mobile-first layout
+
+1) HOME SCREEN CHANGES
+
+Logo
+- Increase the main Sortii Dinner Sorted logo size
+- Set logo width to 170px on mobile
+- Use max-width: 65% of screen width so it stays responsive
+- Keep it centered
+
+Spacing
+- Reduce top padding above the logo to 24px
+- Reduce spacing below the logo to 16px
+- Tighten the vertical spacing between the logo, subtitle text, and “How it works” section
+- Reduce overall section spacing from roughly 32px to about 20px
+- Reduce card spacing in the “How it works” area to around 12–14px
+
+Typography hierarchy
+- Keep the logo as the hero element
+- Keep supporting text readable but secondary
+- Ensure the line “250 dinners. Smart planning. One less thing to think about.” remains centered and visually balanced under the logo
+
+2) PLANNER PAGE HEADER FIX
+
+Current issue
+- There is too much wasted vertical space at the top
+- The logo treatment is inconsistent
+- The header feels too tall and under-designed
+
+New planner header layout
+- Create a compact branded header
+- Place a small Sortii logo at the top left
+- Set small logo width to about 90px
+- Place the home button/icon at the top right aligned horizontally with the logo
+- Put “Weekly Planner” directly underneath the logo with about 8px spacing
+- Keep the preference chips beneath that
+- Reduce the total header height to about 90px–100px
+- Remove excess blank space above and below the header content
+
+Do not use a large logo on this page
+- The planner page should use the smaller corner logo only
+- Avoid repeating oversized branding and oversized title styling
+
+3) VISUAL BALANCE / SPACING
+
+General
+- Tighten top and bottom padding wherever there is obvious dead space
+- Keep breathing room, but reduce floaty empty areas
+- Make the interface feel efficient and tidy for busy users
+
+Cards
+- Keep rounded cards and soft shadows if already present
+- Ensure meal cards still feel touch-friendly
+- Preserve clear spacing between days and cards, but slightly tighten the vertical rhythm
+
+4) COLOUR + BRAND POLISH
+
+Keep palette direction
+- Warm neutral background
+- Teal as primary brand/app colour
+- Mustard/golden tone for primary CTA
+- Soft plum accent for secondary moments
+
+Use plum more intentionally
+- Add plum accent selectively to one or two UI elements where appropriate
+- Good candidates: swap/refresh state, secondary icon accents, selected state, or micro highlights
+- Do not overuse it
+
+Primary CTA
+- Keep “Refresh My Plan” as the primary standout button
+- Make it feel slightly stronger by adding a subtle shadow:
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+
+Bottom nav
+- Darken inactive icons/text slightly so they are easier to read
+- Keep active state clearly teal
+
+Optional header polish
+- Add a very subtle tinted background behind the planner header area to separate it from the rest of the page
+- Example tone: very light teal tint
+- Keep it extremely soft and premium, not obvious
+
+5) UX DETAILS TO PRESERVE
+
+Please preserve:
+- Existing meal card structure
+- Existing filters/preferences chips
+- Existing bottom tab navigation
+- Existing calm premium app tone
+- Existing tap targets and usability on mobile
+
+Please also check:
+- Logo renders correctly on both home and planner pages
+- Header does not push content too far down on smaller screens
+- Layout works well on iPhone-sized mobile screens
+- No crowding or overlap occurs when text wraps
+
+6) IMPLEMENTATION STYLE
+
+Please make these edits directly in the current UI rather than redesigning the whole app.
+Focus on:
+- spacing
+- header structure
+- logo scale
+- visual hierarchy
+- subtle polish
+
+After patching, show me:
+1. what you changed
+2. any components/files updated
+3. any values used for logo width, header height, spacing, and shadow

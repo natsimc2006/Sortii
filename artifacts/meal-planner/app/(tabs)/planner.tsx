@@ -4,6 +4,7 @@ import { useRouter } from "expo-router";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
+  Image,
   Platform,
   ScrollView,
   StyleSheet,
@@ -11,6 +12,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Colors from "@/constants/Colors";
 import { DAYS, MealPlanEntry, MealSlot, PANTRY_STAPLES, Recipe, WEEKEND_DAYS } from "@/constants/recipes";
@@ -19,6 +21,8 @@ import { MealSlotCard } from "@/components/MealSlotCard";
 import { MealSearchModal } from "@/components/MealSearchModal";
 import { RecipeDetailModal } from "@/components/RecipeDetailModal";
 import { Toast, ToastState } from "@/components/Toast";
+
+const sortiiLogo = require("@/assets/images/sortii-logo.png");
 
 type ConfirmAction = "auto" | "clear" | null;
 
@@ -314,17 +318,17 @@ export default function PlannerScreen() {
         style={[
           styles.topBar,
           {
-            paddingTop: Platform.OS === "web" ? 67 : insets.top + 8,
-            backgroundColor: C.background,
+            paddingTop: Platform.OS === "web" ? 50 : insets.top + 4,
+            backgroundColor: C.secondaryActionBg,
             borderBottomColor: C.cardBorder,
           },
         ]}
       >
         <View style={styles.topBarContent}>
           <View style={styles.titleRow}>
-            <View>
-              <Text style={[styles.brandTitle, { color: C.primary }]}>Sortii</Text>
-              <Text style={[styles.screenSubtitle, { color: C.textMuted }]}>Weekly Planner</Text>
+            <View style={styles.headerBrand}>
+              <Image source={sortiiLogo} style={styles.headerLogo} resizeMode="contain" />
+              <Text style={[styles.screenSubtitle, { color: C.textMuted, marginTop: 4 }]}>Weekly Planner</Text>
             </View>
             <TouchableOpacity
               onPress={() => router.push("/home")}
@@ -642,16 +646,24 @@ function FilterChip({ label, icon }: { label: string; icon: string }) {
 const styles = StyleSheet.create({
   topBar: {
     paddingHorizontal: 20,
-    paddingBottom: 14,
+    paddingBottom: 10,
     borderBottomWidth: 1,
   },
   topBarContent: {
-    gap: 8,
+    gap: 6,
   },
   titleRow: {
     flexDirection: "row",
-    alignItems: "flex-end",
+    alignItems: "center",
     justifyContent: "space-between",
+  },
+  headerBrand: {
+    flexDirection: "column",
+    alignItems: "flex-start",
+  },
+  headerLogo: {
+    width: 90,
+    height: 42,
   },
   brandTitle: {
     fontSize: 26,
@@ -659,9 +671,8 @@ const styles = StyleSheet.create({
     lineHeight: 30,
   },
   screenSubtitle: {
-    fontSize: 12,
-    fontFamily: "Inter_400Regular",
-    marginTop: 1,
+    fontSize: 11,
+    fontFamily: "Inter_500Medium",
   },
   chipsRow: {
     flexDirection: "row",
@@ -837,6 +848,11 @@ const styles = StyleSheet.create({
     gap: 6,
     paddingVertical: 14,
     borderRadius: 14,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    elevation: 3,
   },
   actionBtnDestructive: {
     width: 44,

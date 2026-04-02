@@ -60,7 +60,7 @@ export default function HomeScreen() {
       contentContainerStyle={[
         styles.container,
         {
-          paddingTop: Platform.OS === "web" ? 80 : insets.top + 20,
+          paddingTop: Platform.OS === "web" ? 40 : insets.top + 16,
           paddingBottom: Platform.OS === "web" ? 60 : insets.bottom + 40,
         },
       ]}
@@ -162,7 +162,7 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 24,
-    gap: 32,
+    gap: 20,
   },
   backBtn: {
     flexDirection: "row",
@@ -179,12 +179,13 @@ const styles = StyleSheet.create({
   },
   heroSection: {
     alignItems: "center",
-    gap: 16,
-    paddingTop: 8,
+    gap: 12,
+    paddingTop: 0,
   },
   logoImage: {
-    width: 260,
-    height: 120,
+    width: 170,
+    maxWidth: "65%",
+    height: 79,
   },
   subheadline: {
     fontSize: 16,
