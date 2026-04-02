@@ -318,8 +318,8 @@ export default function PlannerScreen() {
         style={[
           styles.topBar,
           {
-            paddingTop: Platform.OS === "web" ? 50 : insets.top + 4,
-            backgroundColor: C.secondaryActionBg,
+            paddingTop: Platform.OS === "web" ? 44 : insets.top + 2,
+            backgroundColor: C.background,
             borderBottomColor: C.cardBorder,
           },
         ]}
@@ -328,30 +328,30 @@ export default function PlannerScreen() {
           <View style={styles.titleRow}>
             <View style={styles.headerBrand}>
               <Image source={sortiiLogo} style={styles.headerLogo} resizeMode="contain" />
-              <Text style={[styles.screenSubtitle, { color: C.textMuted, marginTop: 4 }]}>Weekly Planner</Text>
+              <Text style={[styles.screenSubtitle, { color: C.textMuted, marginTop: 3 }]}>Weekly Planner</Text>
             </View>
-            <TouchableOpacity
-              onPress={() => router.push("/home")}
-              style={[styles.homeIconBtn, { backgroundColor: C.chipBg }]}
-              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-            >
-              <Feather name="home" size={16} color={C.primary} />
-            </TouchableOpacity>
+            <View style={styles.headerIcons}>
+              <TouchableOpacity
+                onPress={() => router.push("/(tabs)/preferences")}
+                style={[styles.filterIconBtn, { backgroundColor: C.plumTint }]}
+                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+              >
+                <Feather name="sliders" size={15} color={C.plum} />
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => router.push("/home")}
+                style={[styles.homeIconBtn, { backgroundColor: C.chipBg }]}
+                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+              >
+                <Feather name="home" size={15} color={C.primary} />
+              </TouchableOpacity>
+            </View>
           </View>
-          <View style={styles.chipsRow}>
-            <View style={styles.filterChips}>
-              <FilterChip label={`${preferences.householdSize} people`} icon="users" />
-              <FilterChip label={budgeLabel} icon="dollar-sign" />
-              <FilterChip label={healthLabel} icon="activity" />
-              <FilterChip label={estimatedCostBand} icon="shopping-bag" />
-            </View>
-            <TouchableOpacity
-              onPress={() => router.push("/(tabs)/preferences")}
-              style={[styles.filterIconBtn, { backgroundColor: C.plumTint }]}
-              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-            >
-              <Feather name="sliders" size={15} color={C.plum} />
-            </TouchableOpacity>
+          <View style={styles.filterChips}>
+            <FilterChip label={`${preferences.householdSize} people`} icon="users" />
+            <FilterChip label={budgeLabel} icon="dollar-sign" />
+            <FilterChip label={healthLabel} icon="activity" />
+            <FilterChip label={estimatedCostBand} icon="shopping-bag" />
           </View>
         </View>
       </View>
@@ -662,8 +662,13 @@ const styles = StyleSheet.create({
     alignItems: "flex-start",
   },
   headerLogo: {
-    width: 90,
-    height: 42,
+    width: 110,
+    height: 51,
+  },
+  headerIcons: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
   },
   brandTitle: {
     fontSize: 26,
@@ -674,13 +679,7 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontFamily: "Inter_500Medium",
   },
-  chipsRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-  },
   filterChips: {
-    flex: 1,
     flexDirection: "row",
     flexWrap: "wrap",
     gap: 6,
