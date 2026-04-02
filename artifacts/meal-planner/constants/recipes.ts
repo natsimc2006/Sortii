@@ -35,6 +35,7 @@ export interface Recipe {
   batchCook?: boolean;
   quickAssembly?: boolean;
   familyStyle?: boolean;
+  kidFriendly?: boolean;
   proteinType?: "chicken" | "beef" | "pork" | "seafood" | "eggs" | "legumes" | "lamb" | "poultry" | "none";
   cuisineType?: "australian" | "italian" | "asian" | "mexican" | "mediterranean" | "indian" | "middle-eastern" | "american" | "other";
   seasonTags?: string[];
@@ -85,7 +86,8 @@ export interface PlanPreferences {
   prepStyle: "mixed" | "batch-cook" | "quick-assembly" | "family-style";
   minimiseWaste: boolean;
   seasonalMode: boolean;
-  dietType: "omnivore" | "vegetarian" | "vegan" | "pescatarian";
+  dietType: "no-preference" | "omnivore" | "vegetarian" | "vegan" | "pescatarian";
+  kidFriendly: boolean;
 }
 
 export const DEFAULT_WEEKEND_OVERRIDES: WeekendOverrides = {
@@ -95,7 +97,7 @@ export const DEFAULT_WEEKEND_OVERRIDES: WeekendOverrides = {
 };
 
 export const DEFAULT_PREFERENCES: PlanPreferences = {
-  planningMode: "mixed",
+  planningMode: "auto",
   householdSize: 4,
   budgetLevel: "standard",
   healthStyle: "standard",
@@ -110,7 +112,8 @@ export const DEFAULT_PREFERENCES: PlanPreferences = {
   prepStyle: "mixed",
   minimiseWaste: false,
   seasonalMode: false,
-  dietType: "omnivore",
+  dietType: "no-preference",
+  kidFriendly: false,
 };
 
 export function getApproxCostPerServe(recipe: Recipe): number {
@@ -222,7 +225,7 @@ function hasIngredientKeyword(ingredients: RecipeIngredient[], keywords: string[
 }
 
 function dietTypeOk(r: Recipe, dietType: string): boolean {
-  if (!dietType || dietType === "omnivore") return true;
+  if (!dietType || dietType === "omnivore" || dietType === "no-preference") return true;
   const hasMeat = hasIngredientKeyword(r.ingredients, MEAT_KEYWORDS);
   const hasSeafood = hasIngredientKeyword(r.ingredients, SEAFOOD_KEYWORDS);
   if (dietType === "pescatarian") return !hasMeat;
@@ -232,6 +235,18 @@ function dietTypeOk(r: Recipe, dietType: string): boolean {
     return !hasMeat && !hasSeafood && !hasDairyEgg;
   }
   return true;
+}
+
+export function getKidFriendlyScore(r: Recipe): boolean {
+  if (r.kidFriendly !== undefined) return r.kidFriendly;
+  const text = (r.name + " " + r.description).toLowerCase();
+  const notKidFriendly =
+    /spicy|chilli.*hot|very hot|jalape|sriracha|szechuan|gourmet|unusual texture|bitterness/;
+  if (notKidFriendly.test(text)) return false;
+  const kidFriendlyPatterns =
+    /pasta|bolognese|meatball|taco|fried rice|chicken.*rice|mac.*cheese|schnitzel|fish.*chip|nugget|burger|pizza|stir.fry|tray.bake|casserole|chicken.*soup|tomato.*soup|spaghetti|lasagna|drumstick|teriyaki|quesadilla|noodle|pancake|bake|chicken breast/;
+  if (kidFriendlyPatterns.test(text)) return true;
+  return r.difficulty === "easy" && r.estimatedCostBand !== "high" && r.cookTimeMinutes <= 30;
 }
 
 const HIGH_CARB_INGREDIENTS = [
@@ -292,7 +307,7 @@ export function filterRecipes(
     isWeekend && overrides.enabled ? overrides.budgetLevel : prefs.budgetLevel;
   const cuisine = prefs.cuisinePreference ?? "mixed";
   const lowerExclusions = (prefs.exclusions ?? []).map((e) => e.toLowerCase());
-  const diet = prefs.dietType ?? "omnivore";
+  const diet = prefs.dietType ?? "no-preference";
 
   const mealTypeOk = (r: Recipe) => {
     if (mealType === "lunch" && r.mealType === "dinner") return false;

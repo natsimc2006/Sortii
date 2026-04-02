@@ -1,0 +1,733 @@
+Please update the app’s onboarding, planner, settings, shopping list, toasts, confirmations, and microcopy so the product feels clearly branded as Sortii: clean, fast, cheeky, and helpful.
+
+IMPORTANT:
+This is not a corporate meal planner and not a soft fluffy wellness app.
+The tone should be:
+- short
+- confident
+- light
+- slightly cheeky
+- practical
+- never cringey
+- never over-written
+
+The app should feel like:
+“Dinner stress removed.”
+“Set a few basics — we’ll handle the rest.”
+“Fast, smart, useful.”
+
+==================================================
+1. BRAND SYSTEM
+==================================================
+
+Brand name:
+Sortii
+
+Primary brand line:
+“Dinner… sorted.”
+
+Secondary line for onboarding:
+“Let’s sort your dinners. Takes 60 seconds.”
+
+Colour palette:
+- Background / warm neutral: #F7F3EB
+- Charcoal / primary text: #2B2B2B
+- Secondary text: #6F6F6A
+- Teal / primary brand colour: #2C9797
+- Gold / CTA accent: #DEA829
+- Deep plum / secondary accent: #5E3A4C
+- Soft teal tint: #E7F4F3
+- Soft gold tint: #F7E8BE
+- Soft plum tint: #F3E8EE
+- Border / divider: #E6E1D7
+- Error / destructive: #C56B5C
+- Destructive background tint: #F8E9E6
+
+Colour rules:
+- 80% of UI should remain neutral, cream, white, charcoal
+- teal is the main brand/action colour
+- gold is the main CTA/highlight colour
+- plum is used sparingly for clever/smart moments, info states, and premium-feeling accents
+- do not make the interface look loud or colourful
+- keep it clean and premium
+
+Logo:
+- Load the uploaded transparent logo from the public assets folder
+- Place it in the onboarding welcome screen and any appropriate app header/splash position
+- Use a clean responsive size
+- Do not distort it
+- Assume the logo file will be stored in /public/sortii-logo.png
+
+==================================================
+2. GLOBAL VOICE + MICROCOPY RULES
+==================================================
+
+Tone rules:
+- Use short sentences
+- Use confident, human language
+- Use slight cheekiness where it improves the moment
+- Never let humour block clarity
+- Tone down cheekiness for destructive actions or warnings
+- Use stronger cheeky tone in toasts, success states, and light guidance
+- Avoid words like “successfully”, “please”, “kindly”, “customise” if there is a clearer, simpler option
+
+Signature phrases to protect and use sparingly:
+- “Dinner… sorted.”
+- “Done. Your week’s sorted.”
+
+Use plum accent styling for:
+- smart tips
+- helpful info toasts
+- optimisation messages
+- “make it smarter” section
+- selected clever/system-generated moments
+
+==================================================
+3. ONBOARDING FLOW
+==================================================
+
+Create or update the first-launch onboarding to be a fast, focused step-by-step experience.
+
+Total steps:
+6
+
+Step order:
+1. Welcome
+2. Planning Mode
+3. Household Size
+4. Budget Level
+5. Meals per Week
+6. Dietary Preferences
+7. Ingredient Exclusions
+Then generate plan
+
+If your implementation requires the welcome screen not to count in numeric progress, that is fine.
+Progress can be:
+- 1 of 6 after welcome
+or
+- 1 of 7 including welcome
+Be consistent.
+
+--------------------------------
+WELCOME SCREEN
+--------------------------------
+
+Layout:
+- Sortii logo at top
+- clean vertical spacing
+- bold headline
+- one short supporting line
+- strong CTA fixed near bottom if suitable
+
+Copy:
+Headline:
+“Dinner… sorted.”
+
+Supporting line:
+“Let’s sort your dinners. Takes 60 seconds.”
+
+Primary CTA:
+“Start my week”
+
+Small helper text:
+“You can tweak things later.”
+
+--------------------------------
+PLANNING MODE SCREEN
+--------------------------------
+
+Headline:
+“How hands-on do you want to be?”
+
+Options:
+- Auto
+- Mixed
+- Manual
+
+Descriptions:
+Auto:
+“We’ve got this.”
+Mixed:
+“You pick a few, we’ll fill the gaps.”
+Manual:
+“All yours.”
+
+Default:
+Auto
+
+--------------------------------
+HOUSEHOLD SIZE SCREEN
+--------------------------------
+
+Headline:
+“How many are you feeding?”
+
+Helper:
+“We’ll size everything for you.”
+
+Use a clean stepper control with large tap targets.
+
+--------------------------------
+BUDGET LEVEL SCREEN
+--------------------------------
+
+Headline:
+“What’s the budget?”
+
+Helper:
+“Good meals don’t have to cost a fortune.”
+
+Options:
+- Super Budget
+- Budget
+- Standard
+- Premium
+
+Where appropriate, show simple supportive sublabels such as:
+Super Budget:
+“~$5 per serve”
+Do not overload the screen.
+
+--------------------------------
+MEALS PER WEEK SCREEN
+--------------------------------
+
+Headline:
+“How many nights are we sorting?”
+
+Options:
+- 3 meals
+- 5 meals
+- 7 meals
+
+--------------------------------
+DIETARY PREFERENCES SCREEN
+--------------------------------
+
+Headline:
+“Anything we should avoid?”
+
+Helper:
+“Skip if you’re easy.”
+
+Options:
+- No preference (default)
+- Vegetarian
+- Vegan
+- Pescatarian
+
+Remove Omnivore completely.
+
+This step is optional and can be advanced without change.
+
+--------------------------------
+INGREDIENT EXCLUSIONS SCREEN
+--------------------------------
+
+Headline:
+“Any hard no’s?”
+
+Helper:
+“We’ll steer clear.”
+
+Use quick-select chips.
+
+Examples:
+- Chicken
+- Pork
+- Beef
+- Lamb
+- Seafood
+- Dairy
+- Gluten
+- Eggs
+- Nuts
+
+This step is optional and can be advanced without any selection.
+
+--------------------------------
+GENERATING STATE
+--------------------------------
+
+When the app is generating the week, show a loading state with rotating messages.
+
+Headline:
+“Alright… give us a sec”
+
+Rotating support lines:
+- “Sorting your week…”
+- “Balancing budget + time…”
+- “Making sure Tuesday isn’t boring…”
+- “Keeping things realistic…”
+- “Almost there…”
+
+When generation completes, show:
+“Done. Your week’s sorted.”
+
+==================================================
+4. SETTINGS / PREFERENCES STRUCTURE
+==================================================
+
+Restructure Settings into 4 tiers with clean hierarchy.
+
+Only Tier 1 should be expanded by default.
+Tiers 2–4 should be collapsed by default.
+
+Add helper text at top of settings page:
+“You can fine-tune your plan anytime.”
+
+--------------------------------
+TIER 1 — QUICK SETUP
+(always visible)
+--------------------------------
+
+Title:
+“Quick Setup”
+
+Helper:
+“Set the basics for your weekly plan.”
+
+Include:
+- Planning Mode
+- Household Size
+- Budget Level
+- Meals per Week
+- Dietary Preferences
+- Ingredient Exclusions
+
+Dietary Preferences options:
+- No preference
+- Vegetarian
+- Vegan
+- Pescatarian
+
+Ingredient Exclusions:
+- keep as selectable chips
+- optional
+
+--------------------------------
+TIER 2 — MAKE IT YOURS
+(collapsed)
+--------------------------------
+
+Title:
+“Make it yours”
+
+Helper:
+“Optional — tweak it if you like.”
+
+Include:
+- Meals to Plan
+- Health Style
+- Cuisine Preference
+- Cooking Effort → rename to “Recipe Complexity”
+- Cooking Preference → rename to “Cooking Style”
+
+Defaults:
+- Meals to Plan: Dinners only
+- Health Style: Standard
+- Cuisine Preference: Mixed
+- Recipe Complexity: Don’t Mind
+- Cooking Style: Mixed
+
+Allow the collapsed summary row to preview 1–2 selected values if cleanly possible.
+
+--------------------------------
+TIER 3 — MAKE IT SMARTER ✨
+(collapsed)
+--------------------------------
+
+Title:
+“Make it smarter ✨”
+
+Helper:
+“Let us do a bit of thinking for you.”
+
+Include:
+- Leftovers Mode → label it “Cook once, eat twice”
+- Shared Ingredients → rename from Minimise Waste
+- Seasonal Mode
+- Prep Style
+- Kid-Friendly Recipes
+
+Shared Ingredients description:
+“Reuse ingredients across the week to save money and reduce waste.”
+
+Seasonal Mode description:
+“Cheaper, fresher, better.”
+
+Kid-Friendly Recipes label:
+“Kid-Friendly Recipes”
+
+Kid-Friendly helper:
+“Prefer meals with simpler flavours, familiar ingredients, and broader family appeal.”
+
+Optional cheeky helper for kid-friendly:
+“Less complaints at the table.”
+
+Prep Style options:
+- Mixed
+- Batch Cook
+- Quick Assembly
+- Family Style
+
+Defaults:
+- Leftovers / Cook once, eat twice = Off
+- Shared Ingredients = Off
+- Seasonal Mode = Off
+- Kid-Friendly Recipes = Off
+- Prep Style = Mixed
+
+--------------------------------
+TIER 4 — ADVANCED
+(collapsed)
+--------------------------------
+
+Title:
+“Advanced”
+
+Helper:
+“Extra controls if you want them.”
+
+Include:
+- Weekend Overrides
+- Weekend Recipe Complexity
+- Weekend Budget
+- Any future specialist controls
+
+Weekend Overrides should remain lower priority than diet and exclusions.
+
+==================================================
+5. LABEL CLEANUP (APPLY GLOBALLY)
+==================================================
+
+Rename these labels everywhere in the UI:
+
+- Diet Type → Dietary Preferences
+- Cooking Effort → Recipe Complexity
+- Cooking Preference → Cooking Style
+- Minimise Waste → Shared Ingredients
+- Leftovers Mode → Cook once, eat twice
+
+Keep wording simple and human.
+
+==================================================
+6. PLANNER SCREEN MICROCOPY + ACTIONS
+==================================================
+
+Update planner screen copy and feedback states to match the Sortii voice.
+
+--------------------------------
+EMPTY PLANNER STATE
+--------------------------------
+
+Headline:
+“Nothing planned yet…”
+
+Support:
+“Let’s fix that.”
+
+CTA:
+“Fill my week”
+
+--------------------------------
+PRIMARY AUTO-PLAN ACTION
+--------------------------------
+
+Use button labels dynamically where possible:
+- Empty week: “Create My Week”
+- Partly filled: “Complete My Week”
+- Full: “Refresh My Plan”
+
+Optional helper text:
+“Sit back. We’ve got this.”
+
+--------------------------------
+DAY GAP / EMPTY DAY SLOT
+--------------------------------
+
+Message:
+“Bit of a gap here…”
+
+Support:
+“Want us to fill it?”
+
+--------------------------------
+MEAL REPLACE ACTION
+--------------------------------
+
+Confirmation / prompt:
+Headline:
+“Let’s try something else.”
+
+Support:
+“We’ll find a better fit.”
+
+Buttons:
+- Cancel
+- Swap it
+
+Success toast:
+“Swapped. That’s better.”
+
+--------------------------------
+MEAL DELETE / REMOVE ACTION
+--------------------------------
+
+Confirmation:
+Headline:
+“Not feeling this one?”
+
+Support:
+“We’ll line up a replacement.”
+
+Buttons:
+- Cancel
+- Replace it
+
+Success toast:
+“Gone. We’ll fill the gap.”
+
+--------------------------------
+MEAL HIDE ACTION
+--------------------------------
+
+Confirmation:
+Headline:
+“Seen enough of this one?”
+
+Support:
+“We’ll keep it out of your week.”
+
+Buttons:
+- Cancel
+- Hide it
+
+Success toast:
+“You won’t see that again this week.”
+
+--------------------------------
+CLEAR WEEK ACTION
+--------------------------------
+
+Confirmation:
+Headline:
+“Start fresh?”
+
+Support:
+“We’ll clear everything.”
+
+Buttons:
+- Cancel
+- Clear week
+
+Success toast:
+“All clear. Fresh start.”
+
+==================================================
+7. SHOPPING LIST MICROCOPY
+==================================================
+
+Shopping list CTA:
+“Get my list”
+
+After list generation:
+- “Shop sorted.”
+or
+- “Your list’s ready.”
+
+Empty shopping state:
+Headline:
+“No meals yet…”
+
+Support:
+“Plan your week first.”
+
+==================================================
+8. SETTINGS / REGENERATION / SYSTEM MESSAGES
+==================================================
+
+When user changes preferences that affect their plan:
+Confirmation:
+Headline:
+“Changed things up?”
+
+Support:
+“We’ll rework your week.”
+
+Buttons:
+- Keep current
+- Update my week
+
+Success toast:
+“Done. That fits better.”
+
+If filters are too restrictive:
+- “You’ve made this tricky 😅”
+- “Try loosening a filter.”
+
+Alternative calmer option:
+- “Nothing quite fits…”
+- “Let’s open things up a bit.”
+
+When saving:
+- “Saved. Easy.”
+
+When auto-planning:
+- “Sit back. We’ve got this.”
+
+==================================================
+9. SMART / AI / SYSTEM MOMENTS
+==================================================
+
+Use these as toast/info states where relevant:
+
+- “We tweaked a few things. Smarter now.”
+- “Trimmed the cost a bit. Still tasty.”
+- “You’ll use that coriander twice. Nice.”
+
+These should be visually styled as clever system messages, preferably using the soft plum tint / plum accent.
+
+==================================================
+10. TOAST / SNACKBAR SYSTEM
+==================================================
+
+Create or update a reusable toast/snackbar system.
+
+Requirements:
+- appears above bottom navigation / action bar
+- rounded corners
+- subtle shadow
+- auto dismiss after ~2.5 to 4 seconds
+- optional action like Undo where relevant
+- non-blocking
+- mobile friendly
+
+Variants:
+- success
+- info
+- warning
+- action/undo
+- smart-tip
+
+Styling:
+- success/default can use teal or neutral styling
+- warnings can use soft destructive tint
+- smart-tip/info can use soft plum tint with plum accent details
+
+Recommended short toast patterns:
+- “Done.”
+- “Sorted.”
+- “Saved.”
+- “Swapped.”
+- “Updated.”
+- “Fixed.”
+
+Use these sparingly and contextually.
+
+==================================================
+11. KID-FRIENDLY RECIPE LOGIC
+==================================================
+
+Ensure the planner can actually find and prioritise kid-friendly meals when the Kid-Friendly Recipes preference is enabled.
+
+Implementation guidance:
+- Add recipe field/tag such as:
+  kidFriendly: true/false
+  or kidFriendlyScore
+
+If missing, infer from recipe characteristics like:
+- mild flavours
+- low spice
+- familiar ingredients
+- simple presentation
+- broader family appeal
+- lower complexity
+
+Kid-friendly examples:
+- pasta bakes
+- tacos with simple fillings
+- mild chicken rice dishes
+- meatballs
+- tray bakes
+- simple stir fries
+- familiar tomato- or cheese-based meals
+
+Avoid prioritising as kid-friendly:
+- very spicy dishes
+- highly bitter ingredients
+- very niche flavours
+- overly complex gourmet meals
+- unusual textures
+
+Planner behaviour:
+- if Kid-Friendly Recipes is ON, increase ranking weight
+- do not make it a total hard restriction unless necessary
+- combine sensibly with budget, leftovers, shared ingredients, and recipe complexity
+
+==================================================
+12. VISUAL / LAYOUT RULES
+==================================================
+
+Keep the interface:
+- clean
+- lightly premium
+- calm
+- highly readable
+- spacious
+- mobile first
+
+Use:
+- large tap targets
+- minimal body text
+- clear section spacing
+- simple hierarchy
+
+Avoid:
+- clutter
+- long paragraphs
+- overusing gold or plum
+- too much humour on destructive/serious actions
+
+Welcome/onboarding CTA should be clearly visible and easy to tap.
+
+==================================================
+13. IMPLEMENT THE SORTII LOGO
+==================================================
+
+Please make the app support a transparent Sortii logo asset.
+
+Assume file path:
+`/public/sortii-logo.png`
+
+Use it in:
+- onboarding welcome screen
+- optional app header / splash if it fits cleanly
+
+Do not distort the aspect ratio.
+Use responsive sizing and proper alt text.
+
+==================================================
+14. FINAL QA
+==================================================
+
+After implementing, verify all of the following:
+
+- welcome screen uses Sortii branding and logo
+- onboarding includes the line:
+  “Let’s sort your dinners. Takes 60 seconds.”
+- onboarding feels fast and clear
+- Omnivore is removed
+- Dietary Preferences defaults to No preference
+- settings tiers are correctly structured and collapsed
+- cheeky microcopy appears across planner, settings, shopping, and toasts
+- microcopy stays clear and never blocks understanding
+- smart-tip/toast states use plum appropriately
+- planner actions have the updated confirmation copy
+- shopping list copy is updated
+- kid-friendly preference exists and affects recipe ranking
+- the interface still feels clean, premium, and practical
+- colours match the Sortii palette
+- logo asset loads correctly from public folder
+
+Please implement this as one cohesive branded UX update, not as isolated text swaps.

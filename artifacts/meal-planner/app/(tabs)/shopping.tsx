@@ -150,7 +150,7 @@ export default function ShoppingScreen() {
     await Clipboard.setStringAsync(buildListText());
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     setCopiedToast(true);
-    setTimeout(() => setCopiedToast(false), 2000);
+    setTimeout(() => setCopiedToast(false), 2500);
   };
 
   const handleShare = async () => {
@@ -178,11 +178,10 @@ export default function ShoppingScreen() {
             <Feather name="shopping-cart" size={40} color={C.primary} />
           </View>
           <Text style={[styles.emptyTitle, { color: C.text }]}>
-            No meals planned yet
+            No meals yet…
           </Text>
           <Text style={[styles.emptyText, { color: C.textSecondary }]}>
-            Add some meals to your weekly planner and your shopping list will
-            appear here, grouped by aisle.
+            Plan your week first.
           </Text>
         </View>
       </View>
@@ -194,7 +193,7 @@ export default function ShoppingScreen() {
       {copiedToast && (
         <View style={[styles.toast, { backgroundColor: C.primary }]}>
           <Feather name="check" size={14} color="#fff" />
-          <Text style={styles.toastText}>Copied to clipboard!</Text>
+          <Text style={styles.toastText}>List copied.</Text>
         </View>
       )}
       <View

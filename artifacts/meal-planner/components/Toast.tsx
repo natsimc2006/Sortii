@@ -8,7 +8,7 @@ import {
   View,
 } from "react-native";
 
-export type ToastVariant = "success" | "info" | "undo" | "warning";
+export type ToastVariant = "success" | "info" | "undo" | "warning" | "smart-tip";
 
 export interface ToastState {
   message: string;
@@ -25,11 +25,12 @@ interface ToastProps extends ToastState {
   onAutoHide?: () => void;
 }
 
-const VARIANT_STYLES: Record<ToastVariant, { bg: string; text: string; icon: string; iconColor: string }> = {
-  success: { bg: "#1F3D2B", text: "#fff", icon: "check-circle", iconColor: "#A5D6A7" },
-  info: { bg: "#F2E8EC", text: "#8B5A6B", icon: "info", iconColor: "#8B5A6B" },
-  undo: { bg: "#2F342F", text: "#fff", icon: "rotate-ccw", iconColor: "#E6EFE5" },
-  warning: { bg: "#FFF3E0", text: "#D6A23A", icon: "alert-circle", iconColor: "#D6A23A" },
+const VARIANT_STYLES: Record<ToastVariant, { bg: string; text: string; icon: string; iconColor: string; actionColor: string }> = {
+  success: { bg: "#1D7070", text: "#fff", icon: "check-circle", iconColor: "#A7D8D8", actionColor: "#fff" },
+  info: { bg: "#E7F4F3", text: "#1D7070", icon: "info", iconColor: "#2C9797", actionColor: "#1D7070" },
+  undo: { bg: "#2B2B2B", text: "#fff", icon: "rotate-ccw", iconColor: "#E0E0E0", actionColor: "#DEA829" },
+  warning: { bg: "#F7E8BE", text: "#8B6820", icon: "alert-circle", iconColor: "#DEA829", actionColor: "#8B6820" },
+  "smart-tip": { bg: "#F3E8EE", text: "#5E3A4C", icon: "zap", iconColor: "#5E3A4C", actionColor: "#5E3A4C" },
 };
 
 export function Toast({
@@ -93,7 +94,7 @@ export function Toast({
             onPress={onAction}
             hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
           >
-            <Text style={[styles.actionText, { color: variant === "info" ? v.text : "#fff" }]}>
+            <Text style={[styles.actionText, { color: v.actionColor }]}>
               {actionLabel}
             </Text>
           </TouchableOpacity>
@@ -122,10 +123,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 11,
     borderRadius: 14,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.12,
-    shadowRadius: 8,
+    boxShadow: "0px 2px 8px rgba(0,0,0,0.12)",
     elevation: 4,
   },
   message: {

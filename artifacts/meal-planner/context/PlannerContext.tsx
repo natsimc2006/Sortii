@@ -19,6 +19,7 @@ import {
   Recipe,
   addIngredientsToSet,
   filterRecipes,
+  getKidFriendlyScore,
   getRecipePrepStyles,
   ingredientOverlapScore,
   pickRecipes,
@@ -262,6 +263,11 @@ export function PlannerProvider({ children }: { children: React.ReactNode }) {
       // Seasonal bonus (up to 5 pts)
       if (currentSeason) {
         score += getRecipeSeasonalScore(r, currentSeason) * 5;
+      }
+
+      // Kid-friendly: up to 10 pts
+      if (p.kidFriendly) {
+        score += getKidFriendlyScore(r) ? 10 : 0;
       }
 
       return score;

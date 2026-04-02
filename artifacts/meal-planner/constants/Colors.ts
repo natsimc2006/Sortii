@@ -1,35 +1,39 @@
-const sage = "#5F7C6A";
-const primaryDark = "#1F3D2B";
-const mustard = "#D6A23A";
-const plum = "#8B5A6B";
+const teal = "#2C9797";
+const tealDark = "#1D7070";
+const gold = "#DEA829";
+const plum = "#5E3A4C";
 
 export default {
   light: {
-    primary: sage,
-    primaryDark,
-    mustard,
+    primary: teal,
+    primaryDark: tealDark,
+    gold,
+    goldTint: "#F7E8BE",
+    mustard: gold,
     plum,
-    plumTint: "#F2E8EC",
+    plumTint: "#F3E8EE",
+    tealTint: "#E7F4F3",
     background: "#F7F3EB",
     card: "#FFFDF9",
-    cardBorder: "#E5E2D8",
-    text: "#2F342F",
-    textSecondary: "#6B6F69",
-    textMuted: "#8A8D86",
-    tint: primaryDark,
+    cardBorder: "#E6E1D7",
+    text: "#2B2B2B",
+    textSecondary: "#6F6F6A",
+    textMuted: "#9B9B96",
+    tint: tealDark,
     tabIconDefault: "#B8BDB7",
-    tabIconSelected: primaryDark,
-    success: sage,
-    warning: mustard,
+    tabIconSelected: teal,
+    success: teal,
+    warning: gold,
     danger: "#C56B5C",
     dangerBg: "#F8E9E6",
-    chipBg: "#E6EFE5",
-    chipText: sage,
-    chipBgActive: primaryDark,
+    chipBg: "#E7F4F3",
+    chipText: "#2B2B2B",
+    chipBgActive: teal,
     chipTextActive: "#FFFFFF",
-    inputBorder: "#E5E2D8",
-    shadow: "rgba(31, 61, 43, 0.08)",
-    accent: mustard,
-    accentLight: "#E8C87A",
+    inputBorder: "#E6E1D7",
+    border: "#E6E1D7",
+    shadow: "rgba(44, 151, 151, 0.08)",
+    accent: gold,
+    accentLight: "#F7E8BE",
   },
 };

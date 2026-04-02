@@ -75,15 +75,14 @@ export default function HomeScreen() {
         <View style={[styles.logoBox, { backgroundColor: C.chipBg }]}>
           <Feather name="calendar" size={36} color={C.primaryDark} />
         </View>
-        <Text style={[styles.headline, { color: C.primaryDark }]}>
-          Plateful
+        <Text style={[styles.headline, { color: C.primary }]}>
+          Sortii
         </Text>
         <Text style={[styles.brandSubtitle, { color: C.textSecondary }]}>
-          Your weekly meals, sorted.
+          Dinner… sorted.
         </Text>
         <Text style={[styles.subheadline, { color: C.textSecondary }]}>
-          Plan meals for the whole family, discover new recipes, and generate
-          your grocery list in seconds.
+          250 dinners. Smart planning. One less thing to think about.
         </Text>
       </View>
 
