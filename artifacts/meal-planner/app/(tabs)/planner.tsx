@@ -365,7 +365,7 @@ export default function PlannerScreen() {
         style={[
           styles.topBar,
           {
-            paddingTop: Platform.OS === "web" ? 30 : insets.top,
+            paddingTop: Platform.OS === "web" ? 24 : insets.top,
             backgroundColor: C.background,
             borderBottomColor: C.cardBorder,
           },
@@ -718,8 +718,8 @@ const styles = StyleSheet.create({
     alignItems: "flex-start",
   },
   headerLogo: {
-    width: 110,
-    height: 51,
+    width: 143,
+    height: 66,
   },
   headerIcons: {
     flexDirection: "row",

@@ -60,7 +60,7 @@ export default function HomeScreen() {
       contentContainerStyle={[
         styles.container,
         {
-          paddingTop: Platform.OS === "web" ? 28 : insets.top + 4,
+          paddingTop: Platform.OS === "web" ? 22 : insets.top + 3,
           paddingBottom: Platform.OS === "web" ? 60 : insets.bottom + 40,
         },
       ]}
@@ -177,9 +177,9 @@ const styles = StyleSheet.create({
     paddingTop: 0,
   },
   logoImage: {
-    width: 320,
-    maxWidth: "82%",
-    height: 148,
+    width: 416,
+    maxWidth: "88%",
+    height: 192,
   },
   subheadline: {
     fontSize: 14,
