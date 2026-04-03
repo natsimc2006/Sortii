@@ -21,41 +21,175 @@ import {
   WeekendOverrides,
 } from "@/constants/recipes";
 import { usePlanner } from "@/context/PlannerContext";
-import { PillButton } from "@/components/PillButton";
 
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
+function OptionRow({
+  options,
+  value,
+  onSelect,
+}: {
+  options: { label: string; value: string }[];
+  value: string;
+  onSelect: (v: string) => void;
+}) {
   const C = Colors.light;
   return (
-    <View style={styles.section}>
-      <Text style={[styles.sectionTitle, { color: C.text }]}>{title}</Text>
+    <View style={styles.optionRow}>
+      {options.map((o) => {
+        const active = value === o.value;
+        return (
+          <TouchableOpacity
+            key={o.value}
+            onPress={() => { Haptics.selectionAsync(); onSelect(o.value); }}
+            activeOpacity={0.75}
+            style={[
+              styles.optionChip,
+              {
+                backgroundColor: active ? C.primary : C.chipBg,
+                borderColor: active ? C.primary : C.border,
+              },
+            ]}
+          >
+            <Text style={[styles.optionChipText, { color: active ? "#fff" : C.textSecondary }]}>
+              {o.label}
+            </Text>
+          </TouchableOpacity>
+        );
+      })}
+    </View>
+  );
+}
+
+function PillBtn({
+  label,
+  active,
+  onPress,
+}: {
+  label: string;
+  active: boolean;
+  onPress: () => void;
+}) {
+  const C = Colors.light;
+  return (
+    <TouchableOpacity
+      onPress={onPress}
+      activeOpacity={0.75}
+      style={[
+        styles.pill,
+        {
+          backgroundColor: active ? C.tealTint : C.card,
+          borderColor: active ? C.primary : C.border,
+        },
+      ]}
+    >
+      <Text style={[styles.pillText, { color: active ? C.primary : C.textSecondary }]}>
+        {label}
+      </Text>
+    </TouchableOpacity>
+  );
+}
+
+function Toggle({ value, onToggle }: { value: boolean; onToggle: () => void }) {
+  const C = Colors.light;
+  return (
+    <TouchableOpacity
+      onPress={onToggle}
+      style={[styles.toggle, { backgroundColor: value ? C.primary : C.border }]}
+    >
+      <View style={[styles.toggleKnob, value && styles.toggleKnobOn]} />
+    </TouchableOpacity>
+  );
+}
+
+function Hint({ text }: { text: string }) {
+  const C = Colors.light;
+  return <Text style={[styles.hint, { color: C.textMuted }]}>{text}</Text>;
+}
+
+function RowLabel({ title, sub }: { title: string; sub?: string }) {
+  const C = Colors.light;
+  return (
+    <View style={styles.rowLabelInner}>
+      <Text style={[styles.rowLabelTitle, { color: C.text }]}>{title}</Text>
+      {sub && <Text style={[styles.rowLabelSub, { color: C.textMuted }]}>{sub}</Text>}
+    </View>
+  );
+}
+
+function ToggleRow({
+  title,
+  sub,
+  value,
+  onToggle,
+}: {
+  title: string;
+  sub: string;
+  value: boolean;
+  onToggle: () => void;
+}) {
+  return (
+    <View style={styles.toggleRow}>
+      <RowLabel title={title} sub={sub} />
+      <Toggle value={value} onToggle={onToggle} />
+    </View>
+  );
+}
+
+function TierSection({
+  title,
+  helper,
+  expanded,
+  onToggle,
+  children,
+}: {
+  title: string;
+  helper: string;
+  expanded: boolean;
+  onToggle: () => void;
+  children: React.ReactNode;
+}) {
+  const C = Colors.light;
+  return (
+    <View style={[styles.tierSection, { borderColor: C.border }]}>
+      <TouchableOpacity
+        onPress={onToggle}
+        activeOpacity={0.75}
+        style={styles.tierHeader}
+      >
+        <View style={styles.tierHeaderLeft}>
+          <Text style={[styles.tierTitle, { color: C.text }]}>{title}</Text>
+          {!expanded && (
+            <Text style={[styles.tierHelper, { color: C.textMuted }]}>{helper}</Text>
+          )}
+        </View>
+        <Feather
+          name={expanded ? "chevron-up" : "chevron-down"}
+          size={18}
+          color={C.textSecondary}
+        />
+      </TouchableOpacity>
+      {expanded && (
+        <View style={styles.tierContent}>
+          <Text style={[styles.tierHelperExpanded, { color: C.textMuted }]}>{helper}</Text>
+          {children}
+        </View>
+      )}
+    </View>
+  );
+}
+
+function SectionBlock({ title, children }: { title: string; children: React.ReactNode }) {
+  const C = Colors.light;
+  return (
+    <View style={styles.sectionBlock}>
+      {title ? (
+        <Text style={[styles.sectionBlockTitle, { color: C.textSecondary }]}>{title}</Text>
+      ) : null}
       {children}
     </View>
   );
 }
 
-function OptionRow({ options, value, onSelect }: {
-  options: { label: string; value: string }[];
-  value: string;
-  onSelect: (v: string) => void;
-}) {
-  return (
-    <View style={styles.optionRow}>
-      {options.map((opt) => (
-        <PillButton
-          key={opt.value}
-          label={opt.label}
-          active={value === opt.value}
-          onPress={() => {
-            Haptics.selectionAsync();
-            onSelect(opt.value);
-          }}
-        />
-      ))}
-    </View>
-  );
-}
-
-export default function PreferencesScreen() {
+export default function PreferencesModal() {
   const { preferences, setPreferences, setIsOnboarded } = usePlanner();
   const router = useRouter();
   const insets = useSafeAreaInsets();
@@ -67,6 +201,12 @@ export default function PreferencesScreen() {
     weekendOverrides: preferences.weekendOverrides ?? { ...DEFAULT_WEEKEND_OVERRIDES },
   });
   const [householdInput, setHouseholdInput] = useState(String(preferences.householdSize));
+  const [savedToast, setSavedToast] = useState(false);
+
+  const [tier1Open, setTier1Open] = useState(true);
+  const [tier2Open, setTier2Open] = useState(false);
+  const [tier3Open, setTier3Open] = useState(false);
+  const [tier4Open, setTier4Open] = useState(false);
 
   const update = (key: keyof PlanPreferences, value: any) => {
     setPrefs((p) => ({ ...p, [key]: value }));
@@ -98,7 +238,20 @@ export default function PreferencesScreen() {
     };
     await setPreferences(finalPrefs);
     await setIsOnboarded(true);
-    router.canGoBack() ? router.back() : router.replace("/(tabs)/planner");
+    setSavedToast(true);
+    setTimeout(() => {
+      setSavedToast(false);
+      router.replace("/(tabs)/planner");
+    }, 1200);
+  };
+
+  const handleClose = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    if (router.canGoBack()) {
+      router.back();
+    } else {
+      router.replace("/(tabs)/planner");
+    }
   };
 
   const handleReset = () => {
@@ -107,428 +260,377 @@ export default function PreferencesScreen() {
     setHouseholdInput(String(DEFAULT_PREFERENCES.householdSize));
   };
 
+  const planningModeHint =
+    prefs.planningMode === "manual"
+      ? "All yours."
+      : prefs.planningMode === "mixed"
+        ? "You pick a few, we'll fill the gaps."
+        : "We've got this.";
+
   return (
     <View style={{ flex: 1, backgroundColor: C.background }}>
-      <ScrollView
-        contentContainerStyle={[
-          styles.container,
+      {savedToast && (
+        <View style={[styles.savedToast, { backgroundColor: C.primary, top: insets.top + 12 }]}>
+          <Feather name="check" size={15} color="#fff" />
+          <Text style={styles.savedToastText}>Saved. Taking you to your plan…</Text>
+        </View>
+      )}
+
+      <View
+        style={[
+          styles.header,
           {
-            paddingTop: Platform.OS === "web" ? 80 : insets.top + 20,
-            paddingBottom: 120,
+            paddingTop: Platform.OS === "web" ? 20 : insets.top + 8,
+            borderBottomColor: C.cardBorder,
+            backgroundColor: C.background,
           },
         ]}
+      >
+        <View style={styles.headerLeft}>
+          <Text style={[styles.pageTitle, { color: C.text }]}>My Preferences</Text>
+          <Text style={[styles.pageHelper, { color: C.textSecondary }]}>
+            Fine-tune your weekly plan.
+          </Text>
+        </View>
+        <TouchableOpacity
+          onPress={handleClose}
+          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          style={[styles.closeBtn, { backgroundColor: C.chipBg }]}
+        >
+          <Feather name="x" size={18} color={C.text} />
+        </TouchableOpacity>
+      </View>
+
+      <ScrollView
+        contentContainerStyle={[styles.container, { paddingBottom: insets.bottom + 120 }]}
         showsVerticalScrollIndicator={false}
       >
-        <View style={styles.headerSection}>
-          <TouchableOpacity
-            onPress={() => router.canGoBack() ? router.back() : router.replace("/(tabs)/planner")}
-            style={[styles.backBtn, { backgroundColor: C.chipBg }]}
-          >
-            <Feather name="arrow-left" size={20} color={C.text} />
-          </TouchableOpacity>
-          <View>
-            <Text style={[styles.title, { color: C.text }]}>Preferences</Text>
-            <Text style={[styles.subtitle, { color: C.textSecondary }]}>
-              Let's get your dinners sorted. Takes 60 seconds.
-            </Text>
-          </View>
-        </View>
-
-        <Section title="Planning Mode">
-          <OptionRow
-            options={[
-              { label: "Manual", value: "manual" },
-              { label: "Mixed", value: "mixed" },
-              { label: "Auto", value: "auto" },
-            ]}
-            value={prefs.planningMode}
-            onSelect={(v) => update("planningMode", v)}
-          />
-          <Text style={[styles.hint, { color: C.textMuted }]}>
-            {prefs.planningMode === "manual"
-              ? "You choose every meal yourself."
-              : prefs.planningMode === "mixed"
-                ? "You choose some, the app fills the rest."
-                : "Sit back. We've got this."}
-          </Text>
-        </Section>
-
-        <Section title="Household Size">
-          <View style={[styles.numberInput, { borderColor: C.inputBorder, backgroundColor: C.card }]}>
-            <TouchableOpacity
-              onPress={() => {
-                Haptics.selectionAsync();
-                const v = Math.max(1, parseInt(householdInput, 10) - 1);
-                setHouseholdInput(String(v));
-              }}
-              style={[styles.stepper, { backgroundColor: C.chipBg }]}
-            >
-              <Feather name="minus" size={18} color={C.primary} />
-            </TouchableOpacity>
-            <TextInput
-              value={householdInput}
-              onChangeText={setHouseholdInput}
-              keyboardType="number-pad"
-              style={[styles.numberField, { color: C.text }]}
-              textAlign="center"
-              maxLength={2}
-            />
-            <TouchableOpacity
-              onPress={() => {
-                Haptics.selectionAsync();
-                const v = Math.min(20, parseInt(householdInput, 10) + 1);
-                setHouseholdInput(String(v));
-              }}
-              style={[styles.stepper, { backgroundColor: C.chipBg }]}
-            >
-              <Feather name="plus" size={18} color={C.primary} />
-            </TouchableOpacity>
-          </View>
-          <Text style={[styles.hint, { color: C.textMuted }]}>
-            We'll scale everything to feed your household. No mental maths needed.
-          </Text>
-        </Section>
-
-        <Section title="Meals to Plan">
-          <OptionRow
-            options={[
-              { label: "Dinners only", value: "dinner-only" },
-              { label: "Lunch + Dinner", value: "lunch-dinner" },
-            ]}
-            value={prefs.mealCoverage}
-            onSelect={(v) => update("mealCoverage", v)}
-          />
-        </Section>
-
-        <Section title="Budget Level">
-          <OptionRow
-            options={[
-              { label: "Super Budget", value: "super-budget" },
-              { label: "Budget", value: "budget" },
-              { label: "Standard", value: "standard" },
-              { label: "Premium", value: "premium" },
-            ]}
-            value={prefs.budgetLevel}
-            onSelect={(v) => update("budgetLevel", v)}
-          />
-          {prefs.budgetLevel === "super-budget" && (
-            <Text style={[styles.hint, { color: C.textMuted }]}>
-              Meals under ~$5 per person — the cheapest meals in the collection.
-            </Text>
-          )}
-        </Section>
-
-        <Section title="Health Style">
-          <OptionRow
-            options={[
-              { label: "Standard", value: "standard" },
-              { label: "Healthy", value: "healthy" },
-              { label: "High Protein", value: "high-protein" },
-              { label: "Low Carb", value: "low-carb" },
-              { label: "Family Friendly", value: "family-friendly" },
-            ]}
-            value={prefs.healthStyle}
-            onSelect={(v) => update("healthStyle", v)}
-          />
-          {prefs.healthStyle === "low-carb" && (
-            <Text style={[styles.hint, { color: C.textMuted }]}>
-              Filters out pasta, rice, and noodle-based dishes.
-            </Text>
-          )}
-          {prefs.healthStyle === "family-friendly" && (
-            <Text style={[styles.hint, { color: C.textMuted }]}>
-              Easy-to-cook meals the whole family will enjoy.
-            </Text>
-          )}
-        </Section>
-
-        <Section title="Cuisine Preference">
-          <OptionRow
-            options={[
-              { label: "Mixed", value: "mixed" },
-              { label: "Italian", value: "italian" },
-              { label: "Asian", value: "asian" },
-              { label: "Mexican", value: "mexican" },
-              { label: "Aussie Classics", value: "aussie" },
-            ]}
-            value={prefs.cuisinePreference ?? "mixed"}
-            onSelect={(v) => update("cuisinePreference", v)}
-          />
-        </Section>
-
-        <Section title="Cooking Effort">
-          <OptionRow
-            options={[
-              { label: "Quick & Simple", value: "quick" },
-              { label: "Balanced", value: "balanced" },
-              { label: "Don't Mind", value: "any" },
-            ]}
-            value={prefs.cookingEffort ?? "any"}
-            onSelect={(v) => update("cookingEffort", v)}
-          />
-          {prefs.cookingEffort === "quick" && (
-            <Text style={[styles.hint, { color: C.textMuted }]}>
-              Easy meals ready in 20 minutes or less.
-            </Text>
-          )}
-          {prefs.cookingEffort === "balanced" && (
-            <Text style={[styles.hint, { color: C.textMuted }]}>
-              Meals under 35 minutes — some prep, great results.
-            </Text>
-          )}
-        </Section>
-
-        <Section title="Cooking Preference">
-          <OptionRow
-            options={[
-              { label: "Mixed", value: "mixed" },
-              { label: "One-Pan", value: "one-pan" },
-              { label: "Air Fryer", value: "air-fryer" },
-              { label: "Oven-Based", value: "oven-based" },
-              { label: "No Preference", value: "no-preference" },
-            ]}
-            value={prefs.cookingStyle}
-            onSelect={(v) => update("cookingStyle", v)}
-          />
-        </Section>
-
-        <Section title="Meals per Week">
-          <OptionRow
-            options={[
-              { label: "3 meals", value: "3" },
-              { label: "5 meals", value: "5" },
-              { label: "7 meals", value: "7" },
-            ]}
-            value={String(prefs.mealVariety)}
-            onSelect={(v) => update("mealVariety", parseInt(v))}
-          />
-          <Text style={[styles.hint, { color: C.textMuted }]}>
-            {prefs.mealVariety === 3
-              ? "Some meals repeat — great for batch cooking."
-              : prefs.mealVariety === 5
-                ? "Moderate variety with some repeats."
-                : "High variety with minimal repetition."}
-          </Text>
-        </Section>
-
-        <Section title="Leftovers Mode">
-          <OptionRow
-            options={[
-              { label: "Off", value: "none" },
-              { label: "Cook once, eat twice", value: "cook-once" },
-            ]}
-            value={prefs.leftoversMode}
-            onSelect={(v) => update("leftoversMode", v)}
-          />
-        </Section>
-
-        <Section title="Weekend Overrides">
-          <View style={styles.weekendToggle}>
-            <View style={styles.weekendToggleLeft}>
-              <Text style={[styles.weekendToggleTitle, { color: C.text }]}>
-                Different settings for weekends
-              </Text>
-              <Text style={[styles.weekendToggleSub, { color: C.textMuted }]}>
-                Saturday &amp; Sunday can have longer cook times or a bigger budget
-              </Text>
-            </View>
-            <TouchableOpacity
-              onPress={() => {
-                Haptics.selectionAsync();
-                updateWeekend("enabled", !(prefs.weekendOverrides?.enabled ?? false));
-              }}
-              style={[
-                styles.toggle,
-                {
-                  backgroundColor: prefs.weekendOverrides?.enabled
-                    ? C.primary
-                    : C.inputBorder,
-                },
+        <TierSection
+          title="Quick Setup"
+          helper="Set the basics for your weekly plan."
+          expanded={tier1Open}
+          onToggle={() => setTier1Open((v) => !v)}
+        >
+          <SectionBlock title="Planning Mode">
+            <OptionRow
+              options={[
+                { label: "Auto", value: "auto" },
+                { label: "Mixed", value: "mixed" },
+                { label: "Manual", value: "manual" },
               ]}
-            >
-              <View
-                style={[
-                  styles.toggleKnob,
-                  prefs.weekendOverrides?.enabled && styles.toggleKnobOn,
-                ]}
+              value={prefs.planningMode}
+              onSelect={(v) => update("planningMode", v)}
+            />
+            <Hint text={planningModeHint} />
+          </SectionBlock>
+
+          <SectionBlock title="Household Size">
+            <View style={[styles.numberInput, { borderColor: C.inputBorder, backgroundColor: C.card }]}>
+              <TouchableOpacity
+                onPress={() => {
+                  Haptics.selectionAsync();
+                  const v = Math.max(1, parseInt(householdInput, 10) - 1);
+                  setHouseholdInput(String(v));
+                }}
+                style={[styles.stepper, { backgroundColor: C.chipBg }]}
+              >
+                <Feather name="minus" size={18} color={C.primary} />
+              </TouchableOpacity>
+              <TextInput
+                value={householdInput}
+                onChangeText={setHouseholdInput}
+                keyboardType="number-pad"
+                style={[styles.numberField, { color: C.text }]}
+                textAlign="center"
+                maxLength={2}
               />
-            </TouchableOpacity>
-          </View>
-
-          {prefs.weekendOverrides?.enabled && (
-            <>
-              <Text style={[styles.weekendSubLabel, { color: C.textSecondary }]}>
-                Weekend cooking effort
-              </Text>
-              <OptionRow
-                options={[
-                  { label: "Quick & Simple", value: "quick" },
-                  { label: "Balanced", value: "balanced" },
-                  { label: "Don't Mind", value: "any" },
-                ]}
-                value={prefs.weekendOverrides?.cookingEffort ?? "any"}
-                onSelect={(v) => updateWeekend("cookingEffort", v as "quick" | "balanced" | "any")}
-              />
-              <Text style={[styles.weekendSubLabel, { color: C.textSecondary }]}>
-                Weekend budget
-              </Text>
-              <OptionRow
-                options={[
-                  { label: "Super Budget", value: "super-budget" },
-                  { label: "Budget", value: "budget" },
-                  { label: "Standard", value: "standard" },
-                  { label: "Premium", value: "premium" },
-                ]}
-                value={prefs.weekendOverrides?.budgetLevel ?? "standard"}
-                onSelect={(v) => updateWeekend("budgetLevel", v)}
-              />
-            </>
-          )}
-        </Section>
-
-        <Section title="Diet Type">
-          <OptionRow
-            options={[
-              { label: "Omnivore", value: "omnivore" },
-              { label: "Pescatarian", value: "pescatarian" },
-              { label: "Vegetarian", value: "vegetarian" },
-              { label: "Vegan", value: "vegan" },
-            ]}
-            value={prefs.dietType ?? "omnivore"}
-            onSelect={(v) => update("dietType", v)}
-          />
-          <Text style={[styles.hint, { color: C.textMuted }]}>
-            {prefs.dietType === "vegan"
-              ? "Filters out all meat, seafood, dairy, and eggs."
-              : prefs.dietType === "vegetarian"
-                ? "Filters out meat and seafood. Dairy and eggs allowed."
-                : prefs.dietType === "pescatarian"
-                  ? "Filters out meat. Fish and seafood are included."
-                  : "No dietary restrictions applied."}
-          </Text>
-        </Section>
-
-        <Section title="Ingredient Exclusions">
-          <View style={styles.exclusionGrid}>
-            {EXCLUSION_OPTIONS.map((ex) => (
-              <PillButton
-                key={ex}
-                label={ex}
-                active={prefs.exclusions.includes(ex)}
-                onPress={() => toggleExclusion(ex)}
-                small
-              />
-            ))}
-          </View>
-        </Section>
-
-        <View style={[styles.smartHeading, { borderTopColor: C.cardBorder }]}>
-          <Text style={[styles.smartHeadingText, { color: C.primary }]}>Smart Planning</Text>
-        </View>
-
-        <Section title="Prep Style">
-          <OptionRow
-            options={[
-              { label: "Mixed", value: "mixed" },
-              { label: "Batch Cook", value: "batch-cook" },
-              { label: "Quick Assembly", value: "quick-assembly" },
-              { label: "Family Style", value: "family-style" },
-            ]}
-            value={prefs.prepStyle ?? "mixed"}
-            onSelect={(v) => update("prepStyle", v)}
-          />
-          {prefs.prepStyle === "batch-cook" && (
-            <Text style={[styles.hint, { color: C.textMuted }]}>
-              Prefers recipes that make multiple portions — great for cooking once and eating across 2–3 days.
-            </Text>
-          )}
-          {prefs.prepStyle === "quick-assembly" && (
-            <Text style={[styles.hint, { color: C.textMuted }]}>
-              Prefers minimal-prep meals — wraps, salads, bowls, and simple assemblies.
-            </Text>
-          )}
-          {prefs.prepStyle === "family-style" && (
-            <Text style={[styles.hint, { color: C.textMuted }]}>
-              Prefers larger-portion, crowd-pleasing recipes with simple, broadly appealing flavours.
-            </Text>
-          )}
-        </Section>
-
-        <Section title="Minimise Waste">
-          <View style={styles.weekendToggle}>
-            <View style={styles.weekendToggleLeft}>
-              <Text style={[styles.weekendToggleTitle, { color: C.text }]}>
-                Shared ingredients
-              </Text>
-              <Text style={[styles.weekendToggleSub, { color: C.textMuted }]}>
-                Prefer meals that reuse the same ingredients across the week to reduce food waste
-              </Text>
+              <TouchableOpacity
+                onPress={() => {
+                  Haptics.selectionAsync();
+                  const v = Math.min(20, parseInt(householdInput, 10) + 1);
+                  setHouseholdInput(String(v));
+                }}
+                style={[styles.stepper, { backgroundColor: C.chipBg }]}
+              >
+                <Feather name="plus" size={18} color={C.primary} />
+              </TouchableOpacity>
             </View>
-            <TouchableOpacity
-              onPress={() => {
+            <Hint text="We'll size everything for you." />
+          </SectionBlock>
+
+          <SectionBlock title="Budget Level">
+            <OptionRow
+              options={[
+                { label: "Super Budget", value: "super-budget" },
+                { label: "Budget", value: "budget" },
+                { label: "Standard", value: "standard" },
+                { label: "Premium", value: "premium" },
+              ]}
+              value={prefs.budgetLevel}
+              onSelect={(v) => update("budgetLevel", v)}
+            />
+            {prefs.budgetLevel === "super-budget" && (
+              <Hint text="~$5 per serve. The leanest meals in the collection." />
+            )}
+          </SectionBlock>
+
+          <SectionBlock title="Meals per Week">
+            <OptionRow
+              options={[
+                { label: "3 nights", value: "3" },
+                { label: "5 nights", value: "5" },
+                { label: "7 nights", value: "7" },
+              ]}
+              value={String(prefs.mealVariety)}
+              onSelect={(v) => update("mealVariety", parseInt(v) as 3 | 5 | 7)}
+            />
+          </SectionBlock>
+
+          <SectionBlock title="Dietary Preferences">
+            <OptionRow
+              options={[
+                { label: "No preference", value: "no-preference" },
+                { label: "Vegetarian", value: "vegetarian" },
+                { label: "Vegan", value: "vegan" },
+                { label: "Pescatarian", value: "pescatarian" },
+              ]}
+              value={prefs.dietType ?? "no-preference"}
+              onSelect={(v) => update("dietType", v)}
+            />
+            {prefs.dietType === "vegan" && (
+              <Hint text="Filters out all meat, seafood, dairy, and eggs." />
+            )}
+            {prefs.dietType === "vegetarian" && (
+              <Hint text="Filters out meat and seafood. Dairy and eggs allowed." />
+            )}
+            {prefs.dietType === "pescatarian" && (
+              <Hint text="Filters out meat. Fish and seafood are included." />
+            )}
+          </SectionBlock>
+
+          <SectionBlock title="Ingredient Exclusions">
+            <View style={styles.pillGrid}>
+              {EXCLUSION_OPTIONS.map((ex) => (
+                <PillBtn
+                  key={ex}
+                  label={ex}
+                  active={prefs.exclusions.includes(ex)}
+                  onPress={() => toggleExclusion(ex)}
+                />
+              ))}
+            </View>
+            <Hint text="Optional — tap anything to exclude it." />
+          </SectionBlock>
+        </TierSection>
+
+        <TierSection
+          title="Make it yours"
+          helper="Optional — tweak it if you like."
+          expanded={tier2Open}
+          onToggle={() => setTier2Open((v) => !v)}
+        >
+          <SectionBlock title="Meals to Plan">
+            <OptionRow
+              options={[
+                { label: "Dinners only", value: "dinner-only" },
+                { label: "Lunch + Dinner", value: "lunch-dinner" },
+              ]}
+              value={prefs.mealCoverage}
+              onSelect={(v) => update("mealCoverage", v)}
+            />
+          </SectionBlock>
+
+          <SectionBlock title="Health Style">
+            <OptionRow
+              options={[
+                { label: "Standard", value: "standard" },
+                { label: "Healthy", value: "healthy" },
+                { label: "High Protein", value: "high-protein" },
+                { label: "Low Carb", value: "low-carb" },
+              ]}
+              value={prefs.healthStyle}
+              onSelect={(v) => update("healthStyle", v)}
+            />
+            {prefs.healthStyle === "low-carb" && (
+              <Hint text="Filters out pasta, rice, and noodle-based dishes." />
+            )}
+          </SectionBlock>
+
+          <SectionBlock title="Cuisine Preference">
+            <OptionRow
+              options={[
+                { label: "Mixed", value: "mixed" },
+                { label: "Italian", value: "italian" },
+                { label: "Asian", value: "asian" },
+                { label: "Mexican", value: "mexican" },
+                { label: "Aussie Classics", value: "aussie" },
+              ]}
+              value={prefs.cuisinePreference ?? "mixed"}
+              onSelect={(v) => update("cuisinePreference", v)}
+            />
+          </SectionBlock>
+
+          <SectionBlock title="Recipe Complexity">
+            <OptionRow
+              options={[
+                { label: "Don't Mind", value: "any" },
+                { label: "Quick & Simple", value: "quick" },
+                { label: "Balanced", value: "balanced" },
+              ]}
+              value={prefs.cookingEffort ?? "any"}
+              onSelect={(v) => update("cookingEffort", v)}
+            />
+            {prefs.cookingEffort === "quick" && (
+              <Hint text="Easy meals ready in 20 minutes or less." />
+            )}
+            {prefs.cookingEffort === "balanced" && (
+              <Hint text="Under 35 minutes — some prep, great results." />
+            )}
+          </SectionBlock>
+
+          <SectionBlock title="Cooking Style">
+            <OptionRow
+              options={[
+                { label: "Mixed", value: "mixed" },
+                { label: "One-Pan", value: "one-pan" },
+                { label: "Air Fryer", value: "air-fryer" },
+                { label: "Oven-Based", value: "oven-based" },
+              ]}
+              value={prefs.cookingStyle}
+              onSelect={(v) => update("cookingStyle", v)}
+            />
+          </SectionBlock>
+        </TierSection>
+
+        <TierSection
+          title="Make it smarter ✨"
+          helper="Let us do a bit of thinking for you."
+          expanded={tier3Open}
+          onToggle={() => setTier3Open((v) => !v)}
+        >
+          <SectionBlock title="">
+            <ToggleRow
+              title="Cook once, eat twice"
+              sub="Prefer meals that make multiple portions — cook once and eat across 2–3 days."
+              value={prefs.leftoversMode === "cook-once"}
+              onToggle={() => {
+                Haptics.selectionAsync();
+                update("leftoversMode", prefs.leftoversMode === "cook-once" ? "none" : "cook-once");
+              }}
+            />
+          </SectionBlock>
+
+          <SectionBlock title="">
+            <ToggleRow
+              title="Shared Ingredients"
+              sub="Reuse ingredients across the week to save money and reduce waste."
+              value={prefs.minimiseWaste ?? false}
+              onToggle={() => {
                 Haptics.selectionAsync();
                 update("minimiseWaste", !(prefs.minimiseWaste ?? false));
               }}
-              style={[
-                styles.toggle,
-                {
-                  backgroundColor: prefs.minimiseWaste
-                    ? C.primary
-                    : C.inputBorder,
-                },
-              ]}
-            >
-              <View
-                style={[
-                  styles.toggleKnob,
-                  prefs.minimiseWaste && styles.toggleKnobOn,
-                ]}
-              />
-            </TouchableOpacity>
-          </View>
-        </Section>
+            />
+          </SectionBlock>
 
-        <Section title="Seasonal Mode">
-          <View style={styles.weekendToggle}>
-            <View style={styles.weekendToggleLeft}>
-              <Text style={[styles.weekendToggleTitle, { color: C.text }]}>
-                In-season ingredients
-              </Text>
-              <Text style={[styles.weekendToggleSub, { color: C.textMuted }]}>
-                Prefer recipes that use Australian produce currently in season — fresher, cheaper, and more sustainable
-              </Text>
-            </View>
-            <TouchableOpacity
-              onPress={() => {
+          <SectionBlock title="">
+            <ToggleRow
+              title="Seasonal Mode"
+              sub="Cheaper, fresher, better."
+              value={prefs.seasonalMode ?? false}
+              onToggle={() => {
                 Haptics.selectionAsync();
                 update("seasonalMode", !(prefs.seasonalMode ?? false));
               }}
-              style={[
-                styles.toggle,
-                {
-                  backgroundColor: prefs.seasonalMode
-                    ? C.primary
-                    : C.inputBorder,
-                },
+            />
+            {prefs.seasonalMode && (
+              <Hint text="Seasonal recipes will be prioritised in your plan." />
+            )}
+          </SectionBlock>
+
+          <SectionBlock title="">
+            <ToggleRow
+              title="Kid-Friendly Recipes"
+              sub="Prefer meals with simpler flavours, familiar ingredients, and broader family appeal."
+              value={prefs.kidFriendly ?? false}
+              onToggle={() => {
+                Haptics.selectionAsync();
+                update("kidFriendly", !(prefs.kidFriendly ?? false));
+              }}
+            />
+            {prefs.kidFriendly && (
+              <Hint text="Less complaints at the table." />
+            )}
+          </SectionBlock>
+
+          <SectionBlock title="Prep Style">
+            <OptionRow
+              options={[
+                { label: "Mixed", value: "mixed" },
+                { label: "Batch Cook", value: "batch-cook" },
+                { label: "Quick Assembly", value: "quick-assembly" },
+                { label: "Family Style", value: "family-style" },
               ]}
-            >
-              <View
-                style={[
-                  styles.toggleKnob,
-                  prefs.seasonalMode && styles.toggleKnobOn,
-                ]}
-              />
-            </TouchableOpacity>
-          </View>
-          {prefs.seasonalMode && (
-            <Text style={[styles.hint, { color: C.textMuted }]}>
-              🌿 Seasonal recipes will be prioritised in your auto-generated plan and labelled on each meal card.
-            </Text>
+              value={prefs.prepStyle ?? "mixed"}
+              onSelect={(v) => update("prepStyle", v)}
+            />
+            {prefs.prepStyle === "batch-cook" && (
+              <Hint text="Prefers recipes that make multiple portions." />
+            )}
+            {prefs.prepStyle === "quick-assembly" && (
+              <Hint text="Wraps, salads, bowls, and simple assemblies." />
+            )}
+          </SectionBlock>
+        </TierSection>
+
+        <TierSection
+          title="Advanced"
+          helper="Extra controls if you want them."
+          expanded={tier4Open}
+          onToggle={() => setTier4Open((v) => !v)}
+        >
+          <SectionBlock title="">
+            <ToggleRow
+              title="Weekend Overrides"
+              sub="Different settings for Saturday & Sunday — longer cook times or bigger budget."
+              value={prefs.weekendOverrides?.enabled ?? false}
+              onToggle={() => {
+                Haptics.selectionAsync();
+                updateWeekend("enabled", !(prefs.weekendOverrides?.enabled ?? false));
+              }}
+            />
+          </SectionBlock>
+
+          {prefs.weekendOverrides?.enabled && (
+            <>
+              <SectionBlock title="Weekend Recipe Complexity">
+                <OptionRow
+                  options={[
+                    { label: "Don't Mind", value: "any" },
+                    { label: "Quick & Simple", value: "quick" },
+                    { label: "Balanced", value: "balanced" },
+                  ]}
+                  value={prefs.weekendOverrides?.cookingEffort ?? "any"}
+                  onSelect={(v) => updateWeekend("cookingEffort", v as "quick" | "balanced" | "any")}
+                />
+              </SectionBlock>
+              <SectionBlock title="Weekend Budget">
+                <OptionRow
+                  options={[
+                    { label: "Super Budget", value: "super-budget" },
+                    { label: "Budget", value: "budget" },
+                    { label: "Standard", value: "standard" },
+                    { label: "Premium", value: "premium" },
+                  ]}
+                  value={prefs.weekendOverrides?.budgetLevel ?? "standard"}
+                  onSelect={(v) => updateWeekend("budgetLevel", v)}
+                />
+              </SectionBlock>
+            </>
           )}
-        </Section>
+        </TierSection>
 
         <TouchableOpacity onPress={handleReset} style={styles.resetRow}>
-          <Feather name="rotate-ccw" size={14} color={C.textMuted} />
+          <Feather name="rotate-ccw" size={13} color={C.textMuted} />
           <Text style={[styles.resetText, { color: C.textMuted }]}>Reset to defaults</Text>
         </TouchableOpacity>
       </ScrollView>
@@ -537,7 +639,7 @@ export default function PreferencesScreen() {
         style={[
           styles.footer,
           {
-            paddingBottom: Platform.OS === "web" ? 34 : insets.bottom + 16,
+            paddingBottom: Platform.OS === "web" ? 24 : insets.bottom + 16,
             backgroundColor: C.background,
             borderTopColor: C.cardBorder,
           },
@@ -546,10 +648,10 @@ export default function PreferencesScreen() {
         <TouchableOpacity
           onPress={handleSave}
           activeOpacity={0.85}
-          style={[styles.saveBtn, { backgroundColor: C.primary }]}
+          style={[styles.saveBtn, { backgroundColor: C.gold }]}
         >
           <Feather name="check" size={20} color="#fff" />
-          <Text style={styles.saveBtnText}>Save Preferences</Text>
+          <Text style={styles.saveBtnText}>Save &amp; go to my plan</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -557,46 +659,115 @@ export default function PreferencesScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    paddingHorizontal: 20,
-    gap: 28,
-  },
-  headerSection: {
+  header: {
     flexDirection: "row",
-    alignItems: "center",
-    gap: 14,
+    alignItems: "flex-start",
+    justifyContent: "space-between",
+    paddingHorizontal: 20,
+    paddingBottom: 14,
+    borderBottomWidth: 1,
   },
-  backBtn: {
-    width: 40,
-    height: 40,
-    borderRadius: 12,
+  headerLeft: {
+    flex: 1,
+    gap: 2,
+  },
+  closeBtn: {
+    width: 34,
+    height: 34,
+    borderRadius: 10,
     alignItems: "center",
     justifyContent: "center",
+    marginLeft: 12,
+    marginTop: 2,
   },
-  title: {
-    fontSize: 24,
+  pageTitle: {
+    fontSize: 22,
     fontFamily: "Inter_700Bold",
   },
-  subtitle: {
-    fontSize: 14,
+  pageHelper: {
+    fontSize: 13,
     fontFamily: "Inter_400Regular",
   },
-  section: {
-    gap: 10,
+  container: {
+    paddingHorizontal: 16,
+    paddingTop: 16,
+    gap: 12,
   },
-  sectionTitle: {
+  tierSection: {
+    borderRadius: 16,
+    borderWidth: 1,
+    overflow: "hidden",
+  },
+  tierHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    gap: 12,
+  },
+  tierHeaderLeft: {
+    flex: 1,
+    gap: 2,
+  },
+  tierTitle: {
     fontSize: 16,
     fontFamily: "Inter_700Bold",
+  },
+  tierHelper: {
+    fontSize: 12,
+    fontFamily: "Inter_400Regular",
+  },
+  tierHelperExpanded: {
+    fontSize: 12,
+    fontFamily: "Inter_400Regular",
+    marginBottom: 4,
+  },
+  tierContent: {
+    paddingHorizontal: 16,
+    paddingBottom: 16,
+    gap: 20,
+    borderTopWidth: 1,
+    borderTopColor: "#E6E1D7",
+  },
+  sectionBlock: {
+    gap: 10,
+  },
+  sectionBlockTitle: {
+    fontSize: 13,
+    fontFamily: "Inter_600SemiBold",
+    textTransform: "uppercase",
+    letterSpacing: 0.3,
   },
   optionRow: {
     flexDirection: "row",
     flexWrap: "wrap",
     gap: 8,
   },
-  hint: {
-    fontSize: 12,
-    fontFamily: "Inter_400Regular",
-    lineHeight: 17,
+  optionChip: {
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 20,
+    borderWidth: 1.5,
+  },
+  optionChipText: {
+    fontSize: 13,
+    fontFamily: "Inter_500Medium",
+  },
+  pill: {
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+    borderRadius: 16,
+    borderWidth: 1.5,
+  },
+  pillText: {
+    fontSize: 13,
+    fontFamily: "Inter_500Medium",
+  },
+  pillGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
   },
   numberInput: {
     flexDirection: "row",
@@ -618,47 +789,7 @@ const styles = StyleSheet.create({
     fontFamily: "Inter_700Bold",
     textAlign: "center",
   },
-  exclusionGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 8,
-  },
-  smartHeading: {
-    borderTopWidth: 1,
-    paddingTop: 8,
-    marginTop: -4,
-  },
-  smartHeadingText: {
-    fontSize: 11,
-    fontFamily: "Inter_700Bold",
-    textTransform: "uppercase",
-    letterSpacing: 1,
-    marginBottom: 4,
-  },
-  resetRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-    alignSelf: "center",
-  },
-  resetText: {
-    fontSize: 13,
-    fontFamily: "Inter_400Regular",
-  },
-  weekendToggle: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
-  },
-  weekendToggleLeft: {
-    flex: 1,
-    gap: 3,
-  },
-  weekendToggleTitle: {
-    fontSize: 14,
-    fontFamily: "Inter_600SemiBold",
-  },
-  weekendToggleSub: {
+  hint: {
     fontSize: 12,
     fontFamily: "Inter_400Regular",
     lineHeight: 17,
@@ -681,31 +812,68 @@ const styles = StyleSheet.create({
   toggleKnobOn: {
     alignSelf: "flex-end",
   },
-  weekendSubLabel: {
-    fontSize: 13,
+  toggleRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+  },
+  rowLabelInner: {
+    flex: 1,
+    gap: 2,
+  },
+  rowLabelTitle: {
+    fontSize: 14,
     fontFamily: "Inter_600SemiBold",
-    marginTop: 4,
+  },
+  rowLabelSub: {
+    fontSize: 12,
+    fontFamily: "Inter_400Regular",
+    lineHeight: 17,
+  },
+  resetRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    alignSelf: "center",
+    paddingVertical: 4,
+  },
+  resetText: {
+    fontSize: 13,
+    fontFamily: "Inter_400Regular",
   },
   footer: {
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
-    paddingHorizontal: 20,
-    paddingTop: 16,
+    paddingHorizontal: 16,
+    paddingTop: 12,
     borderTopWidth: 1,
   },
   saveBtn: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    gap: 10,
+    gap: 8,
     paddingVertical: 16,
     borderRadius: 16,
   },
   saveBtnText: {
-    fontSize: 17,
+    fontSize: 16,
     fontFamily: "Inter_700Bold",
     color: "#fff",
+  },
+  savedToast: {
+    position: "absolute",
+    left: 20,
+    right: 20,
+    borderRadius: 12,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    zIndex: 100,
+  },
+  savedToastText: {
+    color: "#fff",
+    fontSize: 14,
+    fontFamily: "Inter_600SemiBold",
   },
 });

@@ -1,5 +1,6 @@
 import { Feather } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
+import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
   Platform,
@@ -235,6 +236,8 @@ export default function PreferencesScreen() {
     }
   };
 
+  const { replace } = useRouter();
+
   const handleSave = async () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     const size = parseInt(householdInput, 10);
@@ -245,7 +248,10 @@ export default function PreferencesScreen() {
     await setPreferences(finalPrefs);
     await setIsOnboarded(true);
     setSavedToast(true);
-    setTimeout(() => setSavedToast(false), 2500);
+    setTimeout(() => {
+      setSavedToast(false);
+      replace("/(tabs)/planner");
+    }, 1200);
   };
 
   const handleReset = () => {

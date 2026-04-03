@@ -51,6 +51,7 @@ interface PlannerContextType {
   clearPlan: () => void;
   estimatedCostBand: string;
   isOnboarded: boolean;
+  isContextLoaded: boolean;
   setIsOnboarded: (val: boolean) => void;
   preferencesDirty: boolean;
   setPreferencesDirty: (v: boolean) => void;
@@ -111,6 +112,7 @@ export function PlannerProvider({ children }: { children: React.ReactNode }) {
   );
   const [savedPlans, setSavedPlans] = useState<SavedPlan[]>([]);
   const [isOnboarded, setIsOnboardedState] = useState(false);
+  const [isContextLoaded, setIsContextLoaded] = useState(false);
   const [preferencesDirty, setPreferencesDirtyState] = useState(false);
   const [hiddenRecipes, setHiddenRecipes] = useState<string[]>([]);
   const [planHasLimitedVariety, setPlanHasLimitedVariety] = useState(false);
@@ -137,7 +139,9 @@ export function PlannerProvider({ children }: { children: React.ReactNode }) {
         if (planStr) setCurrentPlanState(JSON.parse(planStr));
         if (onbStr === "true") setIsOnboardedState(true);
         if (hiddenStr) setHiddenRecipes(JSON.parse(hiddenStr));
-      } catch (_) {}
+      } catch (_) {} finally {
+        setIsContextLoaded(true);
+      }
     })();
   }, []);
 
@@ -429,6 +433,7 @@ export function PlannerProvider({ children }: { children: React.ReactNode }) {
         clearPlan,
         estimatedCostBand,
         isOnboarded,
+        isContextLoaded,
         setIsOnboarded,
         preferencesDirty,
         setPreferencesDirty,

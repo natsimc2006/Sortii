@@ -125,7 +125,7 @@ function PillChip({
 
 export default function OnboardingScreen() {
   const router = useRouter();
-  const { setPreferences, setIsOnboarded, isOnboarded, autoGeneratePlan } = usePlanner();
+  const { setPreferences, setIsOnboarded, isOnboarded, isContextLoaded, autoGeneratePlan } = usePlanner();
   const insets = useSafeAreaInsets();
   const [step, setStep] = useState<OnboardingStep>(0);
 
@@ -143,10 +143,14 @@ export default function OnboardingScreen() {
   const isInGeneratingFlow = useRef(false);
 
   useEffect(() => {
-    if (isOnboarded && !isInGeneratingFlow.current) {
+    if (!isContextLoaded) return;
+    if (isInGeneratingFlow.current) return;
+    if (isOnboarded) {
+      router.replace("/(tabs)/planner");
+    } else {
       router.replace("/home");
     }
-  }, [isOnboarded]);
+  }, [isContextLoaded, isOnboarded]);
 
   useEffect(() => {
     if (step !== 7) return;
