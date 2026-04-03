@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "Weekly Meal Planner",
-    "slug": "meal-planner",
+    "name": "Sortii - Dinner. Sorted.",
+    "slug": "sortiidinnersorted",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "meal-planner",
+    "scheme": "sortiidinnersorted",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
@@ -14,11 +14,14 @@
       "backgroundColor": "#F9FAF9"
     },
     "ios": {
-      "supportsTablet": false
+      "supportsTablet": false,
+      "bundleIdentifier": "com.sortiidinnersorted.app"
     },
-    "android": {},
+    "android": {
+      "package": "com.sortiidinnersorted.app"
+    },
     "web": {
-      "favicon": "./assets/images/icon.png"
+      "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
       [
