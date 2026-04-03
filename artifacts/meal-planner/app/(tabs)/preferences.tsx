@@ -198,7 +198,7 @@ function SectionBlock({ title, children }: { title: string; children: React.Reac
 }
 
 export default function PreferencesScreen() {
-  const { preferences, setPreferences, setIsOnboarded } = usePlanner();
+  const { preferences, setPreferences, setIsOnboarded, autoGeneratePlan, setPreferencesDirty } = usePlanner();
   const insets = useSafeAreaInsets();
   const C = Colors.light;
 
@@ -247,6 +247,8 @@ export default function PreferencesScreen() {
     };
     await setPreferences(finalPrefs);
     await setIsOnboarded(true);
+    autoGeneratePlan(finalPrefs);
+    setPreferencesDirty(false);
     setSavedToast(true);
     setTimeout(() => {
       setSavedToast(false);
