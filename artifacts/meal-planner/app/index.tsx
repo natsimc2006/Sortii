@@ -207,6 +207,22 @@ export default function OnboardingScreen() {
     }
   };
 
+  const goToPreferencesWithSave = async () => {
+    const newPrefs: PlanPreferences = {
+      ...DEFAULT_PREFERENCES,
+      planningMode,
+      householdSize,
+      budgetLevel: budget,
+      mealVariety: mealsPerWeek,
+      dietType,
+      exclusions,
+      weekendOverrides: { ...DEFAULT_WEEKEND_OVERRIDES },
+    };
+    await setPreferences(newPrefs);
+    await setIsOnboarded(true);
+    router.replace("/preferences");
+  };
+
   const toggleExclusion = (ex: string) => {
     Haptics.selectionAsync();
     setExclusions((prev) =>
@@ -479,32 +495,53 @@ export default function OnboardingScreen() {
       </View>
 
       <View style={styles.stepFooter}>
-        <TouchableOpacity
-          onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); goNext(); }}
-          activeOpacity={0.85}
-          style={[styles.primaryCta, { backgroundColor: C.gold }]}
-        >
-          <Text style={styles.primaryCtaText}>
-            {step === 6 ? "Sort my week" : "Continue"}
-          </Text>
-          <Feather name={step === 6 ? "zap" : "arrow-right"} size={18} color="#fff" />
-        </TouchableOpacity>
-        {step === 6 && (
-          <TouchableOpacity onPress={goNext} style={styles.skipBtn}>
-            <Text style={[styles.skipText, { color: C.textMuted }]}>
-              Skip — no exclusions
-            </Text>
-          </TouchableOpacity>
-        )}
-        {step === 5 && (
-          <TouchableOpacity
-            onPress={() => { Haptics.selectionAsync(); goNext(); }}
-            style={styles.skipBtn}
-          >
-            <Text style={[styles.skipText, { color: C.textMuted }]}>
-              Skip — no preference
-            </Text>
-          </TouchableOpacity>
+        {step === 6 ? (
+          <>
+            <View style={styles.step6BtnRow}>
+              <TouchableOpacity
+                onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); startGenerating(); }}
+                activeOpacity={0.85}
+                style={[styles.primaryCtaFlex, { backgroundColor: C.gold }]}
+              >
+                <Text style={styles.primaryCtaText}>Sort my week</Text>
+                <Feather name="zap" size={18} color="#fff" />
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); goToPreferencesWithSave(); }}
+                activeOpacity={0.85}
+                style={[styles.secondaryCtaFlex, { backgroundColor: C.secondaryActionBg }]}
+              >
+                <Text style={[styles.secondaryCtaText, { color: C.secondaryActionText }]}>More filters</Text>
+                <Feather name="sliders" size={15} color={C.secondaryActionText} />
+              </TouchableOpacity>
+            </View>
+            <TouchableOpacity onPress={() => { Haptics.selectionAsync(); startGenerating(); }} style={styles.skipBtn}>
+              <Text style={[styles.skipText, { color: C.textMuted }]}>
+                Skip — no exclusions
+              </Text>
+            </TouchableOpacity>
+          </>
+        ) : (
+          <>
+            <TouchableOpacity
+              onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); goNext(); }}
+              activeOpacity={0.85}
+              style={[styles.primaryCta, { backgroundColor: C.gold }]}
+            >
+              <Text style={styles.primaryCtaText}>Continue</Text>
+              <Feather name="arrow-right" size={18} color="#fff" />
+            </TouchableOpacity>
+            {step === 5 && (
+              <TouchableOpacity
+                onPress={() => { Haptics.selectionAsync(); goNext(); }}
+                style={styles.skipBtn}
+              >
+                <Text style={[styles.skipText, { color: C.textMuted }]}>
+                  Skip — no preference
+                </Text>
+              </TouchableOpacity>
+            )}
+          </>
         )}
       </View>
     </View>
@@ -520,7 +557,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "flex-start",
-    paddingTop: 52,
+    paddingTop: 20,
     gap: 16,
   },
   logo: {
@@ -655,6 +692,32 @@ const styles = StyleSheet.create({
   stepFooter: {
     gap: 8,
     paddingTop: 12,
+  },
+  step6BtnRow: {
+    flexDirection: "row",
+    gap: 10,
+  },
+  primaryCtaFlex: {
+    flex: 2,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    paddingVertical: 18,
+    borderRadius: 18,
+  },
+  secondaryCtaFlex: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 6,
+    paddingVertical: 18,
+    borderRadius: 18,
+  },
+  secondaryCtaText: {
+    fontSize: 15,
+    fontFamily: "Inter_600SemiBold",
   },
   primaryCta: {
     flexDirection: "row",
