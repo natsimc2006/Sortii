@@ -221,7 +221,7 @@ export default function OnboardingScreen() {
     isInGeneratingFlow.current = true;
     await setPreferences(newPrefs);
     await setIsOnboarded(true);
-    router.replace("/preferences");
+    router.replace("/(tabs)/preferences");
   };
 
   const toggleExclusion = (ex: string) => {

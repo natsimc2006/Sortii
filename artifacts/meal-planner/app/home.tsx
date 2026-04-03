@@ -51,7 +51,7 @@ export default function HomeScreen() {
 
   const handlePreferences = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    router.push("/preferences");
+    router.push("/(tabs)/preferences");
   };
 
   return (
@@ -132,21 +132,21 @@ export default function HomeScreen() {
 
       <View style={styles.actions}>
         <TouchableOpacity
-          onPress={handlePreferences}
+          onPress={handleBack}
           activeOpacity={0.85}
           style={[styles.primaryBtn, { backgroundColor: C.gold }]}
         >
-          <Text style={styles.primaryBtnText}>Update my preferences</Text>
-          <Feather name="sliders" size={20} color="#fff" />
+          <Text style={styles.primaryBtnText}>Get started</Text>
+          <Feather name="arrow-right" size={20} color="#fff" />
         </TouchableOpacity>
 
         <TouchableOpacity
-          onPress={handleBack}
+          onPress={handlePreferences}
           activeOpacity={0.75}
           style={[styles.secondaryBtn, { borderColor: C.inputBorder }]}
         >
           <Text style={[styles.secondaryBtnText, { color: C.text }]}>
-            Go to my week →
+            Edit preferences
           </Text>
         </TouchableOpacity>
       </View>
