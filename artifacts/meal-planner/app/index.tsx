@@ -144,7 +144,7 @@ export default function OnboardingScreen() {
 
   useEffect(() => {
     if (isOnboarded && !isInGeneratingFlow.current) {
-      router.replace("/(tabs)/planner");
+      router.replace("/home");
     }
   }, [isOnboarded]);
 
