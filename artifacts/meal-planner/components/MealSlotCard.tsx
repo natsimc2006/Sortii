@@ -301,8 +301,8 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   recipeIconBox: {
-    width: 40,
-    height: 40,
+    width: 52,
+    height: 52,
     borderRadius: 10,
     alignItems: "center",
     justifyContent: "center",
@@ -310,8 +310,8 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   recipeThumbnail: {
-    width: 40,
-    height: 40,
+    width: 52,
+    height: 52,
   },
   recipeInfo: {
     flex: 1,

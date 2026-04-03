@@ -20,18 +20,18 @@ const sortiiLogo = require("@/assets/images/sortii-logo.png");
 const STEPS = [
   {
     icon: "sliders",
-    title: "Set your preferences",
-    desc: "Choose your household size, budget, and dietary needs.",
+    title: "Tell us about your household",
+    desc: "Household size, budget, dietary needs — sorted in 60 seconds.",
   },
   {
     icon: "calendar",
     title: "Plan your week",
-    desc: "Pick meals manually, fill gaps, or auto-generate the whole week.",
+    desc: "Pick meals manually, fill gaps, or let us sort the whole lot.",
   },
   {
     icon: "shopping-cart",
-    title: "Get your shopping list",
-    desc: "One tap generates a combined, grouped grocery list for the week.",
+    title: "Your list, ready to shop",
+    desc: "One tap. Everything you need. Nothing you don't.",
   },
 ];
 
@@ -71,8 +71,7 @@ export default function HomeScreen() {
         style={[styles.backBtn, { backgroundColor: C.chipBg }]}
         hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
       >
-        <Feather name="arrow-left" size={18} color={C.primary} />
-        <Text style={[styles.backLabel, { color: C.primary }]}>Back to planner</Text>
+        <Feather name="arrow-left" size={16} color={C.primary} />
       </TouchableOpacity>
 
       <View style={styles.heroSection}>
@@ -81,7 +80,7 @@ export default function HomeScreen() {
           style={styles.logoImage}
           resizeMode="contain"
         />
-        <Text style={[styles.subheadline, { color: C.textSecondary }]}>
+        <Text style={[styles.subheadline, { color: "#8A8D86" }]}>
           250 dinners. Smart planning. One less thing to think about.
         </Text>
       </View>
@@ -137,7 +136,7 @@ export default function HomeScreen() {
           activeOpacity={0.85}
           style={[styles.primaryBtn, { backgroundColor: C.gold }]}
         >
-          <Text style={styles.primaryBtnText}>Back to my planner</Text>
+          <Text style={styles.primaryBtnText}>Get started</Text>
           <Feather name="arrow-right" size={20} color="#fff" />
         </TouchableOpacity>
 
@@ -165,17 +164,12 @@ const styles = StyleSheet.create({
     gap: 20,
   },
   backBtn: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
     alignSelf: "flex-start",
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 12,
-  },
-  backLabel: {
-    fontSize: 14,
-    fontFamily: "Inter_600SemiBold",
+    width: 34,
+    height: 34,
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 10,
   },
   heroSection: {
     alignItems: "center",
@@ -183,15 +177,15 @@ const styles = StyleSheet.create({
     paddingTop: 0,
   },
   logoImage: {
-    width: 240,
-    maxWidth: "78%",
-    height: 111,
+    width: 320,
+    maxWidth: "82%",
+    height: 148,
   },
   subheadline: {
-    fontSize: 16,
+    fontSize: 14,
     fontFamily: "Inter_400Regular",
     textAlign: "center",
-    lineHeight: 24,
+    lineHeight: 22,
     maxWidth: 300,
   },
   stepsSection: {

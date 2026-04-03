@@ -129,7 +129,7 @@ export default function PreferencesScreen() {
           <View>
             <Text style={[styles.title, { color: C.text }]}>Preferences</Text>
             <Text style={[styles.subtitle, { color: C.textSecondary }]}>
-              Customise your weekly meal planning
+              Let's get your dinners sorted. Takes 60 seconds.
             </Text>
           </View>
         </View>
@@ -149,7 +149,7 @@ export default function PreferencesScreen() {
               ? "You choose every meal yourself."
               : prefs.planningMode === "mixed"
                 ? "You choose some, the app fills the rest."
-                : "The app picks the whole week for you."}
+                : "Sit back. We've got this."}
           </Text>
         </Section>
 
@@ -185,7 +185,7 @@ export default function PreferencesScreen() {
             </TouchableOpacity>
           </View>
           <Text style={[styles.hint, { color: C.textMuted }]}>
-            Ingredient quantities will be scaled to this number of people.
+            We'll scale everything to feed your household. No mental maths needed.
           </Text>
         </Section>
 

@@ -268,7 +268,7 @@ export default function OnboardingScreen() {
             activeOpacity={0.85}
             style={[styles.primaryCta, { backgroundColor: C.gold }]}
           >
-            <Text style={styles.primaryCtaText}>Start my week</Text>
+            <Text style={styles.primaryCtaText}>Get started</Text>
             <Feather name="arrow-right" size={20} color="#fff" />
           </TouchableOpacity>
           <Text style={[styles.welcomeHelper, { color: C.textMuted }]}>
@@ -519,12 +519,13 @@ const styles = StyleSheet.create({
   welcomeContent: {
     flex: 1,
     alignItems: "center",
-    justifyContent: "center",
-    gap: 20,
+    justifyContent: "flex-start",
+    paddingTop: 52,
+    gap: 16,
   },
   logo: {
-    width: 280,
-    height: 130,
+    width: 320,
+    height: 148,
   },
   welcomeSub: {
     fontSize: 16,
