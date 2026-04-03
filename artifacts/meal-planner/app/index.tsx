@@ -218,6 +218,7 @@ export default function OnboardingScreen() {
       exclusions,
       weekendOverrides: { ...DEFAULT_WEEKEND_OVERRIDES },
     };
+    isInGeneratingFlow.current = true;
     await setPreferences(newPrefs);
     await setIsOnboarded(true);
     router.replace("/preferences");
@@ -497,24 +498,22 @@ export default function OnboardingScreen() {
       <View style={styles.stepFooter}>
         {step === 6 ? (
           <>
-            <View style={styles.step6BtnRow}>
-              <TouchableOpacity
-                onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); startGenerating(); }}
-                activeOpacity={0.85}
-                style={[styles.primaryCtaFlex, { backgroundColor: C.gold }]}
-              >
-                <Text style={styles.primaryCtaText}>Sort my week</Text>
-                <Feather name="zap" size={18} color="#fff" />
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); goToPreferencesWithSave(); }}
-                activeOpacity={0.85}
-                style={[styles.secondaryCtaFlex, { backgroundColor: C.secondaryActionBg }]}
-              >
-                <Text style={[styles.secondaryCtaText, { color: C.secondaryActionText }]}>More filters</Text>
-                <Feather name="sliders" size={15} color={C.secondaryActionText} />
-              </TouchableOpacity>
-            </View>
+            <TouchableOpacity
+              onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); startGenerating(); }}
+              activeOpacity={0.85}
+              style={[styles.primaryCta, { backgroundColor: C.gold }]}
+            >
+              <Text style={styles.primaryCtaText}>Sort my week</Text>
+              <Feather name="zap" size={18} color="#fff" />
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); goToPreferencesWithSave(); }}
+              activeOpacity={0.85}
+              style={[styles.secondaryCtaFull, { backgroundColor: C.secondaryActionBg }]}
+            >
+              <Text style={[styles.secondaryCtaText, { color: C.secondaryActionText }]}>More filters</Text>
+              <Feather name="sliders" size={15} color={C.secondaryActionText} />
+            </TouchableOpacity>
             <TouchableOpacity onPress={() => { Haptics.selectionAsync(); startGenerating(); }} style={styles.skipBtn}>
               <Text style={[styles.skipText, { color: C.textMuted }]}>
                 Skip — no exclusions
@@ -574,11 +573,11 @@ const styles = StyleSheet.create({
   welcomeActions: {
     gap: 12,
     paddingBottom: 8,
-    alignItems: "center",
   },
   welcomeHelper: {
     fontSize: 13,
     fontFamily: "Inter_400Regular",
+    textAlign: "center",
   },
   stepHeader: {
     flexDirection: "row",
@@ -693,26 +692,12 @@ const styles = StyleSheet.create({
     gap: 8,
     paddingTop: 12,
   },
-  step6BtnRow: {
-    flexDirection: "row",
-    gap: 10,
-  },
-  primaryCtaFlex: {
-    flex: 2,
+  secondaryCtaFull: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
     gap: 8,
-    paddingVertical: 18,
-    borderRadius: 18,
-  },
-  secondaryCtaFlex: {
-    flex: 1,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 6,
-    paddingVertical: 18,
+    paddingVertical: 16,
     borderRadius: 18,
   },
   secondaryCtaText: {
