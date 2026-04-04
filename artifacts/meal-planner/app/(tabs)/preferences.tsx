@@ -305,7 +305,7 @@ export default function PreferencesScreen() {
         contentContainerStyle={[
           styles.container,
           {
-            paddingTop: Platform.OS === "web" ? 80 : insets.top + 20,
+            paddingTop: Platform.OS === "web" ? 56 : insets.top + 6,
             paddingBottom: TAB_BAR_HEIGHT + insets.bottom + 40,
           },
         ]}
@@ -911,8 +911,9 @@ const styles = StyleSheet.create({
     fontFamily: "Inter_600SemiBold",
   },
   prefHero: {
-    gap: 6,
-    paddingVertical: 8,
+    gap: 4,
+    paddingTop: 2,
+    paddingBottom: 6,
   },
   prefHeroTopRow: {
     flexDirection: "row",

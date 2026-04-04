@@ -52,7 +52,7 @@ const CAT_META: Record<SpecCat, { label: string; emoji: string; color: string }>
 function formatQty(qty: number, unit: string): string {
   const isWhole = !unit || unit === "whole" || unit === "pieces";
   const r = qty < 1 ? Math.round(qty * 10) / 10 : Math.round(qty * 2) / 2;
-  return isWhole ? String(Math.round(r)) : `${r} ${unit}`;
+  return isWhole ? `× ${Math.round(r)}` : `${r} ${unit}`;
 }
 
 function stepFor(unit: string): number {
