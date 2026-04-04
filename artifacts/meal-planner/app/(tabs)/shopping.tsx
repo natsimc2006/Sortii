@@ -403,7 +403,9 @@ export default function ShoppingScreen() {
   };
 
   // ─── FOOTER HEIGHT ───────────────────────────────────────────────────────
-  const footerH = 72 + (Platform.OS === "web" ? 16 : insets.bottom);
+  const TAB_BAR_HEIGHT = Platform.OS === "web" ? 60 : 49;
+  const footerBottom = TAB_BAR_HEIGHT + (Platform.OS !== "web" ? insets.bottom : 0);
+  const footerH = 72 + footerBottom;
 
   // ─── Empty state ─────────────────────────────────────────────────────────
   if (allItems.length === 0) {
@@ -621,7 +623,7 @@ export default function ShoppingScreen() {
       <View
         style={[
           styles.footer,
-          { paddingBottom: Platform.OS === "web" ? 16 : insets.bottom + 12, borderTopColor: C.cardBorder, backgroundColor: C.card },
+          { paddingBottom: 12, bottom: footerBottom, borderTopColor: C.cardBorder, backgroundColor: C.card },
         ]}
       >
         <TouchableOpacity

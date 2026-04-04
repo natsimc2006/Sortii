@@ -401,14 +401,14 @@ export default function PlannerScreen() {
             <View style={styles.headerIcons}>
               <TouchableOpacity
                 onPress={() => router.push("/(tabs)/preferences")}
-                style={[styles.filterIconBtn, { backgroundColor: C.plumTint }]}
+                style={[styles.filterIconBtn, { backgroundColor: C.plumTint, borderWidth: 1.5, borderColor: C.plum }]}
                 hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
               >
                 <Feather name="sliders" size={15} color={C.plum} />
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={() => router.push("/home")}
-                style={[styles.homeIconBtn, { backgroundColor: C.chipBg }]}
+                style={[styles.homeIconBtn, { backgroundColor: C.chipBg, borderWidth: 1.5, borderColor: C.primary }]}
                 hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
               >
                 <Feather name="home" size={15} color={C.primary} />
