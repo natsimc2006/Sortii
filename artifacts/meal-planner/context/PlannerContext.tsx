@@ -81,27 +81,26 @@ function buildEmptyPlan(prefs: PlanPreferences): MealPlanEntry[] {
   return entries;
 }
 
-function estimateCost(
+function fallbackCostByBand(band: string): number {
+  if (band === "low") return 4.50;
+  if (band === "high") return 11.00;
+  return 7.00;
+}
+
+function calculateWeeklyCost(
   plan: MealPlanEntry[],
   prefs: PlanPreferences
 ): string {
   const filledMeals = plan.filter((m) => m.recipeId);
-  const count = filledMeals.length;
-  const basePerMeal =
-    prefs.budgetLevel === "super-budget"
-      ? 6
-      : prefs.budgetLevel === "budget"
-        ? 12
-        : prefs.budgetLevel === "standard"
-          ? 18
-          : 28;
-  const total = Math.round(
-    (basePerMeal * count * prefs.householdSize) /
-      (prefs.leftoversMode === "cook-once" ? 1.4 : 1)
-  );
-  const lower = Math.round(total * 0.85);
-  const upper = Math.round(total * 1.15);
-  return `$${lower}–$${upper}`;
+  const totalCost = filledMeals.reduce((sum, meal) => {
+    const recipe = RECIPES.find((r) => r.id === meal.recipeId);
+    const costPerServe =
+      recipe?.costPerServeAUD ?? fallbackCostByBand(recipe?.estimatedCostBand ?? "medium");
+    return sum + costPerServe * prefs.householdSize;
+  }, 0);
+  const rangeLow = Math.round(totalCost * 0.92);
+  const rangeHigh = Math.round(totalCost * 1.08);
+  return `$${rangeLow}–$${rangeHigh}`;
 }
 
 export function PlannerProvider({ children }: { children: React.ReactNode }) {
@@ -345,7 +344,7 @@ export function PlannerProvider({ children }: { children: React.ReactNode }) {
           `Week of ${new Date().toLocaleDateString("en-AU", { day: "numeric", month: "short" })}`,
         meals: currentPlan,
         preferences,
-        estimatedCost: estimateCost(currentPlan, preferences),
+        estimatedCost: calculateWeeklyCost(currentPlan, preferences),
       };
       const updated = [newPlan, ...savedPlans];
       setSavedPlans(updated);
@@ -412,7 +411,7 @@ export function PlannerProvider({ children }: { children: React.ReactNode }) {
     });
   }, [preferences, hiddenRecipes]);
 
-  const estimatedCostBand = estimateCost(currentPlan, preferences);
+  const estimatedCostBand = calculateWeeklyCost(currentPlan, preferences);
 
   return (
     <PlannerContext.Provider

@@ -32,6 +32,7 @@ export interface Recipe {
   ingredients: RecipeIngredient[];
   instructions: string[];
   estimatedCostBand: "low" | "medium" | "high";
+  costPerServeAUD?: number;
   batchCook?: boolean;
   quickAssembly?: boolean;
   familyStyle?: boolean;

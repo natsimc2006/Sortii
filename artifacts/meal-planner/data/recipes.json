@@ -92,7 +92,8 @@
     "seasonTags": [
       "all"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/sutysw1468247559.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/sutysw1468247559.jpg",
+    "costPerServeAUD": 5.05
   },
   {
     "id": "r002",
@@ -190,7 +191,8 @@
       "summer",
       "winter"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/hglsbl1614346998.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/hglsbl1614346998.jpg",
+    "costPerServeAUD": 5.18
   },
   {
     "id": "r003",
@@ -280,7 +282,8 @@
     "seasonTags": [
       "all"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/vdwloy1713225718.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/vdwloy1713225718.jpg",
+    "costPerServeAUD": 7.85
   },
   {
     "id": "r004",
@@ -300,7 +303,7 @@
     ],
     "leftoversFriendly": false,
     "mealType": "dinner",
-    "estimatedCostBand": "medium",
+    "estimatedCostBand": "high",
     "ingredients": [
       {
         "name": "Salmon fillets",
@@ -365,7 +368,8 @@
       "summer",
       "spring"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/1548772327.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/1548772327.jpg",
+    "costPerServeAUD": 13.4
   },
   {
     "id": "r005",
@@ -461,7 +465,8 @@
     "seasonTags": [
       "all"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/wrssvt1511556563.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/wrssvt1511556563.jpg",
+    "costPerServeAUD": 3.92
   },
   {
     "id": "r006",
@@ -558,7 +563,8 @@
       "summer",
       "spring"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/wuyd2h1765655837.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/wuyd2h1765655837.jpg",
+    "costPerServeAUD": 2.88
   },
   {
     "id": "r007",
@@ -640,7 +646,8 @@
     "seasonTags": [
       "autumn"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/grhn401765687086.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/grhn401765687086.jpg",
+    "costPerServeAUD": 4.15
   },
   {
     "id": "r008",
@@ -659,7 +666,7 @@
     ],
     "leftoversFriendly": false,
     "mealType": "dinner",
-    "estimatedCostBand": "medium",
+    "estimatedCostBand": "high",
     "ingredients": [
       {
         "name": "Raw prawns",
@@ -737,7 +744,8 @@
     "seasonTags": [
       "all"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/4xcfai1763765676.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/4xcfai1763765676.jpg",
+    "costPerServeAUD": 10.95
   },
   {
     "id": "r009",
@@ -831,7 +839,8 @@
     "seasonTags": [
       "summer"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/g373701551450225.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/g373701551450225.jpg",
+    "costPerServeAUD": 3.45
   },
   {
     "id": "r010",
@@ -850,7 +859,7 @@
     ],
     "leftoversFriendly": false,
     "mealType": "dinner",
-    "estimatedCostBand": "medium",
+    "estimatedCostBand": "high",
     "ingredients": [
       {
         "name": "White fish fillets",
@@ -914,7 +923,8 @@
     "seasonTags": [
       "summer"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/1548772327.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/1548772327.jpg",
+    "costPerServeAUD": 9.1
   },
   {
     "id": "r011",
@@ -1008,7 +1018,8 @@
     "seasonTags": [
       "summer"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/lgmnff1763789847.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/lgmnff1763789847.jpg",
+    "costPerServeAUD": 8.65
   },
   {
     "id": "r012",
@@ -1091,7 +1102,8 @@
     "seasonTags": [
       "all"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/k29viq1585565980.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/k29viq1585565980.jpg",
+    "costPerServeAUD": 8.5
   },
   {
     "id": "r013",
@@ -1178,7 +1190,8 @@
     "seasonTags": [
       "summer"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/sl6vqv1763335988.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/sl6vqv1763335988.jpg",
+    "costPerServeAUD": 5.1
   },
   {
     "id": "r014",
@@ -1267,7 +1280,8 @@
       "autumn",
       "spring"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/wvqpwt1468339226.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/wvqpwt1468339226.jpg",
+    "costPerServeAUD": 3.28
   },
   {
     "id": "r015",
@@ -1349,7 +1363,8 @@
     "seasonTags": [
       "summer"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/atd5sh1583188467.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/atd5sh1583188467.jpg",
+    "costPerServeAUD": 11.85
   },
   {
     "id": "r016",
@@ -1442,7 +1457,8 @@
     "seasonTags": [
       "summer"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/k29viq1585565980.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/k29viq1585565980.jpg",
+    "costPerServeAUD": 7.95
   },
   {
     "id": "r017",
@@ -1531,7 +1547,8 @@
     "seasonTags": [
       "all"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/7kb44y1763589084.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/7kb44y1763589084.jpg",
+    "costPerServeAUD": 3.15
   },
   {
     "id": "r018",
@@ -1551,7 +1568,7 @@
     ],
     "leftoversFriendly": false,
     "mealType": "dinner",
-    "estimatedCostBand": "medium",
+    "estimatedCostBand": "high",
     "ingredients": [
       {
         "name": "Salmon fillets",
@@ -1627,7 +1644,8 @@
     "seasonTags": [
       "summer"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/xxyupu1468262513.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/xxyupu1468262513.jpg",
+    "costPerServeAUD": 11.2
   },
   {
     "id": "r019",
@@ -1710,7 +1728,8 @@
     "seasonTags": [
       "autumn"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/1brbso1763585098.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/1brbso1763585098.jpg",
+    "costPerServeAUD": 2.65
   },
   {
     "id": "r020",
@@ -1800,7 +1819,8 @@
     "seasonTags": [
       "summer"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/uvuyxu1503067369.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/uvuyxu1503067369.jpg",
+    "costPerServeAUD": 4.88
   },
   {
     "id": "r021",
@@ -1884,7 +1904,8 @@
     "seasonTags": [
       "winter"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/wyxwsp1486979827.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/wyxwsp1486979827.jpg",
+    "costPerServeAUD": 4.35
   },
   {
     "id": "r022",
@@ -1979,7 +2000,8 @@
     "seasonTags": [
       "all"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/uuuspp1511297945.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/uuuspp1511297945.jpg",
+    "costPerServeAUD": 7.4
   },
   {
     "id": "r023",
@@ -1997,7 +2019,7 @@
     ],
     "leftoversFriendly": false,
     "mealType": "dinner",
-    "estimatedCostBand": "medium",
+    "estimatedCostBand": "high",
     "ingredients": [
       {
         "name": "Rice noodles",
@@ -2074,7 +2096,8 @@
     "seasonTags": [
       "all"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/rg9ze01763479093.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/rg9ze01763479093.jpg",
+    "costPerServeAUD": 9.35
   },
   {
     "id": "r024",
@@ -2168,7 +2191,8 @@
     "seasonTags": [
       "all"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/6vi2cv1763075785.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/6vi2cv1763075785.jpg",
+    "costPerServeAUD": 3.18
   },
   {
     "id": "r025",
@@ -2188,7 +2212,7 @@
     ],
     "leftoversFriendly": true,
     "mealType": "dinner",
-    "estimatedCostBand": "low",
+    "estimatedCostBand": "medium",
     "ingredients": [
       {
         "name": "Pulled pork (pre-cooked)",
@@ -2245,7 +2269,8 @@
     "seasonTags": [
       "all"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/tzsy461763769901.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/tzsy461763769901.jpg",
+    "costPerServeAUD": 5.92
   },
   {
     "id": "r026",
@@ -2332,7 +2357,8 @@
     "seasonTags": [
       "all"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/grhn401765687086.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/grhn401765687086.jpg",
+    "costPerServeAUD": 6.75
   },
   {
     "id": "r027",
@@ -2427,7 +2453,8 @@
     "seasonTags": [
       "summer"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/tvtxpq1511464705.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/tvtxpq1511464705.jpg",
+    "costPerServeAUD": 6.25
   },
   {
     "id": "r028",
@@ -2521,7 +2548,8 @@
     "seasonTags": [
       "autumn"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/q8pu1k1764114334.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/q8pu1k1764114334.jpg",
+    "costPerServeAUD": 2.45
   },
   {
     "id": "r029",
@@ -2615,7 +2643,8 @@
     "seasonTags": [
       "all"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/vdwloy1713225718.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/vdwloy1713225718.jpg",
+    "costPerServeAUD": 7.1
   },
   {
     "id": "r030",
@@ -2696,7 +2725,8 @@
     "seasonTags": [
       "all"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/grhn401765687086.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/grhn401765687086.jpg",
+    "costPerServeAUD": 7.85
   },
   {
     "id": "r031",
@@ -2803,7 +2833,8 @@
     "seasonTags": [
       "all"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/uuqvwu1504629254.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/uuqvwu1504629254.jpg",
+    "costPerServeAUD": 3.85
   },
   {
     "id": "r032",
@@ -2902,7 +2933,8 @@
     "seasonTags": [
       "summer"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/6g3rso1763486069.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/6g3rso1763486069.jpg",
+    "costPerServeAUD": 3.2
   },
   {
     "id": "r033",
@@ -2990,7 +3022,8 @@
     "seasonTags": [
       "summer"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/st9shl1763755808.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/st9shl1763755808.jpg",
+    "costPerServeAUD": 16.45
   },
   {
     "id": "r034",
@@ -3086,7 +3119,8 @@
     "seasonTags": [
       "summer"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/g373701551450225.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/g373701551450225.jpg",
+    "costPerServeAUD": 3.9
   },
   {
     "id": "r035",
@@ -3183,7 +3217,8 @@
       "summer",
       "winter"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/sstssx1487349585.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/sstssx1487349585.jpg",
+    "costPerServeAUD": 6.8
   },
   {
     "id": "r036",
@@ -3278,7 +3313,8 @@
     "seasonTags": [
       "all"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/vdwloy1713225718.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/vdwloy1713225718.jpg",
+    "costPerServeAUD": 6.95
   },
   {
     "id": "r037",
@@ -3374,7 +3410,8 @@
     "seasonTags": [
       "summer"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/41cxjh1683207682.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/41cxjh1683207682.jpg",
+    "costPerServeAUD": 5.4
   },
   {
     "id": "r038",
@@ -3462,7 +3499,8 @@
     "seasonTags": [
       "all"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/ypxvwv1505333929.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/ypxvwv1505333929.jpg",
+    "costPerServeAUD": 5.65
   },
   {
     "id": "r039",
@@ -3551,7 +3589,8 @@
     "seasonTags": [
       "summer"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/8c8m4q1763791156.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/8c8m4q1763791156.jpg",
+    "costPerServeAUD": 4.15
   },
   {
     "id": "r040",
@@ -3646,7 +3685,8 @@
     "seasonTags": [
       "all"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/bc8v651619789840.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/bc8v651619789840.jpg",
+    "costPerServeAUD": 7.6
   },
   {
     "id": "r041",
@@ -3728,7 +3768,8 @@
     "seasonTags": [
       "summer"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/vdwloy1713225718.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/vdwloy1713225718.jpg",
+    "costPerServeAUD": 7.35
   },
   {
     "id": "r042",
@@ -3816,7 +3857,8 @@
     "seasonTags": [
       "summer"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/vdwloy1713225718.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/vdwloy1713225718.jpg",
+    "costPerServeAUD": 8.2
   },
   {
     "id": "r043",
@@ -3910,7 +3952,8 @@
     "seasonTags": [
       "all"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/7xte3u1763757761.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/7xte3u1763757761.jpg",
+    "costPerServeAUD": 15.9
   },
   {
     "id": "r044",
@@ -3999,7 +4042,8 @@
     "seasonTags": [
       "autumn"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/tqd7s21763780609.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/tqd7s21763780609.jpg",
+    "costPerServeAUD": 3.55
   },
   {
     "id": "r045",
@@ -4019,7 +4063,7 @@
     ],
     "leftoversFriendly": false,
     "mealType": "both",
-    "estimatedCostBand": "low",
+    "estimatedCostBand": "medium",
     "ingredients": [
       {
         "name": "Chicken breast",
@@ -4083,7 +4127,8 @@
     "seasonTags": [
       "summer"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/vdwloy1713225718.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/vdwloy1713225718.jpg",
+    "costPerServeAUD": 5.85
   },
   {
     "id": "r046",
@@ -4167,7 +4212,8 @@
       "autumn",
       "spring"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/wvqpwt1468339226.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/wvqpwt1468339226.jpg",
+    "costPerServeAUD": 4.2
   },
   {
     "id": "r047",
@@ -4255,7 +4301,8 @@
     "seasonTags": [
       "all"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/xquakq1619787532.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/xquakq1619787532.jpg",
+    "costPerServeAUD": 3.7
   },
   {
     "id": "r048",
@@ -4275,7 +4322,7 @@
     ],
     "leftoversFriendly": false,
     "mealType": "dinner",
-    "estimatedCostBand": "low",
+    "estimatedCostBand": "medium",
     "ingredients": [
       {
         "name": "Chicken breast",
@@ -4339,7 +4386,8 @@
     "seasonTags": [
       "all"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/vdwloy1713225718.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/vdwloy1713225718.jpg",
+    "costPerServeAUD": 5.95
   },
   {
     "id": "r049",
@@ -4429,7 +4477,8 @@
     "seasonTags": [
       "all"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/el64dy1763483009.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/el64dy1763483009.jpg",
+    "costPerServeAUD": 4.6
   },
   {
     "id": "r050",
@@ -4514,7 +4563,8 @@
     "seasonTags": [
       "autumn"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/uuuspp1511297945.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/uuuspp1511297945.jpg",
+    "costPerServeAUD": 5.4
   },
   {
     "id": "r051",
@@ -4609,7 +4659,8 @@
     "seasonTags": [
       "all"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/z0ageb1583189517.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/z0ageb1583189517.jpg",
+    "costPerServeAUD": 4.35
   },
   {
     "id": "r052",
@@ -4698,7 +4749,8 @@
     "seasonTags": [
       "summer"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/uvuyxu1503067369.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/uvuyxu1503067369.jpg",
+    "costPerServeAUD": 7.45
   },
   {
     "id": "r053",
@@ -4790,7 +4842,8 @@
       "winter",
       "spring"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/96lt871763480970.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/96lt871763480970.jpg",
+    "costPerServeAUD": 8.5
   },
   {
     "id": "r054",
@@ -4810,7 +4863,7 @@
     ],
     "leftoversFriendly": false,
     "mealType": "dinner",
-    "estimatedCostBand": "medium",
+    "estimatedCostBand": "high",
     "ingredients": [
       {
         "name": "Salmon fillets",
@@ -4874,7 +4927,8 @@
       "summer",
       "winter"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/xxyupu1468262513.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/xxyupu1468262513.jpg",
+    "costPerServeAUD": 10.25
   },
   {
     "id": "r055",
@@ -4963,7 +5017,8 @@
     "seasonTags": [
       "summer"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/rjhf741585564676.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/rjhf741585564676.jpg",
+    "costPerServeAUD": 8.75
   },
   {
     "id": "r056",
@@ -4983,7 +5038,7 @@
     ],
     "leftoversFriendly": true,
     "mealType": "dinner",
-    "estimatedCostBand": "low",
+    "estimatedCostBand": "medium",
     "ingredients": [
       {
         "name": "Beef mince",
@@ -5053,7 +5108,8 @@
     "seasonTags": [
       "summer"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/uvuyxu1503067369.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/uvuyxu1503067369.jpg",
+    "costPerServeAUD": 5.9
   },
   {
     "id": "r057",
@@ -5142,7 +5198,8 @@
     "seasonTags": [
       "all"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/tvtxpq1511464705.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/tvtxpq1511464705.jpg",
+    "costPerServeAUD": 3.85
   },
   {
     "id": "r058",
@@ -5226,7 +5283,8 @@
     "seasonTags": [
       "summer"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/kvbotn1581012881.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/kvbotn1581012881.jpg",
+    "costPerServeAUD": 4.7
   },
   {
     "id": "r059",
@@ -5309,7 +5367,8 @@
     "seasonTags": [
       "summer"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/ul2uy31764794321.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/ul2uy31764794321.jpg",
+    "costPerServeAUD": 3.95
   },
   {
     "id": "r060",
@@ -5327,7 +5386,7 @@
     ],
     "leftoversFriendly": false,
     "mealType": "dinner",
-    "estimatedCostBand": "medium",
+    "estimatedCostBand": "high",
     "ingredients": [
       {
         "name": "Raw prawns",
@@ -5397,7 +5456,8 @@
     "seasonTags": [
       "all"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/rvypwy1503069308.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/rvypwy1503069308.jpg",
+    "costPerServeAUD": 9.15
   },
   {
     "id": "r061",
@@ -5417,7 +5477,7 @@
     ],
     "leftoversFriendly": false,
     "mealType": "dinner",
-    "estimatedCostBand": "medium",
+    "estimatedCostBand": "high",
     "ingredients": [
       {
         "name": "Lamb cutlets",
@@ -5488,7 +5548,8 @@
     "seasonTags": [
       "summer"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/yuwtuu1511295751.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/yuwtuu1511295751.jpg",
+    "costPerServeAUD": 12.4
   },
   {
     "id": "r062",
@@ -5573,7 +5634,8 @@
       "winter",
       "spring"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/wuyd2h1765655837.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/wuyd2h1765655837.jpg",
+    "costPerServeAUD": 3.2
   },
   {
     "id": "r063",
@@ -5663,7 +5725,8 @@
     "seasonTags": [
       "all"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/m0p0j81765568742.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/m0p0j81765568742.jpg",
+    "costPerServeAUD": 5.1
   },
   {
     "id": "r064",
@@ -5746,7 +5809,8 @@
     "seasonTags": [
       "autumn"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/1brbso1763585098.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/1brbso1763585098.jpg",
+    "costPerServeAUD": 2.65
   },
   {
     "id": "r065",
@@ -5831,7 +5895,8 @@
       "summer",
       "winter"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/wvpsxx1468256321.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/wvpsxx1468256321.jpg",
+    "costPerServeAUD": 4.55
   },
   {
     "id": "r066",
@@ -5914,7 +5979,8 @@
     "seasonTags": [
       "summer"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/g373701551450225.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/g373701551450225.jpg",
+    "costPerServeAUD": 3.15
   },
   {
     "id": "r067",
@@ -5933,7 +5999,7 @@
     ],
     "leftoversFriendly": false,
     "mealType": "dinner",
-    "estimatedCostBand": "medium",
+    "estimatedCostBand": "high",
     "ingredients": [
       {
         "name": "Peking duck breast",
@@ -5985,7 +6051,8 @@
     "seasonTags": [
       "summer"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/wvpvsu1511786158.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/wvpvsu1511786158.jpg",
+    "costPerServeAUD": 11.85
   },
   {
     "id": "r068",
@@ -6069,7 +6136,8 @@
     "seasonTags": [
       "all"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/wspuvp1511303478.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/wspuvp1511303478.jpg",
+    "costPerServeAUD": 3.7
   },
   {
     "id": "r069",
@@ -6158,7 +6226,8 @@
     "seasonTags": [
       "autumn"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/z458v91763817681.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/z458v91763817681.jpg",
+    "costPerServeAUD": 4.4
   },
   {
     "id": "r070",
@@ -6252,7 +6321,8 @@
     "seasonTags": [
       "summer"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/uuqvwu1504629254.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/uuqvwu1504629254.jpg",
+    "costPerServeAUD": 3.75
   },
   {
     "id": "r071",
@@ -6335,7 +6405,8 @@
     "seasonTags": [
       "all"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/k29viq1585565980.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/k29viq1585565980.jpg",
+    "costPerServeAUD": 4.85
   },
   {
     "id": "r072",
@@ -6423,7 +6494,8 @@
     "seasonTags": [
       "all"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/sfahy01763752319.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/sfahy01763752319.jpg",
+    "costPerServeAUD": 6.95
   },
   {
     "id": "r073",
@@ -6442,7 +6514,7 @@
     ],
     "leftoversFriendly": false,
     "mealType": "dinner",
-    "estimatedCostBand": "medium",
+    "estimatedCostBand": "high",
     "ingredients": [
       {
         "name": "Barramundi fillets",
@@ -6508,7 +6580,8 @@
       "summer",
       "winter"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/1548772327.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/1548772327.jpg",
+    "costPerServeAUD": 10.5
   },
   {
     "id": "r074",
@@ -6590,7 +6663,8 @@
     "seasonTags": [
       "all"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/g373701551450225.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/g373701551450225.jpg",
+    "costPerServeAUD": 3.6
   },
   {
     "id": "r075",
@@ -6667,7 +6741,8 @@
     "seasonTags": [
       "all"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/uvuyxu1503067369.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/uvuyxu1503067369.jpg",
+    "costPerServeAUD": 4.25
   },
   {
     "id": "r076",
@@ -6744,7 +6819,8 @@
     "seasonTags": [
       "all"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/hcg6l91763596970.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/hcg6l91763596970.jpg",
+    "costPerServeAUD": 3.88
   },
   {
     "id": "r077",
@@ -6815,7 +6891,8 @@
     "seasonTags": [
       "summer"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/5fu4ew1760524857.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/5fu4ew1760524857.jpg",
+    "costPerServeAUD": 3.15
   },
   {
     "id": "r078",
@@ -6892,7 +6969,8 @@
       "summer",
       "spring"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/wuyd2h1765655837.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/wuyd2h1765655837.jpg",
+    "costPerServeAUD": 2.44
   },
   {
     "id": "r079",
@@ -6970,7 +7048,8 @@
     "seasonTags": [
       "all"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/vdwloy1713225718.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/vdwloy1713225718.jpg",
+    "costPerServeAUD": 3.98
   },
   {
     "id": "r080",
@@ -7048,7 +7127,8 @@
     "seasonTags": [
       "autumn"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/uuuspp1511297945.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/uuuspp1511297945.jpg",
+    "costPerServeAUD": 4.35
   },
   {
     "id": "r081",
@@ -7067,7 +7147,7 @@
     ],
     "leftoversFriendly": false,
     "mealType": "both",
-    "estimatedCostBand": "low",
+    "estimatedCostBand": "medium",
     "ingredients": [
       {
         "name": "Large flour tortillas",
@@ -7118,7 +7198,8 @@
     "seasonTags": [
       "summer"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/vdwloy1713225718.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/vdwloy1713225718.jpg",
+    "costPerServeAUD": 5.63
   },
   {
     "id": "r082",
@@ -7138,7 +7219,7 @@
     ],
     "leftoversFriendly": true,
     "mealType": "dinner",
-    "estimatedCostBand": "low",
+    "estimatedCostBand": "medium",
     "ingredients": [
       {
         "name": "Beef mince",
@@ -7201,7 +7282,8 @@
     "seasonTags": [
       "summer"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/z0ageb1583189517.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/z0ageb1583189517.jpg",
+    "costPerServeAUD": 6.13
   },
   {
     "id": "r083",
@@ -7284,7 +7366,8 @@
     "seasonTags": [
       "summer"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/sstssx1487349585.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/sstssx1487349585.jpg",
+    "costPerServeAUD": 6.5
   },
   {
     "id": "r084",
@@ -7302,7 +7385,7 @@
     ],
     "leftoversFriendly": true,
     "mealType": "dinner",
-    "estimatedCostBand": "low",
+    "estimatedCostBand": "medium",
     "ingredients": [
       {
         "name": "Pork sausages",
@@ -7359,7 +7442,8 @@
     "seasonTags": [
       "summer"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/6vi2cv1763075785.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/6vi2cv1763075785.jpg",
+    "costPerServeAUD": 5.88
   },
   {
     "id": "r085",
@@ -7430,7 +7514,8 @@
     "seasonTags": [
       "all"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/wvqpwt1468339226.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/wvqpwt1468339226.jpg",
+    "costPerServeAUD": 2.45
   },
   {
     "id": "r086",
@@ -7512,7 +7597,8 @@
     "seasonTags": [
       "summer"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/lgmnff1763789847.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/lgmnff1763789847.jpg",
+    "costPerServeAUD": 6.25
   },
   {
     "id": "r087",
@@ -7583,7 +7669,8 @@
       "summer",
       "winter"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/xxyupu1468262513.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/xxyupu1468262513.jpg",
+    "costPerServeAUD": 8.35
   },
   {
     "id": "r088",
@@ -7602,7 +7689,7 @@
     ],
     "leftoversFriendly": false,
     "mealType": "dinner",
-    "estimatedCostBand": "medium",
+    "estimatedCostBand": "high",
     "ingredients": [
       {
         "name": "Spaghetti",
@@ -7660,7 +7747,8 @@
     "seasonTags": [
       "all"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/4xcfai1763765676.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/4xcfai1763765676.jpg",
+    "costPerServeAUD": 9.08
   },
   {
     "id": "r089",
@@ -7743,7 +7831,8 @@
     "seasonTags": [
       "autumn"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/z458v91763817681.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/z458v91763817681.jpg",
+    "costPerServeAUD": 4.63
   },
   {
     "id": "r090",
@@ -7819,7 +7908,8 @@
     "seasonTags": [
       "all"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/rvypwy1503069308.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/rvypwy1503069308.jpg",
+    "costPerServeAUD": 4.5
   },
   {
     "id": "r091",
@@ -7895,7 +7985,8 @@
     "seasonTags": [
       "summer"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/lwsnkl1604181187.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/lwsnkl1604181187.jpg",
+    "costPerServeAUD": 7.38
   },
   {
     "id": "r092",
@@ -7973,7 +8064,8 @@
       "summer",
       "winter"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/uuuspp1468263334.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/uuuspp1468263334.jpg",
+    "costPerServeAUD": 5.88
   },
   {
     "id": "r093",
@@ -8049,7 +8141,8 @@
     "seasonTags": [
       "summer"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/ul2uy31764794321.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/ul2uy31764794321.jpg",
+    "costPerServeAUD": 2.88
   },
   {
     "id": "r094",
@@ -8121,7 +8214,8 @@
     "seasonTags": [
       "all"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/wyxwsp1486979827.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/wyxwsp1486979827.jpg",
+    "costPerServeAUD": 4.13
   },
   {
     "id": "r095",
@@ -8199,7 +8293,8 @@
       "autumn",
       "spring"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/2dsltq1560461468.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/2dsltq1560461468.jpg",
+    "costPerServeAUD": 3.35
   },
   {
     "id": "r096",
@@ -8282,7 +8377,8 @@
     "seasonTags": [
       "all"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/vvstvq1487342592.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/vvstvq1487342592.jpg",
+    "costPerServeAUD": 7.13
   },
   {
     "id": "r097",
@@ -8358,7 +8454,8 @@
     "seasonTags": [
       "all"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/k29viq1585565980.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/k29viq1585565980.jpg",
+    "costPerServeAUD": 7.13
   },
   {
     "id": "r098",
@@ -8440,7 +8537,8 @@
     "seasonTags": [
       "all"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/uuuspp1511297945.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/uuuspp1511297945.jpg",
+    "costPerServeAUD": 6.88
   },
   {
     "id": "r099",
@@ -8516,7 +8614,8 @@
     "seasonTags": [
       "all"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/vytypy1511883765.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/vytypy1511883765.jpg",
+    "costPerServeAUD": 7.63
   },
   {
     "id": "r100",
@@ -8598,7 +8697,8 @@
     "seasonTags": [
       "winter"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/m0p0j81765568742.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/m0p0j81765568742.jpg",
+    "costPerServeAUD": 7.75
   },
   {
     "id": "r101",
@@ -8681,7 +8781,8 @@
     "seasonTags": [
       "all"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/4uje7l1763762276.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/4uje7l1763762276.jpg",
+    "costPerServeAUD": 2.45
   },
   {
     "id": "r102",
@@ -8765,7 +8866,8 @@
     "seasonTags": [
       "autumn"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/hglsbl1614346998.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/hglsbl1614346998.jpg",
+    "costPerServeAUD": 4.15
   },
   {
     "id": "r103",
@@ -8848,7 +8950,8 @@
     "seasonTags": [
       "all"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/wspuvp1511303478.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/wspuvp1511303478.jpg",
+    "costPerServeAUD": 4.6
   },
   {
     "id": "r104",
@@ -8931,7 +9034,8 @@
     "seasonTags": [
       "all"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/ctw3ba1763788978.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/ctw3ba1763788978.jpg",
+    "costPerServeAUD": 2.35
   },
   {
     "id": "r105",
@@ -8950,7 +9054,7 @@
     ],
     "leftoversFriendly": true,
     "mealType": "dinner",
-    "estimatedCostBand": "medium",
+    "estimatedCostBand": "low",
     "ingredients": [
       {
         "name": "Chicken breast",
@@ -9015,7 +9119,8 @@
       "all"
     ],
     "batchCook": true,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/vdwloy1713225718.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/vdwloy1713225718.jpg",
+    "costPerServeAUD": 5.25
   },
   {
     "id": "r106",
@@ -9097,7 +9202,8 @@
     "seasonTags": [
       "all"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/ro8mzj1763800655.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/ro8mzj1763800655.jpg",
+    "costPerServeAUD": 5.8
   },
   {
     "id": "r107",
@@ -9181,7 +9287,8 @@
     ],
     "batchCook": true,
     "familyStyle": true,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/nlxald1764112200.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/nlxald1764112200.jpg",
+    "costPerServeAUD": 6.5
   },
   {
     "id": "r108",
@@ -9200,7 +9307,7 @@
     ],
     "leftoversFriendly": false,
     "mealType": "dinner",
-    "estimatedCostBand": "medium",
+    "estimatedCostBand": "low",
     "ingredients": [
       {
         "name": "Pizza bases",
@@ -9265,7 +9372,8 @@
     ],
     "quickAssembly": true,
     "familyStyle": true,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/vdwloy1713225718.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/vdwloy1713225718.jpg",
+    "costPerServeAUD": 5.4
   },
   {
     "id": "r109",
@@ -9348,7 +9456,8 @@
     "seasonTags": [
       "all"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/hglsbl1614346998.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/hglsbl1614346998.jpg",
+    "costPerServeAUD": 4.35
   },
   {
     "id": "r110",
@@ -9367,7 +9476,7 @@
     ],
     "leftoversFriendly": true,
     "mealType": "dinner",
-    "estimatedCostBand": "medium",
+    "estimatedCostBand": "low",
     "ingredients": [
       {
         "name": "Chicken thighs",
@@ -9431,7 +9540,8 @@
       "all"
     ],
     "batchCook": true,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/a08uqk1761848682.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/a08uqk1761848682.jpg",
+    "costPerServeAUD": 4.7
   },
   {
     "id": "r111",
@@ -9451,7 +9561,7 @@
     ],
     "leftoversFriendly": false,
     "mealType": "both",
-    "estimatedCostBand": "medium",
+    "estimatedCostBand": "low",
     "ingredients": [
       {
         "name": "Chicken thighs",
@@ -9515,7 +9625,8 @@
       "summer"
     ],
     "quickAssembly": true,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/vdwloy1713225718.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/vdwloy1713225718.jpg",
+    "costPerServeAUD": 4.85
   },
   {
     "id": "r112",
@@ -9533,7 +9644,7 @@
     ],
     "leftoversFriendly": false,
     "mealType": "dinner",
-    "estimatedCostBand": "medium",
+    "estimatedCostBand": "low",
     "ingredients": [
       {
         "name": "Chicken breast",
@@ -9603,7 +9714,8 @@
       "all"
     ],
     "quickAssembly": true,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/1525872624.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/1525872624.jpg",
+    "costPerServeAUD": 5.15
   },
   {
     "id": "r113",
@@ -9694,7 +9806,8 @@
     ],
     "quickAssembly": true,
     "familyStyle": true,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/wuyd2h1765655837.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/wuyd2h1765655837.jpg",
+    "costPerServeAUD": 3.5
   },
   {
     "id": "r114",
@@ -9782,7 +9895,8 @@
     "seasonTags": [
       "autumn"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/hglsbl1614346998.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/hglsbl1614346998.jpg",
+    "costPerServeAUD": 6.1
   },
   {
     "id": "r115",
@@ -9864,7 +9978,8 @@
       "summer"
     ],
     "quickAssembly": true,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/vdwloy1713225718.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/vdwloy1713225718.jpg",
+    "costPerServeAUD": 5.95
   },
   {
     "id": "r116",
@@ -9882,7 +9997,7 @@
     ],
     "leftoversFriendly": false,
     "mealType": "dinner",
-    "estimatedCostBand": "medium",
+    "estimatedCostBand": "low",
     "ingredients": [
       {
         "name": "Chicken thighs",
@@ -9945,7 +10060,8 @@
     "seasonTags": [
       "all"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/vdwloy1713225718.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/vdwloy1713225718.jpg",
+    "costPerServeAUD": 5.45
   },
   {
     "id": "r117",
@@ -10029,7 +10145,8 @@
       "autumn"
     ],
     "batchCook": true,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/d8bfyg1764117503.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/d8bfyg1764117503.jpg",
+    "costPerServeAUD": 4.2
   },
   {
     "id": "r118",
@@ -10113,7 +10230,8 @@
       "all"
     ],
     "quickAssembly": true,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/vdwloy1713225718.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/vdwloy1713225718.jpg",
+    "costPerServeAUD": 3.65
   },
   {
     "id": "r119",
@@ -10202,7 +10320,8 @@
       "all"
     ],
     "batchCook": true,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/vdwloy1713225718.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/vdwloy1713225718.jpg",
+    "costPerServeAUD": 5.7
   },
   {
     "id": "r120",
@@ -10284,7 +10403,8 @@
       "summer"
     ],
     "quickAssembly": true,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/vdwloy1713225718.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/vdwloy1713225718.jpg",
+    "costPerServeAUD": 5.6
   },
   {
     "id": "r121",
@@ -10367,7 +10487,8 @@
     "seasonTags": [
       "winter"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/1529446352.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/1529446352.jpg",
+    "costPerServeAUD": 3.4
   },
   {
     "id": "r122",
@@ -10450,7 +10571,8 @@
       "all"
     ],
     "quickAssembly": true,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/vdwloy1713225718.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/vdwloy1713225718.jpg",
+    "costPerServeAUD": 3.75
   },
   {
     "id": "r123",
@@ -10534,7 +10656,8 @@
       "all"
     ],
     "quickAssembly": true,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/el64dy1763483009.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/el64dy1763483009.jpg",
+    "costPerServeAUD": 3.85
   },
   {
     "id": "r124",
@@ -10619,7 +10742,8 @@
     ],
     "batchCook": true,
     "familyStyle": true,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/hglsbl1614346998.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/hglsbl1614346998.jpg",
+    "costPerServeAUD": 3.95
   },
   {
     "id": "r125",
@@ -10702,7 +10826,8 @@
       "all"
     ],
     "familyStyle": true,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/vdwloy1713225718.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/vdwloy1713225718.jpg",
+    "costPerServeAUD": 5.85
   },
   {
     "id": "r126",
@@ -10721,7 +10846,7 @@
     ],
     "leftoversFriendly": false,
     "mealType": "dinner",
-    "estimatedCostBand": "medium",
+    "estimatedCostBand": "low",
     "ingredients": [
       {
         "name": "Chicken thighs",
@@ -10783,7 +10908,8 @@
     "seasonTags": [
       "summer"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/3um6il1763794322.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/3um6il1763794322.jpg",
+    "costPerServeAUD": 4.85
   },
   {
     "id": "r127",
@@ -10866,7 +10992,8 @@
       "all"
     ],
     "quickAssembly": true,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/wvpsxx1468256321.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/wvpsxx1468256321.jpg",
+    "costPerServeAUD": 4.2
   },
   {
     "id": "r128",
@@ -10886,7 +11013,7 @@
     ],
     "leftoversFriendly": false,
     "mealType": "both",
-    "estimatedCostBand": "medium",
+    "estimatedCostBand": "low",
     "ingredients": [
       {
         "name": "Chicken thighs",
@@ -10950,7 +11077,8 @@
       "summer"
     ],
     "quickAssembly": true,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/rjhf741585564676.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/rjhf741585564676.jpg",
+    "costPerServeAUD": 5.15
   },
   {
     "id": "r129",
@@ -10969,7 +11097,7 @@
     ],
     "leftoversFriendly": true,
     "mealType": "dinner",
-    "estimatedCostBand": "medium",
+    "estimatedCostBand": "low",
     "ingredients": [
       {
         "name": "Chicken thighs",
@@ -11033,7 +11161,8 @@
       "all"
     ],
     "batchCook": true,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/z2sw3o1764378271.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/z2sw3o1764378271.jpg",
+    "costPerServeAUD": 5.4
   },
   {
     "id": "r130",
@@ -11117,7 +11246,8 @@
       "all"
     ],
     "quickAssembly": true,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/vdwloy1713225718.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/vdwloy1713225718.jpg",
+    "costPerServeAUD": 3.95
   },
   {
     "id": "r131",
@@ -11200,7 +11330,8 @@
       "all"
     ],
     "familyStyle": true,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/hglsbl1614346998.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/hglsbl1614346998.jpg",
+    "costPerServeAUD": 6.25
   },
   {
     "id": "r132",
@@ -11283,7 +11414,8 @@
       "summer"
     ],
     "quickAssembly": true,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/el64dy1763483009.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/el64dy1763483009.jpg",
+    "costPerServeAUD": 5.6
   },
   {
     "id": "r133",
@@ -11365,7 +11497,8 @@
     "seasonTags": [
       "all"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/lwsnkl1604181187.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/lwsnkl1604181187.jpg",
+    "costPerServeAUD": 5.85
   },
   {
     "id": "r134",
@@ -11447,7 +11580,8 @@
       "all"
     ],
     "familyStyle": true,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/wyxwsp1486979827.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/wyxwsp1486979827.jpg",
+    "costPerServeAUD": 4.15
   },
   {
     "id": "r135",
@@ -11531,7 +11665,8 @@
     ],
     "batchCook": true,
     "familyStyle": true,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/vdwloy1713225718.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/vdwloy1713225718.jpg",
+    "costPerServeAUD": 3.8
   },
   {
     "id": "r136",
@@ -11621,7 +11756,8 @@
       "all"
     ],
     "batchCook": true,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/hglsbl1614346998.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/hglsbl1614346998.jpg",
+    "costPerServeAUD": 4.35
   },
   {
     "id": "r137",
@@ -11710,7 +11846,8 @@
       "all"
     ],
     "batchCook": true,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/7kb44y1763589084.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/7kb44y1763589084.jpg",
+    "costPerServeAUD": 3.65
   },
   {
     "id": "r138",
@@ -11794,7 +11931,8 @@
     ],
     "quickAssembly": true,
     "familyStyle": true,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/kvbotn1581012881.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/kvbotn1581012881.jpg",
+    "costPerServeAUD": 3.9
   },
   {
     "id": "r139",
@@ -11881,7 +12019,8 @@
     "seasonTags": [
       "all"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/wyxwsp1486979827.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/wyxwsp1486979827.jpg",
+    "costPerServeAUD": 6.45
   },
   {
     "id": "r140",
@@ -11963,7 +12102,8 @@
       "all"
     ],
     "quickAssembly": true,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/m0p0j81765568742.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/m0p0j81765568742.jpg",
+    "costPerServeAUD": 6.75
   },
   {
     "id": "r141",
@@ -12057,7 +12197,8 @@
     "seasonTags": [
       "summer"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/lgmnff1763789847.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/lgmnff1763789847.jpg",
+    "costPerServeAUD": 5.95
   },
   {
     "id": "r142",
@@ -12076,7 +12217,7 @@
     ],
     "leftoversFriendly": false,
     "mealType": "dinner",
-    "estimatedCostBand": "medium",
+    "estimatedCostBand": "low",
     "ingredients": [
       {
         "name": "Beef mince",
@@ -12141,7 +12282,8 @@
     ],
     "quickAssembly": true,
     "familyStyle": true,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/44bzep1761848278.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/44bzep1761848278.jpg",
+    "costPerServeAUD": 5.25
   },
   {
     "id": "r143",
@@ -12160,7 +12302,7 @@
     ],
     "leftoversFriendly": true,
     "mealType": "dinner",
-    "estimatedCostBand": "high",
+    "estimatedCostBand": "medium",
     "ingredients": [
       {
         "name": "Beef chuck",
@@ -12232,7 +12374,8 @@
     ],
     "batchCook": true,
     "familyStyle": true,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/wrssvt1511556563.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/wrssvt1511556563.jpg",
+    "costPerServeAUD": 8.6
   },
   {
     "id": "r144",
@@ -12322,7 +12465,8 @@
     ],
     "batchCook": true,
     "familyStyle": true,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/sytuqu1511553755.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/sytuqu1511553755.jpg",
+    "costPerServeAUD": 4.55
   },
   {
     "id": "r145",
@@ -12405,7 +12549,8 @@
       "all"
     ],
     "batchCook": true,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/tvttqv1504640475.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/tvttqv1504640475.jpg",
+    "costPerServeAUD": 6.2
   },
   {
     "id": "r146",
@@ -12489,7 +12634,8 @@
     ],
     "batchCook": true,
     "familyStyle": true,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/ypuxtw1511297463.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/ypuxtw1511297463.jpg",
+    "costPerServeAUD": 4.4
   },
   {
     "id": "r147",
@@ -12579,7 +12725,8 @@
       "winter"
     ],
     "batchCook": true,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/wrssvt1511556563.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/wrssvt1511556563.jpg",
+    "costPerServeAUD": 4.1
   },
   {
     "id": "r148",
@@ -12669,7 +12816,8 @@
     ],
     "batchCook": true,
     "familyStyle": true,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/ntafxw1763586291.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/ntafxw1763586291.jpg",
+    "costPerServeAUD": 6.4
   },
   {
     "id": "r149",
@@ -12752,7 +12900,8 @@
     ],
     "quickAssembly": true,
     "familyStyle": true,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/tvtxpq1511464705.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/tvtxpq1511464705.jpg",
+    "costPerServeAUD": 6.15
   },
   {
     "id": "r150",
@@ -12841,7 +12990,8 @@
     ],
     "batchCook": true,
     "familyStyle": true,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/wtsvxx1511296896.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/wtsvxx1511296896.jpg",
+    "costPerServeAUD": 6.65
   },
   {
     "id": "r151",
@@ -12924,7 +13074,8 @@
       "all"
     ],
     "quickAssembly": true,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/44bzep1761848278.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/44bzep1761848278.jpg",
+    "costPerServeAUD": 5.85
   },
   {
     "id": "r152",
@@ -13013,7 +13164,8 @@
       "winter"
     ],
     "batchCook": true,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/m0p0j81765568742.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/m0p0j81765568742.jpg",
+    "costPerServeAUD": 6.2
   },
   {
     "id": "r153",
@@ -13096,7 +13248,8 @@
       "all"
     ],
     "quickAssembly": true,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/wrssvt1511556563.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/wrssvt1511556563.jpg",
+    "costPerServeAUD": 5.5
   },
   {
     "id": "r154",
@@ -13186,7 +13339,8 @@
     ],
     "quickAssembly": true,
     "familyStyle": true,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/z0ageb1583189517.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/z0ageb1583189517.jpg",
+    "costPerServeAUD": 4.95
   },
   {
     "id": "r155",
@@ -13274,7 +13428,8 @@
     "seasonTags": [
       "autumn"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/svprys1511176755.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/svprys1511176755.jpg",
+    "costPerServeAUD": 6.75
   },
   {
     "id": "r156",
@@ -13359,7 +13514,8 @@
     ],
     "batchCook": true,
     "familyStyle": true,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/sutysw1468247559.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/sutysw1468247559.jpg",
+    "costPerServeAUD": 4.65
   },
   {
     "id": "r157",
@@ -13442,7 +13598,8 @@
       "all"
     ],
     "quickAssembly": true,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/wrssvt1511556563.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/wrssvt1511556563.jpg",
+    "costPerServeAUD": 4.3
   },
   {
     "id": "r158",
@@ -13526,7 +13683,8 @@
     ],
     "batchCook": true,
     "familyStyle": true,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/ursuup1487348423.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/ursuup1487348423.jpg",
+    "costPerServeAUD": 10.5
   },
   {
     "id": "r159",
@@ -13614,7 +13772,8 @@
     "seasonTags": [
       "all"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/pbzcrx1763765096.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/pbzcrx1763765096.jpg",
+    "costPerServeAUD": 6.4
   },
   {
     "id": "r160",
@@ -13634,7 +13793,7 @@
     ],
     "leftoversFriendly": true,
     "mealType": "dinner",
-    "estimatedCostBand": "low",
+    "estimatedCostBand": "medium",
     "ingredients": [
       {
         "name": "Beef chuck",
@@ -13704,7 +13863,8 @@
       "all"
     ],
     "batchCook": true,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/wrssvt1511556563.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/wrssvt1511556563.jpg",
+    "costPerServeAUD": 5.85
   },
   {
     "id": "r161",
@@ -13793,7 +13953,8 @@
       "all"
     ],
     "quickAssembly": true,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/z0ageb1583189517.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/z0ageb1583189517.jpg",
+    "costPerServeAUD": 4.75
   },
   {
     "id": "r162",
@@ -13880,7 +14041,8 @@
     "seasonTags": [
       "summer"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/m0p0j81765568742.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/m0p0j81765568742.jpg",
+    "costPerServeAUD": 6.35
   },
   {
     "id": "r163",
@@ -13967,7 +14129,8 @@
     "seasonTags": [
       "winter"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/ursuup1487348423.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/ursuup1487348423.jpg",
+    "costPerServeAUD": 11.25
   },
   {
     "id": "r164",
@@ -14057,7 +14220,8 @@
     ],
     "batchCook": true,
     "familyStyle": true,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/wvqpwt1468339226.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/wvqpwt1468339226.jpg",
+    "costPerServeAUD": 5.2
   },
   {
     "id": "r165",
@@ -14141,7 +14305,8 @@
       "all"
     ],
     "quickAssembly": true,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/tzsy461763769901.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/tzsy461763769901.jpg",
+    "costPerServeAUD": 4.9
   },
   {
     "id": "r166",
@@ -14216,7 +14381,8 @@
     "seasonTags": [
       "all"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/tzsy461763769901.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/tzsy461763769901.jpg",
+    "costPerServeAUD": 6.65
   },
   {
     "id": "r167",
@@ -14307,7 +14473,8 @@
     ],
     "quickAssembly": true,
     "familyStyle": true,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/qt4i0n1763256454.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/qt4i0n1763256454.jpg",
+    "costPerServeAUD": 4.15
   },
   {
     "id": "r168",
@@ -14379,7 +14546,8 @@
       "all"
     ],
     "quickAssembly": true,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/llcbn01574260722.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/llcbn01574260722.jpg",
+    "costPerServeAUD": 5.45
   },
   {
     "id": "r169",
@@ -14456,7 +14624,8 @@
       "autumn"
     ],
     "familyStyle": true,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/h3ijwo1581013377.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/h3ijwo1581013377.jpg",
+    "costPerServeAUD": 4.7
   },
   {
     "id": "r170",
@@ -14475,7 +14644,7 @@
     ],
     "leftoversFriendly": false,
     "mealType": "both",
-    "estimatedCostBand": "low",
+    "estimatedCostBand": "medium",
     "ingredients": [
       {
         "name": "Flour tortillas",
@@ -14534,7 +14703,8 @@
     ],
     "quickAssembly": true,
     "familyStyle": true,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/xrrtss1511555269.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/xrrtss1511555269.jpg",
+    "costPerServeAUD": 5.55
   },
   {
     "id": "r171",
@@ -14624,7 +14794,8 @@
       "summer"
     ],
     "quickAssembly": true,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/tzsy461763769901.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/tzsy461763769901.jpg",
+    "costPerServeAUD": 4.25
   },
   {
     "id": "r172",
@@ -14712,7 +14883,8 @@
     "seasonTags": [
       "winter"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/tzsy461763769901.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/tzsy461763769901.jpg",
+    "costPerServeAUD": 6.8
   },
   {
     "id": "r173",
@@ -14796,7 +14968,8 @@
       "all"
     ],
     "quickAssembly": true,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/tzsy461763769901.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/tzsy461763769901.jpg",
+    "costPerServeAUD": 4.6
   },
   {
     "id": "r174",
@@ -14873,7 +15046,8 @@
       "summer"
     ],
     "batchCook": true,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/w36ets1764362474.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/w36ets1764362474.jpg",
+    "costPerServeAUD": 10.8
   },
   {
     "id": "r175",
@@ -14961,7 +15135,8 @@
     "seasonTags": [
       "all"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/tzsy461763769901.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/tzsy461763769901.jpg",
+    "costPerServeAUD": 9.45
   },
   {
     "id": "r176",
@@ -15045,7 +15220,8 @@
       "all"
     ],
     "batchCook": true,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/xvnx8j1763287209.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/xvnx8j1763287209.jpg",
+    "costPerServeAUD": 3.45
   },
   {
     "id": "r177",
@@ -15122,7 +15298,8 @@
       "all"
     ],
     "quickAssembly": true,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/wvqpwt1468339226.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/wvqpwt1468339226.jpg",
+    "costPerServeAUD": 4.2
   },
   {
     "id": "r178",
@@ -15204,7 +15381,8 @@
       "all"
     ],
     "batchCook": true,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/tzsy461763769901.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/tzsy461763769901.jpg",
+    "costPerServeAUD": 5.85
   },
   {
     "id": "r179",
@@ -15223,7 +15401,7 @@
     ],
     "leftoversFriendly": false,
     "mealType": "dinner",
-    "estimatedCostBand": "medium",
+    "estimatedCostBand": "high",
     "ingredients": [
       {
         "name": "Salmon fillets",
@@ -15287,7 +15465,8 @@
       "spring"
     ],
     "quickAssembly": true,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/1548772327.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/1548772327.jpg",
+    "costPerServeAUD": 9.25
   },
   {
     "id": "r180",
@@ -15369,7 +15548,8 @@
       "summer"
     ],
     "quickAssembly": true,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/4xcfai1763765676.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/4xcfai1763765676.jpg",
+    "costPerServeAUD": 8.15
   },
   {
     "id": "r181",
@@ -15452,7 +15632,8 @@
       "summer"
     ],
     "quickAssembly": true,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/qqlwv91763501559.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/qqlwv91763501559.jpg",
+    "costPerServeAUD": 7.95
   },
   {
     "id": "r182",
@@ -15471,7 +15652,7 @@
     ],
     "leftoversFriendly": false,
     "mealType": "dinner",
-    "estimatedCostBand": "medium",
+    "estimatedCostBand": "high",
     "ingredients": [
       {
         "name": "Salmon fillets",
@@ -15534,7 +15715,8 @@
     "seasonTags": [
       "spring"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/1548772327.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/1548772327.jpg",
+    "costPerServeAUD": 9.1
   },
   {
     "id": "r183",
@@ -15617,7 +15799,8 @@
       "summer"
     ],
     "quickAssembly": true,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/yhi46r1763330279.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/yhi46r1763330279.jpg",
+    "costPerServeAUD": 6.75
   },
   {
     "id": "r184",
@@ -15706,7 +15889,8 @@
     "seasonTags": [
       "all"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/uvuyxu1503067369.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/uvuyxu1503067369.jpg",
+    "costPerServeAUD": 4.85
   },
   {
     "id": "r185",
@@ -15790,7 +15974,8 @@
       "all"
     ],
     "quickAssembly": true,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/hblwvg1763478203.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/hblwvg1763478203.jpg",
+    "costPerServeAUD": 7.3
   },
   {
     "id": "r186",
@@ -15809,7 +15994,7 @@
     ],
     "leftoversFriendly": false,
     "mealType": "dinner",
-    "estimatedCostBand": "medium",
+    "estimatedCostBand": "high",
     "ingredients": [
       {
         "name": "Barramundi fillets",
@@ -15872,7 +16057,8 @@
     "seasonTags": [
       "all"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/1548772327.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/1548772327.jpg",
+    "costPerServeAUD": 9.5
   },
   {
     "id": "r187",
@@ -15892,7 +16078,7 @@
     ],
     "leftoversFriendly": false,
     "mealType": "both",
-    "estimatedCostBand": "medium",
+    "estimatedCostBand": "low",
     "ingredients": [
       {
         "name": "Canned tuna",
@@ -15962,7 +16148,8 @@
       "summer"
     ],
     "quickAssembly": true,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/yypwwq1511304979.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/yypwwq1511304979.jpg",
+    "costPerServeAUD": 5.4
   },
   {
     "id": "r188",
@@ -15980,7 +16167,7 @@
     ],
     "leftoversFriendly": false,
     "mealType": "both",
-    "estimatedCostBand": "medium",
+    "estimatedCostBand": "high",
     "ingredients": [
       {
         "name": "Green prawns",
@@ -16038,7 +16225,8 @@
       "summer"
     ],
     "quickAssembly": true,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/u2lhqb1763331899.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/u2lhqb1763331899.jpg",
+    "costPerServeAUD": 9.05
   },
   {
     "id": "r189",
@@ -16127,7 +16315,8 @@
     "seasonTags": [
       "summer"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/9bl20p1763248192.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/9bl20p1763248192.jpg",
+    "costPerServeAUD": 11.85
   },
   {
     "id": "r190",
@@ -16203,7 +16392,8 @@
       "all"
     ],
     "quickAssembly": true,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/4hzyvq1763792564.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/4hzyvq1763792564.jpg",
+    "costPerServeAUD": 13.2
   },
   {
     "id": "r191",
@@ -16291,7 +16481,8 @@
     "seasonTags": [
       "summer"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/8xuvhj1763794991.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/8xuvhj1763794991.jpg",
+    "costPerServeAUD": 6.9
   },
   {
     "id": "r192",
@@ -16374,7 +16565,8 @@
     ],
     "batchCook": true,
     "familyStyle": true,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/9kwatm1763327074.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/9kwatm1763327074.jpg",
+    "costPerServeAUD": 11.75
   },
   {
     "id": "r193",
@@ -16463,7 +16655,8 @@
       "winter"
     ],
     "batchCook": true,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/sxrpws1511555907.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/sxrpws1511555907.jpg",
+    "costPerServeAUD": 6.35
   },
   {
     "id": "r194",
@@ -16546,7 +16739,8 @@
       "spring"
     ],
     "quickAssembly": true,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/8xuvhj1763794991.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/8xuvhj1763794991.jpg",
+    "costPerServeAUD": 8.6
   },
   {
     "id": "r195",
@@ -16634,7 +16828,8 @@
       "all"
     ],
     "batchCook": true,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/7xte3u1763757761.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/7xte3u1763757761.jpg",
+    "costPerServeAUD": 10.95
   },
   {
     "id": "r196",
@@ -16724,7 +16919,8 @@
       "all"
     ],
     "batchCook": true,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/yuwtuu1511295751.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/yuwtuu1511295751.jpg",
+    "costPerServeAUD": 10.4
   },
   {
     "id": "r197",
@@ -16819,7 +17015,8 @@
       "summer"
     ],
     "batchCook": true,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/8xuvhj1763794991.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/8xuvhj1763794991.jpg",
+    "costPerServeAUD": 9.85
   },
   {
     "id": "r198",
@@ -16908,7 +17105,8 @@
       "all"
     ],
     "batchCook": true,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/sxrpws1511555907.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/sxrpws1511555907.jpg",
+    "costPerServeAUD": 7.15
   },
   {
     "id": "r199",
@@ -16927,7 +17125,7 @@
     ],
     "leftoversFriendly": false,
     "mealType": "dinner",
-    "estimatedCostBand": "medium",
+    "estimatedCostBand": "high",
     "ingredients": [
       {
         "name": "Lamb cutlets",
@@ -16997,7 +17195,8 @@
       "summer"
     ],
     "quickAssembly": true,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/8xuvhj1763794991.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/8xuvhj1763794991.jpg",
+    "costPerServeAUD": 9.3
   },
   {
     "id": "r200",
@@ -17085,7 +17284,8 @@
       "autumn"
     ],
     "batchCook": true,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/sxrpws1511555907.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/sxrpws1511555907.jpg",
+    "costPerServeAUD": 7.45
   },
   {
     "id": "r201",
@@ -17179,7 +17379,8 @@
       "all"
     ],
     "quickAssembly": true,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/8xuvhj1763794991.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/8xuvhj1763794991.jpg",
+    "costPerServeAUD": 8.75
   },
   {
     "id": "r202",
@@ -17197,7 +17398,7 @@
     ],
     "leftoversFriendly": true,
     "mealType": "dinner",
-    "estimatedCostBand": "medium",
+    "estimatedCostBand": "high",
     "ingredients": [
       {
         "name": "Lamb neck chops",
@@ -17267,7 +17468,8 @@
       "summer"
     ],
     "batchCook": true,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/gr4lo51763791826.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/gr4lo51763791826.jpg",
+    "costPerServeAUD": 9.25
   },
   {
     "id": "r203",
@@ -17357,7 +17559,8 @@
       "all"
     ],
     "familyStyle": true,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/30s7vf1763741844.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/30s7vf1763741844.jpg",
+    "costPerServeAUD": 3.45
   },
   {
     "id": "r204",
@@ -17446,7 +17649,8 @@
       "summer"
     ],
     "batchCook": true,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/4k8nzy1763583384.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/4k8nzy1763583384.jpg",
+    "costPerServeAUD": 4.2
   },
   {
     "id": "r205",
@@ -17541,7 +17745,8 @@
       "all"
     ],
     "quickAssembly": true,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/zub3s91764110535.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/zub3s91764110535.jpg",
+    "costPerServeAUD": 3.6
   },
   {
     "id": "r206",
@@ -17629,7 +17834,8 @@
       "all"
     ],
     "batchCook": true,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/wuxrtu1483564410.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/wuxrtu1483564410.jpg",
+    "costPerServeAUD": 3.85
   },
   {
     "id": "r207",
@@ -17714,7 +17920,8 @@
     ],
     "batchCook": true,
     "familyStyle": true,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/uuuspp1511297945.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/uuuspp1511297945.jpg",
+    "costPerServeAUD": 4.15
   },
   {
     "id": "r208",
@@ -17810,7 +18017,8 @@
     ],
     "quickAssembly": true,
     "familyStyle": true,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/uvuyxu1503067369.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/uvuyxu1503067369.jpg",
+    "costPerServeAUD": 4.5
   },
   {
     "id": "r209",
@@ -17892,7 +18100,8 @@
     "seasonTags": [
       "autumn"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/usuqtp1511385394.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/usuqtp1511385394.jpg",
+    "costPerServeAUD": 4.35
   },
   {
     "id": "r210",
@@ -17982,7 +18191,8 @@
     ],
     "batchCook": true,
     "quickAssembly": true,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/tvtxpq1511464705.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/tvtxpq1511464705.jpg",
+    "costPerServeAUD": 3.9
   },
   {
     "id": "r211",
@@ -18066,7 +18276,8 @@
     ],
     "quickAssembly": true,
     "familyStyle": true,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/4uje7l1763762276.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/4uje7l1763762276.jpg",
+    "costPerServeAUD": 4.7
   },
   {
     "id": "r212",
@@ -18155,7 +18366,8 @@
     "seasonTags": [
       "all"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/rg9ze01763479093.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/rg9ze01763479093.jpg",
+    "costPerServeAUD": 4.25
   },
   {
     "id": "r213",
@@ -18244,7 +18456,8 @@
       "summer"
     ],
     "batchCook": true,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/c7lzrl1683208757.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/c7lzrl1683208757.jpg",
+    "costPerServeAUD": 4.6
   },
   {
     "id": "r214",
@@ -18334,7 +18547,8 @@
     ],
     "batchCook": true,
     "familyStyle": true,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/sutysw1468247559.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/sutysw1468247559.jpg",
+    "costPerServeAUD": 3.55
   },
   {
     "id": "r215",
@@ -18423,7 +18637,8 @@
       "summer"
     ],
     "quickAssembly": true,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/11bvtm1764795135.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/11bvtm1764795135.jpg",
+    "costPerServeAUD": 4.4
   },
   {
     "id": "r216",
@@ -18506,7 +18721,8 @@
       "summer"
     ],
     "quickAssembly": true,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/wvqpwt1468339226.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/wvqpwt1468339226.jpg",
+    "costPerServeAUD": 6.85
   },
   {
     "id": "r217",
@@ -18602,7 +18818,8 @@
     ],
     "batchCook": true,
     "familyStyle": true,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/wqurxy1511453156.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/wqurxy1511453156.jpg",
+    "costPerServeAUD": 3.75
   },
   {
     "id": "r218",
@@ -18689,7 +18906,8 @@
     "seasonTags": [
       "autumn"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/usuqtp1511385394.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/usuqtp1511385394.jpg",
+    "costPerServeAUD": 5.95
   },
   {
     "id": "r219",
@@ -18770,7 +18988,8 @@
     "seasonTags": [
       "winter"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/xvrrux1511783685.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/xvrrux1511783685.jpg",
+    "costPerServeAUD": 6.4
   },
   {
     "id": "r220",
@@ -18860,7 +19079,8 @@
       "autumn"
     ],
     "batchCook": true,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/zadvgb1699012544.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/zadvgb1699012544.jpg",
+    "costPerServeAUD": 3.5
   },
   {
     "id": "r221",
@@ -18941,7 +19161,8 @@
     "seasonTags": [
       "winter"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/c400ok1764439058.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/c400ok1764439058.jpg",
+    "costPerServeAUD": 6.5
   },
   {
     "id": "r222",
@@ -19022,7 +19243,8 @@
     "seasonTags": [
       "autumn"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/xrrtss1511555269.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/xrrtss1511555269.jpg",
+    "costPerServeAUD": 6.75
   },
   {
     "id": "r223",
@@ -19111,7 +19333,8 @@
     "seasonTags": [
       "summer"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/6vi2cv1763075785.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/6vi2cv1763075785.jpg",
+    "costPerServeAUD": 4.05
   },
   {
     "id": "r224",
@@ -19199,7 +19422,8 @@
       "winter"
     ],
     "batchCook": true,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/zadvgb1699012544.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/zadvgb1699012544.jpg",
+    "costPerServeAUD": 3.4
   },
   {
     "id": "r225",
@@ -19288,7 +19512,8 @@
       "all"
     ],
     "quickAssembly": true,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/minfsc1763766806.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/minfsc1763766806.jpg",
+    "costPerServeAUD": 3.95
   },
   {
     "id": "r226",
@@ -19366,7 +19591,8 @@
       "all"
     ],
     "quickAssembly": true,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/hqaejl1695738653.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/hqaejl1695738653.jpg",
+    "costPerServeAUD": 3.45
   },
   {
     "id": "r227",
@@ -19450,7 +19676,8 @@
       "summer"
     ],
     "quickAssembly": true,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/1550441882.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/1550441882.jpg",
+    "costPerServeAUD": 4.88
   },
   {
     "id": "r228",
@@ -19525,7 +19752,8 @@
     "seasonTags": [
       "winter"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/wvpvsu1511786158.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/wvpvsu1511786158.jpg",
+    "costPerServeAUD": 12.5
   },
   {
     "id": "r229",
@@ -19601,7 +19829,8 @@
       "summer"
     ],
     "quickAssembly": true,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/lrfdwz1764438393.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/lrfdwz1764438393.jpg",
+    "costPerServeAUD": 6.25
   },
   {
     "id": "r230",
@@ -19620,7 +19849,7 @@
     ],
     "leftoversFriendly": false,
     "mealType": "both",
-    "estimatedCostBand": "medium",
+    "estimatedCostBand": "high",
     "ingredients": [
       {
         "name": "Smoked salmon",
@@ -19684,7 +19913,8 @@
       "all"
     ],
     "quickAssembly": true,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/1548772327.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/1548772327.jpg",
+    "costPerServeAUD": 11.75
   },
   {
     "id": "r231",
@@ -19771,7 +20001,8 @@
     "seasonTags": [
       "all"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/6s3i3p1763488540.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/6s3i3p1763488540.jpg",
+    "costPerServeAUD": 7.85
   },
   {
     "id": "r232",
@@ -19847,7 +20078,8 @@
       "summer"
     ],
     "familyStyle": true,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/44bzep1761848278.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/44bzep1761848278.jpg",
+    "costPerServeAUD": 11.2
   },
   {
     "id": "r233",
@@ -19941,7 +20173,8 @@
     "seasonTags": [
       "all"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/0sd7ac1764787957.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/0sd7ac1764787957.jpg",
+    "costPerServeAUD": 6.4
   },
   {
     "id": "r234",
@@ -20029,7 +20262,8 @@
     "seasonTags": [
       "winter"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/vdwloy1713225718.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/vdwloy1713225718.jpg",
+    "costPerServeAUD": 5.95
   },
   {
     "id": "r235",
@@ -20118,7 +20352,8 @@
     "seasonTags": [
       "all"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/pk8wtn1763758591.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/pk8wtn1763758591.jpg",
+    "costPerServeAUD": 3.85
   },
   {
     "id": "r236",
@@ -20137,7 +20372,7 @@
     ],
     "leftoversFriendly": false,
     "mealType": "both",
-    "estimatedCostBand": "medium",
+    "estimatedCostBand": "high",
     "ingredients": [
       {
         "name": "Cooked prawns",
@@ -20201,7 +20436,8 @@
       "summer"
     ],
     "quickAssembly": true,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/4xcfai1763765676.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/4xcfai1763765676.jpg",
+    "costPerServeAUD": 9.6
   },
   {
     "id": "r237",
@@ -20284,7 +20520,8 @@
       "all"
     ],
     "quickAssembly": true,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/2dsltq1560461468.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/2dsltq1560461468.jpg",
+    "costPerServeAUD": 4.15
   },
   {
     "id": "r238",
@@ -20366,7 +20603,8 @@
       "all"
     ],
     "quickAssembly": true,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/sbx7n71587673021.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/sbx7n71587673021.jpg",
+    "costPerServeAUD": 7.55
   },
   {
     "id": "r239",
@@ -20448,7 +20686,8 @@
       "all"
     ],
     "quickAssembly": true,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/yxiilf1763759428.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/yxiilf1763759428.jpg",
+    "costPerServeAUD": 13.85
   },
   {
     "id": "r240",
@@ -20536,7 +20775,8 @@
       "all"
     ],
     "quickAssembly": true,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/5r5rvx1763287943.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/5r5rvx1763287943.jpg",
+    "costPerServeAUD": 8.75
   },
   {
     "id": "r241",
@@ -20617,7 +20857,8 @@
     "seasonTags": [
       "summer"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/m0p0j81765568742.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/m0p0j81765568742.jpg",
+    "costPerServeAUD": 8.45
   },
   {
     "id": "r242",
@@ -20636,7 +20877,7 @@
     ],
     "leftoversFriendly": false,
     "mealType": "both",
-    "estimatedCostBand": "medium",
+    "estimatedCostBand": "high",
     "ingredients": [
       {
         "name": "Sashimi-grade salmon",
@@ -20706,7 +20947,8 @@
       "all"
     ],
     "quickAssembly": true,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/1549542994.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/1549542994.jpg",
+    "costPerServeAUD": 10.3
   },
   {
     "id": "r243",
@@ -20794,7 +21036,8 @@
     "seasonTags": [
       "summer"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/prjve31763486864.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/prjve31763486864.jpg",
+    "costPerServeAUD": 6.8
   },
   {
     "id": "r244",
@@ -20883,7 +21126,8 @@
       "summer"
     ],
     "batchCook": true,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/fk80jp1763280767.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/fk80jp1763280767.jpg",
+    "costPerServeAUD": 7.65
   },
   {
     "id": "r245",
@@ -20970,7 +21214,8 @@
     "seasonTags": [
       "all"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/m0p0j81765568742.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/m0p0j81765568742.jpg",
+    "costPerServeAUD": 10.9
   },
   {
     "id": "r246",
@@ -21059,7 +21304,8 @@
       "summer"
     ],
     "batchCook": true,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/8xuvhj1763794991.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/8xuvhj1763794991.jpg",
+    "costPerServeAUD": 7.95
   },
   {
     "id": "r247",
@@ -21079,7 +21325,7 @@
     ],
     "leftoversFriendly": false,
     "mealType": "dinner",
-    "estimatedCostBand": "medium",
+    "estimatedCostBand": "low",
     "ingredients": [
       {
         "name": "Firm tofu",
@@ -21148,7 +21394,8 @@
     "seasonTags": [
       "winter"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/1525874812.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/1525874812.jpg",
+    "costPerServeAUD": 5.4
   },
   {
     "id": "r248",
@@ -21237,7 +21484,8 @@
       "all"
     ],
     "quickAssembly": true,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/tbj1bs1764118062.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/tbj1bs1764118062.jpg",
+    "costPerServeAUD": 3.65
   },
   {
     "id": "r249",
@@ -21327,7 +21575,8 @@
     ],
     "batchCook": true,
     "familyStyle": true,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/8rfd4q1764112993.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/8rfd4q1764112993.jpg",
+    "costPerServeAUD": 6.15
   },
   {
     "id": "r250",
@@ -21415,6 +21664,7 @@
     "seasonTags": [
       "summer"
     ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/4xcfai1763765676.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/4xcfai1763765676.jpg",
+    "costPerServeAUD": 8.85
   }
 ]
