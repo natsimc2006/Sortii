@@ -1,0 +1,125 @@
+Add two new swap rule categories to constants/swapRules.ts and 
+extend the swap matching logic to handle frequency-based tips.
+
+─── PART 1: New swap rules to add to SWAP_RULES array ───
+
+Add these rules to the existing SWAP_RULES array:
+
+// AROMATICS — convenience + cost swaps
+{
+  id: 'swap-fresh-garlic-to-jarred',
+  matchKeywords: ['garlic clove', 'cloves garlic', 'garlic'],
+  swapLabel: 'jarred minced garlic or garlic powder',
+  savingPerServeAUD: 0.40,
+  tip: 'Lasts all week. No peeling.',
+},
+{
+  id: 'swap-fresh-ginger-to-jarred',
+  matchKeywords: ['fresh ginger', 'ginger'],
+  swapLabel: 'jarred minced ginger or ground ginger',
+  savingPerServeAUD: 0.40,
+  tip: 'Jarred keeps for months. Same flavour in cooked dishes.',
+},
+{
+  id: 'swap-fresh-chilli-to-flakes',
+  matchKeywords: ['fresh chilli', 'red chilli', 'green chilli', 'chilli'],
+  swapLabel: 'chilli flakes or chilli paste',
+  savingPerServeAUD: 0.50,
+  tip: 'More consistent heat, less waste.',
+},
+
+// PANTRY BUILDING — longer shelf life tips
+{
+  id: 'swap-lemon-juice-to-bottled',
+  matchKeywords: ['lemon juice', 'lemon'],
+  swapLabel: 'bottled lemon juice',
+  savingPerServeAUD: 0.40,
+  tip: 'Fine in cooked dishes and dressings.',
+},
+{
+  id: 'swap-fresh-lime-to-bottled',
+  matchKeywords: ['lime juice', 'lime'],
+  swapLabel: 'bottled lime juice',
+  savingPerServeAUD: 0.35,
+  tip: 'Use fresh only when serving whole wedges.',
+},
+
+─── PART 2: Frequency-based tip for the weekly plan ───
+
+In utils/getSwapsForRecipe.ts, add a separate exported function:
+
+export function getWeeklyPantryTips(allPlannedMeals: Recipe[]): string[] {
+
+  const tips: string[] = [];
+  const allIngredients = allPlannedMeals
+    .flatMap(m => m.ingredients.map(i => i.name.toLowerCase()));
+
+  // Count garlic occurrences across the week
+  const garlicCount = allIngredients
+    .filter(i => i.includes('garlic')).length;
+  if (garlicCount >= 3) {
+    tips.push(
+      `Garlic features in ${garlicCount} of your meals this week. ` +
+      `A jar of minced garlic (~$3) or garlic powder covers the whole week ` +
+      `and keeps for months.`
+    );
+  }
+
+  // Count fresh herb occurrences
+  const freshHerbCount = allIngredients
+    .filter(i => 
+      i.includes('fresh') || 
+      ['basil','coriander','parsley','thyme','rosemary','dill']
+        .some(h => i.includes(h))
+    ).length;
+  if (freshHerbCount >= 3) {
+    tips.push(
+      `You have ${freshHerbCount} fresh herb requirements this week. ` +
+      `Dried herbs at ⅓ quantity work just as well in cooked dishes ` +
+      `and cost a fraction of fresh bunches.`
+    );
+  }
+
+  // Count onion occurrences
+  const onionCount = allIngredients
+    .filter(i => i.includes('onion')).length;
+  if (onionCount >= 4) {
+    tips.push(
+      `Onion appears in ${onionCount} meals. Buy a 1kg bag (~$2.50) ` +
+      `rather than individual onions — much better value.`
+    );
+  }
+
+  return tips;
+}
+
+─── PART 3: Surface weekly pantry tips in the planner ───
+
+In the weekly planner view, call getWeeklyPantryTips() 
+with all planned meals for the week.
+
+If any tips are returned, show them in a collapsible section 
+below the weekly cost summary, titled:
+
+  🧄 "Pantry tips for this week"
+
+Each tip renders as a single text row in plum tint (#F3E8EE) 
+with a small plum left border.
+
+Use the same collapsible pill pattern as the swap tips — 
+collapsed by default, expands on tap.
+
+Dismissable with × — dismissed state resets each time the 
+plan changes.
+
+─── PART 4: Verify ───
+
+Test with a plan where garlic appears in 4+ meals.
+Confirm:
+- The "Pantry tips for this week" section appears in the planner
+- The garlic tip shows the correct meal count
+- The section is collapsed by default
+- Tapping expands it correctly
+- The × dismisses it
+
+Log to console the full tips array generated for the test plan.

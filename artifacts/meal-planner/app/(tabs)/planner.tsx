@@ -22,7 +22,8 @@ import { MealSearchModal } from "@/components/MealSearchModal";
 import { RecipeDetailModal } from "@/components/RecipeDetailModal";
 import { Toast, ToastState } from "@/components/Toast";
 import { SwapTips } from "@/components/SwapTips";
-import { getSwapsForRecipe } from "@/utils/getSwapsForRecipe";
+import { PantryTips } from "@/components/PantryTips";
+import { getSwapsForRecipe, getWeeklyPantryTips } from "@/utils/getSwapsForRecipe";
 import { SWAP_RULES } from "@/constants/swapRules";
 
 const sortiiLogo = require("@/assets/images/sortii-logo.png");
@@ -380,6 +381,18 @@ export default function PlannerScreen() {
     return Math.round(total);
   }, [currentPlan, getRecipeById, preferences.householdSize]);
 
+  const weeklyPantryTips = useMemo(() => {
+    const filledRecipes = currentPlan
+      .filter((e) => e.recipeId)
+      .map((e) => getRecipeById(e.recipeId!))
+      .filter(Boolean) as Recipe[];
+    const tips = getWeeklyPantryTips(filledRecipes);
+    console.log("[PantryTips] Tips for current plan:", tips);
+    return tips;
+  }, [currentPlan, getRecipeById]);
+
+  const planKey = currentPlan.map((e) => e.recipeId ?? "empty").join(",");
+
   return (
     <View style={{ flex: 1, backgroundColor: C.background, marginBottom: TAB_BAR_HEIGHT + insets.bottom }}>
       <View
@@ -428,6 +441,7 @@ export default function PlannerScreen() {
               </Text>
             </View>
           )}
+          <PantryTips key={planKey} tips={weeklyPantryTips} />
         </View>
       </View>
 

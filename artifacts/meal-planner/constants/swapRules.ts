@@ -143,4 +143,43 @@ export const SWAP_RULES: SwapRule[] = [
     savingPerServeAUD: 0.30,
     tip: "Bakes and cooks identically.",
   },
+
+  // AROMATICS
+  {
+    id: "swap-fresh-garlic-to-jarred",
+    matchKeywords: ["garlic clove", "cloves garlic", "garlic"],
+    swapLabel: "jarred minced garlic or garlic powder",
+    savingPerServeAUD: 0.40,
+    tip: "Lasts all week. No peeling.",
+  },
+  {
+    id: "swap-fresh-ginger-to-jarred",
+    matchKeywords: ["fresh ginger", "ginger"],
+    swapLabel: "jarred minced ginger or ground ginger",
+    savingPerServeAUD: 0.40,
+    tip: "Jarred keeps for months. Same flavour in cooked dishes.",
+  },
+  {
+    id: "swap-fresh-chilli-to-flakes",
+    matchKeywords: ["fresh chilli", "red chilli", "green chilli", "chilli"],
+    swapLabel: "chilli flakes or chilli paste",
+    savingPerServeAUD: 0.50,
+    tip: "More consistent heat, less waste.",
+  },
+
+  // PANTRY BUILDING
+  {
+    id: "swap-lemon-juice-to-bottled",
+    matchKeywords: ["lemon juice", "lemon"],
+    swapLabel: "bottled lemon juice",
+    savingPerServeAUD: 0.40,
+    tip: "Fine in cooked dishes and dressings.",
+  },
+  {
+    id: "swap-fresh-lime-to-bottled",
+    matchKeywords: ["lime juice", "lime"],
+    swapLabel: "bottled lime juice",
+    savingPerServeAUD: 0.35,
+    tip: "Use fresh only when serving whole wedges.",
+  },
 ];
