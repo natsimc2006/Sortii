@@ -667,14 +667,6 @@ export default function PlannerScreen() {
         </TouchableOpacity>
 
         <TouchableOpacity
-          onPress={handleAutoGenerate}
-          style={[styles.actionBtnPrimary, { backgroundColor: C.gold }]}
-        >
-          <Feather name="refresh-cw" size={15} color="#fff" />
-          <Text style={[styles.actionBtnPrimaryText]}>{ctaLabel}</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
           onPress={handleSave}
           style={[styles.actionBtnSecondary, { backgroundColor: C.secondaryActionBg }]}
         >

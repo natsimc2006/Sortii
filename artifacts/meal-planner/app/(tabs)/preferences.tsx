@@ -236,7 +236,22 @@ export default function PreferencesScreen() {
     }
   };
 
-  const { replace } = useRouter();
+  const router = useRouter();
+
+  const PLAN_AFFECTING_KEYS: (keyof PlanPreferences)[] = [
+    "planningMode", "healthStyle", "cookingEffort", "mealVariety",
+    "cookingStyle", "cuisinePreference", "mealCoverage", "exclusions",
+    "seasonalMode", "minimiseWaste", "leftoversMode", "weekendOverrides",
+  ];
+
+  const isPlanAffecting = (a: PlanPreferences, b: PlanPreferences) =>
+    PLAN_AFFECTING_KEYS.some((key) =>
+      JSON.stringify(a[key]) !== JSON.stringify(b[key])
+    );
+
+  const handleClose = () => {
+    router.navigate("/(tabs)/planner");
+  };
 
   const handleSave = async () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
@@ -247,12 +262,14 @@ export default function PreferencesScreen() {
     };
     await setPreferences(finalPrefs);
     await setIsOnboarded(true);
-    autoGeneratePlan(finalPrefs);
+    if (isPlanAffecting(finalPrefs, preferences)) {
+      autoGeneratePlan(finalPrefs);
+    }
     setPreferencesDirty(false);
     setSavedToast(true);
     setTimeout(() => {
       setSavedToast(false);
-      replace("/(tabs)/planner");
+      router.replace("/(tabs)/planner");
     }, 1200);
   };
 
@@ -289,7 +306,12 @@ export default function PreferencesScreen() {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.pageHeader}>
-          <Text style={[styles.pageTitle, { color: C.text }]}>Settings</Text>
+          <View style={styles.pageHeaderRow}>
+            <Text style={[styles.pageTitle, { color: C.text }]}>Settings</Text>
+            <TouchableOpacity onPress={handleClose} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }} style={styles.closeBtn}>
+              <Feather name="x" size={22} color={C.textSecondary} />
+            </TouchableOpacity>
+          </View>
           <Text style={[styles.pageHelper, { color: C.textSecondary }]}>
             You can fine-tune your plan anytime.
           </Text>
@@ -645,6 +667,14 @@ const styles = StyleSheet.create({
   pageHeader: {
     gap: 4,
     marginBottom: 4,
+  },
+  pageHeaderRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  closeBtn: {
+    padding: 4,
   },
   pageTitle: {
     fontSize: 26,

@@ -1,9 +1,48 @@
 import { Feather } from "@expo/vector-icons";
+import * as Haptics from "expo-haptics";
 import { BlurView } from "expo-blur";
-import { Tabs } from "expo-router";
+import { Tabs, useRouter } from "expo-router";
 import React from "react";
-import { Platform, StyleSheet, View, useColorScheme } from "react-native";
+import { Platform, StyleSheet, TouchableOpacity, View, useColorScheme } from "react-native";
 import Colors from "@/constants/Colors";
+import { usePlanner } from "@/context/PlannerContext";
+
+function RefreshTabButton({ style }: { style?: any }) {
+  const { autoGeneratePlan } = usePlanner();
+  const router = useRouter();
+  const C = Colors.light;
+
+  return (
+    <TouchableOpacity
+      style={[style, { flex: 1, alignItems: "center", justifyContent: "flex-end", paddingBottom: 4 }]}
+      onPress={() => {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+        router.navigate("/(tabs)/planner");
+        autoGeneratePlan();
+      }}
+      activeOpacity={0.82}
+    >
+      <View
+        style={{
+          width: 52,
+          height: 52,
+          borderRadius: 26,
+          backgroundColor: C.gold,
+          alignItems: "center",
+          justifyContent: "center",
+          marginBottom: Platform.OS === "ios" ? 0 : 4,
+          shadowColor: "#000",
+          shadowOffset: { width: 0, height: 3 },
+          shadowOpacity: 0.18,
+          shadowRadius: 8,
+          elevation: 6,
+        }}
+      >
+        <Feather name="refresh-cw" size={20} color="#fff" />
+      </View>
+    </TouchableOpacity>
+  );
+}
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
@@ -60,6 +99,13 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name="refresh"
+        options={{
+          title: "",
+          tabBarButton: (props) => <RefreshTabButton style={props.style} />,
+        }}
+      />
+      <Tabs.Screen
         name="shopping"
         options={{
           title: "Shopping",
@@ -81,9 +127,7 @@ export default function TabLayout() {
         name="preferences"
         options={{
           title: "Settings",
-          tabBarIcon: ({ color }) => (
-            <Feather name="sliders" size={22} color={color} />
-          ),
+          href: null,
         }}
       />
       <Tabs.Screen
