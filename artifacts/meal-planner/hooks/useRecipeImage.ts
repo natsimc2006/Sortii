@@ -17,9 +17,9 @@ export function useRecipeImage(
   recipeName: string,
   existingUrl?: string
 ): string | null {
-  // Start immediately with whatever we already have (TheMealDB image)
-  // so cards never flash blank while the Unsplash fetch is in-flight
-  const [imageUrl, setImageUrl] = useState<string | null>(existingUrl ?? null);
+  // Start with null — Unsplash is the primary source.
+  // TheMealDB URL is only used as fallback inside getRecipeImage if Unsplash returns nothing.
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;

@@ -19,7 +19,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 const UNSPLASH_KEY = "cWU-u6hsZoSKXaZJ_-YfD5s09NoHtfmHmuaKZ_LXXF4";
 
 const UNSPLASH_BASE = "https://api.unsplash.com";
-const CACHE_PREFIX = "sortii_img_v2_";
+const CACHE_PREFIX = "sortii_img_v3_";
 const SESSION_CACHE: Record<string, string | null> = {};
 
 // ── Query builder ─────────────────────────────────────────────────────────────
