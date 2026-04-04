@@ -1649,7 +1649,7 @@
   },
   {
     "id": "r019",
-    "name": "Pumpkin Soup",
+    "name": "Classic Pumpkin Soup",
     "description": "Silky smooth roasted pumpkin soup with crusty bread",
     "baseServings": 6,
     "cookTimeMinutes": 50,
@@ -1733,7 +1733,7 @@
   },
   {
     "id": "r020",
-    "name": "Beef Tacos",
+    "name": "Beef Soft Tacos",
     "description": "Juicy seasoned beef in corn tortillas with fresh toppings",
     "baseServings": 4,
     "cookTimeMinutes": 20,
@@ -2553,7 +2553,7 @@
   },
   {
     "id": "r029",
-    "name": "Chicken Schnitzel",
+    "name": "Chicken Schnitzel with Potato Salad",
     "description": "Crispy golden chicken schnitzel with potato salad",
     "baseServings": 4,
     "cookTimeMinutes": 30,
@@ -4132,7 +4132,7 @@
   },
   {
     "id": "r046",
-    "name": "Tuna Pasta Bake",
+    "name": "Quick Tuna Pasta Bake",
     "description": "Pantry-staple pasta bake ready in a flash",
     "baseServings": 4,
     "cookTimeMinutes": 25,
@@ -4306,7 +4306,7 @@
   },
   {
     "id": "r048",
-    "name": "Chicken Schnitzel",
+    "name": "Classic Chicken Schnitzel",
     "description": "Golden crumbed chicken schnitzel — an Aussie pub classic",
     "baseServings": 4,
     "cookTimeMinutes": 20,
@@ -5730,7 +5730,7 @@
   },
   {
     "id": "r064",
-    "name": "Pumpkin Soup",
+    "name": "Coconut Ginger Pumpkin Soup",
     "description": "Smooth, warming pumpkin soup with crusty bread",
     "baseServings": 6,
     "cookTimeMinutes": 30,
@@ -6230,101 +6230,6 @@
     "costPerServeAUD": 4.4
   },
   {
-    "id": "r070",
-    "name": "Chilli Con Carne",
-    "description": "Classic slow-simmered chilli with beans and corn chips",
-    "baseServings": 6,
-    "cookTimeMinutes": 40,
-    "difficulty": "easy",
-    "cookingStyle": "one-pan",
-    "healthTags": [
-      "standard",
-      "high-protein"
-    ],
-    "budgetTags": [
-      "budget"
-    ],
-    "leftoversFriendly": true,
-    "mealType": "dinner",
-    "estimatedCostBand": "low",
-    "ingredients": [
-      {
-        "name": "Beef mince",
-        "quantity": 700,
-        "unit": "g",
-        "category": "proteins"
-      },
-      {
-        "name": "Canned kidney beans",
-        "quantity": 800,
-        "unit": "g",
-        "category": "proteins"
-      },
-      {
-        "name": "Crushed tomatoes",
-        "quantity": 800,
-        "unit": "g",
-        "category": "pantry"
-      },
-      {
-        "name": "Onion",
-        "quantity": 2,
-        "unit": "whole",
-        "category": "vegetables"
-      },
-      {
-        "name": "Garlic",
-        "quantity": 4,
-        "unit": "cloves",
-        "category": "herbs"
-      },
-      {
-        "name": "Chilli powder",
-        "quantity": 2,
-        "unit": "tsp",
-        "category": "herbs"
-      },
-      {
-        "name": "Cumin",
-        "quantity": 2,
-        "unit": "tsp",
-        "category": "herbs"
-      },
-      {
-        "name": "Beef stock",
-        "quantity": 250,
-        "unit": "ml",
-        "category": "pantry"
-      },
-      {
-        "name": "Corn chips",
-        "quantity": 200,
-        "unit": "g",
-        "category": "pantry"
-      },
-      {
-        "name": "Sour cream",
-        "quantity": 150,
-        "unit": "g",
-        "category": "dairy"
-      }
-    ],
-    "instructions": [
-      "Sauté onion and garlic until soft.",
-      "Brown mince, breaking up well.",
-      "Add chilli powder and cumin, cook 1 min.",
-      "Add tomatoes, beans and stock, simmer 25 mins.",
-      "Season well. Serve with corn chips and sour cream."
-    ],
-    "proteinType": "beef",
-    "cuisineType": "other",
-    "seasonTags": [
-      "summer"
-    ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/uuqvwu1504629254.jpg",
-    "costPerServeAUD": 3.75
-  },
-  {
     "id": "r071",
     "name": "Grilled Chicken Caesar Salad",
     "description": "The classic Caesar salad with grilled chicken breast",
@@ -6668,7 +6573,7 @@
   },
   {
     "id": "r075",
-    "name": "Beef Tacos",
+    "name": "Crispy Beef Tacos",
     "description": "Spiced beef mince in crispy shells with fresh toppings",
     "baseServings": 4,
     "cookTimeMinutes": 15,
@@ -6971,164 +6876,6 @@
     ],
     "imageUrl": "https://www.themealdb.com/images/media/meals/wuyd2h1765655837.jpg",
     "costPerServeAUD": 2.44
-  },
-  {
-    "id": "r079",
-    "name": "Chicken Schnitzel",
-    "description": "Golden crumbed chicken schnitzel with lemon — an Aussie classic",
-    "baseServings": 4,
-    "cookTimeMinutes": 25,
-    "difficulty": "easy",
-    "cookingStyle": "one-pan",
-    "healthTags": [
-      "standard",
-      "high-protein"
-    ],
-    "budgetTags": [
-      "budget",
-      "standard"
-    ],
-    "leftoversFriendly": false,
-    "mealType": "dinner",
-    "estimatedCostBand": "low",
-    "ingredients": [
-      {
-        "name": "Chicken breast",
-        "quantity": 600,
-        "unit": "g",
-        "category": "proteins"
-      },
-      {
-        "name": "Breadcrumbs",
-        "quantity": 1,
-        "unit": "cup",
-        "category": "grains"
-      },
-      {
-        "name": "Eggs",
-        "quantity": 2,
-        "unit": "whole",
-        "category": "proteins"
-      },
-      {
-        "name": "Plain flour",
-        "quantity": 0.5,
-        "unit": "cup",
-        "category": "grains"
-      },
-      {
-        "name": "Vegetable oil",
-        "quantity": 3,
-        "unit": "tbsp",
-        "category": "condiments"
-      },
-      {
-        "name": "Lemon",
-        "quantity": 1,
-        "unit": "whole",
-        "category": "fruit"
-      },
-      {
-        "name": "Mixed salad leaves",
-        "quantity": 2,
-        "unit": "cups",
-        "category": "vegetables"
-      }
-    ],
-    "instructions": [
-      "Slice chicken breasts in half horizontally. Place between plastic wrap and pound thin.",
-      "Set up three bowls: flour (seasoned), beaten egg, breadcrumbs.",
-      "Coat each piece in flour, then egg, then breadcrumbs.",
-      "Heat oil in a large pan over medium-high heat.",
-      "Cook schnitzels 3 mins each side until golden brown and cooked through.",
-      "Serve with lemon wedges and salad."
-    ],
-    "proteinType": "chicken",
-    "cuisineType": "australian",
-    "seasonTags": [
-      "all"
-    ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/vdwloy1713225718.jpg",
-    "costPerServeAUD": 3.98
-  },
-  {
-    "id": "r080",
-    "name": "Creamy Mushroom Pasta",
-    "description": "Rich, creamy mushroom pasta with garlic and parmesan",
-    "baseServings": 4,
-    "cookTimeMinutes": 20,
-    "difficulty": "easy",
-    "cookingStyle": "mixed",
-    "healthTags": [
-      "standard"
-    ],
-    "budgetTags": [
-      "budget",
-      "standard"
-    ],
-    "leftoversFriendly": false,
-    "mealType": "dinner",
-    "estimatedCostBand": "low",
-    "ingredients": [
-      {
-        "name": "Pasta",
-        "quantity": 400,
-        "unit": "g",
-        "category": "grains"
-      },
-      {
-        "name": "Mushrooms",
-        "quantity": 400,
-        "unit": "g",
-        "category": "vegetables"
-      },
-      {
-        "name": "Thickened cream",
-        "quantity": 200,
-        "unit": "ml",
-        "category": "dairy"
-      },
-      {
-        "name": "Garlic",
-        "quantity": 3,
-        "unit": "cloves",
-        "category": "herbs"
-      },
-      {
-        "name": "Butter",
-        "quantity": 30,
-        "unit": "g",
-        "category": "dairy"
-      },
-      {
-        "name": "Parmesan",
-        "quantity": 60,
-        "unit": "g",
-        "category": "dairy"
-      },
-      {
-        "name": "Fresh thyme",
-        "quantity": 4,
-        "unit": "sprigs",
-        "category": "herbs",
-        "optional": true
-      }
-    ],
-    "instructions": [
-      "Boil salted water and cook pasta until al dente.",
-      "Slice mushrooms thickly. Mince garlic.",
-      "Melt butter in a wide pan, sauté mushrooms over high heat 5 mins until golden.",
-      "Add garlic and thyme, cook 1 min. Pour in cream and simmer 3 mins.",
-      "Drain pasta, toss with mushroom cream sauce and half the parmesan.",
-      "Serve topped with remaining parmesan and cracked black pepper."
-    ],
-    "proteinType": "none",
-    "cuisineType": "italian",
-    "seasonTags": [
-      "autumn"
-    ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/uuuspp1511297945.jpg",
-    "costPerServeAUD": 4.35
   },
   {
     "id": "r081",
@@ -8379,166 +8126,6 @@
     ],
     "imageUrl": "https://www.themealdb.com/images/media/meals/vvstvq1487342592.jpg",
     "costPerServeAUD": 7.13
-  },
-  {
-    "id": "r097",
-    "name": "Chicken Caesar Salad",
-    "description": "Crispy croutons, tender chicken and cos lettuce with Caesar dressing",
-    "baseServings": 4,
-    "cookTimeMinutes": 15,
-    "difficulty": "easy",
-    "cookingStyle": "mixed",
-    "healthTags": [
-      "high-protein"
-    ],
-    "budgetTags": [
-      "standard"
-    ],
-    "leftoversFriendly": false,
-    "mealType": "both",
-    "estimatedCostBand": "medium",
-    "ingredients": [
-      {
-        "name": "Chicken breast",
-        "quantity": 400,
-        "unit": "g",
-        "category": "proteins"
-      },
-      {
-        "name": "Cos lettuce",
-        "quantity": 2,
-        "unit": "whole",
-        "category": "vegetables"
-      },
-      {
-        "name": "Caesar dressing",
-        "quantity": 80,
-        "unit": "ml",
-        "category": "condiments"
-      },
-      {
-        "name": "Parmesan",
-        "quantity": 60,
-        "unit": "g",
-        "category": "dairy"
-      },
-      {
-        "name": "Croutons",
-        "quantity": 1,
-        "unit": "cup",
-        "category": "grains"
-      },
-      {
-        "name": "Bacon",
-        "quantity": 4,
-        "unit": "rashers",
-        "category": "proteins"
-      },
-      {
-        "name": "Olive oil",
-        "quantity": 1,
-        "unit": "tbsp",
-        "category": "condiments"
-      }
-    ],
-    "instructions": [
-      "Cook bacon in a pan until crispy, chop and set aside.",
-      "Slice chicken breast and cook in the same pan with olive oil until golden.",
-      "Tear cos lettuce into rough pieces.",
-      "Toss lettuce with Caesar dressing and half the parmesan.",
-      "Top with chicken, bacon and croutons.",
-      "Finish with remaining parmesan and cracked pepper."
-    ],
-    "proteinType": "chicken",
-    "cuisineType": "other",
-    "seasonTags": [
-      "all"
-    ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/k29viq1585565980.jpg",
-    "costPerServeAUD": 7.13
-  },
-  {
-    "id": "r098",
-    "name": "Mushroom Risotto",
-    "description": "Classic creamy mushroom risotto — comforting and elegant",
-    "baseServings": 4,
-    "cookTimeMinutes": 35,
-    "difficulty": "moderate",
-    "cookingStyle": "one-pan",
-    "healthTags": [
-      "standard"
-    ],
-    "budgetTags": [
-      "standard"
-    ],
-    "leftoversFriendly": false,
-    "mealType": "dinner",
-    "estimatedCostBand": "medium",
-    "ingredients": [
-      {
-        "name": "Arborio rice",
-        "quantity": 320,
-        "unit": "g",
-        "category": "grains"
-      },
-      {
-        "name": "Mushrooms",
-        "quantity": 400,
-        "unit": "g",
-        "category": "vegetables"
-      },
-      {
-        "name": "Chicken or vegetable stock",
-        "quantity": 1,
-        "unit": "L",
-        "category": "pantry"
-      },
-      {
-        "name": "White wine",
-        "quantity": 125,
-        "unit": "ml",
-        "category": "condiments"
-      },
-      {
-        "name": "Onion",
-        "quantity": 1,
-        "unit": "whole",
-        "category": "vegetables"
-      },
-      {
-        "name": "Garlic",
-        "quantity": 2,
-        "unit": "cloves",
-        "category": "herbs"
-      },
-      {
-        "name": "Butter",
-        "quantity": 60,
-        "unit": "g",
-        "category": "dairy"
-      },
-      {
-        "name": "Parmesan",
-        "quantity": 80,
-        "unit": "g",
-        "category": "dairy"
-      }
-    ],
-    "instructions": [
-      "Warm stock in a saucepan. Dice onion, slice mushrooms, mince garlic.",
-      "Melt half the butter, sauté onion until soft. Add garlic and mushrooms, cook 5 mins.",
-      "Add rice, stir 1 min to coat. Pour in wine and stir until absorbed.",
-      "Add warm stock one ladle at a time, stirring constantly until each ladle is absorbed.",
-      "Continue 20-25 mins until rice is al dente and creamy.",
-      "Remove from heat, stir in remaining butter and parmesan. Season and serve."
-    ],
-    "proteinType": "chicken",
-    "cuisineType": "italian",
-    "seasonTags": [
-      "all"
-    ],
-    "imageUrl": "https://www.themealdb.com/images/media/meals/uuuspp1511297945.jpg",
-    "costPerServeAUD": 6.88
   },
   {
     "id": "r099",
