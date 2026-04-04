@@ -1,5 +1,4 @@
 uploads = []
-outputs = []
 
 [[generated]]
 id = "QKx8o1Y-iKswGx4lxTxDi"
@@ -12,3 +11,9 @@ id = "4hhyby18mxHgVMbbkHc9T"
 uri = "file://artifacts/meal-planner/assets/images/splash-icon.png"
 type = "image"
 title = "generated_image"
+
+[[outputs]]
+id = "mKqJJqq5sUuSP3hWqgzsp"
+uri = "file://scripts/recipes-for-pricing.json"
+type = "unspecified"
+title = "recipes-for-pricing.json — 250 recipes for AI pricing pass"
