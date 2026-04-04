@@ -1,0 +1,96 @@
+I need you to create a Node.js script that uses the Anthropic API to 
+automatically generate costPerServeAUD estimates for all 250 recipes 
+in scripts/recipes-for-pricing.json.
+
+─── STEP 1: Install dependency ───
+
+Run: npm install @anthropic-ai/sdk
+
+─── STEP 2: Create the script ───
+
+Create scripts/price-recipes.js with the following logic:
+
+1. Read scripts/recipes-for-pricing.json
+2. Split recipes into batches of 25
+3. For each batch, call the Anthropic API using this exact setup:
+
+   - Model: claude-haiku-4-5-20251001
+   - Max tokens: 2000
+   - Use the ANTHROPIC_API_KEY environment variable (already set in Replit secrets)
+
+4. Use this system prompt for every API call:
+
+"""
+You are an expert in Australian household grocery costs. Estimate a 
+realistic costPerServeAUD for each recipe based on 2025 Woolworths/Coles 
+prices for a standard Australian household.
+
+Rules:
+- Assume home brand for pantry staples (pasta, rice, canned goods, oil, 
+  spices, flour, stock)
+- Assume standard or home brand for dairy
+- Use realistic supermarket prices for fresh produce, meat, seafood
+- Estimate total recipe cost then divide by servings count provided
+- Round to 2 decimal places
+
+Australian price benchmarks:
+- Chicken breast: $10/kg, thighs: $7/kg, mince: $8/kg
+- Beef mince: $9/kg, steak cuts: $18-25/kg
+- Pork mince/shoulder: $9/kg
+- Lamb mince: $11/kg, cutlets: $22/kg
+- Fish fillets: $16/kg, salmon: $22/kg, prawns: $20/kg
+- Eggs: $5/dozen
+- Milk: $2/2L, cream: $3, butter: $4/250g
+- Cheddar cheese: $8/500g, parmesan: $6/100g
+- Pasta/rice/noodles (home brand): $1.50-2/500g
+- Canned tomatoes: $1.20, canned beans/lentils: $1.20-1.50
+- Fresh vegetables (average): $3-5/bunch or bag
+- Onion/garlic/ginger: $0.50-1 per recipe use
+- Olive oil per recipe use: $0.30
+- Dried herbs/spices per recipe use: $0.20
+- Soy sauce/fish sauce/oyster sauce per recipe use: $0.30
+- Coconut milk (can): $2.50
+- Stock per recipe use: $2.00
+- Avocado: $2.50 each
+- Fresh herbs (bunch): $3.00
+
+Return ONLY a valid JSON array, no explanation, no markdown, no code 
+fences. Format exactly:
+[
+  { "id": "recipe-id", "costPerServeAUD": 6.50 },
+  { "id": "recipe-id", "costPerServeAUD": 4.20 }
+]
+"""
+
+5. For each batch, the user message should be:
+
+"""
+Price these recipes. Return only the JSON array.
+
+[PASTE BATCH JSON HERE - the script should insert the actual batch]
+"""
+
+6. Parse the JSON response from each batch
+7. Add a 1 second delay between batches to avoid rate limiting
+8. Collect all results into a single array
+9. Write the final combined array to scripts/recipes-pricing-output.json
+10. Log progress after each batch: "Batch X/10 complete — Y recipes priced"
+
+─── STEP 3: Error handling ───
+
+- If a batch API call fails, log the error and retry that batch once 
+  before skipping
+- If JSON parsing fails on a response, log the raw response and skip 
+  that batch
+- At the end, log how many recipes were successfully priced vs skipped
+
+─── STEP 4: Run it ───
+
+Run the script with: node scripts/price-recipes.js
+
+Confirm when scripts/recipes-pricing-output.json has been created and 
+log the final count and a sample of 5 results so I can verify the 
+output looks correct.
+
+Do not move on to importing the prices until I confirm the output 
+looks good.
