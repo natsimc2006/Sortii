@@ -306,21 +306,15 @@ export default function PreferencesScreen() {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.prefHero}>
-          <Text style={[styles.prefHeroHeading, { color: C.text }]}>Make it yours.</Text>
-          <Text style={[styles.prefHeroSub, { color: C.textSecondary }]}>
-            Set it once. Sortii handles the rest.
-          </Text>
-        </View>
-
-        <View style={styles.pageHeader}>
-          <View style={styles.pageHeaderRow}>
-            <Text style={[styles.pageTitle, { color: C.text }]}>Settings</Text>
+          <View style={styles.prefHeroTopRow}>
+            <View style={{ flex: 1 }} />
             <TouchableOpacity onPress={handleClose} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }} style={styles.closeBtn}>
               <Feather name="x" size={22} color={C.textSecondary} />
             </TouchableOpacity>
           </View>
-          <Text style={[styles.pageHelper, { color: C.textSecondary }]}>
-            You can fine-tune your plan anytime.
+          <Text style={[styles.prefHeroHeading, { color: C.text }]}>Make it yours.</Text>
+          <Text style={[styles.prefHeroSub, { color: C.textSecondary }]}>
+            Set it once. Sortii handles the rest.
           </Text>
         </View>
 
@@ -873,9 +867,13 @@ const styles = StyleSheet.create({
     fontFamily: "Inter_600SemiBold",
   },
   prefHero: {
-    alignItems: "center",
     gap: 6,
     paddingVertical: 8,
+  },
+  prefHeroTopRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 4,
   },
   prefHeroHeading: {
     fontSize: 28,

@@ -59,7 +59,7 @@ export default function HomeScreen() {
 
   const handlePreferences = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    router.push("/preferences");
+    router.push("/(tabs)/preferences");
   };
 
   return (
@@ -168,7 +168,7 @@ export default function HomeScreen() {
       {/* Change 9: Plum accent line + Change 6: Upgraded button */}
       <View style={styles.actions}>
         <Text style={styles.plumAccent}>
-          The convenience of an auto planned meal kit. At supermarket prices.
+          The convenience of a meal kit. At supermarket prices.
         </Text>
         <TouchableOpacity
           onPress={handlePreferences}
