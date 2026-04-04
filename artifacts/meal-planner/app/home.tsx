@@ -60,7 +60,7 @@ export default function HomeScreen() {
       contentContainerStyle={[
         styles.container,
         {
-          paddingTop: Platform.OS === "web" ? 6 : insets.top,
+          paddingTop: Platform.OS === "web" ? 6 : Math.floor(insets.top / 2),
           paddingBottom: Platform.OS === "web" ? 60 : insets.bottom + 40,
         },
       ]}
@@ -161,7 +161,7 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 24,
-    gap: 12,
+    gap: 6,
   },
   backBtn: {
     alignSelf: "flex-start",
