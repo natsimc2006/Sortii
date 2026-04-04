@@ -2,8 +2,9 @@ import { Feather } from "@expo/vector-icons";
 import * as Clipboard from "expo-clipboard";
 import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
-import React, { useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
+  Animated,
   Keyboard,
   Linking,
   Modal,
@@ -99,6 +100,159 @@ export default function ShoppingScreen() {
     if (toastTimer.current) clearTimeout(toastTimer.current);
     setToast(msg);
     toastTimer.current = setTimeout(() => setToast(null), 2500);
+  };
+
+  // ─── Voice input ─────────────────────────────────────────────────────────
+  const [isListening, setIsListening] = useState(false);
+  const [voiceText, setVoiceText] = useState("");
+  const [voiceSupported, setVoiceSupported] = useState<boolean | null>(null);
+  const [permDeniedBanner, setPermDeniedBanner] = useState(false);
+  const pulseAnim = useRef(new Animated.Value(1)).current;
+  const pulseLoopRef = useRef<Animated.CompositeAnimation | null>(null);
+  const webRecognitionRef = useRef<any>(null);
+
+  useEffect(() => {
+    if (Platform.OS === "web") {
+      const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+      setVoiceSupported(!!SR);
+    } else {
+      try {
+        const Voice = require("@react-native-voice/voice").default;
+        Voice.isAvailable()
+          .then((ok: boolean) => setVoiceSupported(ok))
+          .catch(() => setVoiceSupported(false));
+      } catch {
+        setVoiceSupported(false);
+      }
+    }
+    return () => {
+      if (Platform.OS !== "web") {
+        try {
+          const Voice = require("@react-native-voice/voice").default;
+          Voice.destroy().then(() => Voice.removeAllListeners());
+        } catch {}
+      } else if (webRecognitionRef.current) {
+        webRecognitionRef.current.stop();
+      }
+    };
+  }, []);
+
+  const startPulse = () => {
+    pulseLoopRef.current = Animated.loop(
+      Animated.sequence([
+        Animated.timing(pulseAnim, { toValue: 0.35, duration: 400, useNativeDriver: true }),
+        Animated.timing(pulseAnim, { toValue: 1, duration: 400, useNativeDriver: true }),
+      ])
+    );
+    pulseLoopRef.current.start();
+  };
+
+  const stopPulse = () => {
+    if (pulseLoopRef.current) pulseLoopRef.current.stop();
+    Animated.timing(pulseAnim, { toValue: 1, duration: 150, useNativeDriver: true }).start();
+  };
+
+  const parseAndAddItems = (transcript: string) => {
+    const parts = transcript
+      .split(/,| and | & /i)
+      .map((s) => s.trim())
+      .filter(Boolean)
+      .map((s) => s.charAt(0).toUpperCase() + s.slice(1));
+
+    console.log("[Voice] Raw transcript:", transcript);
+    console.log("[Voice] Parsed items:", parts);
+
+    if (parts.length === 0) return;
+    const ts = Date.now();
+    const newExtras: Extra[] = parts.map((name, i) => ({ id: `${ts}-${i}`, name }));
+    setExtras((prev) => [...prev, ...newExtras]);
+    setExtraInput("");
+    setVoiceText("");
+    showToast(`Added ${parts.length} ${parts.length === 1 ? "item" : "items"}.`);
+  };
+
+  const startListening = async () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    if (Platform.OS === "web") {
+      const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+      if (!SR) return;
+      try {
+        await (navigator as any).mediaDevices.getUserMedia({ audio: true });
+      } catch {
+        setPermDeniedBanner(true);
+        return;
+      }
+      const recognition = new SR();
+      recognition.lang = "en-AU";
+      recognition.continuous = false;
+      recognition.interimResults = true;
+      recognition.onresult = (e: any) => {
+        const transcript = Array.from(e.results)
+          .map((r: any) => r[0].transcript)
+          .join("");
+        setVoiceText(transcript);
+        if (e.results[e.results.length - 1].isFinal) {
+          parseAndAddItems(transcript);
+          setIsListening(false);
+          stopPulse();
+        }
+      };
+      recognition.onerror = (e: any) => {
+        console.log("[Voice] Web error:", e.error);
+        if (e.error === "not-allowed") setPermDeniedBanner(true);
+        setIsListening(false);
+        setVoiceText("");
+        stopPulse();
+      };
+      recognition.onend = () => {
+        setIsListening(false);
+        stopPulse();
+      };
+      webRecognitionRef.current = recognition;
+      recognition.start();
+      setIsListening(true);
+      startPulse();
+    } else {
+      try {
+        const Voice = require("@react-native-voice/voice").default;
+        Voice.onSpeechResults = (e: any) => {
+          const transcript = e.value?.[0] ?? "";
+          setVoiceText(transcript);
+          parseAndAddItems(transcript);
+          setIsListening(false);
+          stopPulse();
+        };
+        Voice.onSpeechError = (e: any) => {
+          console.log("[Voice] Native error:", e);
+          setIsListening(false);
+          setVoiceText("");
+          stopPulse();
+        };
+        await Voice.start("en-AU");
+        setIsListening(true);
+        startPulse();
+      } catch (e) {
+        console.log("[Voice] Failed to start:", e);
+        setVoiceSupported(false);
+      }
+    }
+  };
+
+  const stopListening = async () => {
+    if (Platform.OS === "web") {
+      if (webRecognitionRef.current) {
+        webRecognitionRef.current.stop();
+        webRecognitionRef.current = null;
+      }
+    } else {
+      try {
+        const Voice = require("@react-native-voice/voice").default;
+        await Voice.stop();
+      } catch {}
+    }
+    setIsListening(false);
+    setVoiceText("");
+    stopPulse();
   };
 
   // ─── Compute shopping items ─────────────────────────────────────────────
@@ -358,19 +512,51 @@ export default function ShoppingScreen() {
               <Text style={[styles.addHint, { color: C.textMuted }]}>Toilet paper, snacks, whatever.</Text>
             </View>
           </View>
+
+          {permDeniedBanner && (
+            <View style={[styles.permBanner, { backgroundColor: C.chipBg }]}>
+              <Text style={[styles.permBannerText, { color: C.primary }]}>
+                Enable microphone access in Settings to use voice input.
+              </Text>
+              <TouchableOpacity onPress={() => setPermDeniedBanner(false)} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+                <Feather name="x" size={15} color={C.primary} />
+              </TouchableOpacity>
+            </View>
+          )}
+
           <View style={[styles.addRow, { backgroundColor: C.card, borderColor: C.cardBorder }]}>
             <TextInput
-              value={extraInput}
-              onChangeText={setExtraInput}
-              onSubmitEditing={addExtra}
-              placeholder="Item name"
-              placeholderTextColor={C.textMuted}
+              value={isListening ? voiceText : extraInput}
+              onChangeText={isListening ? undefined : setExtraInput}
+              onSubmitEditing={isListening ? undefined : addExtra}
+              placeholder={isListening ? "Listening..." : "Item name"}
+              placeholderTextColor={isListening ? C.primary : C.textMuted}
               returnKeyType="done"
-              style={[styles.addInput, { color: C.text }]}
+              editable={!isListening}
+              style={[
+                styles.addInput,
+                { color: isListening ? C.textSecondary : C.text, fontStyle: isListening ? "italic" : "normal" },
+              ]}
             />
+            {voiceSupported && (
+              <TouchableOpacity
+                onPress={isListening ? stopListening : startListening}
+                style={[
+                  styles.micBtn,
+                  isListening
+                    ? { backgroundColor: C.primary }
+                    : { backgroundColor: "transparent", borderWidth: 1.5, borderColor: C.primary },
+                ]}
+                activeOpacity={0.75}
+              >
+                <Animated.View style={{ opacity: isListening ? pulseAnim : 1 }}>
+                  <Feather name="mic" size={15} color={isListening ? "#fff" : C.primary} />
+                </Animated.View>
+              </TouchableOpacity>
+            )}
             <TouchableOpacity
               onPress={addExtra}
-              style={[styles.addBtn, { backgroundColor: C.primary, opacity: extraInput.trim() ? 1 : 0.4 }]}
+              style={[styles.addBtn, { backgroundColor: C.primary, opacity: extraInput.trim() && !isListening ? 1 : 0.4 }]}
             >
               <Text style={styles.addBtnText}>+ Add</Text>
             </TouchableOpacity>
@@ -694,6 +880,29 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   addBtnText: { fontSize: 13, fontFamily: "Inter_600SemiBold", color: "#fff" },
+  micBtn: {
+    width: 34,
+    height: 34,
+    borderRadius: 8,
+    alignItems: "center",
+    justifyContent: "center",
+    flexShrink: 0,
+  },
+  permBanner: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    marginBottom: 4,
+  },
+  permBannerText: {
+    flex: 1,
+    fontSize: 12,
+    fontFamily: "Inter_400Regular",
+    lineHeight: 17,
+  },
   alreadyHeader: {
     flexDirection: "row",
     alignItems: "center",

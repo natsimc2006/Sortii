@@ -1,0 +1,106 @@
+Add a voice/microphone input feature to the Shopping List screen's 
+"Add your own" section.
+
+─── STEP 1: Install dependency ───
+
+Run: npx expo install @react-native-voice/voice
+
+─── STEP 2: Add microphone permission ───
+
+In app.json, add to the ios permissions array:
+"NSMicrophoneUsageDescription": "Sortii uses your microphone to 
+add items to your shopping list by voice."
+
+Also add:
+"NSSpeechRecognitionUsageDescription": "Sortii uses speech 
+recognition to convert your voice into shopping list items."
+
+─── STEP 3: Build the voice input logic ───
+
+In the Shopping List screen, add the following alongside the 
+existing text input in the "Add your own" section:
+
+Import and initialise @react-native-voice/voice.
+
+State needed:
+- isListening: boolean
+- voiceText: string (interim recognised text)
+
+Voice handlers:
+  Voice.onSpeechResults = (e) => {
+    const transcript = e.value?.[0] ?? '';
+    setVoiceText(transcript);
+    parseAndAddItems(transcript);
+  };
+
+  Voice.onSpeechError = (e) => {
+    console.log('Voice error:', e);
+    setIsListening(false);
+  };
+
+parseAndAddItems function:
+  Split the transcript on commas, " and ", " & " 
+  Trim each resulting string
+  Filter out empty strings
+  Capitalise first letter of each item
+  Add each as a separate item to the Extras list
+  
+  Example input: "eggs, milk and toilet paper"
+  Example output: ["Eggs", "Milk", "Toilet paper"] → 3 separate items
+
+startListening function:
+  Request microphone permission first
+  If granted: call Voice.start('en-AU') — Australian English
+  Set isListening to true
+
+stopListening function:
+  Call Voice.stop()
+  Set isListening to false
+
+Cleanup: call Voice.destroy() on component unmount
+
+─── STEP 4: Build the mic button UI ───
+
+Replace the current "Add your own" input row with this layout:
+
+[ Text input field          ] [ 🎤 ] [ + Add ]
+
+The 🎤 mic button:
+- Idle state: teal outline, microphone icon, #2A8F88
+- Listening state: solid teal background, pulsing animation, 
+  microphone icon, label changes to "Listening..."
+- Use Animated.loop with Animated.sequence for the pulse:
+  opacity cycles 1.0 → 0.4 → 1.0 over 800ms while listening
+
+While listening:
+- The text input shows the interim recognised text in grey/italic
+- This gives the user live feedback that it's working
+
+After recognition completes:
+- Items are added to the Extras list automatically
+- Input field clears
+- Mic returns to idle state
+- Show a brief toast: "Added [X] items." using the same 
+  toast pattern already in the app
+
+─── STEP 5: Graceful fallback ───
+
+If the device does not support speech recognition, or permission 
+is denied:
+- Hide the mic button entirely
+- Do not show an error — just fall back to text-only input silently
+- If permission is denied, show a one-time message:
+  "Enable microphone access in Settings to use voice input."
+  In teal tint (#E6F3F0), dismissable.
+
+─── STEP 6: Verify ───
+
+Test the following:
+1. Tap mic → button animates to listening state
+2. Say "chicken, bread and dishwashing liquid"
+3. Confirm 3 separate items appear in Extras list
+4. Confirm mic returns to idle state
+5. Confirm text input clears after recognition
+
+Log to console: the raw transcript received, and the parsed 
+items array, so we can verify the splitting logic is working.

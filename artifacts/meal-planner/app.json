@@ -15,7 +15,11 @@
     },
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "com.sortiidinnersorted.app"
+      "bundleIdentifier": "com.sortiidinnersorted.app",
+      "infoPlist": {
+        "NSMicrophoneUsageDescription": "Sortii uses your microphone to add items to your shopping list by voice.",
+        "NSSpeechRecognitionUsageDescription": "Sortii uses speech recognition to convert your voice into shopping list items."
+      }
     },
     "android": {
       "package": "com.sortiidinnersorted.app"
@@ -31,7 +35,8 @@
         }
       ],
       "expo-font",
-      "expo-web-browser"
+      "expo-web-browser",
+      "@react-native-voice/voice"
     ],
     "experiments": {
       "typedRoutes": true,
