@@ -46,12 +46,12 @@ function OptionRow({
             style={[
               styles.optionChip,
               {
-                backgroundColor: active ? C.primary : C.chipBg,
+                backgroundColor: active ? C.tealTint : C.chipBg,
                 borderColor: active ? C.primary : C.border,
               },
             ]}
           >
-            <Text style={[styles.optionChipText, { color: active ? "#fff" : C.textSecondary }]}>
+            <Text style={[styles.optionChipText, { color: active ? C.primary : C.textSecondary }]}>
               {o.label}
             </Text>
           </TouchableOpacity>
@@ -305,6 +305,13 @@ export default function PreferencesScreen() {
         ]}
         showsVerticalScrollIndicator={false}
       >
+        <View style={styles.prefHero}>
+          <Text style={[styles.prefHeroHeading, { color: C.text }]}>Make it yours.</Text>
+          <Text style={[styles.prefHeroSub, { color: C.textSecondary }]}>
+            Set it once. Sortii handles the rest.
+          </Text>
+        </View>
+
         <View style={styles.pageHeader}>
           <View style={styles.pageHeaderRow}>
             <Text style={[styles.pageTitle, { color: C.text }]}>Settings</Text>
@@ -384,6 +391,7 @@ export default function PreferencesScreen() {
             {prefs.budgetLevel === "super-budget" && (
               <Hint text="~$5 per serve. The leanest meals in the collection." />
             )}
+            <Hint text="No judgement. Just dinner." />
           </SectionBlock>
 
           <SectionBlock title="Meals per Week">
@@ -396,6 +404,7 @@ export default function PreferencesScreen() {
               value={String(prefs.mealVariety)}
               onSelect={(v) => update("mealVariety", parseInt(v) as 3 | 5 | 7)}
             />
+            <Hint text="Even three nights is a win." />
           </SectionBlock>
 
           <SectionBlock title="Dietary Preferences">
@@ -418,6 +427,7 @@ export default function PreferencesScreen() {
             {prefs.dietType === "pescatarian" && (
               <Hint text="Filters out meat. Fish and seafood are included." />
             )}
+            <Hint text="Hard no's only. We'll handle variety." />
           </SectionBlock>
 
           <SectionBlock title="Ingredient Exclusions">
@@ -717,7 +727,7 @@ const styles = StyleSheet.create({
   tierContent: {
     paddingHorizontal: 16,
     paddingBottom: 16,
-    gap: 20,
+    gap: 24,
     borderTopWidth: 1,
     borderTopColor: "#E6E1D7",
   },
@@ -861,5 +871,22 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 14,
     fontFamily: "Inter_600SemiBold",
+  },
+  prefHero: {
+    alignItems: "center",
+    gap: 6,
+    paddingVertical: 8,
+  },
+  prefHeroHeading: {
+    fontSize: 28,
+    fontFamily: "PlayfairDisplay_700Bold",
+    textAlign: "center",
+  },
+  prefHeroSub: {
+    fontSize: 14,
+    fontFamily: "Inter_400Regular",
+    textAlign: "center",
+    lineHeight: 20,
+    fontStyle: "italic",
   },
 });

@@ -1,5 +1,6 @@
 import { Feather } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
+import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import React from "react";
 import {
@@ -21,18 +22,25 @@ const STEPS = [
   {
     icon: "sliders",
     title: "Tell us about your household",
-    desc: "Household size, budget, dietary needs — sorted in 60 seconds.",
+    desc: "Tell us who you're feeding and what you've got to spend. Takes 60 seconds.",
   },
   {
     icon: "calendar",
     title: "Plan your week",
-    desc: "Pick meals manually, fill gaps, or let us sort the whole lot.",
+    desc: "Let Sortii fill the week, or pick a few yourself. Either way, dinner is handled.",
   },
   {
     icon: "shopping-cart",
     title: "Your list, ready to shop",
-    desc: "One tap. Everything you need. Nothing you don't.",
+    desc: "Your list builds itself. Categorised, consolidated, and ready to share.",
   },
+];
+
+const FEATURES: [string, string][] = [
+  ["240+ recipes. Always something new.", "book-open"],
+  ["Every budget. Real prices.", "dollar-sign"],
+  ["Feeds 1 to 10. Scales automatically.", "users"],
+  ["Cook once. Eat twice. Less waste.", "refresh-cw"],
 ];
 
 export default function HomeScreen() {
@@ -74,30 +82,55 @@ export default function HomeScreen() {
         <Feather name="arrow-left" size={16} color={C.primary} />
       </TouchableOpacity>
 
+      {/* Change 7: Three dots decoration */}
+      <View style={styles.dotsRow}>
+        <View style={[styles.dot, { width: 6, height: 6, backgroundColor: C.gold }]} />
+        <View style={[styles.dot, { width: 8, height: 8, backgroundColor: C.primary }]} />
+        <View style={[styles.dot, { width: 6, height: 6, backgroundColor: "#5E3A4C" }]} />
+      </View>
+
+      {/* Change 1: Hero with glow + Change 8: Updated copy */}
       <View style={styles.heroSection}>
+        <LinearGradient
+          colors={["rgba(255,255,255,0.7)", "rgba(250,248,244,0)"]}
+          style={styles.heroGlow}
+        />
         <Image
           source={sortiiLogo}
           style={styles.logoImage}
           resizeMode="contain"
         />
-        <Text style={[styles.subheadline, { color: "#8A8D86" }]}>
-          250 dinners. Smart planning. One less thing to think about.
+        <Text style={[styles.mainHeadline, { color: C.text }]}>
+          No more "what's for dinner?"
         </Text>
+        <Text style={[styles.subheadline, { color: C.textSecondary }]}>
+          Sortii plans your week in 60 seconds — meals, budget, shopping list. Done.
+        </Text>
+        <Text style={[styles.supportingLine, { color: "#5E3A4C" }]}>
+          Less stress. Fewer takeaways. More evenings back.
+        </Text>
+        {/* Change 2: Teal accent bar */}
+        <View style={[styles.accentBar, { backgroundColor: C.primary }]} />
       </View>
 
+      {/* Change 4 + 3: Section label upgrade + card redesign */}
       <View style={styles.stepsSection}>
-        <Text style={[styles.sectionLabel, { color: C.textMuted }]}>
-          HOW IT WORKS
-        </Text>
+        <View style={styles.sectionLabelRow}>
+          <View style={[styles.sectionDot, { backgroundColor: C.primary }]} />
+          <Text style={[styles.sectionLabel, { color: C.primary }]}>
+            HOW IT WORKS
+          </Text>
+        </View>
         {STEPS.map((step, i) => (
           <View
             key={i}
-            style={[styles.stepCard, { backgroundColor: C.card, borderColor: C.cardBorder }]}
+            style={[styles.stepCard, { backgroundColor: "#FFFFFF", borderColor: C.cardBorder }]}
           >
+            <View style={[styles.stepCardAccent, { backgroundColor: C.primary }]} />
             <View style={[styles.stepNum, { backgroundColor: C.primary }]}>
               <Text style={styles.stepNumText}>{i + 1}</Text>
             </View>
-            <View style={[styles.stepIconBox, { backgroundColor: C.chipBg }]}>
+            <View style={[styles.stepIconBox, { backgroundColor: "#F6E6BA" }]}>
               <Feather name={step.icon as any} size={22} color={C.primary} />
             </View>
             <View style={styles.stepText}>
@@ -112,32 +145,38 @@ export default function HomeScreen() {
         ))}
       </View>
 
-      <View style={styles.features}>
-        {[
-          ["250 Australian-friendly recipes", "book-open"],
-          ["Budget, standard & premium options", "dollar-sign"],
-          ["Serves 1–10 people", "users"],
-          ["Leftovers-friendly planning", "refresh-cw"],
-        ].map(([label, icon]) => (
-          <View key={label} style={styles.featureRow}>
-            <View style={[styles.featureDot, { backgroundColor: C.chipBg }]}>
-              <Feather name={icon as any} size={14} color={C.primary} />
+      {/* Change 5: Feature bullets in card */}
+      <View style={[styles.featuresCard, { backgroundColor: C.tealTint, borderColor: "rgba(42,143,136,0.3)" }]}>
+        <Text style={[styles.featuresCardHeading, { color: C.primary }]}>
+          WHAT'S INCLUDED
+        </Text>
+        {FEATURES.map(([label, icon], idx) => (
+          <View key={label}>
+            <View style={styles.featureRow}>
+              <Feather name={icon as any} size={16} color={C.primary} />
+              <Text style={[styles.featureLabel, { color: C.text }]}>
+                {label}
+              </Text>
             </View>
-            <Text style={[styles.featureLabel, { color: C.textSecondary }]}>
-              {label}
-            </Text>
+            {idx < FEATURES.length - 1 && (
+              <View style={[styles.featureDivider, { backgroundColor: C.cardBorder }]} />
+            )}
           </View>
         ))}
       </View>
 
+      {/* Change 9: Plum accent line + Change 6: Upgraded button */}
       <View style={styles.actions}>
+        <Text style={styles.plumAccent}>
+          The convenience of an auto planned meal kit. At supermarket prices.
+        </Text>
         <TouchableOpacity
           onPress={handlePreferences}
           activeOpacity={0.85}
           style={[styles.primaryBtn, { backgroundColor: C.gold }]}
         >
           <Text style={styles.primaryBtnText}>Get started</Text>
-          <Feather name="arrow-right" size={20} color="#fff" />
+          <Feather name="arrow-right" size={20} color="#fff" style={{ marginLeft: 8 }} />
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -161,7 +200,7 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 24,
-    gap: 6,
+    gap: 20,
   },
   backBtn: {
     alignSelf: "flex-start",
@@ -171,54 +210,128 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     borderRadius: 10,
   },
+  dotsRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    marginTop: -8,
+  },
+  dot: {
+    borderRadius: 999,
+  },
   heroSection: {
     alignItems: "center",
-    gap: 12,
+    gap: 8,
     paddingTop: 0,
+    position: "relative",
+  },
+  heroGlow: {
+    position: "absolute",
+    width: 340,
+    height: 260,
+    borderRadius: 170,
+    top: -20,
+    alignSelf: "center",
+    zIndex: 0,
   },
   logoImage: {
     width: 416,
     maxWidth: "88%",
     height: 192,
+    zIndex: 1,
+  },
+  mainHeadline: {
+    fontSize: 24,
+    fontFamily: "PlayfairDisplay_700Bold",
+    textAlign: "center",
+    lineHeight: 32,
+    zIndex: 1,
   },
   subheadline: {
-    fontSize: 14,
+    fontSize: 15,
     fontFamily: "Inter_400Regular",
     textAlign: "center",
-    lineHeight: 22,
+    lineHeight: 23,
     maxWidth: 300,
+    zIndex: 1,
+  },
+  supportingLine: {
+    fontSize: 13,
+    fontFamily: "Inter_400Regular",
+    textAlign: "center",
+    fontStyle: "italic",
+    zIndex: 1,
+  },
+  accentBar: {
+    width: 48,
+    height: 3,
+    borderRadius: 2,
+    marginTop: 4,
+    zIndex: 1,
   },
   stepsSection: {
     gap: 12,
   },
+  sectionLabelRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    marginBottom: 4,
+  },
+  sectionDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+  },
   sectionLabel: {
     fontSize: 11,
     fontFamily: "Inter_600SemiBold",
-    letterSpacing: 1.2,
+    letterSpacing: 2,
     textTransform: "uppercase",
-    marginBottom: 4,
   },
   stepCard: {
     flexDirection: "row",
     alignItems: "flex-start",
     gap: 12,
-    borderRadius: 16,
-    borderWidth: 1,
-    padding: 16,
+    borderRadius: 14,
+    borderWidth: 1.5,
+    padding: 20,
+    paddingLeft: 24,
     position: "relative",
+    overflow: "hidden",
+    ...Platform.select({
+      web: { boxShadow: "0px 2px 12px rgba(0,0,0,0.06)" },
+      default: {
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.06,
+        shadowRadius: 6,
+        elevation: 2,
+      },
+    }),
+  },
+  stepCardAccent: {
+    position: "absolute",
+    left: 0,
+    top: 0,
+    bottom: 0,
+    width: 3,
+    borderTopLeftRadius: 14,
+    borderBottomLeftRadius: 14,
   },
   stepNum: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
+    width: 28,
+    height: 28,
+    borderRadius: 14,
     alignItems: "center",
     justifyContent: "center",
     position: "absolute",
-    top: 12,
-    left: 12,
+    top: 10,
+    left: 8,
   },
   stepNumText: {
-    fontSize: 11,
+    fontSize: 13,
     fontFamily: "Inter_700Bold",
     color: "#fff",
   },
@@ -243,35 +356,61 @@ const styles = StyleSheet.create({
     fontFamily: "Inter_400Regular",
     lineHeight: 19,
   },
-  features: {
-    gap: 12,
+  featuresCard: {
+    borderRadius: 16,
+    borderWidth: 1,
+    padding: 20,
+    gap: 0,
+  },
+  featuresCardHeading: {
+    fontSize: 11,
+    fontFamily: "Inter_600SemiBold",
+    letterSpacing: 1.5,
+    textTransform: "uppercase",
+    marginBottom: 12,
   },
   featureRow: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 10,
+    gap: 12,
+    paddingVertical: 10,
   },
-  featureDot: {
-    width: 32,
-    height: 32,
-    borderRadius: 10,
-    alignItems: "center",
-    justifyContent: "center",
+  featureDivider: {
+    height: 1,
+    marginHorizontal: 0,
   },
   featureLabel: {
-    fontSize: 14,
+    fontSize: 15,
     fontFamily: "Inter_400Regular",
   },
   actions: {
     gap: 12,
   },
+  plumAccent: {
+    fontSize: 13,
+    fontFamily: "Inter_400Regular",
+    color: "#5E3A4C",
+    fontStyle: "italic",
+    textAlign: "center",
+    lineHeight: 19,
+    marginBottom: 4,
+  },
   primaryBtn: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    gap: 10,
-    paddingVertical: 18,
+    height: 56,
     borderRadius: 18,
+    ...Platform.select({
+      web: { boxShadow: "0px 4px 16px rgba(210,154,34,0.35)" },
+      default: {
+        shadowColor: "#D29A22",
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.35,
+        shadowRadius: 16,
+        elevation: 6,
+      },
+    }),
   },
   primaryBtnText: {
     fontSize: 17,
@@ -292,5 +431,6 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontSize: 13,
     fontFamily: "Inter_400Regular",
+    marginTop: -8,
   },
 });

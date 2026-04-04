@@ -1,0 +1,77 @@
+
+─── CHANGE 3: How It Works cards ───
+
+Currently the three step cards are white on near-white 
+background — they have no separation or depth.
+
+Change each card:
+- Background: #FFFFFF (pure white)
+- Border: 1.5px solid #E6E1D7
+- Shadow: 0px 2px 12px rgba(0,0,0,0.06)
+- Left border accent: 3px solid #2A8F88 (teal)
+- Border radius: 14px
+- Add 4px more padding on all sides
+
+The numbered circles (currently solid teal):
+- Keep solid teal #2A8F88 background
+- Make them slightly larger: 28px diameter
+- Font: Inter bold, white, 13px
+
+The icon squares:
+- Change background from teal tint to #F6E6BA (gold tint)
+- Keep the teal icon colour inside
+- This creates a warm gold/teal contrast that's more 
+  visually interesting
+
+─── CHANGE 4: Section label ───
+
+"HOW IT WORKS" label:
+- Add a small teal dot before the text: • HOW IT WORKS
+- Increase letter spacing to 2px
+- Change colour from current grey to #2A8F88 teal
+- This makes the section feel intentional not incidental
+
+─── CHANGE 5: Feature bullets section ───
+
+The four feature bullets at the bottom currently sit 
+as plain text rows with small icons. Upgrade:
+
+Wrap all four in a single card:
+- Background: #E6F3F0 (teal tint)
+- Border: 1px solid #2A8F88 at 30% opacity
+- Border radius: 16px
+- Padding: 20px
+- Add a small heading above the bullets:
+  Text: "What's included"
+  Style: Inter, 11px, caps, #2A8F88, letter-spacing 1.5px
+
+Each bullet row:
+- Icon: keep teal
+- Text: Inter 15px, charcoal #2B2B2B
+- Add a very subtle divider line between rows: 
+  1px #E6E1D7, full width, no divider after last item
+
+─── CHANGE 6: Get Started button ───
+
+The gold button is good but needs more presence:
+
+- Increase height from current to 56px
+- Add subtle shadow: 0px 4px 16px rgba(210,154,34,0.35)
+  (gold-tinted shadow, not black)
+- Increase font size to 17px, weight 700
+- Keep the → arrow but add 8px spacing before it
+
+─── CHANGE 7: Subtle top decoration ───
+
+In the very top section above the logo, add a decorative 
+element that adds visual interest without distraction:
+
+Three small dots in a horizontal row, centred:
+- Left dot: #D29A22 (gold), 6px diameter
+- Centre dot: #2A8F88 (teal), 8px diameter  
+- Right dot: #5E3A4C (plum), 6px diameter
+- Spacing: 8px between dots
+- Position: 16px below the status bar / top safe area
+
+This echoes the ii dots from the logo and creates a 
+brand-consistent decorative motif
