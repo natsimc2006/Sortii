@@ -239,6 +239,8 @@ const styles = StyleSheet.create({
     width: 416,
     maxWidth: "88%",
     height: 192,
+    marginTop: -38,
+    marginBottom: 30,
     zIndex: 1,
   },
   mainHeadline: {
