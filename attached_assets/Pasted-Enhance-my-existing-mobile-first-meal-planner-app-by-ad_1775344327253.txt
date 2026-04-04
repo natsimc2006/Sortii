@@ -1,0 +1,101 @@
+Enhance my existing mobile-first meal planner app by adding an Unsplash-powered recipe image system for meal cards and recipe views.
+
+Project context:
+- App name: Sortii
+- Brand vibe: friendly, smart, low-stress, modern, practical
+- Use case: users generate a weekly dinner plan quickly and want each meal to feel visually appealing and real
+- The goal is to attach a relevant food image to each recipe or meal card automatically
+- This should improve visual polish without making the app feel cluttered or slow
+
+Build the following system:
+
+1. Unsplash image integration
+- Connect to the Unsplash API using an environment variable for the access key
+- Store the key securely in environment variables, not hardcoded
+- Use the official Unsplash search endpoint to search for food images
+- Build a reusable image-fetching utility function
+
+Environment variable:
+- UNSPLASH_ACCESS_KEY= cWU-u6hsZoSKXaZJ_-YfD5s09NoHtfmHmuaKZ_LXXF4
+
+2. Meal-to-image matching logic
+Each recipe or meal already has a meal title or recipe name.
+Use that title to generate a smart image search query.
+
+Example:
+- "Creamy Chicken Pasta" → search query: "creamy chicken pasta food"
+- "Beef Tacos" → "beef tacos food"
+- "Veggie Stir Fry" → "vegetable stir fry meal"
+- "Sausage Tray Bake" → "sausage tray bake dinner"
+
+Rules:
+- Prefer food-specific search wording, not generic lifestyle images
+- Add words like: food, meal, dinner, recipe only when helpful
+- Avoid non-food results
+- Keep the search query clean and simple
+- If a meal title includes Australian wording, preserve it where possible
+
+3. Fallback logic
+If no strong image is found:
+- Try a simplified query using the core meal words only
+- If still nothing is found, use a local fallback placeholder image
+- The fallback image should feel on-brand and clean, not broken or empty
+
+4. Image selection rules
+When Unsplash returns multiple results:
+- Use the best landscape or square-friendly food image
+- Prefer results that clearly show the cooked meal
+- Avoid overly styled restaurant shots if possible
+- Avoid images with visible text overlays or watermarks
+- Avoid unrelated kitchen/lifestyle shots unless absolutely necessary
+
+5. Caching and performance
+Do not call Unsplash every time the screen renders.
+Implement caching so the app stores the selected image URL for each meal once fetched.
+
+Suggested structure:
+- If a meal already has an imageUrl saved, use it
+- If not, fetch one from Unsplash and save it
+- Cache image URLs in the database or app storage so repeated plans do not re-fetch unnecessarily
+- Prevent duplicate API requests for the same meal title during one session
+
+10. Error handling
+Handle:
+- missing API key
+- failed API requests
+- rate limits
+- no image results
+- malformed response data
+
+If Unsplash fails:
+- do not crash the app
+- return the fallback image
+- optionally log the reason for debugging
+
+11. Code quality
+- Keep the code modular and easy to expand later
+- Add comments where useful
+- Write it so I can later swap Unsplash for another image provider if needed
+- Keep everything mobile-first
+- Do not break my current meal generation flow
+
+12. Future-proofing
+Structure the code so I can later add:
+- manual image override per recipe
+- AI-generated images
+- Spoonacular or recipe API integration
+- image refresh button
+- category-based fallback images
+
+13. Deliverables
+Please implement:
+- the Unsplash API utility
+- the meal image query builder
+- caching logic
+- database field updates if relevant
+- fallback image handling
+- environment variable setup instructions
+- concise notes in the code so future edits are easy
+
+Do not redesign the whole app.
+Only enhance the current experience by layering in recipe imagery cleanly and intelligently.
