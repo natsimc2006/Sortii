@@ -1,0 +1,234 @@
+Build a Smart Swap feature for the Sortii planner. This surfaces 
+money-saving ingredient swap suggestions on planned meals, 
+consistent with Sortii's "save money at supermarket prices" brand.
+
+─── STEP 1: Create the swap rules data file ───
+
+Create constants/swapRules.ts with the following structure and rules:
+
+export type SwapRule = {
+  id: string;
+  matchKeywords: string[];      // ingredient name keywords to match on
+  swapLabel: string;            // what to swap to
+  savingPerServeAUD: number;    // estimated saving per serve
+  tip: string;                  // short human Sortii-voice tip
+};
+
+export const SWAP_RULES: SwapRule[] = [
+
+  // PROTEIN SWAPS
+  {
+    id: 'swap-breast-to-thigh',
+    matchKeywords: ['chicken breast'],
+    swapLabel: 'chicken thigh',
+    savingPerServeAUD: 1.50,
+    tip: 'Thighs are juicier anyway.',
+  },
+  {
+    id: 'swap-lamb-to-beef',
+    matchKeywords: ['lamb mince', 'lamb'],
+    swapLabel: 'beef mince',
+    savingPerServeAUD: 1.00,
+    tip: 'Works in any mince dish.',
+  },
+  {
+    id: 'swap-salmon-to-barramundi',
+    matchKeywords: ['salmon'],
+    swapLabel: 'barramundi or flathead',
+    savingPerServeAUD: 2.50,
+    tip: 'Local fish, better value.',
+  },
+  {
+    id: 'swap-prawns-to-fish',
+    matchKeywords: ['prawn', 'prawns', 'shrimp'],
+    swapLabel: 'fish fillets',
+    savingPerServeAUD: 2.00,
+    tip: 'Same vibe, easier on the wallet.',
+  },
+  {
+    id: 'swap-beef-steak-to-mince',
+    matchKeywords: ['beef steak', 'sirloin', 'ribeye', 'scotch fillet'],
+    swapLabel: 'beef mince',
+    savingPerServeAUD: 4.00,
+    tip: 'Mince works harder for less.',
+  },
+
+  // PANTRY SWAPS
+  {
+    id: 'swap-branded-pasta',
+    matchKeywords: ['pasta', 'spaghetti', 'penne', 'fettuccine', 'linguine'],
+    swapLabel: 'home brand pasta',
+    savingPerServeAUD: 0.50,
+    tip: 'Tastes the same. Promise.',
+  },
+  {
+    id: 'swap-branded-rice',
+    matchKeywords: ['rice', 'jasmine rice', 'basmati rice'],
+    swapLabel: 'home brand rice',
+    savingPerServeAUD: 0.40,
+    tip: 'No difference in the bowl.',
+  },
+  {
+    id: 'swap-branded-stock',
+    matchKeywords: ['stock', 'chicken stock', 'beef stock', 'vegetable stock'],
+    swapLabel: 'home brand stock',
+    savingPerServeAUD: 0.40,
+    tip: 'Home brand stocks are fine.',
+  },
+  {
+    id: 'swap-branded-canned-tomatoes',
+    matchKeywords: ['canned tomatoes', 'tinned tomatoes', 'crushed tomatoes'],
+    swapLabel: 'home brand canned tomatoes',
+    savingPerServeAUD: 0.30,
+    tip: 'Same tomatoes, different label.',
+  },
+  {
+    id: 'swap-coconut-cream-to-milk',
+    matchKeywords: ['coconut cream'],
+    swapLabel: 'coconut milk',
+    savingPerServeAUD: 0.50,
+    tip: 'Lighter but works just as well.',
+  },
+
+  // PRODUCE SWAPS
+  {
+    id: 'swap-avocado-remove',
+    matchKeywords: ['avocado'],
+    swapLabel: 'skip it',
+    savingPerServeAUD: 1.25,
+    tip: 'Optional in most dishes.',
+  },
+  {
+    id: 'swap-fresh-herbs-to-dried',
+    matchKeywords: ['fresh basil', 'fresh coriander', 'fresh parsley', 
+                    'fresh thyme', 'fresh rosemary', 'fresh oregano'],
+    swapLabel: 'dried herbs',
+    savingPerServeAUD: 0.80,
+    tip: 'Use ⅓ of the quantity.',
+  },
+  {
+    id: 'swap-broccolini-to-broccoli',
+    matchKeywords: ['broccolini'],
+    swapLabel: 'broccoli',
+    savingPerServeAUD: 0.80,
+    tip: 'Cut smaller, same result.',
+  },
+  {
+    id: 'swap-baby-spinach-to-spinach',
+    matchKeywords: ['baby spinach'],
+    swapLabel: 'frozen spinach',
+    savingPerServeAUD: 0.60,
+    tip: 'Frozen is fine in cooked dishes.',
+  },
+  {
+    id: 'swap-pine-nuts',
+    matchKeywords: ['pine nuts'],
+    swapLabel: 'sunflower seeds or slivered almonds',
+    savingPerServeAUD: 1.50,
+    tip: 'Same crunch, fraction of the price.',
+  },
+  {
+    id: 'swap-parmesan-to-pecorino',
+    matchKeywords: ['parmesan'],
+    swapLabel: 'home brand parmesan',
+    savingPerServeAUD: 0.60,
+    tip: 'Pre-grated home brand is fine.',
+  },
+
+  // DAIRY SWAPS
+  {
+    id: 'swap-thickened-cream',
+    matchKeywords: ['thickened cream', 'heavy cream', 'double cream'],
+    swapLabel: 'light cream or evaporated milk',
+    savingPerServeAUD: 0.50,
+    tip: 'Works in sauces and soups.',
+  },
+  {
+    id: 'swap-branded-butter',
+    matchKeywords: ['butter'],
+    swapLabel: 'home brand butter',
+    savingPerServeAUD: 0.30,
+    tip: 'Bakes and cooks identically.',
+  },
+];
+
+─── STEP 2: Create the swap matching utility ───
+
+Create utils/getSwapsForRecipe.ts:
+
+import { SWAP_RULES, SwapRule } from '../constants/swapRules';
+
+export function getSwapsForRecipe(ingredients: string[]): SwapRule[] {
+  const ingredientText = ingredients.join(' ').toLowerCase();
+  
+  return SWAP_RULES.filter(rule =>
+    rule.matchKeywords.some(keyword =>
+      ingredientText.includes(keyword.toLowerCase())
+    )
+  );
+}
+
+─── STEP 3: Build the Swap Tip UI component ───
+
+Create components/SwapTips.tsx
+
+This component receives a recipe's ingredients array and renders 
+swap suggestions if any rules match.
+
+Design:
+- Compact card, sits below the recipe card on the planner screen
+- Background: #F3E8EE (plum tint) — signals "smart feature"
+- Small plum left border accent: #5E3A4C
+- Header row: 💡 "Save money on this meal"
+- Each matched swap renders as one row:
+
+  [swap icon →] "Swap [original] → [swapLabel]"    "save ~$[X]/serve"
+
+- Maximum 3 swaps shown per recipe (highest saving first)
+- If more than 3 match, show "2 more swaps available" in small text
+- A small "×" dismiss button top-right to hide tips for that meal slot
+  (store dismissed state in local component state, not persisted)
+
+Sortii voice for the tip text — show on tap/press of each row:
+  Small expandable tip text using the recipe's tip field
+  E.g. "Thighs are juicier anyway."
+
+─── STEP 4: Wire SwapTips into the planner ───
+
+In the weekly planner view, for each filled meal slot:
+- Call getSwapsForRecipe() with that recipe's ingredient names
+- If 1 or more swaps match, render the SwapTips component 
+  below that meal card
+- If zero swaps match, render nothing
+
+The swap tips should be:
+- Visible but not intrusive — below the card, not overlaid
+- Collapsible: show a small plum "💡 Swaps available" pill on 
+  the meal card itself that expands/collapses the SwapTips panel
+- Default state: collapsed (don't overwhelm on first view)
+
+─── STEP 5: Add total swap saving to the planner header ───
+
+In the weekly plan header/summary area, if any swaps are available 
+across the week's meals, show a single line in plum:
+
+  "💡 Apply all swaps → save up to $[X] this week"
+
+Calculate [X] by summing the highest savingPerServeAUD per matched 
+swap × householdSize × number of meals that swap applies to.
+
+Round to nearest dollar. Only show if saving is $2 or more.
+
+─── STEP 6: Verify ───
+
+Test with a plan that includes chicken breast, salmon, and pasta.
+Confirm:
+- Chicken breast meal shows "Swap to chicken thigh — save ~$1.50/serve"
+- Salmon meal shows "Swap to barramundi — save ~$2.50/serve"  
+- Pasta meal shows "Swap to home brand — save ~$0.50/serve"
+- The planner header shows the combined weekly saving
+- Tapping the 💡 pill expands and collapses the swap panel
+- Dismissing a swap tip hides it without affecting other meals
+
+Log to console how many swap matches were found across the 
+test plan.

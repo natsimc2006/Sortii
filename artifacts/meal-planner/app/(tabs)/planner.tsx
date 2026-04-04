@@ -21,6 +21,9 @@ import { MealSlotCard } from "@/components/MealSlotCard";
 import { MealSearchModal } from "@/components/MealSearchModal";
 import { RecipeDetailModal } from "@/components/RecipeDetailModal";
 import { Toast, ToastState } from "@/components/Toast";
+import { SwapTips } from "@/components/SwapTips";
+import { getSwapsForRecipe } from "@/utils/getSwapsForRecipe";
+import { SWAP_RULES } from "@/constants/swapRules";
 
 const sortiiLogo = require("@/assets/images/sortii-logo.png");
 
@@ -357,6 +360,26 @@ export default function PlannerScreen() {
       .map(([name, count]) => ({ name, count }));
   }, [currentPlan, preferences.minimiseWaste, getRecipeById]);
 
+  const weeklySwapSaving = useMemo(() => {
+    const filledRecipes = currentPlan
+      .filter((e) => e.recipeId)
+      .map((e) => getRecipeById(e.recipeId!))
+      .filter(Boolean) as Recipe[];
+    // For each swap rule, count how many meals it applies to
+    const ruleCount: Record<string, number> = {};
+    for (const recipe of filledRecipes) {
+      const matched = getSwapsForRecipe(recipe.ingredients.map((i) => i.name));
+      for (const swap of matched) {
+        ruleCount[swap.id] = (ruleCount[swap.id] ?? 0) + 1;
+      }
+    }
+    const total = Object.entries(ruleCount).reduce((sum, [ruleId, count]) => {
+      const rule = SWAP_RULES.find((r) => r.id === ruleId);
+      return rule ? sum + rule.savingPerServeAUD * preferences.householdSize * count : sum;
+    }, 0);
+    return Math.round(total);
+  }, [currentPlan, getRecipeById, preferences.householdSize]);
+
   return (
     <View style={{ flex: 1, backgroundColor: C.background, marginBottom: TAB_BAR_HEIGHT + insets.bottom }}>
       <View
@@ -398,6 +421,13 @@ export default function PlannerScreen() {
             <FilterChip label={healthLabel} icon="activity" />
             <FilterChip label={estimatedCostBand} icon="shopping-bag" />
           </View>
+          {weeklySwapSaving >= 2 && (
+            <View style={styles.swapBanner}>
+              <Text style={styles.swapBannerText}>
+                💡 Apply all swaps → save up to ${weeklySwapSaving} this week
+              </Text>
+            </View>
+          )}
         </View>
       </View>
 
@@ -458,18 +488,25 @@ export default function PlannerScreen() {
                 )}
               </View>
               {lunchEntry !== undefined && lunchEntry !== null && (
-                <MealSlotCard
-                  day={day}
-                  slot="lunch"
-                  recipe={lunchRecipe}
-                  onAdd={() => openSearch(day, "lunch")}
-                  onRemove={() => handleMealRemove(day, "lunch")}
-                  onSwap={() => handleMealSwap(day, "lunch")}
-                  onViewRecipe={lunchRecipe ? () => setDetailRecipe(lunchRecipe) : undefined}
-                  onAutoSwap={lunchRecipe ? () => handleMealAutoSwap(day, "lunch") : undefined}
-                  onHideRecipe={lunchRecipe ? () => handleMealHide(lunchRecipe) : undefined}
-                  seasonalMode={preferences.seasonalMode ?? false}
-                />
+                <>
+                  <MealSlotCard
+                    day={day}
+                    slot="lunch"
+                    recipe={lunchRecipe}
+                    onAdd={() => openSearch(day, "lunch")}
+                    onRemove={() => handleMealRemove(day, "lunch")}
+                    onSwap={() => handleMealSwap(day, "lunch")}
+                    onViewRecipe={lunchRecipe ? () => setDetailRecipe(lunchRecipe) : undefined}
+                    onAutoSwap={lunchRecipe ? () => handleMealAutoSwap(day, "lunch") : undefined}
+                    onHideRecipe={lunchRecipe ? () => handleMealHide(lunchRecipe) : undefined}
+                    seasonalMode={preferences.seasonalMode ?? false}
+                  />
+                  {lunchRecipe && (
+                    <SwapTips
+                      ingredientNames={lunchRecipe.ingredients.map((i) => i.name)}
+                    />
+                  )}
+                </>
               )}
               <MealSlotCard
                 day={day}
@@ -483,6 +520,11 @@ export default function PlannerScreen() {
                 onHideRecipe={dinnerRecipe ? () => handleMealHide(dinnerRecipe) : undefined}
                 seasonalMode={preferences.seasonalMode ?? false}
               />
+              {dinnerRecipe && (
+                <SwapTips
+                  ingredientNames={dinnerRecipe.ingredients.map((i) => i.name)}
+                />
+              )}
             </View>
           );
         })}
@@ -726,6 +768,21 @@ const styles = StyleSheet.create({
   filterChipText: {
     fontSize: 11,
     fontFamily: "Inter_500Medium",
+  },
+  swapBanner: {
+    backgroundColor: "#F3E8EE",
+    borderRadius: 10,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    marginTop: 8,
+    borderWidth: 1,
+    borderColor: "#D4BAC8",
+  },
+  swapBannerText: {
+    fontSize: 12,
+    fontFamily: "Inter_600SemiBold",
+    color: "#5E3A4C",
+    textAlign: "center",
   },
   filterIconBtn: {
     width: 32,
