@@ -45,13 +45,12 @@ function OptionRow({
             activeOpacity={0.75}
             style={[
               styles.optionChip,
-              {
-                backgroundColor: active ? C.tealTint : C.chipBg,
-                borderColor: active ? C.primary : C.border,
-              },
+              active
+                ? { backgroundColor: C.primary, borderColor: C.primary }
+                : { backgroundColor: "#F7F3EB", borderColor: "#E6E1D7" },
             ]}
           >
-            <Text style={[styles.optionChipText, { color: active ? C.primary : C.textSecondary }]}>
+            <Text style={[styles.optionChipText, { color: active ? "#FFFFFF" : C.text }]}>
               {o.label}
             </Text>
           </TouchableOpacity>
@@ -77,13 +76,12 @@ function PillButton({
       activeOpacity={0.75}
       style={[
         styles.pill,
-        {
-          backgroundColor: active ? C.tealTint : C.card,
-          borderColor: active ? C.primary : C.border,
-        },
+        active
+          ? { backgroundColor: C.primary, borderColor: C.primary }
+          : { backgroundColor: "#F7F3EB", borderColor: "#E6E1D7" },
       ]}
     >
-      <Text style={[styles.pillText, { color: active ? C.primary : C.textSecondary }]}>
+      <Text style={[styles.pillText, { color: active ? "#FFFFFF" : C.text }]}>
         {label}
       </Text>
     </TouchableOpacity>
@@ -109,8 +107,7 @@ function Toggle({
 }
 
 function Hint({ text }: { text: string }) {
-  const C = Colors.light;
-  return <Text style={[styles.hint, { color: C.textMuted }]}>{text}</Text>;
+  return <Text style={styles.hint}>{text}</Text>;
 }
 
 function RowLabel({ title, sub }: { title: string; sub?: string }) {
@@ -149,6 +146,9 @@ function TierSection({
   onToggle,
   badge,
   children,
+  accentColor,
+  cardBg,
+  shadowStyle,
 }: {
   title: string;
   helper: string;
@@ -156,10 +156,16 @@ function TierSection({
   onToggle: () => void;
   badge?: string;
   children: React.ReactNode;
+  accentColor?: string;
+  cardBg?: string;
+  shadowStyle?: object;
 }) {
   const C = Colors.light;
   return (
-    <View style={[styles.tierSection, { borderColor: C.border }]}>
+    <View style={[styles.tierSection, { borderColor: C.border, backgroundColor: cardBg ?? C.card }, shadowStyle]}>
+      {accentColor && (
+        <View style={[styles.tierAccent, { backgroundColor: accentColor }]} />
+      )}
       <TouchableOpacity
         onPress={onToggle}
         activeOpacity={0.75}
@@ -191,7 +197,7 @@ function SectionBlock({ title, children }: { title: string; children: React.Reac
   const C = Colors.light;
   return (
     <View style={styles.sectionBlock}>
-      <Text style={[styles.sectionBlockTitle, { color: C.textSecondary }]}>{title}</Text>
+      {title ? <Text style={[styles.sectionBlockTitle, { color: C.primary }]}>{title}</Text> : null}
       {children}
     </View>
   );
@@ -323,6 +329,20 @@ export default function PreferencesScreen() {
           helper="Set the basics for your weekly plan."
           expanded={tier1Open}
           onToggle={() => setTier1Open((v) => !v)}
+          shadowStyle={{
+            borderColor: "rgba(42,143,136,0.40)",
+            borderWidth: 1.5,
+            ...Platform.select({
+              web: { boxShadow: "0px 3px 16px rgba(42,143,136,0.10)" } as object,
+              default: {
+                shadowColor: "#2A8F88",
+                shadowOffset: { width: 0, height: 3 },
+                shadowOpacity: 0.10,
+                shadowRadius: 16,
+                elevation: 3,
+              },
+            }),
+          }}
         >
           <SectionBlock title="Planning Mode">
             <OptionRow
@@ -345,7 +365,7 @@ export default function PreferencesScreen() {
                   const v = Math.max(1, parseInt(householdInput, 10) - 1);
                   setHouseholdInput(String(v));
                 }}
-                style={[styles.stepper, { backgroundColor: C.chipBg }]}
+                style={[styles.stepper, { backgroundColor: "#E6F3F0" }]}
               >
                 <Feather name="minus" size={18} color={C.primary} />
               </TouchableOpacity>
@@ -353,7 +373,7 @@ export default function PreferencesScreen() {
                 value={householdInput}
                 onChangeText={setHouseholdInput}
                 keyboardType="number-pad"
-                style={[styles.numberField, { color: C.text }]}
+                style={[styles.numberField, { color: "#2B2B2B", fontFamily: "Inter_700Bold" }]}
                 textAlign="center"
                 maxLength={2}
               />
@@ -363,7 +383,7 @@ export default function PreferencesScreen() {
                   const v = Math.min(20, parseInt(householdInput, 10) + 1);
                   setHouseholdInput(String(v));
                 }}
-                style={[styles.stepper, { backgroundColor: C.chipBg }]}
+                style={[styles.stepper, { backgroundColor: "#E6F3F0" }]}
               >
                 <Feather name="plus" size={18} color={C.primary} />
               </TouchableOpacity>
@@ -444,6 +464,8 @@ export default function PreferencesScreen() {
           helper="Optional — tweak it if you like."
           expanded={tier2Open}
           onToggle={() => setTier2Open((v) => !v)}
+          accentColor="#D29A22"
+          cardBg="#FFFDF7"
         >
           <SectionBlock title="Meals to Plan">
             <OptionRow
@@ -523,6 +545,8 @@ export default function PreferencesScreen() {
           helper="Let us do a bit of thinking for you."
           expanded={tier3Open}
           onToggle={() => setTier3Open((v) => !v)}
+          accentColor="#5E3A4C"
+          cardBg="#F3E8EE"
         >
           <SectionBlock title="">
             <ToggleRow
@@ -603,6 +627,8 @@ export default function PreferencesScreen() {
           helper="Extra controls if you want them."
           expanded={tier4Open}
           onToggle={() => setTier4Open((v) => !v)}
+          accentColor="#E6E1D7"
+          cardBg="#FFFFFF"
         >
           <SectionBlock title="">
             <ToggleRow
@@ -692,6 +718,15 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     borderWidth: 1,
     overflow: "hidden",
+    backgroundColor: "#FFFFFF",
+  },
+  tierAccent: {
+    position: "absolute",
+    left: 0,
+    top: 0,
+    bottom: 0,
+    width: 3,
+    zIndex: 1,
   },
   tierHeader: {
     flexDirection: "row",
@@ -729,10 +764,10 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   sectionBlockTitle: {
-    fontSize: 13,
+    fontSize: 12,
     fontFamily: "Inter_600SemiBold",
     textTransform: "uppercase",
-    letterSpacing: 0.6,
+    letterSpacing: 1.5,
   },
   optionRow: {
     flexDirection: "row",
@@ -752,15 +787,19 @@ const styles = StyleSheet.create({
   hint: {
     fontSize: 12,
     fontFamily: "Inter_400Regular",
+    fontStyle: "italic",
     lineHeight: 17,
+    color: "#5E3A4C",
   },
   numberInput: {
     flexDirection: "row",
     alignItems: "center",
-    borderWidth: 1.5,
+    borderWidth: 1,
+    borderColor: "rgba(42,143,136,0.30)",
     borderRadius: 16,
     overflow: "hidden",
     alignSelf: "flex-start",
+    backgroundColor: "#E6F3F0",
   },
   stepper: {
     width: 48,
@@ -843,6 +882,11 @@ const styles = StyleSheet.create({
     gap: 10,
     paddingVertical: 16,
     borderRadius: 16,
+    shadowColor: "#D29A22",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.30,
+    shadowRadius: 16,
+    elevation: 5,
   },
   saveBtnText: {
     fontSize: 17,

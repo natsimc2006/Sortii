@@ -1,0 +1,133 @@
+The preferences/settings screen reads too flat and colourless 
+on a real iOS device. Apply the following targeted fixes using 
+only existing Sortii brand colours. Do not change layout or 
+structure — colour and contrast fixes only.
+
+─── FIX 1: Quick Setup card ───
+
+The main Quick Setup card currently has a white background 
+that disappears into the page background.
+
+Change:
+- Card background: #FFFFFF (pure white)
+- Card border: 1.5px solid #2A8F88 at 40% opacity
+- Card shadow: 0px 3px 16px rgba(42,143,136,0.10)
+  (subtle teal-tinted shadow, not grey)
+- This gives the card visible separation and a warm 
+  teal presence without being heavy
+
+─── FIX 2: Section labels ───
+
+PLANNING MODE, HOUSEHOLD SIZE, BUDGET LEVEL, 
+MEALS PER WEEK, DIETARY PREFERENCES, 
+INGREDIENT EXCLUSIONS labels are currently grey 
+and low contrast.
+
+Change all section labels to:
+- Colour: #2A8F88 (teal)
+- Font weight: 600
+- Letter spacing: 1.5px
+- Font size: keep current (11-12px)
+
+This makes each section feel intentional and 
+adds consistent teal rhythm down the screen.
+
+─── FIX 3: Selected chip state ───
+
+Currently selected chips use a teal outline only —
+too subtle on a real device.
+
+Change selected chip state to:
+- Background: #2A8F88 (solid teal)
+- Text: #FFFFFF (white)
+- Border: none
+
+Change unselected chip state to:
+- Background: #F7F3EB (warm neutral — matches page bg)
+- Text: #2B2B2B (charcoal)
+- Border: 1.5px solid #E6E1D7
+
+This creates a clear, unmissable difference between 
+selected and unselected on any screen brightness.
+
+─── FIX 4: Micro-copy colour ───
+
+The helper text below each section 
+("We've got this.", "We'll size everything for you.", 
+"No judgement. Just dinner.", "Even three nights is a win.",
+"Hard no's only. We'll handle variety.",
+"Optional — tap anything to exclude it.") 
+currently reads in grey and is easy to miss.
+
+Change micro-copy colour to: #5E3A4C (plum)
+Font style: italic
+Font size: keep current
+
+This turns the personality lines into a deliberate 
+plum accent that runs down the screen — creating 
+a visual thread of brand voice as the user scrolls.
+
+─── FIX 5: Household size stepper ───
+
+The − / + stepper control currently has a very light 
+teal tint background. On real device this reads as 
+almost white.
+
+Change:
+- Stepper container background: #E6F3F0 (teal tint, stronger)
+- − and + symbols: #2A8F88 (solid teal, not grey)
+- Number: #2B2B2B charcoal, font weight 700
+- Border: 1px solid #2A8F88 at 30% opacity
+
+─── FIX 6: Collapsible section cards ───
+
+"Make it yours", "Make it smarter ✨", "Advanced" 
+cards at the bottom currently look identical to each 
+other and to the background — no differentiation.
+
+Change:
+- "Make it yours" card: 
+  Left border accent 3px #D29A22 (gold)
+  Background: #FFFDF7 (very slightly warm white)
+
+- "Make it smarter ✨" card:
+  Left border accent 3px #5E3A4C (plum)  
+  Background: #F3E8EE (plum tint, very subtle)
+
+- "Advanced" card:
+  Left border accent 3px #E6E1D7 (border grey)
+  Background: #FFFFFF
+  
+This visually differentiates the three sections and 
+uses all three accent colours intentionally — gold 
+for personalisation, plum for intelligence, 
+neutral for advanced/technical.
+
+─── FIX 7: Save settings button ───
+
+Add a warm gold shadow to match the Get Started 
+button on the home screen:
+- Shadow: 0px 4px 16px rgba(210,154,34,0.30)
+- This lifts it off the page on a real device
+
+─── FIX 8: Page background ───
+
+The overall page background behind the card appears 
+as flat grey on a real device.
+
+Confirm it is set to #F7F3EB (warm neutral) 
+not a cool grey. If it is using any grey value, 
+change it to #F7F3EB.
+
+─── VERIFY ───
+
+Take a screenshot on the real device preview 
+(not simulator) and confirm:
+- Section labels are visibly teal
+- Selected chips are solid teal with white text
+- Micro-copy lines are visibly plum and italic
+- The three collapsible cards have distinct 
+  left border colours
+- The Quick Setup card has visible separation 
+  from the background
+- The stepper − and + are clearly teal
