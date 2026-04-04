@@ -16,7 +16,7 @@ interface Props {
 
 export function SwapTips({ ingredientNames }: Props) {
   const swaps = getSwapsForRecipe(ingredientNames);
-  const [expanded, setExpanded] = useState(true);
+  const [expanded, setExpanded] = useState(false);
   const [dismissed, setDismissed] = useState(false);
   const [openTipId, setOpenTipId] = useState<string | null>(null);
 
