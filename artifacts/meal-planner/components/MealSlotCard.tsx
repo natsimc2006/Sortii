@@ -11,6 +11,7 @@ import {
 import Colors from "@/constants/Colors";
 import { Recipe, getPrepStyleLabel } from "@/constants/recipes";
 import { getCurrentAustralianSeason, isRecipeSeasonal } from "@/utils/seasonUtils";
+import { useRecipeImage } from "@/hooks/useRecipeImage";
 
 const C = Colors.light;
 
@@ -56,6 +57,7 @@ export function MealSlotCard({
   seasonalMode = false,
 }: MealSlotCardProps) {
   const [imgError, setImgError] = useState(false);
+  const imageUrl = useRecipeImage(recipe?.id ?? "", recipe?.name ?? "", recipe?.imageUrl);
   const currentSeason = seasonalMode ? getCurrentAustralianSeason() : null;
   const showSeasonalBadge =
     seasonalMode && recipe != null && currentSeason
@@ -100,7 +102,7 @@ export function MealSlotCard({
         ? "layers"
         : "coffee";
 
-  const showImage = !!recipe.imageUrl && !imgError;
+  const showImage = !!imageUrl && !imgError;
   const prepLabel = getPrepStyleLabel(recipe);
 
   return (
@@ -186,7 +188,7 @@ export function MealSlotCard({
         <View style={[styles.recipeIconBox, { backgroundColor: ICON.recipe.bg }]}>
           {showImage ? (
             <Image
-              source={{ uri: recipe.imageUrl }}
+              source={{ uri: imageUrl! }}
               style={styles.recipeThumbnail}
               resizeMode="cover"
               onError={() => setImgError(true)}

@@ -14,6 +14,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Colors from "@/constants/Colors";
 import { Recipe, getApproxCostPerServe, scaleQuantity } from "@/constants/recipes";
 import { usePlanner } from "@/context/PlannerContext";
+import { useRecipeImage } from "@/hooks/useRecipeImage";
 
 interface RecipeDetailModalProps {
   recipe: Recipe | null;
@@ -175,6 +176,7 @@ export function RecipeDetailModal({ recipe, onClose }: RecipeDetailModalProps) {
   const { preferences } = usePlanner();
   const [expandedSteps, setExpandedSteps] = useState<Set<number>>(new Set());
   const [heroImgError, setHeroImgError] = useState(false);
+  const heroImageUrl = useRecipeImage(recipe?.id ?? "", recipe?.name ?? "", recipe?.imageUrl);
 
   if (!recipe) return null;
 
@@ -199,10 +201,10 @@ export function RecipeDetailModal({ recipe, onClose }: RecipeDetailModalProps) {
       onRequestClose={onClose}
     >
       <View style={[styles.container, { backgroundColor: C.background }]}>
-        {recipe.imageUrl && !heroImgError && (
+        {heroImageUrl && !heroImgError && (
           <View style={styles.heroBanner}>
             <Image
-              source={{ uri: recipe.imageUrl }}
+              source={{ uri: heroImageUrl }}
               style={styles.heroImage}
               resizeMode="cover"
               onError={() => setHeroImgError(true)}
@@ -219,7 +221,7 @@ export function RecipeDetailModal({ recipe, onClose }: RecipeDetailModalProps) {
           style={[
             styles.header,
             {
-              paddingTop: recipe.imageUrl && !heroImgError ? 16 : (Platform.OS === "web" ? 67 : insets.top + 16),
+              paddingTop: heroImageUrl && !heroImgError ? 16 : (Platform.OS === "web" ? 67 : insets.top + 16),
               borderBottomColor: C.cardBorder,
             },
           ]}
@@ -228,7 +230,7 @@ export function RecipeDetailModal({ recipe, onClose }: RecipeDetailModalProps) {
             <Text style={[styles.title, { color: C.text }]} numberOfLines={2}>
               {recipe.name}
             </Text>
-            {!(recipe.imageUrl && !heroImgError) && (
+            {!(heroImageUrl && !heroImgError) && (
               <TouchableOpacity
                 onPress={onClose}
                 style={[styles.closeBtn, { backgroundColor: C.chipBg }]}
