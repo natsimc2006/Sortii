@@ -7,6 +7,9 @@
     "hello": "tsx ./src/hello.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.39.0"
+  },
   "devDependencies": {
     "@types/node": "catalog:",
     "tsx": "catalog:"

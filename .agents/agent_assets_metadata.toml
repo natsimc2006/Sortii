@@ -17,3 +17,9 @@ id = "mKqJJqq5sUuSP3hWqgzsp"
 uri = "file://scripts/recipes-for-pricing.json"
 type = "unspecified"
 title = "recipes-for-pricing.json — 250 recipes for AI pricing pass"
+
+[[outputs]]
+id = "rjpri8iDJicPnY9DVZi32"
+uri = "file://scripts/recipes-pricing-output.json"
+type = "unspecified"
+title = "recipes-pricing-output.json — AI-generated prices for 250 recipes"

@@ -1,0 +1,1002 @@
+[
+  {
+    "id": "r001",
+    "costPerServeAUD": 5.05
+  },
+  {
+    "id": "r002",
+    "costPerServeAUD": 5.18
+  },
+  {
+    "id": "r003",
+    "costPerServeAUD": 7.85
+  },
+  {
+    "id": "r004",
+    "costPerServeAUD": 13.4
+  },
+  {
+    "id": "r005",
+    "costPerServeAUD": 3.92
+  },
+  {
+    "id": "r006",
+    "costPerServeAUD": 2.88
+  },
+  {
+    "id": "r007",
+    "costPerServeAUD": 4.15
+  },
+  {
+    "id": "r008",
+    "costPerServeAUD": 10.95
+  },
+  {
+    "id": "r009",
+    "costPerServeAUD": 3.45
+  },
+  {
+    "id": "r010",
+    "costPerServeAUD": 9.1
+  },
+  {
+    "id": "r011",
+    "costPerServeAUD": 8.65
+  },
+  {
+    "id": "r012",
+    "costPerServeAUD": 8.5
+  },
+  {
+    "id": "r013",
+    "costPerServeAUD": 5.1
+  },
+  {
+    "id": "r014",
+    "costPerServeAUD": 3.28
+  },
+  {
+    "id": "r015",
+    "costPerServeAUD": 11.85
+  },
+  {
+    "id": "r016",
+    "costPerServeAUD": 7.95
+  },
+  {
+    "id": "r017",
+    "costPerServeAUD": 3.15
+  },
+  {
+    "id": "r018",
+    "costPerServeAUD": 11.2
+  },
+  {
+    "id": "r019",
+    "costPerServeAUD": 2.65
+  },
+  {
+    "id": "r020",
+    "costPerServeAUD": 4.88
+  },
+  {
+    "id": "r021",
+    "costPerServeAUD": 4.35
+  },
+  {
+    "id": "r022",
+    "costPerServeAUD": 7.4
+  },
+  {
+    "id": "r023",
+    "costPerServeAUD": 9.35
+  },
+  {
+    "id": "r024",
+    "costPerServeAUD": 3.18
+  },
+  {
+    "id": "r025",
+    "costPerServeAUD": 5.92
+  },
+  {
+    "id": "r026",
+    "costPerServeAUD": 6.75
+  },
+  {
+    "id": "r027",
+    "costPerServeAUD": 6.25
+  },
+  {
+    "id": "r028",
+    "costPerServeAUD": 2.45
+  },
+  {
+    "id": "r029",
+    "costPerServeAUD": 7.1
+  },
+  {
+    "id": "r030",
+    "costPerServeAUD": 7.85
+  },
+  {
+    "id": "r031",
+    "costPerServeAUD": 3.85
+  },
+  {
+    "id": "r032",
+    "costPerServeAUD": 3.2
+  },
+  {
+    "id": "r033",
+    "costPerServeAUD": 16.45
+  },
+  {
+    "id": "r034",
+    "costPerServeAUD": 3.9
+  },
+  {
+    "id": "r035",
+    "costPerServeAUD": 6.8
+  },
+  {
+    "id": "r036",
+    "costPerServeAUD": 6.95
+  },
+  {
+    "id": "r037",
+    "costPerServeAUD": 5.4
+  },
+  {
+    "id": "r038",
+    "costPerServeAUD": 5.65
+  },
+  {
+    "id": "r039",
+    "costPerServeAUD": 4.15
+  },
+  {
+    "id": "r040",
+    "costPerServeAUD": 7.6
+  },
+  {
+    "id": "r041",
+    "costPerServeAUD": 7.35
+  },
+  {
+    "id": "r042",
+    "costPerServeAUD": 8.2
+  },
+  {
+    "id": "r043",
+    "costPerServeAUD": 15.9
+  },
+  {
+    "id": "r044",
+    "costPerServeAUD": 3.55
+  },
+  {
+    "id": "r045",
+    "costPerServeAUD": 5.85
+  },
+  {
+    "id": "r046",
+    "costPerServeAUD": 4.2
+  },
+  {
+    "id": "r047",
+    "costPerServeAUD": 3.7
+  },
+  {
+    "id": "r048",
+    "costPerServeAUD": 5.95
+  },
+  {
+    "id": "r049",
+    "costPerServeAUD": 4.6
+  },
+  {
+    "id": "r050",
+    "costPerServeAUD": 5.4
+  },
+  {
+    "id": "r051",
+    "costPerServeAUD": 4.35
+  },
+  {
+    "id": "r052",
+    "costPerServeAUD": 7.45
+  },
+  {
+    "id": "r053",
+    "costPerServeAUD": 8.5
+  },
+  {
+    "id": "r054",
+    "costPerServeAUD": 10.25
+  },
+  {
+    "id": "r055",
+    "costPerServeAUD": 8.75
+  },
+  {
+    "id": "r056",
+    "costPerServeAUD": 5.9
+  },
+  {
+    "id": "r057",
+    "costPerServeAUD": 3.85
+  },
+  {
+    "id": "r058",
+    "costPerServeAUD": 4.7
+  },
+  {
+    "id": "r059",
+    "costPerServeAUD": 3.95
+  },
+  {
+    "id": "r060",
+    "costPerServeAUD": 9.15
+  },
+  {
+    "id": "r061",
+    "costPerServeAUD": 12.4
+  },
+  {
+    "id": "r062",
+    "costPerServeAUD": 3.2
+  },
+  {
+    "id": "r063",
+    "costPerServeAUD": 5.1
+  },
+  {
+    "id": "r064",
+    "costPerServeAUD": 2.65
+  },
+  {
+    "id": "r065",
+    "costPerServeAUD": 4.55
+  },
+  {
+    "id": "r066",
+    "costPerServeAUD": 3.15
+  },
+  {
+    "id": "r067",
+    "costPerServeAUD": 11.85
+  },
+  {
+    "id": "r068",
+    "costPerServeAUD": 3.7
+  },
+  {
+    "id": "r069",
+    "costPerServeAUD": 4.4
+  },
+  {
+    "id": "r070",
+    "costPerServeAUD": 3.75
+  },
+  {
+    "id": "r071",
+    "costPerServeAUD": 4.85
+  },
+  {
+    "id": "r072",
+    "costPerServeAUD": 6.95
+  },
+  {
+    "id": "r073",
+    "costPerServeAUD": 10.5
+  },
+  {
+    "id": "r074",
+    "costPerServeAUD": 3.6
+  },
+  {
+    "id": "r075",
+    "costPerServeAUD": 4.25
+  },
+  {
+    "id": "r076",
+    "costPerServeAUD": 3.88
+  },
+  {
+    "id": "r077",
+    "costPerServeAUD": 3.15
+  },
+  {
+    "id": "r078",
+    "costPerServeAUD": 2.44
+  },
+  {
+    "id": "r079",
+    "costPerServeAUD": 3.98
+  },
+  {
+    "id": "r080",
+    "costPerServeAUD": 4.35
+  },
+  {
+    "id": "r081",
+    "costPerServeAUD": 5.63
+  },
+  {
+    "id": "r082",
+    "costPerServeAUD": 6.13
+  },
+  {
+    "id": "r083",
+    "costPerServeAUD": 6.5
+  },
+  {
+    "id": "r084",
+    "costPerServeAUD": 5.88
+  },
+  {
+    "id": "r085",
+    "costPerServeAUD": 2.45
+  },
+  {
+    "id": "r086",
+    "costPerServeAUD": 6.25
+  },
+  {
+    "id": "r087",
+    "costPerServeAUD": 8.35
+  },
+  {
+    "id": "r088",
+    "costPerServeAUD": 9.08
+  },
+  {
+    "id": "r089",
+    "costPerServeAUD": 4.63
+  },
+  {
+    "id": "r090",
+    "costPerServeAUD": 4.5
+  },
+  {
+    "id": "r091",
+    "costPerServeAUD": 7.38
+  },
+  {
+    "id": "r092",
+    "costPerServeAUD": 5.88
+  },
+  {
+    "id": "r093",
+    "costPerServeAUD": 2.88
+  },
+  {
+    "id": "r094",
+    "costPerServeAUD": 4.13
+  },
+  {
+    "id": "r095",
+    "costPerServeAUD": 3.35
+  },
+  {
+    "id": "r096",
+    "costPerServeAUD": 7.13
+  },
+  {
+    "id": "r097",
+    "costPerServeAUD": 7.13
+  },
+  {
+    "id": "r098",
+    "costPerServeAUD": 6.88
+  },
+  {
+    "id": "r099",
+    "costPerServeAUD": 7.63
+  },
+  {
+    "id": "r100",
+    "costPerServeAUD": 7.75
+  },
+  {
+    "id": "r101",
+    "costPerServeAUD": 2.45
+  },
+  {
+    "id": "r102",
+    "costPerServeAUD": 4.15
+  },
+  {
+    "id": "r103",
+    "costPerServeAUD": 4.6
+  },
+  {
+    "id": "r104",
+    "costPerServeAUD": 2.35
+  },
+  {
+    "id": "r105",
+    "costPerServeAUD": 5.25
+  },
+  {
+    "id": "r106",
+    "costPerServeAUD": 5.8
+  },
+  {
+    "id": "r107",
+    "costPerServeAUD": 6.5
+  },
+  {
+    "id": "r108",
+    "costPerServeAUD": 5.4
+  },
+  {
+    "id": "r109",
+    "costPerServeAUD": 4.35
+  },
+  {
+    "id": "r110",
+    "costPerServeAUD": 4.7
+  },
+  {
+    "id": "r111",
+    "costPerServeAUD": 4.85
+  },
+  {
+    "id": "r112",
+    "costPerServeAUD": 5.15
+  },
+  {
+    "id": "r113",
+    "costPerServeAUD": 3.5
+  },
+  {
+    "id": "r114",
+    "costPerServeAUD": 6.1
+  },
+  {
+    "id": "r115",
+    "costPerServeAUD": 5.95
+  },
+  {
+    "id": "r116",
+    "costPerServeAUD": 5.45
+  },
+  {
+    "id": "r117",
+    "costPerServeAUD": 4.2
+  },
+  {
+    "id": "r118",
+    "costPerServeAUD": 3.65
+  },
+  {
+    "id": "r119",
+    "costPerServeAUD": 5.7
+  },
+  {
+    "id": "r120",
+    "costPerServeAUD": 5.6
+  },
+  {
+    "id": "r121",
+    "costPerServeAUD": 3.4
+  },
+  {
+    "id": "r122",
+    "costPerServeAUD": 3.75
+  },
+  {
+    "id": "r123",
+    "costPerServeAUD": 3.85
+  },
+  {
+    "id": "r124",
+    "costPerServeAUD": 3.95
+  },
+  {
+    "id": "r125",
+    "costPerServeAUD": 5.85
+  },
+  {
+    "id": "r126",
+    "costPerServeAUD": 4.85
+  },
+  {
+    "id": "r127",
+    "costPerServeAUD": 4.2
+  },
+  {
+    "id": "r128",
+    "costPerServeAUD": 5.15
+  },
+  {
+    "id": "r129",
+    "costPerServeAUD": 5.4
+  },
+  {
+    "id": "r130",
+    "costPerServeAUD": 3.95
+  },
+  {
+    "id": "r131",
+    "costPerServeAUD": 6.25
+  },
+  {
+    "id": "r132",
+    "costPerServeAUD": 5.6
+  },
+  {
+    "id": "r133",
+    "costPerServeAUD": 5.85
+  },
+  {
+    "id": "r134",
+    "costPerServeAUD": 4.15
+  },
+  {
+    "id": "r135",
+    "costPerServeAUD": 3.8
+  },
+  {
+    "id": "r136",
+    "costPerServeAUD": 4.35
+  },
+  {
+    "id": "r137",
+    "costPerServeAUD": 3.65
+  },
+  {
+    "id": "r138",
+    "costPerServeAUD": 3.9
+  },
+  {
+    "id": "r139",
+    "costPerServeAUD": 6.45
+  },
+  {
+    "id": "r140",
+    "costPerServeAUD": 6.75
+  },
+  {
+    "id": "r141",
+    "costPerServeAUD": 5.95
+  },
+  {
+    "id": "r142",
+    "costPerServeAUD": 5.25
+  },
+  {
+    "id": "r143",
+    "costPerServeAUD": 8.6
+  },
+  {
+    "id": "r144",
+    "costPerServeAUD": 4.55
+  },
+  {
+    "id": "r145",
+    "costPerServeAUD": 6.2
+  },
+  {
+    "id": "r146",
+    "costPerServeAUD": 4.4
+  },
+  {
+    "id": "r147",
+    "costPerServeAUD": 4.1
+  },
+  {
+    "id": "r148",
+    "costPerServeAUD": 6.4
+  },
+  {
+    "id": "r149",
+    "costPerServeAUD": 6.15
+  },
+  {
+    "id": "r150",
+    "costPerServeAUD": 6.65
+  },
+  {
+    "id": "r151",
+    "costPerServeAUD": 5.85
+  },
+  {
+    "id": "r152",
+    "costPerServeAUD": 6.2
+  },
+  {
+    "id": "r153",
+    "costPerServeAUD": 5.5
+  },
+  {
+    "id": "r154",
+    "costPerServeAUD": 4.95
+  },
+  {
+    "id": "r155",
+    "costPerServeAUD": 6.75
+  },
+  {
+    "id": "r156",
+    "costPerServeAUD": 4.65
+  },
+  {
+    "id": "r157",
+    "costPerServeAUD": 4.3
+  },
+  {
+    "id": "r158",
+    "costPerServeAUD": 10.5
+  },
+  {
+    "id": "r159",
+    "costPerServeAUD": 6.4
+  },
+  {
+    "id": "r160",
+    "costPerServeAUD": 5.85
+  },
+  {
+    "id": "r161",
+    "costPerServeAUD": 4.75
+  },
+  {
+    "id": "r162",
+    "costPerServeAUD": 6.35
+  },
+  {
+    "id": "r163",
+    "costPerServeAUD": 11.25
+  },
+  {
+    "id": "r164",
+    "costPerServeAUD": 5.2
+  },
+  {
+    "id": "r165",
+    "costPerServeAUD": 4.9
+  },
+  {
+    "id": "r166",
+    "costPerServeAUD": 6.65
+  },
+  {
+    "id": "r167",
+    "costPerServeAUD": 4.15
+  },
+  {
+    "id": "r168",
+    "costPerServeAUD": 5.45
+  },
+  {
+    "id": "r169",
+    "costPerServeAUD": 4.7
+  },
+  {
+    "id": "r170",
+    "costPerServeAUD": 5.55
+  },
+  {
+    "id": "r171",
+    "costPerServeAUD": 4.25
+  },
+  {
+    "id": "r172",
+    "costPerServeAUD": 6.8
+  },
+  {
+    "id": "r173",
+    "costPerServeAUD": 4.6
+  },
+  {
+    "id": "r174",
+    "costPerServeAUD": 10.8
+  },
+  {
+    "id": "r175",
+    "costPerServeAUD": 9.45
+  },
+  {
+    "id": "r176",
+    "costPerServeAUD": 3.45
+  },
+  {
+    "id": "r177",
+    "costPerServeAUD": 4.2
+  },
+  {
+    "id": "r178",
+    "costPerServeAUD": 5.85
+  },
+  {
+    "id": "r179",
+    "costPerServeAUD": 9.25
+  },
+  {
+    "id": "r180",
+    "costPerServeAUD": 8.15
+  },
+  {
+    "id": "r181",
+    "costPerServeAUD": 7.95
+  },
+  {
+    "id": "r182",
+    "costPerServeAUD": 9.1
+  },
+  {
+    "id": "r183",
+    "costPerServeAUD": 6.75
+  },
+  {
+    "id": "r184",
+    "costPerServeAUD": 4.85
+  },
+  {
+    "id": "r185",
+    "costPerServeAUD": 7.3
+  },
+  {
+    "id": "r186",
+    "costPerServeAUD": 9.5
+  },
+  {
+    "id": "r187",
+    "costPerServeAUD": 5.4
+  },
+  {
+    "id": "r188",
+    "costPerServeAUD": 9.05
+  },
+  {
+    "id": "r189",
+    "costPerServeAUD": 11.85
+  },
+  {
+    "id": "r190",
+    "costPerServeAUD": 13.2
+  },
+  {
+    "id": "r191",
+    "costPerServeAUD": 6.9
+  },
+  {
+    "id": "r192",
+    "costPerServeAUD": 11.75
+  },
+  {
+    "id": "r193",
+    "costPerServeAUD": 6.35
+  },
+  {
+    "id": "r194",
+    "costPerServeAUD": 8.6
+  },
+  {
+    "id": "r195",
+    "costPerServeAUD": 10.95
+  },
+  {
+    "id": "r196",
+    "costPerServeAUD": 10.4
+  },
+  {
+    "id": "r197",
+    "costPerServeAUD": 9.85
+  },
+  {
+    "id": "r198",
+    "costPerServeAUD": 7.15
+  },
+  {
+    "id": "r199",
+    "costPerServeAUD": 9.3
+  },
+  {
+    "id": "r200",
+    "costPerServeAUD": 7.45
+  },
+  {
+    "id": "r201",
+    "costPerServeAUD": 8.75
+  },
+  {
+    "id": "r202",
+    "costPerServeAUD": 9.25
+  },
+  {
+    "id": "r203",
+    "costPerServeAUD": 3.45
+  },
+  {
+    "id": "r204",
+    "costPerServeAUD": 4.2
+  },
+  {
+    "id": "r205",
+    "costPerServeAUD": 3.6
+  },
+  {
+    "id": "r206",
+    "costPerServeAUD": 3.85
+  },
+  {
+    "id": "r207",
+    "costPerServeAUD": 4.15
+  },
+  {
+    "id": "r208",
+    "costPerServeAUD": 4.5
+  },
+  {
+    "id": "r209",
+    "costPerServeAUD": 4.35
+  },
+  {
+    "id": "r210",
+    "costPerServeAUD": 3.9
+  },
+  {
+    "id": "r211",
+    "costPerServeAUD": 4.7
+  },
+  {
+    "id": "r212",
+    "costPerServeAUD": 4.25
+  },
+  {
+    "id": "r213",
+    "costPerServeAUD": 4.6
+  },
+  {
+    "id": "r214",
+    "costPerServeAUD": 3.55
+  },
+  {
+    "id": "r215",
+    "costPerServeAUD": 4.4
+  },
+  {
+    "id": "r216",
+    "costPerServeAUD": 6.85
+  },
+  {
+    "id": "r217",
+    "costPerServeAUD": 3.75
+  },
+  {
+    "id": "r218",
+    "costPerServeAUD": 5.95
+  },
+  {
+    "id": "r219",
+    "costPerServeAUD": 6.4
+  },
+  {
+    "id": "r220",
+    "costPerServeAUD": 3.5
+  },
+  {
+    "id": "r221",
+    "costPerServeAUD": 6.5
+  },
+  {
+    "id": "r222",
+    "costPerServeAUD": 6.75
+  },
+  {
+    "id": "r223",
+    "costPerServeAUD": 4.05
+  },
+  {
+    "id": "r224",
+    "costPerServeAUD": 3.4
+  },
+  {
+    "id": "r225",
+    "costPerServeAUD": 3.95
+  },
+  {
+    "id": "r226",
+    "costPerServeAUD": 3.45
+  },
+  {
+    "id": "r227",
+    "costPerServeAUD": 4.88
+  },
+  {
+    "id": "r228",
+    "costPerServeAUD": 12.5
+  },
+  {
+    "id": "r229",
+    "costPerServeAUD": 6.25
+  },
+  {
+    "id": "r230",
+    "costPerServeAUD": 11.75
+  },
+  {
+    "id": "r231",
+    "costPerServeAUD": 7.85
+  },
+  {
+    "id": "r232",
+    "costPerServeAUD": 11.2
+  },
+  {
+    "id": "r233",
+    "costPerServeAUD": 6.4
+  },
+  {
+    "id": "r234",
+    "costPerServeAUD": 5.95
+  },
+  {
+    "id": "r235",
+    "costPerServeAUD": 3.85
+  },
+  {
+    "id": "r236",
+    "costPerServeAUD": 9.6
+  },
+  {
+    "id": "r237",
+    "costPerServeAUD": 4.15
+  },
+  {
+    "id": "r238",
+    "costPerServeAUD": 7.55
+  },
+  {
+    "id": "r239",
+    "costPerServeAUD": 13.85
+  },
+  {
+    "id": "r240",
+    "costPerServeAUD": 8.75
+  },
+  {
+    "id": "r241",
+    "costPerServeAUD": 8.45
+  },
+  {
+    "id": "r242",
+    "costPerServeAUD": 10.3
+  },
+  {
+    "id": "r243",
+    "costPerServeAUD": 6.8
+  },
+  {
+    "id": "r244",
+    "costPerServeAUD": 7.65
+  },
+  {
+    "id": "r245",
+    "costPerServeAUD": 10.9
+  },
+  {
+    "id": "r246",
+    "costPerServeAUD": 7.95
+  },
+  {
+    "id": "r247",
+    "costPerServeAUD": 5.4
+  },
+  {
+    "id": "r248",
+    "costPerServeAUD": 3.65
+  },
+  {
+    "id": "r249",
+    "costPerServeAUD": 6.15
+  },
+  {
+    "id": "r250",
+    "costPerServeAUD": 8.85
+  }
+]
