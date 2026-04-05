@@ -751,8 +751,8 @@ const styles = StyleSheet.create({
     alignItems: "flex-start",
   },
   headerLogo: {
-    width: 143,
-    height: 66,
+    width: 170,
+    height: 78,
   },
   headerIcons: {
     flexDirection: "row",
