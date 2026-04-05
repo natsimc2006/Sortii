@@ -13,6 +13,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import React, { useEffect } from "react";
+import { Platform } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { KeyboardProvider } from "react-native-keyboard-controller";
 import { SafeAreaProvider } from "react-native-safe-area-context";
@@ -39,6 +40,30 @@ export default function RootLayout() {
       SplashScreen.hideAsync();
     }
   }, [fontsLoaded, fontError]);
+
+  useEffect(() => {
+    if (Platform.OS !== "web") return;
+    const addMeta = (name: string, content: string, prop = "name") => {
+      if (document.querySelector(`meta[${prop}="${name}"]`)) return;
+      const m = document.createElement("meta");
+      m.setAttribute(prop, name);
+      m.content = content;
+      document.head.appendChild(m);
+    };
+    const addLink = (rel: string, href: string) => {
+      if (document.querySelector(`link[rel="${rel}"]`)) return;
+      const l = document.createElement("link");
+      l.rel = rel;
+      (l as HTMLLinkElement).href = href;
+      document.head.appendChild(l);
+    };
+    addLink("manifest", "/manifest.json");
+    addLink("apple-touch-icon", "/icons/apple-touch-icon.png");
+    addMeta("apple-mobile-web-app-capable", "yes");
+    addMeta("apple-mobile-web-app-status-bar-style", "default");
+    addMeta("apple-mobile-web-app-title", "Sortii");
+    addMeta("format-detection", "telephone=no");
+  }, []);
 
   if (!fontsLoaded && !fontError) return null;
 

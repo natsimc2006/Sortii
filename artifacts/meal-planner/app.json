@@ -25,7 +25,15 @@
       "package": "com.sortiidinnersorted.app"
     },
     "web": {
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/images/favicon.png",
+      "name": "Sortii – Dinner. Sorted.",
+      "shortName": "Sortii",
+      "description": "Your weekly meal planner. Plan dinners, build your shopping list, and eat well.",
+      "themeColor": "#2A8F88",
+      "backgroundColor": "#FAF8F4",
+      "display": "standalone",
+      "orientation": "portrait",
+      "lang": "en-AU"
     },
     "plugins": [
       [
