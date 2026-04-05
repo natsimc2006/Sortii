@@ -1,8 +1,8 @@
 const tealPrimary = "#25857F";
 const tealAccent = "#2A8F88";
 const tealDark = "#1E6D68";
-const gold = "#D29A22";
-const goldDark = "#B97D12";
+const gold = "#F0AC2E";
+const goldDark = "#D29A22";
 const plum = "#5E3A4C";
 
 export default {

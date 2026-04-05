@@ -464,7 +464,7 @@ export default function PreferencesScreen() {
           helper="Optional — tweak it if you like."
           expanded={tier2Open}
           onToggle={() => setTier2Open((v) => !v)}
-          accentColor="#D29A22"
+          accentColor="#F0AC2E"
           cardBg="#FFFDF7"
         >
           <SectionBlock title="Meals to Plan">
@@ -882,7 +882,7 @@ const styles = StyleSheet.create({
     gap: 10,
     paddingVertical: 16,
     borderRadius: 16,
-    shadowColor: "#D29A22",
+    shadowColor: "#F0AC2E",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.30,
     shadowRadius: 16,
