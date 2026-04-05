@@ -130,8 +130,8 @@ export default function HomeScreen() {
             <View style={[styles.stepNum, { backgroundColor: C.primary }]}>
               <Text style={styles.stepNumText}>{i + 1}</Text>
             </View>
-            <View style={[styles.stepIconBox, { backgroundColor: "#F6E6BA" }]}>
-              <Feather name={step.icon as any} size={22} color={C.primary} />
+            <View style={[styles.stepIconBox, { backgroundColor: C.gold }]}>
+              <Feather name={step.icon as any} size={22} color="#FFFFFF" />
             </View>
             <View style={styles.stepText}>
               <Text style={[styles.stepTitle, { color: C.text }]}>
