@@ -23,3 +23,9 @@ id = "rjpri8iDJicPnY9DVZi32"
 uri = "file://scripts/recipes-pricing-output.json"
 type = "unspecified"
 title = "recipes-pricing-output.json — AI-generated prices for 250 recipes"
+
+[[outputs]]
+id = "NTopD53MCSupPad_vDPkT"
+uri = "file://artifacts/meal-planner/data/recipes.json"
+type = "unspecified"
+title = "recipes.json (275 recipes)"
