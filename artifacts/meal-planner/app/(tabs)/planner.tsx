@@ -26,7 +26,7 @@ import { PantryTips } from "@/components/PantryTips";
 import { getSwapsForRecipe, getWeeklyPantryTips } from "@/utils/getSwapsForRecipe";
 import { SWAP_RULES } from "@/constants/swapRules";
 
-const sortiiLogo = require("@/assets/images/sortii-logo.png");
+const sortiiLogo = require("@/assets/images/sortii-logo-orange.png");
 
 function pickRandom<T>(arr: T[]): T {
   return arr[Math.floor(Math.random() * arr.length)];
@@ -409,7 +409,7 @@ export default function PlannerScreen() {
         style={[
           styles.topBar,
           {
-            paddingTop: Platform.OS === "web" ? 14 : insets.top - 4,
+            paddingTop: Platform.OS === "web" ? 30 : insets.top + 4,
             backgroundColor: C.background,
             borderBottomColor: C.cardBorder,
           },
@@ -734,7 +734,8 @@ function FilterChip({ label, icon }: { label: string; icon: string }) {
 
 const styles = StyleSheet.create({
   topBar: {
-    paddingHorizontal: 20,
+    paddingLeft: 30,
+    paddingRight: 20,
     paddingBottom: 18,
     borderBottomWidth: 1,
   },
@@ -751,8 +752,8 @@ const styles = StyleSheet.create({
     alignItems: "flex-start",
   },
   headerLogo: {
-    width: 170,
-    height: 78,
+    width: 221,
+    height: 101,
   },
   headerIcons: {
     flexDirection: "row",

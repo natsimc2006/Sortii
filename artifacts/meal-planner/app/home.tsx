@@ -16,7 +16,7 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Colors from "@/constants/Colors";
 
-const sortiiLogo = require("@/assets/images/sortii-logo.png");
+const sortiiLogo = require("@/assets/images/sortii-logo-orange.png");
 
 const STEPS = [
   {
@@ -236,9 +236,9 @@ const styles = StyleSheet.create({
     zIndex: 0,
   },
   logoImage: {
-    width: 416,
-    maxWidth: "88%",
-    height: 192,
+    width: 500,
+    maxWidth: "92%",
+    height: 230,
     marginTop: -38,
     marginBottom: 30,
     zIndex: 1,
