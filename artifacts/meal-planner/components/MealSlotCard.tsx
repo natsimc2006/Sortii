@@ -1,7 +1,8 @@
 import { Feather } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import {
+  Animated,
   Image,
   Platform,
   StyleSheet,
@@ -59,6 +60,15 @@ export function MealSlotCard({
 }: MealSlotCardProps) {
   const [imgError, setImgError] = useState(false);
   const imageUrl = useRecipeImage(recipe?.id ?? "", recipe?.name ?? "", recipe?.imageUrl);
+  const imgOpacity = useRef(new Animated.Value(0)).current;
+
+  const handleImageLoad = () => {
+    Animated.timing(imgOpacity, {
+      toValue: 1,
+      duration: 280,
+      useNativeDriver: true,
+    }).start();
+  };
   const currentSeason = seasonalMode ? getCurrentAustralianSeason() : null;
   const showSeasonalBadge =
     seasonalMode && recipe != null && currentSeason
@@ -188,11 +198,12 @@ export function MealSlotCard({
       >
         <View style={[styles.recipeIconBox, { backgroundColor: ICON.recipe.bg }]}>
           {showImage ? (
-            <Image
+            <Animated.Image
               source={{ uri: imageUrl! }}
-              style={styles.recipeThumbnail}
+              style={[styles.recipeThumbnail, { opacity: imgOpacity }]}
               resizeMode="cover"
               onError={() => setImgError(true)}
+              onLoad={handleImageLoad}
             />
           ) : (
             <Feather name={cookIcon as any} size={16} color={ICON.recipe.icon} />

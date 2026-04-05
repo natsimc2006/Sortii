@@ -13,6 +13,8 @@ import {
   View,
 } from "react-native";
 
+import { PressableScale } from "@/components/PressableScale";
+
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Colors from "@/constants/Colors";
 import { DAYS, MealPlanEntry, MealSlot, PANTRY_STAPLES, Recipe, WEEKEND_DAYS } from "@/constants/recipes";
@@ -682,21 +684,21 @@ export default function PlannerScreen() {
           },
         ]}
       >
-        <TouchableOpacity
+        <PressableScale
           onPress={handleFill}
           style={[styles.actionBtnSecondary, { backgroundColor: C.secondaryActionBg }]}
         >
           <Feather name="zap" size={15} color={C.secondaryActionText} />
           <Text style={[styles.actionBtnText, { color: C.secondaryActionText }]}>Fill Gaps</Text>
-        </TouchableOpacity>
+        </PressableScale>
 
-        <TouchableOpacity
+        <PressableScale
           onPress={handleSave}
           style={[styles.actionBtnSecondary, { backgroundColor: C.secondaryActionBg }]}
         >
           <Feather name="bookmark" size={15} color={C.secondaryActionText} />
           <Text style={[styles.actionBtnText, { color: C.secondaryActionText }]}>Save</Text>
-        </TouchableOpacity>
+        </PressableScale>
 
         <TouchableOpacity
           onPress={handleClear}

@@ -1,0 +1,114 @@
+Update the hero text styling on the Sortii opening screen for a cleaner, more modern, premium mobile feel.
+
+IMPORTANT:
+- Do not redesign the page layout
+- Keep existing spacing and structure unless a tiny adjustment is needed for better balance
+- This is a typography and copy refinement only
+
+--------------------------------------------------
+1. UPDATE THE HERO COPY
+--------------------------------------------------
+
+Change the headline text to:
+No more “what’s for dinner”
+
+Change the supporting paragraph to:
+Sortii plans your week in 60 seconds — meals, budget, shopping list. Sorted.
+
+Keep the third line as:
+Less stress. Fewer takeaways. More evenings back.
+
+--------------------------------------------------
+2. FONT PAIRING
+--------------------------------------------------
+
+Use this font pairing:
+
+- Headline font: Manrope
+- Supporting paragraph font: Inter
+- Third line font: Inter
+
+If Manrope is unavailable, use Poppins for the headline and keep Inter for the other two lines.
+
+--------------------------------------------------
+3. HEADLINE STYLING
+--------------------------------------------------
+
+Apply these styles to:
+No more “what’s for dinner”
+
+- font-family: Manrope, sans-serif
+- font-weight: 700
+- font-size: 40px
+- line-height: 46px
+- letter-spacing: -0.5px
+- color: #1F1F1F
+- text-align: center
+
+Goal:
+The headline should feel modern, confident, clean, and premium — not editorial or overly formal.
+
+--------------------------------------------------
+4. SUPPORTING PARAGRAPH STYLING
+--------------------------------------------------
+
+Apply these styles to:
+Sortii plans your week in 60 seconds — meals, budget, shopping list. Sorted.
+
+- font-family: Inter, sans-serif
+- font-weight: 400
+- font-size: 18px
+- line-height: 29px
+- letter-spacing: 0px
+- color: #5B5B5B
+- text-align: center
+
+Goal:
+The paragraph should feel crisp, readable, calm, and app-native.
+
+--------------------------------------------------
+5. THIRD LINE STYLING
+--------------------------------------------------
+
+Apply these styles to:
+Less stress. Fewer takeaways. More evenings back.
+
+- font-family: Inter, sans-serif
+- font-weight: 500
+- font-style: italic
+- font-size: 16px
+- line-height: 24px
+- letter-spacing: 0px
+- color: use existing plum accent or #6B4A5E
+- text-align: center
+
+Goal:
+This line should feel warm, human, slightly softer, and emotionally supportive.
+
+--------------------------------------------------
+6. SPACING TWEAKS
+--------------------------------------------------
+
+Make small spacing adjustments if needed so the text block feels balanced.
+
+Recommended spacing:
+- generous space below the logo area
+- 16px to 20px gap below headline
+- 10px to 14px gap below paragraph
+- maintain breathing room before the “How it works” section
+
+Do not compress the text block.
+
+--------------------------------------------------
+7. FINAL DESIGN GOAL
+--------------------------------------------------
+
+The hero text area should feel:
+- modern
+- light
+- premium
+- clear
+- warm
+- app-native
+
+It should feel like a confident product headline, not a magazine/article headline.

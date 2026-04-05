@@ -1,7 +1,7 @@
 import { Feather } from "@expo/vector-icons";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import {
-  Image,
+  Animated,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -27,6 +27,15 @@ export function RecipeCard({
   const C = Colors.light;
   const [imgError, setImgError] = useState(false);
   const imageUrl = useRecipeImage(recipe.id, recipe.name, recipe.imageUrl);
+  const imgOpacity = useRef(new Animated.Value(0)).current;
+
+  const handleImageLoad = () => {
+    Animated.timing(imgOpacity, {
+      toValue: 1,
+      duration: 280,
+      useNativeDriver: true,
+    }).start();
+  };
 
   const cookIcon =
     recipe.cookingStyle === "air-fryer"
@@ -51,11 +60,12 @@ export function RecipeCard({
       <View style={styles.header}>
         <View style={[styles.iconBox, { backgroundColor: C.chipBg }]}>
           {showImage ? (
-            <Image
+            <Animated.Image
               source={{ uri: imageUrl! }}
-              style={styles.thumbnail}
+              style={[styles.thumbnail, { opacity: imgOpacity }]}
               resizeMode="cover"
               onError={() => setImgError(true)}
+              onLoad={handleImageLoad}
             />
           ) : (
             <Feather name={cookIcon as any} size={20} color={C.primary} />

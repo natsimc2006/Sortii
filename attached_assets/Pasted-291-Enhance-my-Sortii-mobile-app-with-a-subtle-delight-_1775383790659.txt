@@ -1,0 +1,111 @@
+291"}
+Enhance my Sortii mobile app with a subtle “delight layer” using micro-interactions, motion, and feedback.
+
+IMPORTANT:
+- Keep all animations fast, subtle, and purposeful
+- Do NOT add heavy or distracting animations
+- Do NOT slow down the app
+- Focus on polish, responsiveness, and small moments of satisfaction
+
+--------------------------------------------------
+1. BUTTON INTERACTIONS
+--------------------------------------------------
+
+Apply to all buttons:
+- On press: scale down slightly (0.97)
+- On release: return to normal (1.0) with soft easing
+- Keep transitions quick (100–150ms)
+
+Gold CTA:
+- Slight shadow increase or glow on press
+
+--------------------------------------------------
+2. CARD INTERACTIONS
+--------------------------------------------------
+
+Meal cards and tappable cards:
+- On tap: slight lift (scale 1 → 1.02)
+- Smooth transition into detail screens
+
+--------------------------------------------------
+3. SWAP INTERACTION
+--------------------------------------------------
+
+When a meal is swapped:
+- Animate card transition (fade or slide)
+- Slight lift effect during change
+- Show temporary micro-label:
+  “Saved $X” or “Smarter choice”
+
+--------------------------------------------------
+4. COMPLETION MOMENTS
+--------------------------------------------------
+
+When week is fully planned:
+- Animate checkmark appearing
+- Fade in confirmation text
+- Optional soft haptic feedback
+
+--------------------------------------------------
+5. SHOPPING LIST INTERACTIONS
+--------------------------------------------------
+
+When ticking items:
+- Animate checkbox fill
+- Fade or strike through item
+- Slight row fade
+
+When section complete:
+- Show subtle “Done” indicator
+
+--------------------------------------------------
+6. LOADING / AUTO ACTIONS
+--------------------------------------------------
+
+For “Fill gaps” or auto planning:
+- Show short loading shimmer (300–500ms)
+- Animate items appearing in quick sequence
+
+--------------------------------------------------
+7. IMAGE LOADING
+--------------------------------------------------
+
+Recipe images:
+- Fade in smoothly
+- Optional very subtle zoom effect on load
+
+--------------------------------------------------
+8. TRANSITIONS
+--------------------------------------------------
+
+Use:
+- smooth ease-in-out transitions
+- short durations (100–300ms)
+- consistent motion across app
+
+--------------------------------------------------
+9. MICROCOPY (OPTIONAL)
+--------------------------------------------------
+
+Use short, subtle phrases:
+- “Sorted.”
+- “Done.”
+- “Saved you $X.”
+- “That was easy.”
+
+Keep tone:
+- calm
+- helpful
+- slightly cheeky
+
+--------------------------------------------------
+10. FINAL GOAL
+--------------------------------------------------
+
+The app should feel:
+- responsive
+- satisfying
+- polished
+- effortless to use
+
+Not flashy — just quietly excel

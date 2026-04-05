@@ -13,6 +13,8 @@ import {
   View,
 } from "react-native";
 
+import { PressableScale } from "@/components/PressableScale";
+
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Colors from "@/constants/Colors";
 
@@ -100,13 +102,13 @@ export default function HomeScreen() {
           style={styles.logoImage}
           resizeMode="contain"
         />
-        <Text style={[styles.mainHeadline, { color: C.text }]}>
-          No more "what's for dinner?"
+        <Text style={styles.mainHeadline}>
+          No more "what's for dinner"
         </Text>
-        <Text style={[styles.subheadline, { color: C.textSecondary }]}>
-          Sortii plans your week in 60 seconds — meals, budget, shopping list. Done.
+        <Text style={styles.subheadline}>
+          Sortii plans your week in 60 seconds — meals, budget, shopping list. Sorted.
         </Text>
-        <Text style={[styles.supportingLine, { color: "#5E3A4C" }]}>
+        <Text style={styles.supportingLine}>
           Less stress. Fewer takeaways. More evenings back.
         </Text>
         {/* Change 2: Teal accent bar */}
@@ -170,24 +172,23 @@ export default function HomeScreen() {
         <Text style={styles.plumAccent}>
           The convenience of a meal kit. At supermarket prices.
         </Text>
-        <TouchableOpacity
+        <PressableScale
           onPress={handlePreferences}
-          activeOpacity={0.85}
           style={[styles.primaryBtn, { backgroundColor: C.gold }]}
         >
           <Text style={styles.primaryBtnText}>Get started</Text>
           <Feather name="arrow-right" size={20} color="#fff" style={{ marginLeft: 8 }} />
-        </TouchableOpacity>
+        </PressableScale>
 
-        <TouchableOpacity
+        <PressableScale
           onPress={handleBack}
-          activeOpacity={0.75}
+          scaleTo={0.98}
           style={[styles.secondaryBtn, { borderColor: C.inputBorder }]}
         >
           <Text style={[styles.secondaryBtnText, { color: C.text }]}>
             Go to my plan →
           </Text>
-        </TouchableOpacity>
+        </PressableScale>
       </View>
 
       <Text style={[styles.note, { color: C.textMuted }]}>
@@ -244,25 +245,33 @@ const styles = StyleSheet.create({
     zIndex: 1,
   },
   mainHeadline: {
-    fontSize: 24,
-    fontFamily: "PlayfairDisplay_700Bold",
+    fontSize: 40,
+    fontFamily: "Manrope_700Bold",
+    fontWeight: "700",
     textAlign: "center",
-    lineHeight: 32,
+    lineHeight: 46,
+    letterSpacing: -0.5,
+    color: "#1F1F1F",
     zIndex: 1,
   },
   subheadline: {
-    fontSize: 15,
+    fontSize: 18,
     fontFamily: "Inter_400Regular",
     textAlign: "center",
-    lineHeight: 23,
-    maxWidth: 300,
+    lineHeight: 29,
+    letterSpacing: 0,
+    color: "#5B5B5B",
+    maxWidth: 320,
     zIndex: 1,
   },
   supportingLine: {
-    fontSize: 13,
-    fontFamily: "Inter_400Regular",
-    textAlign: "center",
+    fontSize: 16,
+    fontFamily: "Inter_500Medium",
     fontStyle: "italic",
+    textAlign: "center",
+    lineHeight: 24,
+    letterSpacing: 0,
+    color: "#6B4A5E",
     zIndex: 1,
   },
   accentBar: {
