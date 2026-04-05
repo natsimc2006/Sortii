@@ -35,6 +35,11 @@ export interface Recipe {
   instructions: string[];
   estimatedCostBand: "low" | "medium" | "high";
   costPerServeAUD?: number;
+  costPerServeGBP?: number;
+  costPerServe?: number;
+  currency?: string;
+  currencySymbol?: string;
+  locale?: string[];
   batchCook?: boolean;
   quickAssembly?: boolean;
   familyStyle?: boolean;
@@ -45,6 +50,7 @@ export interface Recipe {
   imageUrl?: string;
   kidFriendlyScore?: 0 | 1 | 2;
   kidFriendlyReason?: string;
+  source?: string;
 }
 
 export const RECIPES: Recipe[] = RECIPES_DATA as unknown as Recipe[];
@@ -291,7 +297,8 @@ export function filterRecipes(
   prefs: PlanPreferences,
   mealType: MealSlot = "dinner",
   dayName?: string,
-  hiddenIds?: string[]
+  hiddenIds?: string[],
+  pool?: Recipe[]
 ): Recipe[] {
   const isWeekend = dayName ? WEEKEND_DAYS.includes(dayName) : false;
   const overrides = prefs.weekendOverrides ?? DEFAULT_WEEKEND_OVERRIDES;
@@ -355,7 +362,9 @@ export function filterRecipes(
     });
   };
 
-  const full = RECIPES.filter((r) => {
+  const recipePool = pool ?? RECIPES;
+
+  const full = recipePool.filter((r) => {
     if (isHidden(r)) return false;
     if (!mealTypeOk(r)) return false;
     if (!cookingEffortOk(r, effectiveEffort)) return false;
@@ -373,7 +382,7 @@ export function filterRecipes(
   });
   if (full.length >= 3) return sortKidFriendly(full);
 
-  const relaxed = RECIPES.filter((r) => {
+  const relaxed = recipePool.filter((r) => {
     if (isHidden(r)) return false;
     if (!mealTypeOk(r)) return false;
     if (!cookingStyleOk(r, prefs.cookingStyle ?? "mixed")) return false;
@@ -389,10 +398,10 @@ export function filterRecipes(
   });
   if (relaxed.length >= 3) return sortKidFriendly(relaxed);
 
-  const minimal = RECIPES.filter((r) => !isHidden(r) && mealTypeOk(r) && dietTypeOk(r, diet) && exclusionOk(r) && kidOk(r));
+  const minimal = recipePool.filter((r) => !isHidden(r) && mealTypeOk(r) && dietTypeOk(r, diet) && exclusionOk(r) && kidOk(r));
   if (minimal.length > 0) return sortKidFriendly(minimal);
-  const fallback = RECIPES.filter((r) => !isHidden(r) && mealTypeOk(r) && kidOk(r));
-  return sortKidFriendly(fallback.length > 0 ? fallback : RECIPES.filter((r) => !isHidden(r) && mealTypeOk(r)));
+  const fallback = recipePool.filter((r) => !isHidden(r) && mealTypeOk(r) && kidOk(r));
+  return sortKidFriendly(fallback.length > 0 ? fallback : recipePool.filter((r) => !isHidden(r) && mealTypeOk(r)));
 }
 
 export function pickRecipes(

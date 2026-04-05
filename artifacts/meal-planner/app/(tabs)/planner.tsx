@@ -20,6 +20,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Colors from "@/constants/Colors";
 import { DAYS, MealPlanEntry, MealSlot, PANTRY_STAPLES, Recipe, WEEKEND_DAYS } from "@/constants/recipes";
 import { usePlanner } from "@/context/PlannerContext";
+import { useLocale } from "@/context/LocaleContext";
 import { MealSlotCard } from "@/components/MealSlotCard";
 import { MealSearchModal } from "@/components/MealSearchModal";
 import { RecipeDetailModal } from "@/components/RecipeDetailModal";
@@ -115,6 +116,7 @@ export default function PlannerScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const C = Colors.light;
+  const { currencySymbol } = useLocale();
 
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedDay, setSelectedDay] = useState<string>(DAYS[0]);
@@ -518,7 +520,7 @@ export default function PlannerScreen() {
           {weeklySwapSaving >= 2 && (
             <View style={styles.swapBanner}>
               <Text style={styles.swapBannerText}>
-                💡 Apply all swaps → save up to ${weeklySwapSaving} this week
+                💡 Apply all swaps → save up to {currencySymbol}{weeklySwapSaving} this week
               </Text>
             </View>
           )}

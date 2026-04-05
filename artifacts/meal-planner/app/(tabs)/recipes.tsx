@@ -11,7 +11,8 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Colors from "@/constants/Colors";
-import { RECIPES, Recipe, getApproxCostPerServe } from "@/constants/recipes";
+import { Recipe, getApproxCostPerServe } from "@/constants/recipes";
+import { useLocale } from "@/context/LocaleContext";
 import { RecipeCard } from "@/components/RecipeCard";
 import { PillButton } from "@/components/PillButton";
 import { RecipeDetailModal } from "@/components/RecipeDetailModal";
@@ -29,27 +30,35 @@ const FILTERS: { label: string; value: FilterType }[] = [
   { label: "Leftovers", value: "leftovers" },
 ];
 
-const COST_FILTERS: { label: string; value: CostFilter; icon: string }[] = [
+const COST_FILTERS_AU: { label: string; value: CostFilter; icon: string }[] = [
   { label: "Any price", value: "any", icon: "dollar-sign" },
   { label: "Under $5/serve", value: "under5", icon: "dollar-sign" },
   { label: "Under $10/serve", value: "under10", icon: "dollar-sign" },
+];
+const COST_FILTERS_UK: { label: string; value: CostFilter; icon: string }[] = [
+  { label: "Any price", value: "any", icon: "dollar-sign" },
+  { label: "Under £3/serve", value: "under5", icon: "dollar-sign" },
+  { label: "Under £6/serve", value: "under10", icon: "dollar-sign" },
 ];
 
 export default function RecipesScreen() {
   const insets = useSafeAreaInsets();
   const C = Colors.light;
+  const { appRecipes, currencySymbol, locale } = useLocale();
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<FilterType>("all");
   const [costFilter, setCostFilter] = useState<CostFilter>("any");
   const [detailRecipe, setDetailRecipe] = useState<Recipe | null>(null);
 
+  const costThresholds = locale === 'UK' ? { low: 3, high: 6 } : { low: 5, high: 10 };
+
   const filtered = useMemo(() => {
-    return RECIPES.filter((r) => {
+    return appRecipes.filter((r) => {
       if (search.trim()) {
         const q = search.toLowerCase();
         if (
           !r.name.toLowerCase().includes(q) &&
-          !r.description.toLowerCase().includes(q) &&
+          !(r.description || '').toLowerCase().includes(q) &&
           !r.ingredients.some((i) => i.name.toLowerCase().includes(q))
         )
           return false;
@@ -61,13 +70,13 @@ export default function RecipesScreen() {
       if (filter === "air-fryer" && r.cookingStyle !== "air-fryer") return false;
       if (filter === "leftovers" && !r.leftoversFriendly) return false;
 
-      const costPerServe = getApproxCostPerServe(r);
-      if (costFilter === "under5" && costPerServe >= 5) return false;
-      if (costFilter === "under10" && costPerServe >= 10) return false;
+      const costPerServe = r.costPerServe ?? getApproxCostPerServe(r);
+      if (costFilter === "under5" && costPerServe >= costThresholds.low) return false;
+      if (costFilter === "under10" && costPerServe >= costThresholds.high) return false;
 
       return true;
     });
-  }, [search, filter, costFilter]);
+  }, [search, filter, costFilter, appRecipes]);
 
   return (
     <View style={{ flex: 1, backgroundColor: C.background }}>
@@ -84,7 +93,7 @@ export default function RecipesScreen() {
           <View>
             <Text style={[styles.screenTitle, { color: C.text }]}>Recipes</Text>
             <Text style={[styles.screenSub, { color: C.textSecondary }]}>
-              {filtered.length} of {RECIPES.length} recipes
+              {filtered.length} of {appRecipes.length} recipes
             </Text>
           </View>
         </View>
@@ -123,7 +132,7 @@ export default function RecipesScreen() {
           <Text style={[styles.costLabel, { color: C.textSecondary }]}>Price:</Text>
           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
             <View style={styles.costFilters}>
-              {COST_FILTERS.map((f) => (
+              {(locale === 'UK' ? COST_FILTERS_UK : COST_FILTERS_AU).map((f) => (
                 <PillButton
                   key={f.value}
                   label={f.label}

@@ -1,0 +1,1508 @@
+[
+  {
+    "recipeId": "uk_shepherds_pie",
+    "region": "UK",
+    "title": "Shepherd\u2019s pie",
+    "serves": 4,
+    "tags": [
+      "comfort",
+      "family",
+      "batch_cook"
+    ],
+    "mealType": "dinner",
+    "cookTimeMins": 60,
+    "ingredientRows": [
+      {
+        "ingredientKey": "beef_mince_budget",
+        "ingredientLabel": "Budget minced beef",
+        "quantity": 500,
+        "unit": "g",
+        "estimatedCostGBP": 3.18
+      },
+      {
+        "ingredientKey": "onions",
+        "ingredientLabel": "Onions",
+        "quantity": 200,
+        "unit": "g",
+        "estimatedCostGBP": 0.23
+      },
+      {
+        "ingredientKey": "carrots",
+        "ingredientLabel": "Carrots",
+        "quantity": 150,
+        "unit": "g",
+        "estimatedCostGBP": 0.11
+      },
+      {
+        "ingredientKey": "peas_frozen",
+        "ingredientLabel": "Frozen peas",
+        "quantity": 150,
+        "unit": "g",
+        "estimatedCostGBP": 0.22
+      },
+      {
+        "ingredientKey": "stock_cubes_chicken_10",
+        "ingredientLabel": "Stock cube",
+        "quantity": 1,
+        "unit": "each",
+        "estimatedCostGBP": 1.0
+      },
+      {
+        "ingredientKey": "tomato_puree",
+        "ingredientLabel": "Tomato puree",
+        "quantity": 40,
+        "unit": "g",
+        "estimatedCostGBP": 0.15
+      },
+      {
+        "ingredientKey": "potatoes_white_2kg",
+        "ingredientLabel": "White potatoes",
+        "quantity": 1000,
+        "unit": "g",
+        "estimatedCostGBP": 0.88
+      },
+      {
+        "ingredientKey": "milk_semi_skimmed_4pt",
+        "ingredientLabel": "Semi-skimmed milk",
+        "quantity": 100,
+        "unit": "ml",
+        "estimatedCostGBP": 0.07
+      },
+      {
+        "ingredientKey": "butter",
+        "ingredientLabel": "Butter",
+        "quantity": 25,
+        "unit": "g",
+        "estimatedCostGBP": 0.22
+      }
+    ],
+    "estimatedRecipeCostGBP": 6.06,
+    "estimatedCostPerServeGBP": 1.52,
+    "locale": [
+      "UK"
+    ],
+    "source": "uk_pack"
+  },
+  {
+    "recipeId": "uk_sausages_mash",
+    "region": "UK",
+    "title": "Sausages and mash with onion gravy",
+    "serves": 4,
+    "tags": [
+      "comfort",
+      "family",
+      "quick"
+    ],
+    "mealType": "dinner",
+    "cookTimeMins": 35,
+    "ingredientRows": [
+      {
+        "ingredientKey": "sausages_pork",
+        "ingredientLabel": "Pork sausages",
+        "quantity": 900,
+        "unit": "g",
+        "estimatedCostGBP": 4.66
+      },
+      {
+        "ingredientKey": "potatoes_white_2kg",
+        "ingredientLabel": "White potatoes",
+        "quantity": 1000,
+        "unit": "g",
+        "estimatedCostGBP": 0.88
+      },
+      {
+        "ingredientKey": "milk_semi_skimmed_4pt",
+        "ingredientLabel": "Semi-skimmed milk",
+        "quantity": 120,
+        "unit": "ml",
+        "estimatedCostGBP": 0.09
+      },
+      {
+        "ingredientKey": "butter",
+        "ingredientLabel": "Butter",
+        "quantity": 25,
+        "unit": "g",
+        "estimatedCostGBP": 0.22
+      },
+      {
+        "ingredientKey": "onions",
+        "ingredientLabel": "Onions",
+        "quantity": 300,
+        "unit": "g",
+        "estimatedCostGBP": 0.34
+      },
+      {
+        "ingredientKey": "plain_flour",
+        "ingredientLabel": "Plain flour",
+        "quantity": 20,
+        "unit": "g",
+        "estimatedCostGBP": 0.02
+      },
+      {
+        "ingredientKey": "stock_cubes_chicken_10",
+        "ingredientLabel": "Stock cube",
+        "quantity": 1,
+        "unit": "each",
+        "estimatedCostGBP": 1.0
+      }
+    ],
+    "estimatedRecipeCostGBP": 7.21,
+    "estimatedCostPerServeGBP": 1.8,
+    "locale": [
+      "UK"
+    ],
+    "source": "uk_pack"
+  },
+  {
+    "recipeId": "uk_fish_pie",
+    "region": "UK",
+    "title": "Fish pie",
+    "serves": 4,
+    "tags": [
+      "comfort",
+      "family",
+      "batch_cook"
+    ],
+    "mealType": "dinner",
+    "cookTimeMins": 50,
+    "ingredientRows": [
+      {
+        "ingredientKey": "white_fish_frozen",
+        "ingredientLabel": "Frozen white fish fillets",
+        "quantity": 500,
+        "unit": "g",
+        "estimatedCostGBP": 3.25
+      },
+      {
+        "ingredientKey": "peas_frozen",
+        "ingredientLabel": "Frozen peas",
+        "quantity": 150,
+        "unit": "g",
+        "estimatedCostGBP": 0.22
+      },
+      {
+        "ingredientKey": "potatoes_white_2kg",
+        "ingredientLabel": "White potatoes",
+        "quantity": 900,
+        "unit": "g",
+        "estimatedCostGBP": 0.79
+      },
+      {
+        "ingredientKey": "milk_semi_skimmed_4pt",
+        "ingredientLabel": "Semi-skimmed milk",
+        "quantity": 350,
+        "unit": "ml",
+        "estimatedCostGBP": 0.25
+      },
+      {
+        "ingredientKey": "butter",
+        "ingredientLabel": "Butter",
+        "quantity": 35,
+        "unit": "g",
+        "estimatedCostGBP": 0.31
+      },
+      {
+        "ingredientKey": "plain_flour",
+        "ingredientLabel": "Plain flour",
+        "quantity": 30,
+        "unit": "g",
+        "estimatedCostGBP": 0.02
+      },
+      {
+        "ingredientKey": "cheddar_mature_400",
+        "ingredientLabel": "Mature cheddar",
+        "quantity": 60,
+        "unit": "g",
+        "estimatedCostGBP": 0.42
+      }
+    ],
+    "estimatedRecipeCostGBP": 5.26,
+    "estimatedCostPerServeGBP": 1.31,
+    "locale": [
+      "UK"
+    ],
+    "source": "uk_pack"
+  },
+  {
+    "recipeId": "uk_chicken_leek_pie",
+    "region": "UK",
+    "title": "Chicken and leek pie",
+    "serves": 4,
+    "tags": [
+      "comfort",
+      "family"
+    ],
+    "mealType": "dinner",
+    "cookTimeMins": 50,
+    "ingredientRows": [
+      {
+        "ingredientKey": "chicken_breast_fresh",
+        "ingredientLabel": "Chicken breast fillets",
+        "quantity": 600,
+        "unit": "g",
+        "estimatedCostGBP": 4.23
+      },
+      {
+        "ingredientKey": "onions",
+        "ingredientLabel": "Onions",
+        "quantity": 150,
+        "unit": "g",
+        "estimatedCostGBP": 0.17
+      },
+      {
+        "ingredientKey": "spring_onions_bunch",
+        "ingredientLabel": "Spring onions",
+        "quantity": 1,
+        "unit": "bunch",
+        "estimatedCostGBP": 0.64
+      },
+      {
+        "ingredientKey": "double_cream",
+        "ingredientLabel": "Double cream",
+        "quantity": 150,
+        "unit": "ml",
+        "estimatedCostGBP": 0.72
+      },
+      {
+        "ingredientKey": "milk_semi_skimmed_4pt",
+        "ingredientLabel": "Semi-skimmed milk",
+        "quantity": 100,
+        "unit": "ml",
+        "estimatedCostGBP": 0.07
+      },
+      {
+        "ingredientKey": "plain_flour",
+        "ingredientLabel": "Plain flour",
+        "quantity": 25,
+        "unit": "g",
+        "estimatedCostGBP": 0.02
+      },
+      {
+        "ingredientKey": "butter",
+        "ingredientLabel": "Butter",
+        "quantity": 25,
+        "unit": "g",
+        "estimatedCostGBP": 0.22
+      },
+      {
+        "ingredientKey": "pizza_base",
+        "ingredientLabel": "Ready-rolled pie topper/pastry equivalent",
+        "quantity": 1,
+        "unit": "pack",
+        "estimatedCostGBP": 1.5
+      }
+    ],
+    "estimatedRecipeCostGBP": 7.57,
+    "estimatedCostPerServeGBP": 1.89,
+    "locale": [
+      "UK"
+    ],
+    "source": "uk_pack"
+  },
+  {
+    "recipeId": "uk_chicken_pasta_bake",
+    "region": "UK",
+    "title": "Chicken pasta bake",
+    "serves": 4,
+    "tags": [
+      "family",
+      "staple",
+      "batch_cook"
+    ],
+    "mealType": "dinner",
+    "cookTimeMins": 40,
+    "ingredientRows": [
+      {
+        "ingredientKey": "chicken_breast_fresh",
+        "ingredientLabel": "Chicken breast fillets",
+        "quantity": 500,
+        "unit": "g",
+        "estimatedCostGBP": 3.52
+      },
+      {
+        "ingredientKey": "penne_pasta",
+        "ingredientLabel": "Penne pasta",
+        "quantity": 350,
+        "unit": "g",
+        "estimatedCostGBP": 0.45
+      },
+      {
+        "ingredientKey": "jar_pasta_sauce",
+        "ingredientLabel": "Pasta sauce",
+        "quantity": 1,
+        "unit": "jar",
+        "estimatedCostGBP": 1.2
+      },
+      {
+        "ingredientKey": "mozzarella_250",
+        "ingredientLabel": "Grated mozzarella",
+        "quantity": 150,
+        "unit": "g",
+        "estimatedCostGBP": 1.32
+      },
+      {
+        "ingredientKey": "cheddar_mature_400",
+        "ingredientLabel": "Mature cheddar",
+        "quantity": 60,
+        "unit": "g",
+        "estimatedCostGBP": 0.42
+      },
+      {
+        "ingredientKey": "onions",
+        "ingredientLabel": "Onions",
+        "quantity": 120,
+        "unit": "g",
+        "estimatedCostGBP": 0.14
+      },
+      {
+        "ingredientKey": "peppers_3pk",
+        "ingredientLabel": "Peppers",
+        "quantity": 1,
+        "unit": "each",
+        "estimatedCostGBP": 1.79
+      }
+    ],
+    "estimatedRecipeCostGBP": 8.84,
+    "estimatedCostPerServeGBP": 2.21,
+    "locale": [
+      "UK"
+    ],
+    "source": "uk_pack"
+  },
+  {
+    "recipeId": "uk_sausage_pasta",
+    "region": "UK",
+    "title": "Sausage pasta",
+    "serves": 4,
+    "tags": [
+      "family",
+      "quick",
+      "budget"
+    ],
+    "mealType": "dinner",
+    "cookTimeMins": 30,
+    "ingredientRows": [
+      {
+        "ingredientKey": "sausages_pork",
+        "ingredientLabel": "Pork sausages",
+        "quantity": 454,
+        "unit": "g",
+        "estimatedCostGBP": 2.35
+      },
+      {
+        "ingredientKey": "penne_pasta",
+        "ingredientLabel": "Penne pasta",
+        "quantity": 350,
+        "unit": "g",
+        "estimatedCostGBP": 0.45
+      },
+      {
+        "ingredientKey": "passata",
+        "ingredientLabel": "Passata",
+        "quantity": 500,
+        "unit": "g",
+        "estimatedCostGBP": 0.75
+      },
+      {
+        "ingredientKey": "onions",
+        "ingredientLabel": "Onions",
+        "quantity": 120,
+        "unit": "g",
+        "estimatedCostGBP": 0.14
+      },
+      {
+        "ingredientKey": "herb_parsley",
+        "ingredientLabel": "Fresh parsley",
+        "quantity": 1,
+        "unit": "pack",
+        "estimatedCostGBP": 0.65
+      },
+      {
+        "ingredientKey": "cheddar_mature_400",
+        "ingredientLabel": "Mature cheddar",
+        "quantity": 60,
+        "unit": "g",
+        "estimatedCostGBP": 0.42
+      }
+    ],
+    "estimatedRecipeCostGBP": 4.76,
+    "estimatedCostPerServeGBP": 1.19,
+    "locale": [
+      "UK"
+    ],
+    "source": "uk_pack"
+  },
+  {
+    "recipeId": "uk_lasagne",
+    "region": "UK",
+    "title": "Lasagne",
+    "serves": 6,
+    "tags": [
+      "comfort",
+      "family",
+      "batch_cook"
+    ],
+    "mealType": "dinner",
+    "cookTimeMins": 65,
+    "ingredientRows": [
+      {
+        "ingredientKey": "beef_mince_10",
+        "ingredientLabel": "Minced beef 10% fat",
+        "quantity": 750,
+        "unit": "g",
+        "estimatedCostGBP": 6.93
+      },
+      {
+        "ingredientKey": "lasagne_sheets",
+        "ingredientLabel": "Lasagne sheets",
+        "quantity": 250,
+        "unit": "g",
+        "estimatedCostGBP": 0.6
+      },
+      {
+        "ingredientKey": "onions",
+        "ingredientLabel": "Onions",
+        "quantity": 200,
+        "unit": "g",
+        "estimatedCostGBP": 0.23
+      },
+      {
+        "ingredientKey": "carrots",
+        "ingredientLabel": "Carrots",
+        "quantity": 120,
+        "unit": "g",
+        "estimatedCostGBP": 0.09
+      },
+      {
+        "ingredientKey": "chopped_tomatoes_400",
+        "ingredientLabel": "Chopped tomatoes",
+        "quantity": 2,
+        "unit": "tin",
+        "estimatedCostGBP": 0.9
+      },
+      {
+        "ingredientKey": "tomato_puree",
+        "ingredientLabel": "Tomato puree",
+        "quantity": 50,
+        "unit": "g",
+        "estimatedCostGBP": 0.19
+      },
+      {
+        "ingredientKey": "milk_semi_skimmed_4pt",
+        "ingredientLabel": "Semi-skimmed milk",
+        "quantity": 600,
+        "unit": "ml",
+        "estimatedCostGBP": 0.44
+      },
+      {
+        "ingredientKey": "plain_flour",
+        "ingredientLabel": "Plain flour",
+        "quantity": 50,
+        "unit": "g",
+        "estimatedCostGBP": 0.04
+      },
+      {
+        "ingredientKey": "butter",
+        "ingredientLabel": "Butter",
+        "quantity": 50,
+        "unit": "g",
+        "estimatedCostGBP": 0.44
+      },
+      {
+        "ingredientKey": "cheddar_mature_400",
+        "ingredientLabel": "Mature cheddar",
+        "quantity": 150,
+        "unit": "g",
+        "estimatedCostGBP": 1.04
+      }
+    ],
+    "estimatedRecipeCostGBP": 10.9,
+    "estimatedCostPerServeGBP": 1.82,
+    "locale": [
+      "UK"
+    ],
+    "source": "uk_pack"
+  },
+  {
+    "recipeId": "uk_jacket_potato_beans_cheese",
+    "region": "UK",
+    "title": "Jacket potatoes with beans and cheese",
+    "serves": 4,
+    "tags": [
+      "budget",
+      "quick",
+      "family"
+    ],
+    "mealType": "dinner",
+    "cookTimeMins": 50,
+    "ingredientRows": [
+      {
+        "ingredientKey": "potatoes_white_2kg",
+        "ingredientLabel": "Baking potatoes",
+        "quantity": 1200,
+        "unit": "g",
+        "estimatedCostGBP": 1.05
+      },
+      {
+        "ingredientKey": "baked_beans",
+        "ingredientLabel": "Baked beans",
+        "quantity": 2,
+        "unit": "tin",
+        "estimatedCostGBP": 1.1
+      },
+      {
+        "ingredientKey": "cheddar_mature_400",
+        "ingredientLabel": "Mature cheddar",
+        "quantity": 150,
+        "unit": "g",
+        "estimatedCostGBP": 1.04
+      },
+      {
+        "ingredientKey": "butter",
+        "ingredientLabel": "Butter",
+        "quantity": 20,
+        "unit": "g",
+        "estimatedCostGBP": 0.18
+      }
+    ],
+    "estimatedRecipeCostGBP": 3.37,
+    "estimatedCostPerServeGBP": 0.84,
+    "locale": [
+      "UK"
+    ],
+    "source": "uk_pack"
+  },
+  {
+    "recipeId": "uk_chicken_korma",
+    "region": "UK",
+    "title": "Chicken korma",
+    "serves": 4,
+    "tags": [
+      "fakeaway",
+      "family"
+    ],
+    "mealType": "dinner",
+    "cookTimeMins": 35,
+    "ingredientRows": [
+      {
+        "ingredientKey": "chicken_breast_fresh",
+        "ingredientLabel": "Chicken breast fillets",
+        "quantity": 600,
+        "unit": "g",
+        "estimatedCostGBP": 4.23
+      },
+      {
+        "ingredientKey": "onions",
+        "ingredientLabel": "Onions",
+        "quantity": 120,
+        "unit": "g",
+        "estimatedCostGBP": 0.14
+      },
+      {
+        "ingredientKey": "curry_paste",
+        "ingredientLabel": "Curry paste",
+        "quantity": 80,
+        "unit": "g",
+        "estimatedCostGBP": 0.6
+      },
+      {
+        "ingredientKey": "coconut_milk",
+        "ingredientLabel": "Coconut milk",
+        "quantity": 1,
+        "unit": "can",
+        "estimatedCostGBP": 0.95
+      },
+      {
+        "ingredientKey": "rice_white",
+        "ingredientLabel": "Long grain rice",
+        "quantity": 300,
+        "unit": "g",
+        "estimatedCostGBP": 0.49
+      },
+      {
+        "ingredientKey": "herb_coriander",
+        "ingredientLabel": "Fresh coriander",
+        "quantity": 1,
+        "unit": "pack",
+        "estimatedCostGBP": 0.65
+      }
+    ],
+    "estimatedRecipeCostGBP": 7.06,
+    "estimatedCostPerServeGBP": 1.77,
+    "locale": [
+      "UK"
+    ],
+    "source": "uk_pack"
+  },
+  {
+    "recipeId": "uk_sweet_sour_chicken",
+    "region": "UK",
+    "title": "Sweet and sour chicken",
+    "serves": 4,
+    "tags": [
+      "fakeaway",
+      "quick",
+      "family"
+    ],
+    "mealType": "dinner",
+    "cookTimeMins": 25,
+    "ingredientRows": [
+      {
+        "ingredientKey": "chicken_breast_fresh",
+        "ingredientLabel": "Chicken breast fillets",
+        "quantity": 500,
+        "unit": "g",
+        "estimatedCostGBP": 3.52
+      },
+      {
+        "ingredientKey": "peppers_3pk",
+        "ingredientLabel": "Peppers",
+        "quantity": 2,
+        "unit": "each",
+        "estimatedCostGBP": 3.58
+      },
+      {
+        "ingredientKey": "onions",
+        "ingredientLabel": "Onions",
+        "quantity": 100,
+        "unit": "g",
+        "estimatedCostGBP": 0.11
+      },
+      {
+        "ingredientKey": "rice_white",
+        "ingredientLabel": "Long grain rice",
+        "quantity": 300,
+        "unit": "g",
+        "estimatedCostGBP": 0.49
+      },
+      {
+        "ingredientKey": "soy_sauce",
+        "ingredientLabel": "Soy sauce",
+        "quantity": 45,
+        "unit": "ml",
+        "estimatedCostGBP": 0.36
+      },
+      {
+        "ingredientKey": "brown_sugar",
+        "ingredientLabel": "Light brown sugar",
+        "quantity": 30,
+        "unit": "g",
+        "estimatedCostGBP": 0.07
+      },
+      {
+        "ingredientKey": "tomato_puree",
+        "ingredientLabel": "Tomato puree",
+        "quantity": 25,
+        "unit": "g",
+        "estimatedCostGBP": 0.09
+      }
+    ],
+    "estimatedRecipeCostGBP": 8.22,
+    "estimatedCostPerServeGBP": 2.06,
+    "locale": [
+      "UK"
+    ],
+    "source": "uk_pack"
+  },
+  {
+    "recipeId": "uk_beans_on_toast",
+    "region": "UK",
+    "title": "Beans on toast",
+    "serves": 2,
+    "tags": [
+      "budget",
+      "quick",
+      "cheap_eats"
+    ],
+    "mealType": "dinner",
+    "cookTimeMins": 10,
+    "ingredientRows": [
+      {
+        "ingredientKey": "baked_beans",
+        "ingredientLabel": "Baked beans",
+        "quantity": 1,
+        "unit": "tin",
+        "estimatedCostGBP": 0.55
+      },
+      {
+        "ingredientKey": "bread_loaf",
+        "ingredientLabel": "Bread loaf",
+        "quantity": 4,
+        "unit": "slices",
+        "estimatedCostGBP": 0.25
+      },
+      {
+        "ingredientKey": "butter",
+        "ingredientLabel": "Butter",
+        "quantity": 15,
+        "unit": "g",
+        "estimatedCostGBP": 0.13
+      },
+      {
+        "ingredientKey": "cheddar_mature_400",
+        "ingredientLabel": "Mature cheddar",
+        "quantity": 40,
+        "unit": "g",
+        "estimatedCostGBP": 0.28
+      }
+    ],
+    "estimatedRecipeCostGBP": 1.21,
+    "estimatedCostPerServeGBP": 0.6,
+    "locale": [
+      "UK"
+    ],
+    "source": "uk_pack"
+  },
+  {
+    "recipeId": "uk_cheese_toasties",
+    "region": "UK",
+    "title": "Cheese toasties",
+    "serves": 2,
+    "tags": [
+      "budget",
+      "quick",
+      "lunch_for_dinner"
+    ],
+    "mealType": "dinner",
+    "cookTimeMins": 10,
+    "ingredientRows": [
+      {
+        "ingredientKey": "bread_loaf",
+        "ingredientLabel": "Bread loaf",
+        "quantity": 4,
+        "unit": "slices",
+        "estimatedCostGBP": 0.25
+      },
+      {
+        "ingredientKey": "cheddar_mature_400",
+        "ingredientLabel": "Mature cheddar",
+        "quantity": 120,
+        "unit": "g",
+        "estimatedCostGBP": 0.83
+      },
+      {
+        "ingredientKey": "butter",
+        "ingredientLabel": "Butter",
+        "quantity": 20,
+        "unit": "g",
+        "estimatedCostGBP": 0.18
+      }
+    ],
+    "estimatedRecipeCostGBP": 1.26,
+    "estimatedCostPerServeGBP": 0.63,
+    "locale": [
+      "UK"
+    ],
+    "source": "uk_pack"
+  },
+  {
+    "recipeId": "uk_egg_chips",
+    "region": "UK",
+    "title": "Egg and chips",
+    "serves": 2,
+    "tags": [
+      "budget",
+      "quick"
+    ],
+    "mealType": "dinner",
+    "cookTimeMins": 20,
+    "ingredientRows": [
+      {
+        "ingredientKey": "eggs_free_range_12",
+        "ingredientLabel": "Eggs",
+        "quantity": 4,
+        "unit": "each",
+        "estimatedCostGBP": 1.2
+      },
+      {
+        "ingredientKey": "chips_frozen",
+        "ingredientLabel": "Frozen oven chips",
+        "quantity": 500,
+        "unit": "g",
+        "estimatedCostGBP": 1.05
+      },
+      {
+        "ingredientKey": "baked_beans",
+        "ingredientLabel": "Baked beans",
+        "quantity": 1,
+        "unit": "tin",
+        "estimatedCostGBP": 0.55
+      }
+    ],
+    "estimatedRecipeCostGBP": 4.2,
+    "estimatedCostPerServeGBP": 1.05,
+    "locale": [
+      "UK"
+    ],
+    "source": "uk_pack"
+  },
+  {
+    "recipeId": "uk_halloumi_roast_veg_couscous",
+    "region": "UK",
+    "title": "Halloumi and roast veg couscous",
+    "serves": 4,
+    "tags": [
+      "lighter",
+      "vegetarian",
+      "family"
+    ],
+    "mealType": "dinner",
+    "cookTimeMins": 30,
+    "ingredientRows": [
+      {
+        "ingredientKey": "halloumi",
+        "ingredientLabel": "Halloumi",
+        "quantity": 225,
+        "unit": "g",
+        "estimatedCostGBP": 2.49
+      },
+      {
+        "ingredientKey": "couscous",
+        "ingredientLabel": "Couscous",
+        "quantity": 250,
+        "unit": "g",
+        "estimatedCostGBP": 0.6
+      },
+      {
+        "ingredientKey": "courgette_loose",
+        "ingredientLabel": "Courgette",
+        "quantity": 2,
+        "unit": "each",
+        "estimatedCostGBP": 1.14
+      },
+      {
+        "ingredientKey": "aubergine_each",
+        "ingredientLabel": "Aubergine",
+        "quantity": 1,
+        "unit": "each",
+        "estimatedCostGBP": 0.83
+      },
+      {
+        "ingredientKey": "peppers_3pk",
+        "ingredientLabel": "Peppers",
+        "quantity": 2,
+        "unit": "each",
+        "estimatedCostGBP": 3.58
+      },
+      {
+        "ingredientKey": "olive_oil",
+        "ingredientLabel": "Olive oil",
+        "quantity": 30,
+        "unit": "ml",
+        "estimatedCostGBP": 0.26
+      },
+      {
+        "ingredientKey": "lemons",
+        "ingredientLabel": "Lemons",
+        "quantity": 1,
+        "unit": "each",
+        "estimatedCostGBP": 1.25
+      }
+    ],
+    "estimatedRecipeCostGBP": 10.15,
+    "estimatedCostPerServeGBP": 2.54,
+    "locale": [
+      "UK"
+    ],
+    "source": "uk_pack"
+  },
+  {
+    "recipeId": "uk_chicken_traybake",
+    "region": "UK",
+    "title": "Chicken traybake with potatoes and peppers",
+    "serves": 4,
+    "tags": [
+      "quick",
+      "family",
+      "one_tray"
+    ],
+    "mealType": "dinner",
+    "cookTimeMins": 40,
+    "ingredientRows": [
+      {
+        "ingredientKey": "chicken_breast_fresh",
+        "ingredientLabel": "Chicken breast fillets",
+        "quantity": 600,
+        "unit": "g",
+        "estimatedCostGBP": 4.23
+      },
+      {
+        "ingredientKey": "potatoes_white_2kg",
+        "ingredientLabel": "White potatoes",
+        "quantity": 800,
+        "unit": "g",
+        "estimatedCostGBP": 0.7
+      },
+      {
+        "ingredientKey": "peppers_3pk",
+        "ingredientLabel": "Peppers",
+        "quantity": 2,
+        "unit": "each",
+        "estimatedCostGBP": 3.58
+      },
+      {
+        "ingredientKey": "onions",
+        "ingredientLabel": "Onions",
+        "quantity": 200,
+        "unit": "g",
+        "estimatedCostGBP": 0.23
+      },
+      {
+        "ingredientKey": "olive_oil",
+        "ingredientLabel": "Olive oil",
+        "quantity": 25,
+        "unit": "ml",
+        "estimatedCostGBP": 0.21
+      },
+      {
+        "ingredientKey": "herb_parsley",
+        "ingredientLabel": "Fresh parsley",
+        "quantity": 1,
+        "unit": "pack",
+        "estimatedCostGBP": 0.65
+      }
+    ],
+    "estimatedRecipeCostGBP": 9.6,
+    "estimatedCostPerServeGBP": 2.4,
+    "locale": [
+      "UK"
+    ],
+    "source": "uk_pack"
+  },
+  {
+    "recipeId": "uk_meatball_pasta",
+    "region": "UK",
+    "title": "Meatball pasta",
+    "serves": 4,
+    "tags": [
+      "family",
+      "staple"
+    ],
+    "ingredientRows": [
+      {
+        "ingredientKey": "beef_mince_10",
+        "ingredientLabel": "Minced beef",
+        "quantity": 500,
+        "unit": "g"
+      },
+      {
+        "ingredientKey": "penne_pasta",
+        "ingredientLabel": "Penne pasta",
+        "quantity": 350,
+        "unit": "g"
+      },
+      {
+        "ingredientKey": "passata",
+        "ingredientLabel": "Passata",
+        "quantity": 500,
+        "unit": "g"
+      },
+      {
+        "ingredientKey": "onions",
+        "ingredientLabel": "Onions",
+        "quantity": 100,
+        "unit": "g"
+      },
+      {
+        "ingredientKey": "cheddar_mature_400",
+        "ingredientLabel": "Mature cheddar",
+        "quantity": 50,
+        "unit": "g"
+      }
+    ],
+    "locale": [
+      "UK"
+    ],
+    "source": "uk_pack",
+    "estimatedCostPerServeGBP": 1.65,
+    "estimatedRecipeCostGBP": 6.6,
+    "pricingNote": "estimated_haiku_pending"
+  },
+  {
+    "recipeId": "uk_mac_cheese",
+    "region": "UK",
+    "title": "Mac and cheese",
+    "serves": 4,
+    "tags": [
+      "comfort",
+      "budget"
+    ],
+    "ingredientRows": [
+      {
+        "ingredientKey": "penne_pasta",
+        "quantity": 300,
+        "unit": "g"
+      },
+      {
+        "ingredientKey": "milk_semi_skimmed_4pt",
+        "quantity": 400,
+        "unit": "ml"
+      },
+      {
+        "ingredientKey": "cheddar_mature_400",
+        "quantity": 200,
+        "unit": "g"
+      },
+      {
+        "ingredientKey": "butter",
+        "quantity": 40,
+        "unit": "g"
+      },
+      {
+        "ingredientKey": "plain_flour",
+        "quantity": 40,
+        "unit": "g"
+      }
+    ],
+    "locale": [
+      "UK"
+    ],
+    "source": "uk_pack",
+    "estimatedCostPerServeGBP": 0.95,
+    "estimatedRecipeCostGBP": 3.8,
+    "pricingNote": "estimated_haiku_pending"
+  },
+  {
+    "recipeId": "uk_beef_stir_fry",
+    "region": "UK",
+    "title": "Beef stir fry",
+    "serves": 4,
+    "tags": [
+      "quick",
+      "fakeaway"
+    ],
+    "ingredientRows": [
+      {
+        "ingredientKey": "beef_mince_5",
+        "quantity": 400,
+        "unit": "g"
+      },
+      {
+        "ingredientKey": "noodles_egg",
+        "quantity": 300,
+        "unit": "g"
+      },
+      {
+        "ingredientKey": "peppers_3pk",
+        "quantity": 2,
+        "unit": "each"
+      },
+      {
+        "ingredientKey": "spring_onions_bunch",
+        "quantity": 1,
+        "unit": "bunch"
+      },
+      {
+        "ingredientKey": "soy_sauce",
+        "quantity": 40,
+        "unit": "ml"
+      }
+    ],
+    "locale": [
+      "UK"
+    ],
+    "source": "uk_pack",
+    "estimatedCostPerServeGBP": 2.2,
+    "estimatedRecipeCostGBP": 8.8,
+    "pricingNote": "estimated_haiku_pending"
+  },
+  {
+    "recipeId": "uk_doner_wraps",
+    "region": "UK",
+    "title": "Fakeaway doner kebab wraps",
+    "serves": 4,
+    "tags": [
+      "fakeaway",
+      "family"
+    ],
+    "ingredientRows": [
+      {
+        "ingredientKey": "beef_mince_10",
+        "quantity": 500,
+        "unit": "g"
+      },
+      {
+        "ingredientKey": "wraps_8",
+        "quantity": 1,
+        "unit": "pack"
+      },
+      {
+        "ingredientKey": "lettuce",
+        "quantity": 1,
+        "unit": "each"
+      },
+      {
+        "ingredientKey": "cucumber",
+        "quantity": 1,
+        "unit": "each"
+      },
+      {
+        "ingredientKey": "mayonnaise",
+        "quantity": 50,
+        "unit": "ml"
+      }
+    ],
+    "locale": [
+      "UK"
+    ],
+    "source": "uk_pack",
+    "estimatedCostPerServeGBP": 1.85,
+    "estimatedRecipeCostGBP": 7.4,
+    "pricingNote": "estimated_haiku_pending"
+  },
+  {
+    "recipeId": "uk_chicken_wraps",
+    "region": "UK",
+    "title": "Chicken wraps",
+    "serves": 4,
+    "tags": [
+      "quick",
+      "family"
+    ],
+    "ingredientRows": [
+      {
+        "ingredientKey": "chicken_breast_fresh",
+        "quantity": 500,
+        "unit": "g"
+      },
+      {
+        "ingredientKey": "wraps_8",
+        "quantity": 1,
+        "unit": "pack"
+      },
+      {
+        "ingredientKey": "lettuce",
+        "quantity": 1,
+        "unit": "each"
+      },
+      {
+        "ingredientKey": "mayonnaise",
+        "quantity": 40,
+        "unit": "ml"
+      }
+    ],
+    "locale": [
+      "UK"
+    ],
+    "source": "uk_pack",
+    "estimatedCostPerServeGBP": 1.9,
+    "estimatedRecipeCostGBP": 7.6,
+    "pricingNote": "estimated_haiku_pending"
+  },
+  {
+    "recipeId": "uk_omelette_toast",
+    "region": "UK",
+    "title": "Omelette and toast",
+    "serves": 2,
+    "tags": [
+      "budget",
+      "quick"
+    ],
+    "ingredientRows": [
+      {
+        "ingredientKey": "eggs_free_range_12",
+        "quantity": 4,
+        "unit": "each"
+      },
+      {
+        "ingredientKey": "bread_loaf",
+        "quantity": 4,
+        "unit": "slices"
+      },
+      {
+        "ingredientKey": "butter",
+        "quantity": 10,
+        "unit": "g"
+      }
+    ],
+    "locale": [
+      "UK"
+    ],
+    "source": "uk_pack",
+    "estimatedCostPerServeGBP": 0.75,
+    "estimatedRecipeCostGBP": 1.5,
+    "pricingNote": "estimated_haiku_pending"
+  },
+  {
+    "recipeId": "uk_beans_sausages",
+    "region": "UK",
+    "title": "Beans and sausages",
+    "serves": 2,
+    "tags": [
+      "budget"
+    ],
+    "ingredientRows": [
+      {
+        "ingredientKey": "sausages_pork",
+        "quantity": 300,
+        "unit": "g"
+      },
+      {
+        "ingredientKey": "baked_beans",
+        "quantity": 1,
+        "unit": "tin"
+      }
+    ],
+    "locale": [
+      "UK"
+    ],
+    "source": "uk_pack",
+    "estimatedCostPerServeGBP": 0.9,
+    "estimatedRecipeCostGBP": 1.8,
+    "pricingNote": "estimated_haiku_pending"
+  },
+  {
+    "recipeId": "uk_noodles_egg",
+    "region": "UK",
+    "title": "Instant noodles with egg",
+    "serves": 1,
+    "tags": [
+      "budget",
+      "quick"
+    ],
+    "ingredientRows": [
+      {
+        "ingredientKey": "noodles_egg",
+        "quantity": 100,
+        "unit": "g"
+      },
+      {
+        "ingredientKey": "eggs_free_range_12",
+        "quantity": 1,
+        "unit": "each"
+      }
+    ],
+    "locale": [
+      "UK"
+    ],
+    "source": "uk_pack",
+    "estimatedCostPerServeGBP": 0.55,
+    "estimatedRecipeCostGBP": 0.55,
+    "pricingNote": "estimated_haiku_pending"
+  },
+  {
+    "recipeId": "uk_sausage_traybake",
+    "region": "UK",
+    "title": "Sausage traybake",
+    "serves": 4,
+    "tags": [
+      "one_tray"
+    ],
+    "ingredientRows": [
+      {
+        "ingredientKey": "sausages_pork",
+        "quantity": 600,
+        "unit": "g"
+      },
+      {
+        "ingredientKey": "potatoes_white_2kg",
+        "quantity": 800,
+        "unit": "g"
+      },
+      {
+        "ingredientKey": "peppers_3pk",
+        "quantity": 2,
+        "unit": "each"
+      },
+      {
+        "ingredientKey": "olive_oil",
+        "quantity": 25,
+        "unit": "ml"
+      }
+    ],
+    "locale": [
+      "UK"
+    ],
+    "source": "uk_pack",
+    "estimatedCostPerServeGBP": 1.45,
+    "estimatedRecipeCostGBP": 5.8,
+    "pricingNote": "estimated_haiku_pending"
+  },
+  {
+    "recipeId": "uk_one_pot_chicken_rice",
+    "region": "UK",
+    "title": "One-pot chicken and rice",
+    "serves": 4,
+    "tags": [
+      "one_pot",
+      "family"
+    ],
+    "ingredientRows": [
+      {
+        "ingredientKey": "chicken_breast_fresh",
+        "quantity": 500,
+        "unit": "g"
+      },
+      {
+        "ingredientKey": "rice_white",
+        "quantity": 300,
+        "unit": "g"
+      },
+      {
+        "ingredientKey": "onions",
+        "quantity": 150,
+        "unit": "g"
+      },
+      {
+        "ingredientKey": "stock_cubes_chicken_10",
+        "quantity": 1,
+        "unit": "each"
+      }
+    ],
+    "locale": [
+      "UK"
+    ],
+    "source": "uk_pack",
+    "estimatedCostPerServeGBP": 1.8,
+    "estimatedRecipeCostGBP": 7.2,
+    "pricingNote": "estimated_haiku_pending"
+  },
+  {
+    "recipeId": "uk_roast_dinner_simple",
+    "region": "UK",
+    "title": "Simple roast dinner",
+    "serves": 4,
+    "tags": [
+      "comfort",
+      "family"
+    ],
+    "ingredientRows": [
+      {
+        "ingredientKey": "chicken_breast_fresh",
+        "quantity": 600,
+        "unit": "g"
+      },
+      {
+        "ingredientKey": "potatoes_white_2kg",
+        "quantity": 1000,
+        "unit": "g"
+      },
+      {
+        "ingredientKey": "carrots",
+        "quantity": 300,
+        "unit": "g"
+      },
+      {
+        "ingredientKey": "peas_frozen",
+        "quantity": 200,
+        "unit": "g"
+      }
+    ],
+    "locale": [
+      "UK"
+    ],
+    "source": "uk_pack",
+    "estimatedCostPerServeGBP": 2.85,
+    "estimatedRecipeCostGBP": 11.4,
+    "pricingNote": "estimated_haiku_pending"
+  },
+  {
+    "recipeId": "uk_couscous_chicken",
+    "region": "UK",
+    "title": "Chicken couscous bowl",
+    "serves": 4,
+    "tags": [
+      "lighter"
+    ],
+    "ingredientRows": [
+      {
+        "ingredientKey": "chicken_breast_fresh",
+        "quantity": 500,
+        "unit": "g"
+      },
+      {
+        "ingredientKey": "couscous",
+        "quantity": 250,
+        "unit": "g"
+      },
+      {
+        "ingredientKey": "peppers_3pk",
+        "quantity": 2,
+        "unit": "each"
+      }
+    ],
+    "locale": [
+      "UK"
+    ],
+    "source": "uk_pack",
+    "estimatedCostPerServeGBP": 1.9,
+    "estimatedRecipeCostGBP": 7.6,
+    "pricingNote": "estimated_haiku_pending"
+  },
+  {
+    "recipeId": "uk_simple_stir_fry",
+    "region": "UK",
+    "title": "Simple chicken stir fry",
+    "serves": 4,
+    "tags": [
+      "quick"
+    ],
+    "ingredientRows": [
+      {
+        "ingredientKey": "chicken_breast_fresh",
+        "quantity": 500,
+        "unit": "g"
+      },
+      {
+        "ingredientKey": "noodles_egg",
+        "quantity": 300,
+        "unit": "g"
+      },
+      {
+        "ingredientKey": "mixed_veg_frozen",
+        "quantity": 300,
+        "unit": "g"
+      },
+      {
+        "ingredientKey": "soy_sauce",
+        "quantity": 40,
+        "unit": "ml"
+      }
+    ],
+    "locale": [
+      "UK"
+    ],
+    "source": "uk_pack",
+    "estimatedCostPerServeGBP": 1.75,
+    "estimatedRecipeCostGBP": 7.0,
+    "pricingNote": "estimated_haiku_pending"
+  },
+  {
+    "recipeId": "uk_pasta_tomato_basic",
+    "region": "UK",
+    "title": "Basic tomato pasta",
+    "serves": 4,
+    "tags": [
+      "budget"
+    ],
+    "ingredientRows": [
+      {
+        "ingredientKey": "penne_pasta",
+        "quantity": 350,
+        "unit": "g"
+      },
+      {
+        "ingredientKey": "passata",
+        "quantity": 500,
+        "unit": "g"
+      },
+      {
+        "ingredientKey": "onions",
+        "quantity": 100,
+        "unit": "g"
+      },
+      {
+        "ingredientKey": "cheddar_mature_400",
+        "quantity": 50,
+        "unit": "g"
+      }
+    ],
+    "locale": [
+      "UK"
+    ],
+    "source": "uk_pack",
+    "estimatedCostPerServeGBP": 0.65,
+    "estimatedRecipeCostGBP": 2.6,
+    "pricingNote": "estimated_haiku_pending"
+  }
+]

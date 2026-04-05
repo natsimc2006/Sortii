@@ -15,7 +15,6 @@ import {
   MealSlot,
   PANTRY_STAPLES,
   PlanPreferences,
-  RECIPES,
   Recipe,
   addIngredientsToSet,
   filterRecipes,
@@ -24,6 +23,7 @@ import {
   ingredientOverlapScore,
   pickRecipes,
 } from "@/constants/recipes";
+import { useLocale } from "@/context/LocaleContext";
 
 export interface SavedPlan {
   id: string;
@@ -81,7 +81,12 @@ function buildEmptyPlan(prefs: PlanPreferences): MealPlanEntry[] {
   return entries;
 }
 
-function fallbackCostByBand(band: string): number {
+function fallbackCostByBand(band: string, currSym: string): number {
+  if (currSym === '£') {
+    if (band === "low") return 1.20;
+    if (band === "high") return 3.00;
+    return 1.80;
+  }
   if (band === "low") return 4.50;
   if (band === "high") return 11.00;
   return 7.00;
@@ -89,21 +94,27 @@ function fallbackCostByBand(band: string): number {
 
 function calculateWeeklyCost(
   plan: MealPlanEntry[],
-  prefs: PlanPreferences
+  prefs: PlanPreferences,
+  recipes: Recipe[],
+  currencySymbol: string
 ): string {
   const filledMeals = plan.filter((m) => m.recipeId);
   const totalCost = filledMeals.reduce((sum, meal) => {
-    const recipe = RECIPES.find((r) => r.id === meal.recipeId);
+    const recipe = recipes.find((r) => r.id === meal.recipeId);
     const costPerServe =
-      recipe?.costPerServeAUD ?? fallbackCostByBand(recipe?.estimatedCostBand ?? "medium");
+      recipe?.costPerServe ??
+      recipe?.costPerServeAUD ??
+      fallbackCostByBand(recipe?.estimatedCostBand ?? "medium", currencySymbol);
     return sum + costPerServe * prefs.householdSize;
   }, 0);
   const rangeLow = Math.round(totalCost * 0.92);
   const rangeHigh = Math.round(totalCost * 1.08);
-  return `$${rangeLow}–$${rangeHigh}`;
+  return `${currencySymbol}${rangeLow}–${currencySymbol}${rangeHigh}`;
 }
 
 export function PlannerProvider({ children }: { children: React.ReactNode }) {
+  const { appRecipes, currencySymbol } = useLocale();
+
   const [preferences, setPreferencesState] =
     useState<PlanPreferences>(DEFAULT_PREFERENCES);
   const [currentPlan, setCurrentPlanState] = useState<MealPlanEntry[]>(
@@ -165,8 +176,8 @@ export function PlannerProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const getRecipeById = useCallback(
-    (id: string) => RECIPES.find((r) => r.id === id),
-    []
+    (id: string) => appRecipes.find((r) => r.id === id),
+    [appRecipes]
   );
 
   const setMealSlot = useCallback(
@@ -189,7 +200,7 @@ export function PlannerProvider({ children }: { children: React.ReactNode }) {
 
     const updatedPlan = currentPlan.map((entry) => {
       if (entry.recipeId) return entry;
-      const pool = filterRecipes(preferences, entry.slot, entry.day, hiddenRecipes);
+      const pool = filterRecipes(preferences, entry.slot, entry.day, hiddenRecipes, appRecipes);
       const picks = pickRecipes(pool, 1, preferences.mealVariety, filledIds);
       if (picks.length > 0) {
         if (preferences.leftoversMode === "none") filledIds.push(picks[0].id);
@@ -198,7 +209,7 @@ export function PlannerProvider({ children }: { children: React.ReactNode }) {
       return entry;
     });
     setCurrentPlan(updatedPlan);
-  }, [currentPlan, preferences, hiddenRecipes, setCurrentPlan]);
+  }, [currentPlan, preferences, hiddenRecipes, appRecipes, setCurrentPlan]);
 
   const autoGeneratePlan = useCallback((newPrefs?: PlanPreferences) => {
     const p = newPrefs ?? preferences;
@@ -279,7 +290,7 @@ export function PlannerProvider({ children }: { children: React.ReactNode }) {
     };
 
     const generated = fresh.map((entry) => {
-      const pool = filterRecipes(p, entry.slot, entry.day, hiddenRecipes);
+      const pool = filterRecipes(p, entry.slot, entry.day, hiddenRecipes, appRecipes);
 
       // Score all candidates with small random tie-breaker for variety
       const scored = pool
@@ -325,7 +336,7 @@ export function PlannerProvider({ children }: { children: React.ReactNode }) {
     setPlanHasLimitedVariety(hadToRepeat);
     setCurrentPlan(generated);
     setPreferencesDirtyState(false);
-  }, [preferences, hiddenRecipes, setCurrentPlan]);
+  }, [preferences, hiddenRecipes, appRecipes, setCurrentPlan]);
 
   const clearPlan = useCallback(() => {
     setCurrentPlan(buildEmptyPlan(preferences));
@@ -346,7 +357,7 @@ export function PlannerProvider({ children }: { children: React.ReactNode }) {
           `Week of ${new Date().toLocaleDateString("en-AU", { day: "numeric", month: "short" })}`,
         meals: currentPlan,
         preferences,
-        estimatedCost: calculateWeeklyCost(currentPlan, preferences),
+        estimatedCost: calculateWeeklyCost(currentPlan, preferences, appRecipes, currencySymbol),
       };
       const updated = [newPlan, ...savedPlans];
       setSavedPlans(updated);
@@ -385,14 +396,14 @@ export function PlannerProvider({ children }: { children: React.ReactNode }) {
       const newPlan = prev.map((entry) => {
         if (entry.recipeId !== id) return entry;
         const filledIds = prev.filter((m) => m.recipeId && m.recipeId !== id).map((m) => m.recipeId as string);
-        const pool = filterRecipes(preferences, entry.slot, entry.day, updated);
+        const pool = filterRecipes(preferences, entry.slot, entry.day, updated, appRecipes);
         const picks = pickRecipes(pool, 1, preferences.mealVariety, filledIds);
         return { ...entry, recipeId: picks[0]?.id ?? null };
       });
       AsyncStorage.setItem(STORAGE_KEYS.currentPlan, JSON.stringify(newPlan));
       return newPlan;
     });
-  }, [hiddenRecipes, preferences]);
+  }, [hiddenRecipes, preferences, appRecipes]);
 
   const autoSwapSlot = useCallback((day: string, slot: MealSlot) => {
     setCurrentPlanState((prev) => {
@@ -401,7 +412,7 @@ export function PlannerProvider({ children }: { children: React.ReactNode }) {
       const filledIds = prev
         .filter((m) => m.recipeId && !(m.day === day && m.slot === slot))
         .map((m) => m.recipeId as string);
-      let pool = filterRecipes(preferences, slot, day, hiddenRecipes);
+      let pool = filterRecipes(preferences, slot, day, hiddenRecipes, appRecipes);
       if (currentId) pool = pool.filter((r) => r.id !== currentId);
       const picks = pickRecipes(pool, 1, preferences.mealVariety, filledIds);
       if (picks.length === 0) return prev;
@@ -411,9 +422,9 @@ export function PlannerProvider({ children }: { children: React.ReactNode }) {
       AsyncStorage.setItem(STORAGE_KEYS.currentPlan, JSON.stringify(newPlan));
       return newPlan;
     });
-  }, [preferences, hiddenRecipes]);
+  }, [preferences, hiddenRecipes, appRecipes]);
 
-  const estimatedCostBand = calculateWeeklyCost(currentPlan, preferences);
+  const estimatedCostBand = calculateWeeklyCost(currentPlan, preferences, appRecipes, currencySymbol);
 
   return (
     <PlannerContext.Provider

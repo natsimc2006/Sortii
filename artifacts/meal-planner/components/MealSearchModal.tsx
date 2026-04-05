@@ -13,7 +13,8 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Colors from "@/constants/Colors";
-import { MealSlot, RECIPES, Recipe, filterRecipes } from "@/constants/recipes";
+import { MealSlot, Recipe, filterRecipes } from "@/constants/recipes";
+import { useLocale } from "@/context/LocaleContext";
 import { usePlanner } from "@/context/PlannerContext";
 import { RecipeCard } from "./RecipeCard";
 
@@ -31,6 +32,7 @@ export function MealSearchModal({
   onClose,
 }: MealSearchModalProps) {
   const { preferences, setMealSlot } = usePlanner();
+  const { appRecipes } = useLocale();
   const [search, setSearch] = useState("");
   const [showAll, setShowAll] = useState(false);
   const insets = useSafeAreaInsets();
@@ -38,8 +40,8 @@ export function MealSearchModal({
 
   const filteredRecipes = useMemo(() => {
     const base = showAll
-      ? RECIPES
-      : filterRecipes(preferences, slot, day);
+      ? appRecipes
+      : filterRecipes(preferences, slot, day, undefined, appRecipes);
     if (!search.trim()) return base;
     const q = search.toLowerCase();
     return base.filter(
@@ -48,7 +50,7 @@ export function MealSearchModal({
         r.description.toLowerCase().includes(q) ||
         r.ingredients.some((i) => i.name.toLowerCase().includes(q))
     );
-  }, [search, preferences, slot, showAll]);
+  }, [search, preferences, slot, showAll, appRecipes]);
 
   const handleSelect = (recipe: Recipe) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);

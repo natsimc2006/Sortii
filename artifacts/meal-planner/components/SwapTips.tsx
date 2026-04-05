@@ -2,6 +2,7 @@ import { Feather } from "@expo/vector-icons";
 import React, { useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SwapRule } from "@/constants/swapRules";
+import { useLocale } from "@/context/LocaleContext";
 import { getSwapsForRecipe } from "@/utils/getSwapsForRecipe";
 
 const PLUM = "#5E3A4C";
@@ -16,6 +17,7 @@ interface Props {
 
 export function SwapTips({ ingredientNames }: Props) {
   const swaps = getSwapsForRecipe(ingredientNames);
+  const { currencySymbol } = useLocale();
   const [expanded, setExpanded] = useState(false);
   const [dismissed, setDismissed] = useState(false);
   const [openTipId, setOpenTipId] = useState<string | null>(null);
@@ -72,6 +74,7 @@ export function SwapTips({ ingredientNames }: Props) {
         <SwapRow
           key={swap.id}
           swap={swap}
+          currencySymbol={currencySymbol}
           tipOpen={openTipId === swap.id}
           onToggleTip={() =>
             setOpenTipId((prev) => (prev === swap.id ? null : swap.id))
@@ -90,10 +93,12 @@ export function SwapTips({ ingredientNames }: Props) {
 
 function SwapRow({
   swap,
+  currencySymbol,
   tipOpen,
   onToggleTip,
 }: {
   swap: SwapRule;
+  currencySymbol: string;
   tipOpen: boolean;
   onToggleTip: () => void;
 }) {
@@ -116,7 +121,7 @@ function SwapRow({
         )}
       </View>
       <Text style={styles.swapSaving}>
-        ~${swap.savingPerServeAUD.toFixed(2)}/serve
+        ~{currencySymbol}{swap.savingPerServeAUD.toFixed(2)}/serve
       </Text>
     </TouchableOpacity>
   );
