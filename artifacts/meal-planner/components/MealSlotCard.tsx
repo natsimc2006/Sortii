@@ -3,6 +3,7 @@ import * as Haptics from "expo-haptics";
 import React, { useState } from "react";
 import {
   Image,
+  Platform,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -266,14 +267,19 @@ const styles = StyleSheet.create({
   },
   filledSlot: {
     borderRadius: 14,
-    borderWidth: 1,
+    borderWidth: 1.5,
     padding: 12,
     gap: 10,
-    shadowColor: "#1A1A1A",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.07,
-    shadowRadius: 8,
-    elevation: 2,
+    ...Platform.select({
+      web: { boxShadow: "0px 2px 10px rgba(0,0,0,0.09)" },
+      default: {
+        shadowColor: "#1A1A1A",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.09,
+        shadowRadius: 8,
+        elevation: 3,
+      },
+    }),
   },
   slotHeader: {
     flexDirection: "row",

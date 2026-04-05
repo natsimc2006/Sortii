@@ -146,7 +146,7 @@ export default function HomeScreen() {
       </View>
 
       {/* Change 5: Feature bullets in card */}
-      <View style={[styles.featuresCard, { backgroundColor: C.tealTint, borderColor: "rgba(42,143,136,0.3)" }]}>
+      <View style={[styles.featuresCard, { backgroundColor: "#FFFFFF", borderColor: C.cardBorder }]}>
         <Text style={[styles.featuresCardHeading, { color: C.primary }]}>
           WHAT'S INCLUDED
         </Text>
@@ -303,13 +303,13 @@ const styles = StyleSheet.create({
     position: "relative",
     overflow: "hidden",
     ...Platform.select({
-      web: { boxShadow: "0px 2px 12px rgba(0,0,0,0.06)" },
+      web: { boxShadow: "0px 2px 14px rgba(0,0,0,0.09)" },
       default: {
         shadowColor: "#000",
         shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.06,
-        shadowRadius: 6,
-        elevation: 2,
+        shadowOpacity: 0.09,
+        shadowRadius: 8,
+        elevation: 3,
       },
     }),
   },
@@ -360,9 +360,19 @@ const styles = StyleSheet.create({
   },
   featuresCard: {
     borderRadius: 16,
-    borderWidth: 1,
+    borderWidth: 1.5,
     padding: 20,
     gap: 0,
+    ...Platform.select({
+      web: { boxShadow: "0px 2px 12px rgba(0,0,0,0.07)" },
+      default: {
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.07,
+        shadowRadius: 8,
+        elevation: 2,
+      },
+    }),
   },
   featuresCardHeading: {
     fontSize: 11,

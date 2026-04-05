@@ -1,0 +1,183 @@
+Apply a visual polish pass to improve contrast, clarity, and visual hierarchy across the Sortii app.
+
+IMPORTANT:
+- Do NOT redesign layouts or components
+- Do NOT change brand colours
+- Do NOT revert the white background (keep the fresh white base)
+- Only make small, targeted adjustments to improve visual clarity and energy
+- Goal: reduce any “flat” feeling and bring back controlled colour pop
+
+--------------------------------------------------
+1. CARD ELEVATION (HIGH PRIORITY)
+--------------------------------------------------
+
+Meal cards, “How it works” cards, shopping list rows, and setup containers currently blend slightly into the white background.
+
+Update all cards to feel more defined:
+
+- Background: keep white
+- Add a subtle shadow:
+  - very low opacity
+  - soft blur
+  - no harsh edges
+- Add a slightly stronger border:
+  - soft neutral grey (not too faint)
+- Maintain rounded corners
+
+Goal:
+Cards should feel like they gently “lift” off the page instead of blending into it.
+
+--------------------------------------------------
+2. SELECTED vs UNSELECTED STATES (HIGH IMPACT)
+--------------------------------------------------
+
+Buttons, pills, and chips currently feel slightly washed in unselected states.
+
+Update as follows:
+
+SELECTED:
+- Teal fill
+- White text
+- Slightly stronger visual weight
+
+UNSELECTED:
+- White or very light neutral background
+- Add a clearer border (increase contrast slightly)
+- Darken text slightly for readability
+
+Apply this to:
+- Planning mode (Auto / Mixed / Manual)
+- Budget level buttons
+- Meal count buttons
+- Top filter chips (4 people / budget / etc.)
+
+Goal:
+Users should instantly see what is selected vs not.
+
+--------------------------------------------------
+3. “APPLY ALL SWAPS” BANNER (MAKE THIS POP)
+--------------------------------------------------
+
+This is a key value moment but currently feels too soft.
+
+Update to:
+
+Option A (preferred):
+- Light plum-tinted background (slightly stronger than current)
+- Darker plum text for contrast
+- Keep rounded card style
+
+OR
+
+Option B:
+- White card
+- Plum border
+- Stronger plum text
+
+Ensure:
+- This banner visually stands out as a smart suggestion
+- It reads as actionable, not passive
+
+--------------------------------------------------
+4. “WHAT’S INCLUDED” SECTION (REDUCE WASHOUT)
+--------------------------------------------------
+
+This section currently feels slightly flat.
+
+Update by:
+
+EITHER:
+- Slightly deepen the background tint for better contrast
+
+OR (preferred):
+- Convert to white card
+- Add subtle dividers between rows
+- Keep icons and text clean
+
+Goal:
+Make this feel like a feature highlight, not background filler.
+
+--------------------------------------------------
+5. TEXT CONTRAST IMPROVEMENTS
+--------------------------------------------------
+
+Improve readability across the app:
+
+- Headings: ensure near-black or strong charcoal
+- Body text: slightly darker neutral
+- Helper text: still softer, but not faded
+
+Apply especially to:
+- Shopping list rows
+- Setup page helper text
+- Planner metadata
+
+Goal:
+Text should feel crisp and easy to scan.
+
+--------------------------------------------------
+6. ICON + CONTROL CLARITY
+--------------------------------------------------
+
+Some controls feel slightly “ghosted”.
+
+Update:
+- Plus / minus buttons → slightly darker icons or stronger fill
+- Checkboxes → clearer border
+- Small action icons → increase contrast slightly
+
+Do NOT make them heavy — just more tappable.
+
+--------------------------------------------------
+7. SPACING MICRO-ADJUSTMENTS
+--------------------------------------------------
+
+Add slight breathing room where needed:
+
+- Increase vertical spacing between major sections slightly
+- Add a touch more padding inside cards
+- Ensure sections don’t visually blend together
+
+Do NOT change layout structure — just spacing refinement.
+
+--------------------------------------------------
+8. KEEP THESE AS-IS (IMPORTANT)
+--------------------------------------------------
+
+Do NOT change:
+- White background direction
+- Gold CTA buttons (they work well)
+- Teal as primary action colour
+- Overall layout and flow
+- Friendly, warm tone of the UI
+
+--------------------------------------------------
+9. FINAL DESIGN GOAL
+--------------------------------------------------
+
+After changes, the app should feel:
+
+- Fresh (white base stays)
+- Clear (stronger hierarchy)
+- Light (not heavy or cluttered)
+- But also:
+  - More confident
+  - More intentional
+  - Less washed out
+
+Think:
+“Clean white kitchen with colourful, defined ingredients”
+NOT:
+“Everything softly blending together”
+
+--------------------------------------------------
+10. PRIORITY ORDER (IF LIMITED CHANGES)
+--------------------------------------------------
+
+If only partial updates can be made, prioritise:
+
+1. Card elevation (shadow + border)
+2. Selected/unselected state clarity
+3. Swap banner visibility
+4. Text contrast improvements
+5. Icon/button clarity
