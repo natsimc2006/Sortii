@@ -103,7 +103,7 @@ export default function HomeScreen() {
           resizeMode="contain"
         />
         <Text style={styles.mainHeadline}>
-          No more "what's for dinner"
+          {"No more\n\u201Cwhat\u2019s for dinner\u201D"}
         </Text>
         <Text style={styles.subheadline}>
           Sortii plans your week in 60 seconds — meals, budget, shopping list. Sorted.
@@ -241,27 +241,28 @@ const styles = StyleSheet.create({
     maxWidth: "92%",
     height: 230,
     marginTop: -38,
-    marginBottom: 30,
+    marginBottom: 38,
     zIndex: 1,
   },
   mainHeadline: {
-    fontSize: 40,
-    fontFamily: "Manrope_700Bold",
-    fontWeight: "700",
+    fontSize: 35,
+    fontFamily: "Manrope_600SemiBold",
+    fontWeight: "600",
     textAlign: "center",
-    lineHeight: 46,
-    letterSpacing: -0.5,
-    color: "#1F1F1F",
+    lineHeight: 52,
+    letterSpacing: -0.3,
+    color: "#3A3A36",
+    marginBottom: 14,
     zIndex: 1,
   },
   subheadline: {
-    fontSize: 18,
+    fontSize: 17,
     fontFamily: "Inter_400Regular",
     textAlign: "center",
-    lineHeight: 29,
+    lineHeight: 28,
     letterSpacing: 0,
-    color: "#5B5B5B",
-    maxWidth: 320,
+    color: "#5F5F59",
+    maxWidth: 310,
     zIndex: 1,
   },
   supportingLine: {
