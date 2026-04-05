@@ -33,7 +33,7 @@ export function RecipeCard({
     Animated.timing(imgOpacity, {
       toValue: 1,
       duration: 280,
-      useNativeDriver: true,
+      useNativeDriver: false,
     }).start();
   };
 

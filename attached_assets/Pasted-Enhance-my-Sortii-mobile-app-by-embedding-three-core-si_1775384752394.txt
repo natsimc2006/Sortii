@@ -1,0 +1,173 @@
+Enhance my Sortii mobile app by embedding three core “signature moments” into the user experience using subtle UI feedback, microcopy, and light animation.
+
+IMPORTANT:
+- Do NOT redesign layouts or flows
+- Do NOT add heavy animations
+- Keep everything fast, subtle, and natural
+- These moments should feel effortless, not forced
+- Use existing UI where possible and layer enhancements on top
+
+The goal is to reinforce:
+1. “Week Sorted” (completion & relief)
+2. “You saved money” (value & shareability)
+3. “Mental load removed” (calm & retention)
+
+--------------------------------------------------
+1. SIGNATURE MOMENT: “WEEK SORTED”
+--------------------------------------------------
+
+Trigger this moment when:
+- A full week plan is completed
+- User taps “Fill gaps” and planner completes
+- User finishes onboarding/setup
+
+Enhancements:
+- Animate a subtle checkmark drawing in or fading in
+- Slight delay (200–400ms) before showing confirmation text
+- Optional soft haptic feedback (if supported)
+
+Primary copy:
+- “Nothing left to decide. That’s the point.”
+
+Alternate rotating lines:
+- “Week sorted.”
+- “Dinner… sorted.”
+- “You’re done here.”
+
+Display:
+- Place just under planner header or top section
+- Ensure it feels like a calm, confident confirmation (not a popup)
+
+Goal:
+User feels immediate relief and completion.
+
+--------------------------------------------------
+2. SIGNATURE MOMENT: “YOU SAVED MONEY”
+--------------------------------------------------
+
+Trigger this moment when:
+- A swap is applied
+- Weekly plan updates with savings
+- Shopping list total reflects optimisation
+
+Enhancements:
+- Show a small temporary label near the interaction:
+  e.g. “Saved $6”
+- Fade in/out quickly (1–2 seconds)
+- Optional slight card highlight or glow during swap
+
+Optional persistent display:
+- Weekly summary line:
+  “You saved $54 this week”
+
+Microcopy options:
+- “Saved you $X”
+- “Smarter choice”
+- “Same vibe, less spend”
+
+Placement:
+- Near swap interactions
+- Near pricing/total areas
+- Avoid clutter — only show when relevant
+
+Goal:
+Make savings feel instant, visible, and satisfying.
+
+--------------------------------------------------
+3. SIGNATURE MOMENT: “MENTAL LOAD REMOVED”
+--------------------------------------------------
+
+Trigger this moment when:
+- User opens planner and week is already filled
+- User views completed plan
+- User sees ready-made shopping list
+
+Enhancements:
+- Use calm, reassuring microcopy in key locations
+
+Examples:
+- “We’ve got this.”
+- “Nothing left to decide.”
+- “Your list, ready to shop.”
+- “Done.”
+
+- Slight fade-in of these lines (no pop or bounce)
+- Keep tone soft and confident
+
+Placement:
+- Planner header area
+- Setup screens
+- Shopping list header
+
+Goal:
+User feels calm, supported, and mentally “off the hook”
+
+--------------------------------------------------
+4. ROTATION SYSTEM (IMPORTANT)
+--------------------------------------------------
+
+Do NOT show the same line every time.
+
+Create a simple rotation system:
+- Randomly rotate between 2–3 approved lines per moment
+- Keep tone consistent
+
+This prevents the app feeling repetitive and keeps it human.
+
+--------------------------------------------------
+5. ANIMATION GUIDELINES
+--------------------------------------------------
+
+- Duration: 100–300ms for most interactions
+- Use ease-in-out transitions
+- No large movements
+- No flashy effects
+
+Use:
+- fade
+- slight scale (1 → 1.02)
+- subtle motion only
+
+Avoid:
+- bouncing elements excessively
+- long delays
+- distracting transitions
+
+--------------------------------------------------
+6. PRIORITY IMPLEMENTATION
+--------------------------------------------------
+
+If limited time, prioritise:
+
+1. “Week Sorted” moment (highest emotional impact)
+2. “Saved $X” feedback on swaps
+3. Planner reassurance microcopy
+
+--------------------------------------------------
+7. FINAL EXPERIENCE GOAL
+--------------------------------------------------
+
+After implementation, the app should feel:
+
+- Effortless to use
+- Slightly rewarding
+- Calm and supportive
+- Smart and helpful
+
+Users should think:
+“This just sorted everything for me.”
+
+Not:
+“This is a feature-heavy app.”
+
+--------------------------------------------------
+8. DO NOT
+--------------------------------------------------
+
+- Do NOT overuse messages
+- Do NOT interrupt the flow with popups
+- Do NOT add noise or clutter
+- Do NOT make it feel gamified or gimmicky
+
+Keep everything:
+subtle, intentional, and premium

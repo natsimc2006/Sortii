@@ -1,11 +1,14 @@
 import React, { useRef } from "react";
 import {
   Animated,
+  Platform,
   StyleProp,
   TouchableOpacity,
   TouchableOpacityProps,
   ViewStyle,
 } from "react-native";
+
+const USE_NATIVE = Platform.OS !== "web";
 
 interface PressableScaleProps extends TouchableOpacityProps {
   children: React.ReactNode;
@@ -27,7 +30,7 @@ export function PressableScale({
     Animated.timing(scale, {
       toValue: scaleTo,
       duration: 100,
-      useNativeDriver: true,
+      useNativeDriver: USE_NATIVE,
     }).start();
     onPressIn?.(e);
   };
@@ -36,7 +39,7 @@ export function PressableScale({
     Animated.timing(scale, {
       toValue: 1,
       duration: 150,
-      useNativeDriver: true,
+      useNativeDriver: USE_NATIVE,
     }).start();
     onPressOut?.(e);
   };

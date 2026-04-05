@@ -66,7 +66,7 @@ export function MealSlotCard({
     Animated.timing(imgOpacity, {
       toValue: 1,
       duration: 280,
-      useNativeDriver: true,
+      useNativeDriver: false,
     }).start();
   };
   const currentSeason = seasonalMode ? getCurrentAustralianSeason() : null;

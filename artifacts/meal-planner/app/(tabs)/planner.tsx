@@ -4,6 +4,7 @@ import { useRouter } from "expo-router";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
+  Animated,
   Image,
   Platform,
   ScrollView,
@@ -53,6 +54,12 @@ const TOAST_AUTO_PLAN = [
   "That took longer to read than it did to plan.",
 ];
 
+const MENTAL_LOAD_MSGS = [
+  "We've got this.",
+  "Nothing left to decide.",
+  "Dinner's handled.",
+];
+
 const TOAST_SAVE = [
   "Saved. Your future self is already relieved.",
   "Plan locked in. Nice work.",
@@ -61,6 +68,13 @@ const TOAST_SAVE = [
 const TOAST_CLEAR_MEAL = [
   "Gone. We'll find you something better.",
   "Cleared. Fresh start for that day.",
+];
+
+const TOAST_AUTO_SWAP = [
+  "Smarter choice.",
+  "Same vibe, less spend.",
+  "Swapped. That's better.",
+  "Good call.",
 ];
 
 const TOAST_HIDE_RECIPE = [
@@ -114,6 +128,14 @@ export default function PlannerScreen() {
   const undoSnapshotRef = useRef<MealPlanEntry[] | null>(null);
   const recipeTipShownRef = useRef(false);
 
+  const weekSortedOpacity = useRef(new Animated.Value(0)).current;
+  const [weekSortedMessage, setWeekSortedMessage] = useState("");
+  const weekFullMountedRef = useRef(false);
+  const prevWeekFullRef = useRef(false);
+
+  const mountOpacity = useRef(new Animated.Value(0)).current;
+  const [headerReassuranceMsg] = useState(() => pickRandom(MENTAL_LOAD_MSGS));
+
   const openSearch = (day: string, slot: MealSlot) => {
     setSelectedDay(day);
     setSelectedSlot(slot);
@@ -150,6 +172,12 @@ export default function PlannerScreen() {
     AsyncStorage.getItem("sortii_recipe_tip_shown").then((v) => {
       if (v === "true") recipeTipShownRef.current = true;
     });
+    Animated.timing(mountOpacity, {
+      toValue: 1,
+      duration: 350,
+      delay: 250,
+      useNativeDriver: false,
+    }).start();
   }, []);
 
   useEffect(() => {
@@ -309,7 +337,7 @@ export default function PlannerScreen() {
       autoSwapSlot(day, slot);
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       showToast({
-        message: "Swapped. That's better.",
+        message: pickRandom(TOAST_AUTO_SWAP),
         variant: "undo",
         actionLabel: "Undo",
         onAction: handleUndo,
@@ -322,6 +350,35 @@ export default function PlannerScreen() {
   const totalSlots = currentPlan.length;
   const isWeekEmpty = filledCount === 0;
   const isWeekFull = filledCount === totalSlots && totalSlots > 0;
+
+  useEffect(() => {
+    if (!weekFullMountedRef.current) {
+      weekFullMountedRef.current = true;
+      if (isWeekFull) {
+        const msg = pickRandom(FULL_PLAN_MESSAGES);
+        setWeekSortedMessage(msg);
+        weekSortedOpacity.setValue(1);
+      }
+      prevWeekFullRef.current = isWeekFull;
+      return;
+    }
+    if (isWeekFull && !prevWeekFullRef.current) {
+      const msg = pickRandom(FULL_PLAN_MESSAGES);
+      setWeekSortedMessage(msg);
+      weekSortedOpacity.setValue(0);
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      setTimeout(() => {
+        Animated.timing(weekSortedOpacity, {
+          toValue: 1,
+          duration: 450,
+          useNativeDriver: false,
+        }).start();
+      }, 300);
+    } else if (!isWeekFull) {
+      weekSortedOpacity.setValue(0);
+    }
+    prevWeekFullRef.current = isWeekFull;
+  }, [isWeekFull]);
 
   const ctaLabel = isWeekEmpty
     ? "Create My Week"
@@ -446,6 +503,11 @@ export default function PlannerScreen() {
             <FilterChip label={healthLabel} icon="activity" />
             <FilterChip label={estimatedCostBand} icon="shopping-bag" />
           </View>
+          {filledCount >= 3 && !isWeekFull && (
+            <Animated.Text style={[styles.headerReassurance, { opacity: mountOpacity }]}>
+              {headerReassuranceMsg}
+            </Animated.Text>
+          )}
           {weeklySwapSaving >= 2 && (
             <View style={styles.swapBanner}>
               <Text style={styles.swapBannerText}>
@@ -473,13 +535,19 @@ export default function PlannerScreen() {
             ]}
           />
         </View>
-        <Text style={[styles.progressLabel, { color: isWeekFull ? C.primary : C.textSecondary }]}>
-          {isWeekFull
-            ? pickRandom(FULL_PLAN_MESSAGES)
-            : isWeekEmpty
+        {isWeekFull ? (
+          <Animated.Text
+            style={[styles.progressLabel, { color: C.primary, opacity: weekSortedOpacity }]}
+          >
+            ✓ {weekSortedMessage}
+          </Animated.Text>
+        ) : (
+          <Text style={[styles.progressLabel, { color: isWeekEmpty ? C.textMuted : C.textSecondary }]}>
+            {isWeekEmpty
               ? pickRandom(EMPTY_PLAN_MESSAGES)
               : `${filledCount} of ${totalSlots} meals planned`}
-        </Text>
+          </Text>
+        )}
 
         {DAYS.map((day) => {
           const dinnerEntry = getEntry(day, "dinner");
@@ -775,6 +843,13 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
     gap: 6,
+  },
+  headerReassurance: {
+    fontSize: 12,
+    fontFamily: "Inter_500Medium",
+    fontStyle: "italic",
+    color: "#6B4A5E",
+    marginTop: 6,
   },
   filterChip: {
     flexDirection: "row",
