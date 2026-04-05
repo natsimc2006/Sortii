@@ -1,0 +1,20 @@
+We have a recipes.json file and a filter system including a kidFriendly boolean. The problem: the kid-friendly filter is weak — when enabled, it still returns curries, chowder, and other adult-oriented meals. Fix this properly.
+TASK 1 — Audit and fix recipes.json tagging:
+Go through every recipe. Set "kidFriendly": true ONLY if ALL of these are true:
+
+Mild flavour profile (no chilli, curry powder, cumin, paprika as dominant flavours, no seafood chowder, no strong herbs like coriander as a main element)
+Simple textures (no chunky stews with mixed textures, no slimy or unfamiliar textures)
+Familiar format (pasta, rice dishes, roast chicken, sausages, pizza, noodles, wraps, burgers, nuggets, simple soups like pumpkin or tomato, bolognese, mac and cheese, fried rice, tacos with mild fillings)
+Could plausibly appear on a primary school lunchbox or family dinner table in Australia
+
+Set "kidFriendly": false for: curries (any kind), chowders, risotto with strong flavours, dishes with blue cheese, strong fish, offal, spicy anything, or anything considered an "adult" taste.
+Also add a new field: "kidFriendlyReason": "" — a short internal note for why it was tagged (e.g. "mild pasta dish", "simple chicken and rice"). This is dev-only, not shown in UI.
+TASK 2 — Strengthen the filter in the planner algorithm:
+Find wherever the weekly meal plan is generated (likely generateWeeklyPlan.ts or similar). When kidFriendly filter is active:
+
+Filter the recipe pool to ONLY kidFriendly: true recipes BEFORE any random selection
+Do NOT fall back to non-kid-friendly recipes if the pool is small — instead surface the "loosen a filter" message: "You've made this tricky 😅 Try removing a filter."
+Ensure this filter stacks correctly with dietary filters (vegetarian + kid friendly should work together)
+
+TASK 3 — UI label audit:
+Find the kid-friendly toggle/chip in preferences or filters. Make sure the label reads "Kid Friendly" (not "Family" or "Child-friendly"). Add a micro-label beneath it in plum italic: "Mild, familiar meals" — this sets expectations so users understand what the filter actually does

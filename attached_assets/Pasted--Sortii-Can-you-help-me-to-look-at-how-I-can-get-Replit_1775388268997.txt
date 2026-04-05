@@ -1,0 +1,71 @@
+
+Sortii
+/
+Can you help me to look at how I can get Replit to better decide on ‘kid friendly recipes, and maybe increase the meal data base to include more.
+
+At the moment that filter is very weak on meals (and think this will be ket for families budgeting), and meals pulled through include things like curries, chowder - nothing ‘basic simple kid driven’?
+
+9:20 PM
+
+Reading frontend design skill
+Reading frontend design skill
+Good timing to nail this — kid-friendly is a huge trust signal for family users. Let me give you a proper two-part solution: a Replit agent prompt to fix the filtering logic + a set of kid-friendly recipes to add to your database.
+
+The two problems to fix
+1. The filter logic — "kid friendly" is probably just a boolean tag right now, but curries/chowder are slipping through because they're tagged wrong, or the tag exists but isn't being respected properly in the planner algorithm.
+
+2. The recipe data — Not enough genuinely kid-appropriate meals in the pool, so even good filtering returns thin results.
+
+Prompt 1 — Fix the kid-friendly filter logic
+Paste this into your Replit agent:
+
+CONTEXT: I'm building Dinner Sorted, a React Native/Expo dinner planning app. We have a recipes.json file and a filter system including a kidFriendly boolean. The problem: the kid-friendly filter is weak — when enabled, it still returns curries, chowder, and other adult-oriented meals. Fix this properly.
+
+TASK 1 — Audit and fix recipes.json tagging: Go through every recipe. Set "kidFriendly": true ONLY if ALL of these are true:
+
+Mild flavour profile (no chilli, curry powder, cumin, paprika as dominant flavours, no seafood chowder, no strong herbs like coriander as a main element)
+Simple textures (no chunky stews with mixed textures, no slimy or unfamiliar textures)
+Familiar format (pasta, rice dishes, roast chicken, sausages, pizza, noodles, wraps, burgers, nuggets, simple soups like pumpkin or tomato, bolognese, mac and cheese, fried rice, tacos with mild fillings)
+Could plausibly appear on a primary school lunchbox or family dinner table in Australia
+Set "kidFriendly": false for: curries (any kind), chowders, risotto with strong flavours, dishes with blue cheese, strong fish, offal, spicy anything, or anything considered an "adult" taste.
+
+Also add a new field: "kidFriendlyReason": "" — a short internal note for why it was tagged (e.g. "mild pasta dish", "simple chicken and rice"). This is dev-only, not shown in UI.
+
+TASK 2 — Strengthen the filter in the planner algorithm: Find wherever the weekly meal plan is generated (likely generateWeeklyPlan.ts or similar). When kidFriendly filter is active:
+
+Filter the recipe pool to ONLY kidFriendly: true recipes BEFORE any random selection
+Do NOT fall back to non-kid-friendly recipes if the pool is small — instead surface the "loosen a filter" message: "You've made this tricky 😅 Try removing a filter."
+Ensure this filter stacks correctly with dietary filters (vegetarian + kid friendly should work together)
+TASK 3 — UI label audit: Find the kid-friendly toggle/chip in preferences or filters. Make sure the label reads "Kid Friendly" (not "Family" or "Child-friendly"). Add a micro-label beneath it in plum italic: "Mild, familiar meals" — this sets expectations so users understand what the filter actually does.
+
+Prompt 2 — Expand the kid-friendly recipe pool
+Paste this separately (it's a data expansion task):
+
+CONTEXT: Dinner Sorted's recipes.json doesn't have enough genuinely kid-friendly meals. Add the following 30 recipes to the JSON, all with "kidFriendly": true. Use the same schema as existing recipes — include name, ingredients, costPerServeAUD, prepTime, cookTime, tags, kidFriendly, kidFriendlyReason, servings (default 4). Estimate costPerServeAUD realistically for Australian supermarkets (Woolworths/Coles pricing, 2024).
+
+Recipes to add:
+
+Pasta:
+
+Spaghetti Bolognese
+Mac and Cheese (homemade)
+Pasta with Butter and Parmesan
+Pasta Bake (tomato, mince, cheese)
+Pesto Pasta with Chicken
+Rice dishes: 6. Fried Rice with Egg and Peas 7. Chicken and Rice (simple baked) 8. Sausage and Rice Bake
+
+Chicken: 9. Crumbed Chicken Schnitzel 10. Honey Soy Chicken Drumsticks 11. Baked BBQ Chicken Thighs 12. Chicken Nuggets (homemade, oven-baked) 13. Chicken Quesadillas (mild)
+
+Beef/Mince: 14. Beef Tacos (mild, build-your-own) 15. Cheeseburgers (homemade patties) 16. Sloppy Joes on bread rolls 17. Meatballs in Tomato Sauce 18. Shepherd's Pie
+
+Sausages/Hot dogs: 19. Sausages with Mashed Potato and Gravy 20. Toad in the Hole (sausages in batter) 21. Corn Dogs (oven-baked)
+
+Simple veg/sides as mains: 22. Cheese and Veggie Frittata 23. Pumpkin Soup (smooth, kid-friendly) 24. Tomato Soup with Cheesy Toast 25. Baked Potato with Cheese and Baked Beans
+
+Wraps/Sandwiches: 26. Chicken Caesar Wraps (mild) 27. Ham and Cheese Toasties (dinner version with salad)
+
+Pizza: 28. Homemade Pizza (simple tomato and cheese base, toppings on side) 29. Pizza Scrolls
+
+Fish (mild): 30. Fish and Chips (oven-baked, white fish)
+
+Make sure every recipe has: "dietaryTags" array (e.g. ["meat"], ["vegetarian"]), "kidFriendly": true, and realistic "costPerServeAUD" between $2.50–$6.00 AUD.
