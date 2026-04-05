@@ -2,7 +2,7 @@
   {
     "recipeId": "uk_shepherds_pie",
     "region": "UK",
-    "title": "Shepherd\u2019s pie",
+    "title": "Shepherd’s pie",
     "serves": 4,
     "tags": [
       "comfort",
@@ -45,7 +45,7 @@
         "ingredientLabel": "Stock cube",
         "quantity": 1,
         "unit": "each",
-        "estimatedCostGBP": 1.0
+        "estimatedCostGBP": 1
       },
       {
         "ingredientKey": "tomato_puree",
@@ -143,7 +143,7 @@
         "ingredientLabel": "Stock cube",
         "quantity": 1,
         "unit": "each",
-        "estimatedCostGBP": 1.0
+        "estimatedCostGBP": 1
       }
     ],
     "estimatedRecipeCostGBP": 7.21,
@@ -1014,9 +1014,9 @@
       "UK"
     ],
     "source": "uk_pack",
-    "estimatedCostPerServeGBP": 1.65,
-    "estimatedRecipeCostGBP": 6.6,
-    "pricingNote": "estimated_haiku_pending"
+    "estimatedCostPerServeGBP": 2.13,
+    "estimatedRecipeCostGBP": 8.52,
+    "pricingNote": "haiku_priced"
   },
   {
     "recipeId": "uk_mac_cheese",
@@ -1058,9 +1058,9 @@
       "UK"
     ],
     "source": "uk_pack",
-    "estimatedCostPerServeGBP": 0.95,
-    "estimatedRecipeCostGBP": 3.8,
-    "pricingNote": "estimated_haiku_pending"
+    "estimatedCostPerServeGBP": 1.94,
+    "estimatedRecipeCostGBP": 7.76,
+    "pricingNote": "haiku_priced"
   },
   {
     "recipeId": "uk_beef_stir_fry",
@@ -1102,9 +1102,9 @@
       "UK"
     ],
     "source": "uk_pack",
-    "estimatedCostPerServeGBP": 2.2,
-    "estimatedRecipeCostGBP": 8.8,
-    "pricingNote": "estimated_haiku_pending"
+    "estimatedCostPerServeGBP": 1.89,
+    "estimatedRecipeCostGBP": 7.56,
+    "pricingNote": "haiku_priced"
   },
   {
     "recipeId": "uk_doner_wraps",
@@ -1146,9 +1146,9 @@
       "UK"
     ],
     "source": "uk_pack",
-    "estimatedCostPerServeGBP": 1.85,
-    "estimatedRecipeCostGBP": 7.4,
-    "pricingNote": "estimated_haiku_pending"
+    "estimatedCostPerServeGBP": 2.46,
+    "estimatedRecipeCostGBP": 9.84,
+    "pricingNote": "haiku_priced"
   },
   {
     "recipeId": "uk_chicken_wraps",
@@ -1185,9 +1185,9 @@
       "UK"
     ],
     "source": "uk_pack",
-    "estimatedCostPerServeGBP": 1.9,
-    "estimatedRecipeCostGBP": 7.6,
-    "pricingNote": "estimated_haiku_pending"
+    "estimatedCostPerServeGBP": 2.19,
+    "estimatedRecipeCostGBP": 8.76,
+    "pricingNote": "haiku_priced"
   },
   {
     "recipeId": "uk_omelette_toast",
@@ -1219,9 +1219,9 @@
       "UK"
     ],
     "source": "uk_pack",
-    "estimatedCostPerServeGBP": 0.75,
-    "estimatedRecipeCostGBP": 1.5,
-    "pricingNote": "estimated_haiku_pending"
+    "estimatedCostPerServeGBP": 0.95,
+    "estimatedRecipeCostGBP": 1.9,
+    "pricingNote": "haiku_priced"
   },
   {
     "recipeId": "uk_beans_sausages",
@@ -1247,9 +1247,9 @@
       "UK"
     ],
     "source": "uk_pack",
-    "estimatedCostPerServeGBP": 0.9,
-    "estimatedRecipeCostGBP": 1.8,
-    "pricingNote": "estimated_haiku_pending"
+    "estimatedCostPerServeGBP": 1.21,
+    "estimatedRecipeCostGBP": 2.42,
+    "pricingNote": "haiku_priced"
   },
   {
     "recipeId": "uk_noodles_egg",
@@ -1276,9 +1276,9 @@
       "UK"
     ],
     "source": "uk_pack",
-    "estimatedCostPerServeGBP": 0.55,
-    "estimatedRecipeCostGBP": 0.55,
-    "pricingNote": "estimated_haiku_pending"
+    "estimatedCostPerServeGBP": 0.5,
+    "estimatedRecipeCostGBP": 0.5,
+    "pricingNote": "haiku_priced"
   },
   {
     "recipeId": "uk_sausage_traybake",
@@ -1314,9 +1314,9 @@
       "UK"
     ],
     "source": "uk_pack",
-    "estimatedCostPerServeGBP": 1.45,
-    "estimatedRecipeCostGBP": 5.8,
-    "pricingNote": "estimated_haiku_pending"
+    "estimatedCostPerServeGBP": 1.85,
+    "estimatedRecipeCostGBP": 7.4,
+    "pricingNote": "haiku_priced"
   },
   {
     "recipeId": "uk_one_pot_chicken_rice",
@@ -1353,9 +1353,9 @@
       "UK"
     ],
     "source": "uk_pack",
-    "estimatedCostPerServeGBP": 1.8,
-    "estimatedRecipeCostGBP": 7.2,
-    "pricingNote": "estimated_haiku_pending"
+    "estimatedCostPerServeGBP": 1.58,
+    "estimatedRecipeCostGBP": 6.32,
+    "pricingNote": "haiku_priced"
   },
   {
     "recipeId": "uk_roast_dinner_simple",
@@ -1392,9 +1392,9 @@
       "UK"
     ],
     "source": "uk_pack",
-    "estimatedCostPerServeGBP": 2.85,
-    "estimatedRecipeCostGBP": 11.4,
-    "pricingNote": "estimated_haiku_pending"
+    "estimatedCostPerServeGBP": 2.59,
+    "estimatedRecipeCostGBP": 10.36,
+    "pricingNote": "haiku_priced"
   },
   {
     "recipeId": "uk_couscous_chicken",
@@ -1425,9 +1425,9 @@
       "UK"
     ],
     "source": "uk_pack",
-    "estimatedCostPerServeGBP": 1.9,
-    "estimatedRecipeCostGBP": 7.6,
-    "pricingNote": "estimated_haiku_pending"
+    "estimatedCostPerServeGBP": 2.01,
+    "estimatedRecipeCostGBP": 8.04,
+    "pricingNote": "haiku_priced"
   },
   {
     "recipeId": "uk_simple_stir_fry",
@@ -1463,9 +1463,9 @@
       "UK"
     ],
     "source": "uk_pack",
-    "estimatedCostPerServeGBP": 1.75,
-    "estimatedRecipeCostGBP": 7.0,
-    "pricingNote": "estimated_haiku_pending"
+    "estimatedCostPerServeGBP": 1.84,
+    "estimatedRecipeCostGBP": 7.36,
+    "pricingNote": "haiku_priced"
   },
   {
     "recipeId": "uk_pasta_tomato_basic",
@@ -1501,8 +1501,8 @@
       "UK"
     ],
     "source": "uk_pack",
-    "estimatedCostPerServeGBP": 0.65,
-    "estimatedRecipeCostGBP": 2.6,
-    "pricingNote": "estimated_haiku_pending"
+    "estimatedCostPerServeGBP": 0.64,
+    "estimatedRecipeCostGBP": 2.56,
+    "pricingNote": "haiku_priced"
   }
 ]
