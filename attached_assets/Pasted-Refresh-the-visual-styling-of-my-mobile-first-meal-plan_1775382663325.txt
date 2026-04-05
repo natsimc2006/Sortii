@@ -1,0 +1,300 @@
+Refresh the visual styling of my mobile-first meal planning app “Sortii: Dinner… Sorted.” to feel fresher, cleaner, lighter, and more appetising.
+
+IMPORTANT:
+- Do NOT redesign the app from scratch.
+- Do NOT change the core structure, navigation, or information architecture.
+- Keep the existing Sortii brand colours and overall identity.
+- This is a visual refinement and polish pass only.
+- Goal: shift the app from slightly muted/soft beige to a fresher white-based interface that makes the teal, gold, food imagery, and content feel more vibrant and modern.
+
+OVERALL VISUAL DIRECTION:
+I want the app to feel:
+- fresh
+- clean
+- easy
+- modern
+- bright
+- lightly premium
+- warm, not sterile
+- organised, but not corporate
+- helpful and friendly, with a subtle cheeky personality
+
+Reference feeling:
+- bright white or softly warm-white background
+- crisp card separation
+- more contrast
+- food imagery feels more hero
+- accent colours pop more clearly
+- UI feels airy and breathable
+
+--------------------------------------------------
+1. GLOBAL COLOUR + SURFACE CHANGES
+--------------------------------------------------
+
+Update the UI so that white becomes the main canvas.
+
+Use this surface hierarchy:
+- Primary app background: white or very soft warm white
+  - preferred: #FFFFFF
+  - acceptable: #FAFAF8 or #FCFBF8
+- Secondary sections: very subtle tinted off-white only where needed
+- Cards: white
+- Borders: very soft warm grey or pale stone
+- Avoid large flat beige/grey backgrounds that dull the interface
+
+Keep the existing brand accents:
+- teal as primary brand action/accent
+- golden yellow as reward/highlight/CTA accent
+- plum as personality/secondary accent
+- charcoal / near-black for headings
+- soft muted neutrals for borders and background support
+
+Suggested visual usage:
+- Teal = selected states, active nav, key labels, icons, progress accents
+- Gold = floating action button, major CTA, celebratory highlights
+- Plum = supportive notes, secondary banners, subtle personality moments
+- Neutral beige = only as a very soft supporting tone, not the main page background
+
+Improve overall contrast:
+- headings darker
+- body text slightly darker than current
+- selected buttons clearer
+- outlines cleaner
+- surfaces more distinct
+
+--------------------------------------------------
+2. TYPOGRAPHY + VISUAL CLARITY
+--------------------------------------------------
+
+Keep current font family unless already deeply embedded, but improve hierarchy and clarity:
+- Main headings: darker, clearer, slightly more premium feeling
+- Body text: medium-dark neutral for better readability
+- Secondary helper text: softened but still readable
+- Small labels should not feel washed out
+
+Tone:
+- calm confidence
+- easy to scan
+- not overly playful
+- not too serious
+
+Increase visual hierarchy by making:
+- page titles more dominant
+- section labels clearer
+- helper text more intentionally secondary
+- selected options visually more obvious
+
+--------------------------------------------------
+3. SPACING + AIRINESS
+--------------------------------------------------
+
+Increase the sense of breathing room throughout the app without changing layout structure.
+
+Apply:
+- slightly more vertical spacing between sections
+- slightly more internal padding inside cards
+- clearer separation between page sections
+- ensure cards feel like they float on the page rather than blend into it
+
+Goal:
+- cleaner scan
+- less crowded
+- fresher visual rhythm
+- more premium feel
+
+--------------------------------------------------
+4. CARD STYLING
+--------------------------------------------------
+
+Update cards across the app to feel crisp and elevated.
+
+For cards:
+- white background
+- subtle border in very light neutral
+- optional very soft shadow
+- rounded corners retained
+- avoid heavy shadow
+- avoid muddy backgrounds
+
+Cards should feel:
+- clean
+- layered
+- easy to tap
+- modern
+
+Suggested effect:
+- thin pale outline
+- soft shadow with low opacity
+- strong separation from page background
+
+--------------------------------------------------
+5. BUTTONS, PILLS, CHIPS, AND TOGGLES
+--------------------------------------------------
+
+Refresh all selectable controls to feel clearer and more polished.
+
+For selected pills/buttons:
+- teal fill with white text for primary selected state
+- ensure selected state is obvious at a glance
+- slightly stronger contrast than current
+
+For unselected pills/buttons:
+- white or very light warm-neutral fill
+- thin soft outline
+- dark text
+- cleaner than current muted beige look
+
+For chips and tags:
+- make them feel more deliberate and colour-coded
+- retain softness, but improve clarity and consistency
+
+Do NOT make everything highly saturated.
+The goal is refined freshness, not loudness.
+
+--------------------------------------------------
+6. PAGE-BY-PAGE CHANGES
+--------------------------------------------------
+
+A. LANDING / INTRO / “NO MORE WHAT’S FOR DINNER?”
+- Change the main background to white or soft warm white
+- Keep the logo area clean and centred
+- Increase contrast of headline and supporting text
+- Allow more white space around hero copy
+- Make the page feel more premium and light
+- “How it works” cards should be white with subtle borders/shadow
+- Icon tiles inside steps can keep colour, but should pop more on white
+- Teal accents should look fresher because of the brighter canvas
+- Preserve the warm, reassuring tone
+
+B. WEEKLY PLANNER PAGE
+- Main planner background should shift to white / soft warm white
+- Section areas should feel cleaner and less muted
+- Meal cards should be white and feel elevated
+- Improve hierarchy between:
+  - day headings
+  - meal card
+  - metadata
+  - swap prompts
+- “Apply all swaps” banner should stand out more clearly
+  - use either a soft plum-tinted background or clearer white card styling with accent text
+  - keep it friendly, helpful, and noticeable
+- “Pantry tips” chip/banner should also feel intentional and light
+- The green/teal confirmation line (“Week sorted. You’re done here.”) should feel satisfying and crisp
+- Ensure bottom action controls (“Fill Gaps”, “Save”, delete icon) feel clean and modern on white
+- Floating central yellow action button should remain a standout feature
+
+C. SHOPPING LIST PAGE
+- Move page background to white / soft warm white
+- Keep grouped category layout
+- Each shopping item row should feel cleaner and more premium
+- Quantity controls should look less washed out and slightly more polished
+- Checkbox, plus/minus, and delete controls should remain obvious but lighter and tidier
+- The large gold “Share list” button should stay bold and warm
+- Improve row spacing and separation for easier scanning
+- Make category headers feel slightly more editorial/clean
+
+D. RECIPE DETAIL PAGE
+- Let the food image be the hero
+- Ensure the image area feels immersive and appetising
+- Keep the content section below bright and clean
+- Metadata chips under recipe title should look neat and consistent
+- Ingredient list should feel airy and easy to scan
+- Use teal sparingly but clearly for ingredient quantities or emphasis
+- Preserve readability and a premium-casual recipe app feel
+
+E. QUICK SETUP / PREFERENCES PAGE
+- Main page background should become white / soft warm white
+- Keep the form structure and sections as-is
+- The “Quick Setup” container should feel cleaner and more premium
+- Improve the styling of segmented controls and pill options:
+  - selected = teal fill / white text
+  - unselected = white or very pale neutral with soft border
+- Household size stepper should look more polished and crisp
+- Supporting lines like “We’ve got this” and “No judgement. Just dinner.” should remain, but look more elegant and intentional
+- Preserve the welcoming personality while improving freshness and contrast
+
+--------------------------------------------------
+7. FOOD IMAGE TREATMENT
+--------------------------------------------------
+
+Food imagery is a major emotional asset in this app.
+Adjust presentation so food feels fresher and more appetising.
+
+Guidelines:
+- Allow food photos to stand out more against the brighter interface
+- Avoid surrounding them with dull background tones
+- Use white space and clean card framing to make food the emotional focal point
+- Keep images warm, inviting, and vibrant
+
+--------------------------------------------------
+8. NAVIGATION + ICON TREATMENT
+--------------------------------------------------
+
+Keep the existing navigation structure and icon system, but visually refine it:
+- active icon state should feel crisp and branded
+- inactive icons should be softer but still legible
+- bottom navigation should feel clean against a white base
+- ensure floating center action remains visually strong and intentional
+
+--------------------------------------------------
+9. SHADOWS, BORDERS, AND ELEVATION
+--------------------------------------------------
+
+Use a restrained design system:
+- very light borders
+- subtle shadows only where needed
+- rounded corners remain
+- avoid heavy depth or glossy effects
+
+Aim for:
+- soft modern polish
+- card clarity
+- layered but minimal feel
+
+--------------------------------------------------
+10. WHAT NOT TO CHANGE
+--------------------------------------------------
+
+Do NOT:
+- change the app’s core navigation
+- change the feature flow
+- change the brand name, logo, or major brand colours
+- redesign content structure
+- remove the warmth/personality
+- make the interface feel sterile, clinical, or overly techy
+- overuse beige backgrounds
+- overuse shadows
+- make it look corporate
+
+--------------------------------------------------
+11. FINAL DESIGN GOAL
+--------------------------------------------------
+
+The end result should feel like:
+“Sortii now looks brighter, fresher, and more premium — while still feeling warm, practical, friendly, and easy.”
+
+It should feel like:
+- less visual heaviness
+- more freshness
+- more appetite appeal
+- clearer interaction states
+- cleaner white-based surfaces
+- a nicer balance between function and lifestyle appeal
+
+Please update shared styles / theme tokens first where possible, then apply the changes consistently across:
+- landing / intro page
+- planner page
+- shopping list page
+- recipe detail page
+- preferences / quick setup page
+
+If possible, centralise:
+- page background colours
+- card background colours
+- border colours
+- shadow styles
+- text colours
+- selected / unselected pill styles
+- CTA styles
+
+So the refresh is consistent across the app.

@@ -47,7 +47,7 @@ function OptionRow({
               styles.optionChip,
               active
                 ? { backgroundColor: C.primary, borderColor: C.primary }
-                : { backgroundColor: "#F7F3EB", borderColor: "#E6E1D7" },
+                : { backgroundColor: "#FFFFFF", borderColor: "#E0E0E0" },
             ]}
           >
             <Text style={[styles.optionChipText, { color: active ? "#FFFFFF" : C.text }]}>
@@ -78,7 +78,7 @@ function PillButton({
         styles.pill,
         active
           ? { backgroundColor: C.primary, borderColor: C.primary }
-          : { backgroundColor: "#F7F3EB", borderColor: "#E6E1D7" },
+          : { backgroundColor: "#FFFFFF", borderColor: "#E0E0E0" },
       ]}
     >
       <Text style={[styles.pillText, { color: active ? "#FFFFFF" : C.text }]}>
@@ -373,7 +373,7 @@ export default function PreferencesScreen() {
                 value={householdInput}
                 onChangeText={setHouseholdInput}
                 keyboardType="number-pad"
-                style={[styles.numberField, { color: "#2B2B2B", fontFamily: "Inter_700Bold" }]}
+                style={[styles.numberField, { color: C.text, fontFamily: "Inter_700Bold" }]}
                 textAlign="center"
                 maxLength={2}
               />

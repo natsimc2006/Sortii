@@ -92,7 +92,7 @@ export default function HomeScreen() {
       {/* Change 1: Hero with glow + Change 8: Updated copy */}
       <View style={styles.heroSection}>
         <LinearGradient
-          colors={["rgba(255,255,255,0.7)", "rgba(250,248,244,0)"]}
+          colors={["rgba(255,255,255,0.9)", "rgba(255,255,255,0)"]}
           style={styles.heroGlow}
         />
         <Image
