@@ -409,7 +409,7 @@ export default function PlannerScreen() {
         style={[
           styles.topBar,
           {
-            paddingTop: Platform.OS === "web" ? 30 : insets.top + 4,
+            paddingTop: Platform.OS === "web" ? 10 : insets.top - 8,
             backgroundColor: C.background,
             borderBottomColor: C.cardBorder,
           },
@@ -734,7 +734,7 @@ function FilterChip({ label, icon }: { label: string; icon: string }) {
 
 const styles = StyleSheet.create({
   topBar: {
-    paddingLeft: 30,
+    paddingLeft: 10,
     paddingRight: 20,
     paddingBottom: 18,
     borderBottomWidth: 1,
