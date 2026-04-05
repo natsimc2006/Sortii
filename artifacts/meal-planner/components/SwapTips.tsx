@@ -36,8 +36,8 @@ export function SwapTips({ ingredientNames }: Props) {
         <Text style={styles.pillEmoji}>💡</Text>
         <Text style={styles.pillText}>
           {swaps.length === 1
-            ? "1 swap available"
-            : `${swaps.length} swaps available`}
+            ? "1 swap waiting"
+            : `${swaps.length} swaps waiting`}
         </Text>
         <Feather name="chevron-down" size={12} color={PLUM} />
       </TouchableOpacity>

@@ -1,13 +1,15 @@
-const teal = "#2A8F88";
-const tealDark = "#257D78";
+const tealPrimary = "#25857F";
+const tealAccent = "#2A8F88";
+const tealDark = "#1E6D68";
 const gold = "#D29A22";
 const goldDark = "#B97D12";
 const plum = "#5E3A4C";
 
 export default {
   light: {
-    primary: teal,
+    primary: tealPrimary,
     primaryDark: tealDark,
+    accent: tealAccent,
     gold,
     goldDark,
     goldTint: "#F6E6BA",
@@ -15,30 +17,29 @@ export default {
     plum,
     plumTint: "#F3E8EE",
     tealTint: "#E6F3F0",
-    background: "#FAF8F4",
+    background: "#FBF9F4",
     card: "#FFFFFF",
-    cardBorder: "#E6E1D7",
+    cardBorder: "#E3DED2",
     text: "#2B2B2B",
     textSecondary: "#6F6F6A",
     textMuted: "#9B9B96",
-    tint: tealDark,
+    tint: tealPrimary,
     tabIconDefault: "#B8BDB7",
-    tabIconSelected: teal,
-    success: teal,
+    tabIconSelected: tealPrimary,
+    success: tealPrimary,
     warning: gold,
     danger: "#B86557",
     dangerBg: "#F7E9E8",
     chipBg: "#E6F3F0",
     chipText: "#2B2B2B",
-    chipBgActive: teal,
+    chipBgActive: tealPrimary,
     chipTextActive: "#FFFFFF",
-    inputBorder: "#E6E1D7",
-    border: "#E6E1D7",
-    shadow: "rgba(42, 143, 136, 0.08)",
-    accent: gold,
+    inputBorder: "#E3DED2",
+    border: "#E3DED2",
+    shadow: `rgba(37, 133, 127, 0.09)`,
     accentLight: "#F6E6BA",
     secondaryActionBg: "#EAF4F2",
-    secondaryActionText: "#257D78",
+    secondaryActionText: tealPrimary,
     clearBg: "#F7E9E8",
     clearText: "#B86557",
     seasonalGreen: "#5F7C50",

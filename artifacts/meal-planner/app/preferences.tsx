@@ -855,6 +855,11 @@ const styles = StyleSheet.create({
     gap: 8,
     paddingVertical: 16,
     borderRadius: 16,
+    shadowColor: "#D29A22",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.32,
+    shadowRadius: 16,
+    elevation: 6,
   },
   saveBtnText: {
     fontSize: 16,

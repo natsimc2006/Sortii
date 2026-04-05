@@ -715,6 +715,11 @@ const styles = StyleSheet.create({
     gap: 10,
     paddingVertical: 18,
     borderRadius: 18,
+    shadowColor: "#D29A22",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.32,
+    shadowRadius: 16,
+    elevation: 6,
   },
   primaryCtaText: {
     fontSize: 17,

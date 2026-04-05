@@ -931,6 +931,11 @@ const styles = StyleSheet.create({
     gap: 10,
     borderRadius: 16,
     paddingVertical: 15,
+    shadowColor: "#D29A22",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.32,
+    shadowRadius: 14,
+    elevation: 5,
   },
   shareBtnText: { fontSize: 16, fontFamily: "Inter_700Bold", color: "#fff" },
   sheetOverlay: {

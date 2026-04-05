@@ -269,6 +269,11 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     padding: 12,
     gap: 10,
+    shadowColor: "#1A1A1A",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.07,
+    shadowRadius: 8,
+    elevation: 2,
   },
   slotHeader: {
     flexDirection: "row",
