@@ -589,8 +589,8 @@ export default function PreferencesScreen() {
 
           <SectionBlock title="">
             <ToggleRow
-              title="Kid-Friendly Recipes"
-              sub="Prefer meals with simpler flavours, familiar ingredients, and broader family appeal."
+              title="Kid-friendly meals"
+              sub="No spice. No surprises."
               value={prefs.kidFriendly ?? false}
               onToggle={() => {
                 Haptics.selectionAsync();
@@ -598,7 +598,7 @@ export default function PreferencesScreen() {
               }}
             />
             {prefs.kidFriendly && (
-              <Hint text="Less complaints at the table." />
+              <Hint text="Only confirmed kid-friendly meals will be shown." />
             )}
           </SectionBlock>
 

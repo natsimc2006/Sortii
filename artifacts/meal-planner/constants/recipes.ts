@@ -1,4 +1,6 @@
 import RECIPES_DATA from "../data/recipes.json";
+import { getKidFriendlyScore } from "./kidFriendlyRules";
+export { getKidFriendlyScore };
 
 export interface RecipeIngredient {
   name: string;
@@ -41,6 +43,8 @@ export interface Recipe {
   cuisineType?: "australian" | "italian" | "asian" | "mexican" | "mediterranean" | "indian" | "middle-eastern" | "american" | "other";
   seasonTags?: string[];
   imageUrl?: string;
+  kidFriendlyScore?: 0 | 1 | 2;
+  kidFriendlyReason?: string;
 }
 
 export const RECIPES: Recipe[] = RECIPES_DATA as unknown as Recipe[];
@@ -238,17 +242,6 @@ function dietTypeOk(r: Recipe, dietType: string): boolean {
   return true;
 }
 
-export function getKidFriendlyScore(r: Recipe): boolean {
-  if (r.kidFriendly !== undefined) return r.kidFriendly;
-  const text = (r.name + " " + r.description).toLowerCase();
-  const notKidFriendly =
-    /spicy|chilli.*hot|very hot|jalape|sriracha|szechuan|gourmet|unusual texture|bitterness/;
-  if (notKidFriendly.test(text)) return false;
-  const kidFriendlyPatterns =
-    /pasta|bolognese|meatball|taco|fried rice|chicken.*rice|mac.*cheese|schnitzel|fish.*chip|nugget|burger|pizza|stir.fry|tray.bake|casserole|chicken.*soup|tomato.*soup|spaghetti|lasagna|drumstick|teriyaki|quesadilla|noodle|pancake|bake|chicken breast/;
-  if (kidFriendlyPatterns.test(text)) return true;
-  return r.difficulty === "easy" && r.estimatedCostBand !== "high" && r.cookTimeMinutes <= 30;
-}
 
 const HIGH_CARB_INGREDIENTS = [
   "pasta", "spaghetti", "noodle", "rice", "bread", "tortilla",
@@ -346,6 +339,22 @@ export function filterRecipes(
 
   const isHidden = (r: Recipe) => !!(hiddenIds && hiddenIds.includes(r.id));
 
+  const kidActive = !!(prefs.kidFriendly);
+  const kidOk = (r: Recipe) => {
+    if (!kidActive) return true;
+    const score = r.kidFriendlyScore ?? getKidFriendlyScore(r);
+    return score !== 0;
+  };
+
+  const sortKidFriendly = (pool: Recipe[]): Recipe[] => {
+    if (!kidActive) return pool;
+    return [...pool].sort((a, b) => {
+      const sa = a.kidFriendlyScore ?? getKidFriendlyScore(a);
+      const sb = b.kidFriendlyScore ?? getKidFriendlyScore(b);
+      return sb - sa;
+    });
+  };
+
   const full = RECIPES.filter((r) => {
     if (isHidden(r)) return false;
     if (!mealTypeOk(r)) return false;
@@ -359,9 +368,10 @@ export function filterRecipes(
     if (effectiveBudget === "budget" && !r.budgetTags.includes("budget")) return false;
     if (prefs.leftoversMode === "cook-once" && !r.leftoversFriendly) return false;
     if (!exclusionOk(r)) return false;
+    if (!kidOk(r)) return false;
     return true;
   });
-  if (full.length >= 3) return full;
+  if (full.length >= 3) return sortKidFriendly(full);
 
   const relaxed = RECIPES.filter((r) => {
     if (isHidden(r)) return false;
@@ -374,12 +384,15 @@ export function filterRecipes(
     if (effectiveBudget === "budget" && !r.budgetTags.includes("budget")) return false;
     if (prefs.leftoversMode === "cook-once" && !r.leftoversFriendly) return false;
     if (!exclusionOk(r)) return false;
+    if (!kidOk(r)) return false;
     return true;
   });
-  if (relaxed.length >= 3) return relaxed;
+  if (relaxed.length >= 3) return sortKidFriendly(relaxed);
 
-  const minimal = RECIPES.filter((r) => !isHidden(r) && mealTypeOk(r) && dietTypeOk(r, diet) && exclusionOk(r));
-  return minimal.length > 0 ? minimal : RECIPES.filter((r) => !isHidden(r) && mealTypeOk(r));
+  const minimal = RECIPES.filter((r) => !isHidden(r) && mealTypeOk(r) && dietTypeOk(r, diet) && exclusionOk(r) && kidOk(r));
+  if (minimal.length > 0) return sortKidFriendly(minimal);
+  const fallback = RECIPES.filter((r) => !isHidden(r) && mealTypeOk(r) && kidOk(r));
+  return sortKidFriendly(fallback.length > 0 ? fallback : RECIPES.filter((r) => !isHidden(r) && mealTypeOk(r)));
 }
 
 export function pickRecipes(

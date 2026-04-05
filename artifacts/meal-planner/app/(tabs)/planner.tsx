@@ -194,7 +194,9 @@ export default function PlannerScreen() {
           }, 600);
         } else if (planHasLimitedVariety) {
           showToast({
-            message: pickRandom(TOAST_FILTERS_RESTRICTIVE),
+            message: preferences.kidFriendly
+              ? "You've made this tricky 😅 Try loosening a filter."
+              : pickRandom(TOAST_FILTERS_RESTRICTIVE),
             variant: "smart-tip",
             persistent: true,
             actionLabel: "Open settings",
@@ -503,6 +505,11 @@ export default function PlannerScreen() {
             <FilterChip label={healthLabel} icon="activity" />
             <FilterChip label={estimatedCostBand} icon="shopping-bag" />
           </View>
+          {preferences.kidFriendly && (
+            <Text style={styles.kidFriendlyNote}>
+              Showing kid-friendly meals only
+            </Text>
+          )}
           {filledCount >= 3 && !isWeekFull && (
             <Animated.Text style={[styles.headerReassurance, { opacity: mountOpacity }]}>
               {headerReassuranceMsg}
@@ -594,6 +601,7 @@ export default function PlannerScreen() {
                     onAutoSwap={lunchRecipe ? () => handleMealAutoSwap(day, "lunch") : undefined}
                     onHideRecipe={lunchRecipe ? () => handleMealHide(lunchRecipe) : undefined}
                     seasonalMode={preferences.seasonalMode ?? false}
+                    kidFriendlyFilter={preferences.kidFriendly ?? false}
                   />
                   {lunchRecipe && (
                     <SwapTips
@@ -613,6 +621,7 @@ export default function PlannerScreen() {
                 onAutoSwap={dinnerRecipe ? () => handleMealAutoSwap(day, "dinner") : undefined}
                 onHideRecipe={dinnerRecipe ? () => handleMealHide(dinnerRecipe) : undefined}
                 seasonalMode={preferences.seasonalMode ?? false}
+                kidFriendlyFilter={preferences.kidFriendly ?? false}
               />
               {dinnerRecipe && (
                 <SwapTips
@@ -850,6 +859,14 @@ const styles = StyleSheet.create({
     fontStyle: "italic",
     color: "#6B4A5E",
     marginTop: 6,
+  },
+  kidFriendlyNote: {
+    fontSize: 11,
+    fontFamily: "Inter_500Medium",
+    fontStyle: "italic",
+    color: "#5E3A4C",
+    marginTop: 4,
+    marginBottom: 2,
   },
   filterChip: {
     flexDirection: "row",

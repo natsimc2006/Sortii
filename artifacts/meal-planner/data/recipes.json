@@ -93,7 +93,10 @@
       "all"
     ],
     "imageUrl": "https://www.themealdb.com/images/media/meals/sutysw1468247559.jpg",
-    "costPerServeAUD": 5.05
+    "costPerServeAUD": 5.05,
+    "kidFriendly": true,
+    "kidFriendlyScore": 2,
+    "kidFriendlyReason": "kid-friendly: spaghetti bol"
   },
   {
     "id": "r002",
@@ -192,7 +195,10 @@
       "winter"
     ],
     "costPerServeAUD": 5.18,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/m0p0j81765568742.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/m0p0j81765568742.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 1,
+    "kidFriendlyReason": "neutral: no strong signals"
   },
   {
     "id": "r003",
@@ -283,7 +289,10 @@
       "all"
     ],
     "costPerServeAUD": 7.85,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/lqampv1762325397.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/lqampv1762325397.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 0,
+    "kidFriendlyReason": "disqualified: dish type (\\bcurry\\b)"
   },
   {
     "id": "r004",
@@ -369,7 +378,10 @@
       "spring"
     ],
     "costPerServeAUD": 13.4,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/ysxwuq1487323065.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/ysxwuq1487323065.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 1,
+    "kidFriendlyReason": "neutral: no strong signals"
   },
   {
     "id": "r005",
@@ -466,7 +478,10 @@
       "all"
     ],
     "costPerServeAUD": 3.92,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/lx1kkj1593349302.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/lx1kkj1593349302.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 1,
+    "kidFriendlyReason": "neutral: no strong signals"
   },
   {
     "id": "r006",
@@ -564,7 +579,10 @@
       "spring"
     ],
     "costPerServeAUD": 2.88,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/vdwloy1713225718.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/vdwloy1713225718.jpg",
+    "kidFriendly": true,
+    "kidFriendlyScore": 2,
+    "kidFriendlyReason": "kid-friendly: fried rice"
   },
   {
     "id": "r007",
@@ -647,7 +665,10 @@
       "autumn"
     ],
     "costPerServeAUD": 4.15,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/0dhtwr1763371444.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/0dhtwr1763371444.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 1,
+    "kidFriendlyReason": "neutral: no strong signals"
   },
   {
     "id": "r008",
@@ -745,7 +766,10 @@
       "all"
     ],
     "costPerServeAUD": 10.95,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/xxrxux1503070723.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/xxrxux1503070723.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 0,
+    "kidFriendlyReason": "disqualified: ingredient \"smoked paprika\""
   },
   {
     "id": "r009",
@@ -840,7 +864,10 @@
       "summer"
     ],
     "imageUrl": "https://www.themealdb.com/images/media/meals/g373701551450225.jpg",
-    "costPerServeAUD": 3.45
+    "costPerServeAUD": 3.45,
+    "kidFriendly": false,
+    "kidFriendlyScore": 0,
+    "kidFriendlyReason": "disqualified: ingredient \"chilli\""
   },
   {
     "id": "r010",
@@ -924,7 +951,10 @@
       "summer"
     ],
     "costPerServeAUD": 9.1,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/yhi46r1763330279.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/yhi46r1763330279.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 1,
+    "kidFriendlyReason": "neutral: no strong signals"
   },
   {
     "id": "r011",
@@ -1019,7 +1049,10 @@
       "summer"
     ],
     "costPerServeAUD": 8.65,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/st9shl1763755808.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/st9shl1763755808.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 1,
+    "kidFriendlyReason": "neutral: no strong signals"
   },
   {
     "id": "r012",
@@ -1103,7 +1136,10 @@
       "all"
     ],
     "costPerServeAUD": 8.5,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/yypwwq1511304979.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/yypwwq1511304979.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 1,
+    "kidFriendlyReason": "neutral: no strong signals"
   },
   {
     "id": "r013",
@@ -1191,7 +1227,10 @@
       "summer"
     ],
     "costPerServeAUD": 5.1,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/qtuwxu1468233098.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/qtuwxu1468233098.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 1,
+    "kidFriendlyReason": "neutral: no strong signals"
   },
   {
     "id": "r014",
@@ -1281,7 +1320,10 @@
       "spring"
     ],
     "costPerServeAUD": 3.28,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/wtsvxx1511296896.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/wtsvxx1511296896.jpg",
+    "kidFriendly": true,
+    "kidFriendlyScore": 2,
+    "kidFriendlyReason": "kid-friendly: pasta bake"
   },
   {
     "id": "r015",
@@ -1364,7 +1406,10 @@
       "summer"
     ],
     "costPerServeAUD": 11.85,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/vussxq1511882648.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/vussxq1511882648.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 1,
+    "kidFriendlyReason": "neutral: no strong signals"
   },
   {
     "id": "r016",
@@ -1458,7 +1503,10 @@
       "summer"
     ],
     "costPerServeAUD": 7.95,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/k29viq1585565980.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/k29viq1585565980.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 1,
+    "kidFriendlyReason": "neutral: no strong signals"
   },
   {
     "id": "r017",
@@ -1548,7 +1596,10 @@
       "all"
     ],
     "costPerServeAUD": 3.15,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/118oj61763423896.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/118oj61763423896.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 1,
+    "kidFriendlyReason": "neutral: no strong signals"
   },
   {
     "id": "r018",
@@ -1645,7 +1696,10 @@
       "summer"
     ],
     "costPerServeAUD": 11.2,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/020z181619788503.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/020z181619788503.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 1,
+    "kidFriendlyReason": "neutral: no strong signals"
   },
   {
     "id": "r019",
@@ -1729,7 +1783,10 @@
       "autumn"
     ],
     "costPerServeAUD": 2.65,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/ikizdm1763760862.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/ikizdm1763760862.jpg",
+    "kidFriendly": true,
+    "kidFriendlyScore": 2,
+    "kidFriendlyReason": "kid-friendly: pumpkin soup"
   },
   {
     "id": "r020",
@@ -1820,7 +1877,10 @@
       "summer"
     ],
     "costPerServeAUD": 4.88,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/7xte3u1763757761.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/7xte3u1763757761.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 1,
+    "kidFriendlyReason": "neutral: no strong signals"
   },
   {
     "id": "r021",
@@ -1905,7 +1965,10 @@
       "winter"
     ],
     "costPerServeAUD": 4.35,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/sstssx1487349585.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/sstssx1487349585.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 1,
+    "kidFriendlyReason": "neutral: no strong signals"
   },
   {
     "id": "r022",
@@ -2001,7 +2064,10 @@
       "all"
     ],
     "costPerServeAUD": 7.4,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/xutquv1505330523.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/xutquv1505330523.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 0,
+    "kidFriendlyReason": "disqualified: ingredient \"wine\""
   },
   {
     "id": "r023",
@@ -2097,7 +2163,10 @@
       "all"
     ],
     "costPerServeAUD": 9.35,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/rg9ze01763479093.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/rg9ze01763479093.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 0,
+    "kidFriendlyReason": "disqualified: dish type (pad\\s*thai)"
   },
   {
     "id": "r024",
@@ -2192,7 +2261,10 @@
       "all"
     ],
     "costPerServeAUD": 3.18,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/tvttqv1504640475.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/tvttqv1504640475.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 0,
+    "kidFriendlyReason": "disqualified: dish type (\\bcurry\\b)"
   },
   {
     "id": "r025",
@@ -2270,7 +2342,10 @@
       "all"
     ],
     "costPerServeAUD": 5.92,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/ursuup1487348423.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/ursuup1487348423.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 1,
+    "kidFriendlyReason": "neutral: no strong signals"
   },
   {
     "id": "r026",
@@ -2358,7 +2433,10 @@
       "all"
     ],
     "costPerServeAUD": 6.75,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/xxyupu1468262513.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/xxyupu1468262513.jpg",
+    "kidFriendly": true,
+    "kidFriendlyScore": 2,
+    "kidFriendlyReason": "kid-friendly: fish and chip"
   },
   {
     "id": "r027",
@@ -2454,7 +2532,10 @@
       "summer"
     ],
     "costPerServeAUD": 6.25,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/vwrpps1503068729.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/vwrpps1503068729.jpg",
+    "kidFriendly": true,
+    "kidFriendlyScore": 2,
+    "kidFriendlyReason": "kid-friendly: chicken strip"
   },
   {
     "id": "r028",
@@ -2549,7 +2630,10 @@
       "autumn"
     ],
     "costPerServeAUD": 2.45,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/xwutvy1511555540.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/xwutvy1511555540.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 0,
+    "kidFriendlyReason": "disqualified: ingredient \"smoked paprika\""
   },
   {
     "id": "r029",
@@ -2644,7 +2728,10 @@
       "all"
     ],
     "costPerServeAUD": 7.1,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/02s6gc1763799560.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/02s6gc1763799560.jpg",
+    "kidFriendly": true,
+    "kidFriendlyScore": 2,
+    "kidFriendlyReason": "kid-friendly: schnitzel"
   },
   {
     "id": "r030",
@@ -2726,7 +2813,10 @@
       "all"
     ],
     "costPerServeAUD": 7.85,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/bc8v651619789840.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/bc8v651619789840.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 0,
+    "kidFriendlyReason": "disqualified: ingredient \"wine\""
   },
   {
     "id": "r031",
@@ -2834,7 +2924,10 @@
       "all"
     ],
     "costPerServeAUD": 3.85,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/g373701551450225.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/g373701551450225.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 0,
+    "kidFriendlyReason": "disqualified: ingredient \"chilli\""
   },
   {
     "id": "r032",
@@ -2934,7 +3027,10 @@
       "summer"
     ],
     "costPerServeAUD": 3.2,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/uuuspp1468263334.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/uuuspp1468263334.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 0,
+    "kidFriendlyReason": "disqualified: ingredient \"wine\""
   },
   {
     "id": "r033",
@@ -3023,7 +3119,10 @@
       "summer"
     ],
     "costPerServeAUD": 16.45,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/qysyss1511558054.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/qysyss1511558054.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 0,
+    "kidFriendlyReason": "disqualified: ingredient \"chilli\""
   },
   {
     "id": "r034",
@@ -3120,7 +3219,10 @@
       "summer"
     ],
     "costPerServeAUD": 3.9,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/eo0yfb1763600916.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/eo0yfb1763600916.jpg",
+    "kidFriendly": true,
+    "kidFriendlyScore": 2,
+    "kidFriendlyReason": "kid-friendly: frittata"
   },
   {
     "id": "r035",
@@ -3218,7 +3320,10 @@
       "winter"
     ],
     "costPerServeAUD": 6.8,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/sstssx1487349585.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/sstssx1487349585.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 0,
+    "kidFriendlyReason": "disqualified: dish type (\\bcurry\\b)"
   },
   {
     "id": "r036",
@@ -3314,7 +3419,10 @@
       "all"
     ],
     "costPerServeAUD": 6.95,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/yxsurp1511304301.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/yxsurp1511304301.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 1,
+    "kidFriendlyReason": "neutral: no strong signals"
   },
   {
     "id": "r037",
@@ -3411,7 +3519,10 @@
       "summer"
     ],
     "costPerServeAUD": 5.4,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/u5e9qq1763795441.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/u5e9qq1763795441.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 1,
+    "kidFriendlyReason": "neutral: no strong signals"
   },
   {
     "id": "r038",
@@ -3500,7 +3611,10 @@
       "all"
     ],
     "costPerServeAUD": 5.65,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/0jv5gx1661040802.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/0jv5gx1661040802.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 1,
+    "kidFriendlyReason": "neutral: no strong signals"
   },
   {
     "id": "r039",
@@ -3590,7 +3704,10 @@
       "summer"
     ],
     "costPerServeAUD": 4.15,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/yqwtvu1487426027.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/yqwtvu1487426027.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 0,
+    "kidFriendlyReason": "disqualified: ingredient \"wine\""
   },
   {
     "id": "r040",
@@ -3686,7 +3803,10 @@
       "all"
     ],
     "imageUrl": "https://www.themealdb.com/images/media/meals/bc8v651619789840.jpg",
-    "costPerServeAUD": 7.6
+    "costPerServeAUD": 7.6,
+    "kidFriendly": false,
+    "kidFriendlyScore": 0,
+    "kidFriendlyReason": "disqualified: dish type (\\bcurry\\b)"
   },
   {
     "id": "r041",
@@ -3769,7 +3889,10 @@
       "summer"
     ],
     "costPerServeAUD": 7.35,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/rjhf741585564676.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/rjhf741585564676.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 1,
+    "kidFriendlyReason": "neutral: no strong signals"
   },
   {
     "id": "r042",
@@ -3858,7 +3981,10 @@
       "summer"
     ],
     "costPerServeAUD": 8.2,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/qrqywr1503066605.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/qrqywr1503066605.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 1,
+    "kidFriendlyReason": "neutral: no strong signals"
   },
   {
     "id": "r043",
@@ -3953,7 +4079,10 @@
       "all"
     ],
     "costPerServeAUD": 15.9,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/8ovxf41763253962.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/8ovxf41763253962.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 0,
+    "kidFriendlyReason": "disqualified: ingredient \"wine\""
   },
   {
     "id": "r044",
@@ -4043,7 +4172,10 @@
       "autumn"
     ],
     "costPerServeAUD": 3.55,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/ysqrus1487425681.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/ysqrus1487425681.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 0,
+    "kidFriendlyReason": "disqualified: ingredient \"chilli\""
   },
   {
     "id": "r045",
@@ -4128,7 +4260,10 @@
       "summer"
     ],
     "costPerServeAUD": 5.85,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/vvstvq1487342592.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/vvstvq1487342592.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 0,
+    "kidFriendlyReason": "disqualified: ingredient \"smoked paprika\""
   },
   {
     "id": "r046",
@@ -4213,7 +4348,10 @@
       "spring"
     ],
     "costPerServeAUD": 4.2,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/qtqvys1468573168.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/qtqvys1468573168.jpg",
+    "kidFriendly": true,
+    "kidFriendlyScore": 2,
+    "kidFriendlyReason": "kid-friendly: pasta bake"
   },
   {
     "id": "r047",
@@ -4302,7 +4440,10 @@
       "all"
     ],
     "costPerServeAUD": 3.7,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/d8f6qx1604182128.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/d8f6qx1604182128.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 0,
+    "kidFriendlyReason": "disqualified: dish type (\\bspicy\\b)"
   },
   {
     "id": "r048",
@@ -4387,7 +4528,10 @@
       "all"
     ],
     "costPerServeAUD": 5.95,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/8xuvhj1763794991.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/8xuvhj1763794991.jpg",
+    "kidFriendly": true,
+    "kidFriendlyScore": 2,
+    "kidFriendlyReason": "kid-friendly: schnitzel"
   },
   {
     "id": "r049",
@@ -4478,7 +4622,10 @@
       "all"
     ],
     "costPerServeAUD": 4.6,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/ae6clc1760524712.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/ae6clc1760524712.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 0,
+    "kidFriendlyReason": "disqualified: ingredient \"chilli\""
   },
   {
     "id": "r050",
@@ -4564,7 +4711,10 @@
       "autumn"
     ],
     "costPerServeAUD": 5.4,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/llcbn01574260722.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/llcbn01574260722.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 0,
+    "kidFriendlyReason": "disqualified: ingredient \"wine\""
   },
   {
     "id": "r051",
@@ -4660,7 +4810,10 @@
       "all"
     ],
     "costPerServeAUD": 4.35,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/sypxpx1515365095.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/sypxpx1515365095.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 0,
+    "kidFriendlyReason": "disqualified: ingredient \"chilli\""
   },
   {
     "id": "r052",
@@ -4750,7 +4903,10 @@
       "summer"
     ],
     "imageUrl": "https://www.themealdb.com/images/media/meals/spswqs1511558697.jpg",
-    "costPerServeAUD": 7.45
+    "costPerServeAUD": 7.45,
+    "kidFriendly": false,
+    "kidFriendlyScore": 0,
+    "kidFriendlyReason": "disqualified: ingredient \"smoked paprika\""
   },
   {
     "id": "r053",
@@ -4843,7 +4999,10 @@
       "spring"
     ],
     "imageUrl": "https://www.themealdb.com/images/media/meals/1525872624.jpg",
-    "costPerServeAUD": 8.5
+    "costPerServeAUD": 8.5,
+    "kidFriendly": false,
+    "kidFriendlyScore": 1,
+    "kidFriendlyReason": "neutral: no strong signals"
   },
   {
     "id": "r054",
@@ -4928,7 +5087,10 @@
       "winter"
     ],
     "imageUrl": "https://www.themealdb.com/images/media/meals/xxyupu1468262513.jpg",
-    "costPerServeAUD": 10.25
+    "costPerServeAUD": 10.25,
+    "kidFriendly": false,
+    "kidFriendlyScore": 1,
+    "kidFriendlyReason": "neutral: no strong signals"
   },
   {
     "id": "r055",
@@ -5018,7 +5180,10 @@
       "summer"
     ],
     "costPerServeAUD": 8.75,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/jyylmo1763790808.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/jyylmo1763790808.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 1,
+    "kidFriendlyReason": "neutral: no strong signals"
   },
   {
     "id": "r056",
@@ -5109,7 +5274,10 @@
       "summer"
     ],
     "costPerServeAUD": 5.9,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/sbx7n71587673021.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/sbx7n71587673021.jpg",
+    "kidFriendly": true,
+    "kidFriendlyScore": 2,
+    "kidFriendlyReason": "kid-friendly: taco"
   },
   {
     "id": "r057",
@@ -5199,7 +5367,10 @@
       "all"
     ],
     "costPerServeAUD": 3.85,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/lqampv1762325397.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/lqampv1762325397.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 0,
+    "kidFriendlyReason": "disqualified: dish type (\\bcurry\\b)"
   },
   {
     "id": "r058",
@@ -5284,7 +5455,10 @@
       "summer"
     ],
     "costPerServeAUD": 4.7,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/wvpsxx1468256321.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/wvpsxx1468256321.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 1,
+    "kidFriendlyReason": "neutral: no strong signals"
   },
   {
     "id": "r059",
@@ -5368,7 +5542,10 @@
       "summer"
     ],
     "costPerServeAUD": 3.95,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/wrpwuu1511786491.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/wrpwuu1511786491.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 1,
+    "kidFriendlyReason": "neutral: no strong signals"
   },
   {
     "id": "r060",
@@ -5457,7 +5634,10 @@
       "all"
     ],
     "imageUrl": "https://www.themealdb.com/images/media/meals/rvypwy1503069308.jpg",
-    "costPerServeAUD": 9.15
+    "costPerServeAUD": 9.15,
+    "kidFriendly": false,
+    "kidFriendlyScore": 0,
+    "kidFriendlyReason": "disqualified: dish type (\\blaksa\\b)"
   },
   {
     "id": "r061",
@@ -5549,7 +5729,10 @@
       "summer"
     ],
     "costPerServeAUD": 12.4,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/k29viq1585565980.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/k29viq1585565980.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 1,
+    "kidFriendlyReason": "neutral: no strong signals"
   },
   {
     "id": "r062",
@@ -5635,7 +5818,10 @@
       "spring"
     ],
     "costPerServeAUD": 3.2,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/fk80jp1763280767.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/fk80jp1763280767.jpg",
+    "kidFriendly": true,
+    "kidFriendlyScore": 2,
+    "kidFriendlyReason": "kid-friendly: fried rice"
   },
   {
     "id": "r063",
@@ -5726,7 +5912,10 @@
       "all"
     ],
     "costPerServeAUD": 5.1,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/vptwyt1511450962.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/vptwyt1511450962.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 1,
+    "kidFriendlyReason": "neutral: no strong signals"
   },
   {
     "id": "r064",
@@ -5810,7 +5999,10 @@
       "autumn"
     ],
     "costPerServeAUD": 2.65,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/804v1j1764367088.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/804v1j1764367088.jpg",
+    "kidFriendly": true,
+    "kidFriendlyScore": 2,
+    "kidFriendlyReason": "kid-friendly: pumpkin soup"
   },
   {
     "id": "r065",
@@ -5896,7 +6088,10 @@
       "winter"
     ],
     "costPerServeAUD": 4.55,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/0dhtwr1763371444.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/0dhtwr1763371444.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 1,
+    "kidFriendlyReason": "neutral: no strong signals"
   },
   {
     "id": "r066",
@@ -5980,7 +6175,10 @@
       "summer"
     ],
     "costPerServeAUD": 3.15,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/ctg8jd1585563097.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/ctg8jd1585563097.jpg",
+    "kidFriendly": true,
+    "kidFriendlyScore": 2,
+    "kidFriendlyReason": "kid-friendly: frittata"
   },
   {
     "id": "r067",
@@ -6052,7 +6250,10 @@
       "summer"
     ],
     "costPerServeAUD": 11.85,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/y7h0lq1683208991.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/y7h0lq1683208991.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 1,
+    "kidFriendlyReason": "neutral: no strong signals"
   },
   {
     "id": "r068",
@@ -6137,7 +6338,10 @@
       "all"
     ],
     "costPerServeAUD": 3.7,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/sutysw1468247559.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/sutysw1468247559.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 0,
+    "kidFriendlyReason": "disqualified: ingredient \"chilli\""
   },
   {
     "id": "r069",
@@ -6227,7 +6431,10 @@
       "autumn"
     ],
     "costPerServeAUD": 4.4,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/7xte3u1763757761.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/7xte3u1763757761.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 0,
+    "kidFriendlyReason": "disqualified: ingredient \"smoked paprika\""
   },
   {
     "id": "r071",
@@ -6311,7 +6518,10 @@
       "all"
     ],
     "costPerServeAUD": 4.85,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/yypwwq1511304979.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/yypwwq1511304979.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 1,
+    "kidFriendlyReason": "neutral: no strong signals"
   },
   {
     "id": "r072",
@@ -6400,7 +6610,10 @@
       "all"
     ],
     "costPerServeAUD": 6.95,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/ntafxw1763586291.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/ntafxw1763586291.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 0,
+    "kidFriendlyReason": "disqualified: ingredient \"chilli\""
   },
   {
     "id": "r073",
@@ -6486,7 +6699,10 @@
       "winter"
     ],
     "costPerServeAUD": 10.5,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/prrirc1763781360.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/prrirc1763781360.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 1,
+    "kidFriendlyReason": "neutral: no strong signals"
   },
   {
     "id": "r074",
@@ -6569,7 +6785,10 @@
       "all"
     ],
     "costPerServeAUD": 3.6,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/c7lzrl1683208757.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/c7lzrl1683208757.jpg",
+    "kidFriendly": true,
+    "kidFriendlyScore": 2,
+    "kidFriendlyReason": "kid-friendly: frittata"
   },
   {
     "id": "r075",
@@ -6647,7 +6866,10 @@
       "all"
     ],
     "costPerServeAUD": 4.25,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/gr4lo51763791826.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/gr4lo51763791826.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 1,
+    "kidFriendlyReason": "neutral: no strong signals"
   },
   {
     "id": "r076",
@@ -6725,7 +6947,10 @@
       "all"
     ],
     "costPerServeAUD": 3.88,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/sstssx1487349585.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/sstssx1487349585.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 1,
+    "kidFriendlyReason": "neutral: no strong signals"
   },
   {
     "id": "r077",
@@ -6797,7 +7022,10 @@
       "summer"
     ],
     "costPerServeAUD": 3.15,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/wtsvxx1511296896.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/wtsvxx1511296896.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 1,
+    "kidFriendlyReason": "neutral: no strong signals"
   },
   {
     "id": "r078",
@@ -6875,7 +7103,10 @@
       "spring"
     ],
     "imageUrl": "https://www.themealdb.com/images/media/meals/uuuspp1511297945.jpg",
-    "costPerServeAUD": 2.44
+    "costPerServeAUD": 2.44,
+    "kidFriendly": true,
+    "kidFriendlyScore": 2,
+    "kidFriendlyReason": "kid-friendly: fried rice"
   },
   {
     "id": "r081",
@@ -6946,7 +7177,10 @@
       "summer"
     ],
     "costPerServeAUD": 5.63,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/rjhf741585564676.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/rjhf741585564676.jpg",
+    "kidFriendly": true,
+    "kidFriendlyScore": 2,
+    "kidFriendlyReason": "kid-friendly: quesadilla"
   },
   {
     "id": "r082",
@@ -7030,7 +7264,10 @@
       "summer"
     ],
     "costPerServeAUD": 6.13,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/syqypv1486981727.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/syqypv1486981727.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 1,
+    "kidFriendlyReason": "neutral: no strong signals"
   },
   {
     "id": "r083",
@@ -7114,7 +7351,10 @@
       "summer"
     ],
     "imageUrl": "https://www.themealdb.com/images/media/meals/sstssx1487349585.jpg",
-    "costPerServeAUD": 6.5
+    "costPerServeAUD": 6.5,
+    "kidFriendly": false,
+    "kidFriendlyScore": 0,
+    "kidFriendlyReason": "disqualified: dish type (\\bcurry\\b)"
   },
   {
     "id": "r084",
@@ -7190,7 +7430,10 @@
       "summer"
     ],
     "costPerServeAUD": 5.88,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/6sarfo1762340107.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/6sarfo1762340107.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 1,
+    "kidFriendlyReason": "neutral: no strong signals"
   },
   {
     "id": "r085",
@@ -7262,7 +7505,10 @@
       "all"
     ],
     "costPerServeAUD": 2.45,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/xutquv1505330523.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/xutquv1505330523.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 0,
+    "kidFriendlyReason": "disqualified: dish type (\\bspicy\\b)"
   },
   {
     "id": "r086",
@@ -7345,7 +7591,10 @@
       "summer"
     ],
     "costPerServeAUD": 6.25,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/h3ijwo1581013377.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/h3ijwo1581013377.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 1,
+    "kidFriendlyReason": "neutral: no strong signals"
   },
   {
     "id": "r087",
@@ -7417,7 +7666,10 @@
       "winter"
     ],
     "imageUrl": "https://www.themealdb.com/images/media/meals/xxyupu1468262513.jpg",
-    "costPerServeAUD": 8.35
+    "costPerServeAUD": 8.35,
+    "kidFriendly": false,
+    "kidFriendlyScore": 1,
+    "kidFriendlyReason": "neutral: no strong signals"
   },
   {
     "id": "r088",
@@ -7495,7 +7747,10 @@
       "all"
     ],
     "costPerServeAUD": 9.08,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/1550440197.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/1550440197.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 0,
+    "kidFriendlyReason": "disqualified: ingredient \"chilli\""
   },
   {
     "id": "r089",
@@ -7579,7 +7834,10 @@
       "autumn"
     ],
     "costPerServeAUD": 4.63,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/7xte3u1763757761.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/7xte3u1763757761.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 0,
+    "kidFriendlyReason": "disqualified: ingredient \"smoked paprika\""
   },
   {
     "id": "r090",
@@ -7656,7 +7914,10 @@
       "all"
     ],
     "costPerServeAUD": 4.5,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/rg9ze01763479093.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/rg9ze01763479093.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 0,
+    "kidFriendlyReason": "disqualified: ingredient \"chilli\""
   },
   {
     "id": "r091",
@@ -7733,7 +7994,10 @@
       "summer"
     ],
     "costPerServeAUD": 7.38,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/nlxald1764112200.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/nlxald1764112200.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 1,
+    "kidFriendlyReason": "neutral: no strong signals"
   },
   {
     "id": "r092",
@@ -7812,7 +8076,10 @@
       "winter"
     ],
     "costPerServeAUD": 5.88,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/1529444830.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/1529444830.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 1,
+    "kidFriendlyReason": "neutral: no strong signals"
   },
   {
     "id": "r093",
@@ -7889,7 +8156,10 @@
       "summer"
     ],
     "costPerServeAUD": 2.88,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/bopa2i1683209167.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/bopa2i1683209167.jpg",
+    "kidFriendly": true,
+    "kidFriendlyScore": 2,
+    "kidFriendlyReason": "kid-friendly: corn fritter"
   },
   {
     "id": "r094",
@@ -7962,7 +8232,10 @@
       "all"
     ],
     "costPerServeAUD": 4.13,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/tvttqv1504640475.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/tvttqv1504640475.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 1,
+    "kidFriendlyReason": "neutral: no strong signals"
   },
   {
     "id": "r095",
@@ -8041,7 +8314,10 @@
       "spring"
     ],
     "costPerServeAUD": 3.35,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/0jv5gx1661040802.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/0jv5gx1661040802.jpg",
+    "kidFriendly": true,
+    "kidFriendlyScore": 2,
+    "kidFriendlyReason": "kid-friendly: pasta bake"
   },
   {
     "id": "r096",
@@ -8125,7 +8401,10 @@
       "all"
     ],
     "imageUrl": "https://www.themealdb.com/images/media/meals/vvstvq1487342592.jpg",
-    "costPerServeAUD": 7.13
+    "costPerServeAUD": 7.13,
+    "kidFriendly": false,
+    "kidFriendlyScore": 0,
+    "kidFriendlyReason": "disqualified: dish type (\\bcurry\\b)"
   },
   {
     "id": "r099",
@@ -8202,7 +8481,10 @@
       "all"
     ],
     "costPerServeAUD": 7.63,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/1549542994.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/1549542994.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 0,
+    "kidFriendlyReason": "disqualified: ingredient \"beer\""
   },
   {
     "id": "r100",
@@ -8285,7 +8567,10 @@
       "winter"
     ],
     "costPerServeAUD": 7.75,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/1529442316.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/1529442316.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 1,
+    "kidFriendlyReason": "neutral: no strong signals"
   },
   {
     "id": "r101",
@@ -8369,7 +8654,10 @@
       "all"
     ],
     "costPerServeAUD": 2.45,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/vwrpps1503068729.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/vwrpps1503068729.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 0,
+    "kidFriendlyReason": "disqualified: ingredient \"curry powder\""
   },
   {
     "id": "r102",
@@ -8454,7 +8742,10 @@
       "autumn"
     ],
     "costPerServeAUD": 4.15,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/h5qmn31763304965.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/h5qmn31763304965.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 1,
+    "kidFriendlyReason": "neutral: no strong signals"
   },
   {
     "id": "r103",
@@ -8538,7 +8829,10 @@
       "all"
     ],
     "costPerServeAUD": 4.6,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/qrqywr1503066605.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/qrqywr1503066605.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 1,
+    "kidFriendlyReason": "neutral: no strong signals"
   },
   {
     "id": "r104",
@@ -8622,7 +8916,10 @@
       "all"
     ],
     "costPerServeAUD": 2.35,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/qtuwxu1468233098.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/qtuwxu1468233098.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 0,
+    "kidFriendlyReason": "disqualified: dish type (\\bspicy\\b)"
   },
   {
     "id": "r105",
@@ -8707,7 +9004,10 @@
     ],
     "batchCook": true,
     "costPerServeAUD": 5.25,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/yxsurp1511304301.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/yxsurp1511304301.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 0,
+    "kidFriendlyReason": "disqualified: dish type (\\bcurry\\b)"
   },
   {
     "id": "r106",
@@ -8790,7 +9090,10 @@
       "all"
     ],
     "costPerServeAUD": 5.8,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/qtqvys1468573168.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/qtqvys1468573168.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 1,
+    "kidFriendlyReason": "neutral: no strong signals"
   },
   {
     "id": "r107",
@@ -8875,7 +9178,10 @@
     "batchCook": true,
     "familyStyle": true,
     "costPerServeAUD": 6.5,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/7xte3u1763757761.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/7xte3u1763757761.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 1,
+    "kidFriendlyReason": "neutral: no strong signals"
   },
   {
     "id": "r108",
@@ -8960,7 +9266,10 @@
     "quickAssembly": true,
     "familyStyle": true,
     "costPerServeAUD": 5.4,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/lrfdwz1764438393.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/lrfdwz1764438393.jpg",
+    "kidFriendly": true,
+    "kidFriendlyScore": 2,
+    "kidFriendlyReason": "kid-friendly: pizza"
   },
   {
     "id": "r109",
@@ -9044,7 +9353,10 @@
       "all"
     ],
     "costPerServeAUD": 4.35,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/zadvgb1699012544.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/zadvgb1699012544.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 0,
+    "kidFriendlyReason": "disqualified: dish type (\\bchowder\\b)"
   },
   {
     "id": "r110",
@@ -9128,7 +9440,10 @@
     ],
     "batchCook": true,
     "costPerServeAUD": 4.7,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/wruvqv1511880994.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/wruvqv1511880994.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 1,
+    "kidFriendlyReason": "neutral: no strong signals"
   },
   {
     "id": "r111",
@@ -9213,7 +9528,10 @@
     ],
     "quickAssembly": true,
     "costPerServeAUD": 4.85,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/uvuyxu1503067369.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/uvuyxu1503067369.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 1,
+    "kidFriendlyReason": "neutral: no strong signals"
   },
   {
     "id": "r112",
@@ -9302,7 +9620,10 @@
     ],
     "quickAssembly": true,
     "imageUrl": "https://www.themealdb.com/images/media/meals/1525872624.jpg",
-    "costPerServeAUD": 5.15
+    "costPerServeAUD": 5.15,
+    "kidFriendly": false,
+    "kidFriendlyScore": 0,
+    "kidFriendlyReason": "disqualified: dish type (\\bspicy\\b)"
   },
   {
     "id": "r113",
@@ -9394,7 +9715,10 @@
     "quickAssembly": true,
     "familyStyle": true,
     "imageUrl": "https://www.themealdb.com/images/media/meals/1529446352.jpg",
-    "costPerServeAUD": 3.5
+    "costPerServeAUD": 3.5,
+    "kidFriendly": true,
+    "kidFriendlyScore": 2,
+    "kidFriendlyReason": "kid-friendly: fried rice"
   },
   {
     "id": "r114",
@@ -9483,7 +9807,10 @@
       "autumn"
     ],
     "costPerServeAUD": 6.1,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/llcbn01574260722.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/llcbn01574260722.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 0,
+    "kidFriendlyReason": "disqualified: ingredient \"wine\""
   },
   {
     "id": "r115",
@@ -9566,7 +9893,10 @@
     ],
     "quickAssembly": true,
     "costPerServeAUD": 5.95,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/vvstvq1487342592.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/vvstvq1487342592.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 1,
+    "kidFriendlyReason": "neutral: no strong signals"
   },
   {
     "id": "r116",
@@ -9648,7 +9978,10 @@
       "all"
     ],
     "costPerServeAUD": 5.45,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/ip5xtp1769779958.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/ip5xtp1769779958.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 0,
+    "kidFriendlyReason": "disqualified: dish type (\\blaksa\\b)"
   },
   {
     "id": "r117",
@@ -9733,7 +10066,10 @@
     ],
     "batchCook": true,
     "costPerServeAUD": 4.2,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/ursuup1487348423.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/ursuup1487348423.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 0,
+    "kidFriendlyReason": "disqualified: ingredient \"smoked paprika\""
   },
   {
     "id": "r118",
@@ -9818,7 +10154,10 @@
     ],
     "quickAssembly": true,
     "costPerServeAUD": 3.65,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/rvypwy1503069308.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/rvypwy1503069308.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 1,
+    "kidFriendlyReason": "neutral: no strong signals"
   },
   {
     "id": "r119",
@@ -9908,7 +10247,10 @@
     ],
     "batchCook": true,
     "costPerServeAUD": 5.7,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/lqampv1762325397.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/lqampv1762325397.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 0,
+    "kidFriendlyReason": "disqualified: ingredient \"wine\""
   },
   {
     "id": "r120",
@@ -9991,7 +10333,10 @@
     ],
     "quickAssembly": true,
     "costPerServeAUD": 5.6,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/qxytrx1511304021.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/qxytrx1511304021.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 0,
+    "kidFriendlyReason": "disqualified: ingredient \"chilli\""
   },
   {
     "id": "r121",
@@ -10075,7 +10420,10 @@
       "winter"
     ],
     "imageUrl": "https://www.themealdb.com/images/media/meals/0dhtwr1763371444.jpg",
-    "costPerServeAUD": 3.4
+    "costPerServeAUD": 3.4,
+    "kidFriendly": false,
+    "kidFriendlyScore": 1,
+    "kidFriendlyReason": "neutral: no strong signals"
   },
   {
     "id": "r122",
@@ -10159,7 +10507,10 @@
     ],
     "quickAssembly": true,
     "costPerServeAUD": 3.75,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/sstssx1487349585.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/sstssx1487349585.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 0,
+    "kidFriendlyReason": "disqualified: dish type (\\bspicy\\b)"
   },
   {
     "id": "r123",
@@ -10244,7 +10595,10 @@
     ],
     "quickAssembly": true,
     "costPerServeAUD": 3.85,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/tvttqv1504640475.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/tvttqv1504640475.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 0,
+    "kidFriendlyReason": "disqualified: ingredient \"chilli\""
   },
   {
     "id": "r124",
@@ -10330,7 +10684,10 @@
     "batchCook": true,
     "familyStyle": true,
     "costPerServeAUD": 3.95,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/stpuws1511191310.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/stpuws1511191310.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 1,
+    "kidFriendlyReason": "neutral: no strong signals"
   },
   {
     "id": "r125",
@@ -10414,7 +10771,10 @@
     ],
     "familyStyle": true,
     "costPerServeAUD": 5.85,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/vwrpps1503068729.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/vwrpps1503068729.jpg",
+    "kidFriendly": true,
+    "kidFriendlyScore": 2,
+    "kidFriendlyReason": "kid-friendly: crumbed chicken"
   },
   {
     "id": "r126",
@@ -10496,7 +10856,10 @@
       "summer"
     ],
     "costPerServeAUD": 4.85,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/yxsurp1511304301.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/yxsurp1511304301.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 1,
+    "kidFriendlyReason": "neutral: no strong signals"
   },
   {
     "id": "r127",
@@ -10580,7 +10943,10 @@
     ],
     "quickAssembly": true,
     "costPerServeAUD": 4.2,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/wuyd2h1765655837.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/wuyd2h1765655837.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 1,
+    "kidFriendlyReason": "neutral: no strong signals"
   },
   {
     "id": "r128",
@@ -10665,7 +11031,10 @@
     ],
     "quickAssembly": true,
     "costPerServeAUD": 5.15,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/rjhf741585564676.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/rjhf741585564676.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 1,
+    "kidFriendlyReason": "neutral: no strong signals"
   },
   {
     "id": "r129",
@@ -10749,7 +11118,10 @@
     ],
     "batchCook": true,
     "costPerServeAUD": 5.4,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/vvstvq1487342592.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/vvstvq1487342592.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 0,
+    "kidFriendlyReason": "disqualified: dish type (\\bcurry\\b)"
   },
   {
     "id": "r130",
@@ -10834,7 +11206,10 @@
     ],
     "quickAssembly": true,
     "costPerServeAUD": 3.95,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/m0p0j81765568742.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/m0p0j81765568742.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 1,
+    "kidFriendlyReason": "neutral: no strong signals"
   },
   {
     "id": "r131",
@@ -10918,7 +11293,10 @@
     ],
     "familyStyle": true,
     "costPerServeAUD": 6.25,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/sutysw1468247559.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/sutysw1468247559.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 1,
+    "kidFriendlyReason": "neutral: no strong signals"
   },
   {
     "id": "r132",
@@ -11002,7 +11380,10 @@
     ],
     "quickAssembly": true,
     "costPerServeAUD": 5.6,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/1525872624.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/1525872624.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 0,
+    "kidFriendlyReason": "disqualified: ingredient \"chilli\""
   },
   {
     "id": "r133",
@@ -11085,7 +11466,10 @@
       "all"
     ],
     "imageUrl": "https://www.themealdb.com/images/media/meals/vwrpps1503068729.jpg",
-    "costPerServeAUD": 5.85
+    "costPerServeAUD": 5.85,
+    "kidFriendly": false,
+    "kidFriendlyScore": 0,
+    "kidFriendlyReason": "disqualified: dish type (\\bcurry\\b)"
   },
   {
     "id": "r134",
@@ -11168,7 +11552,10 @@
     ],
     "familyStyle": true,
     "costPerServeAUD": 4.15,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/lqampv1762325397.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/lqampv1762325397.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 1,
+    "kidFriendlyReason": "neutral: no strong signals"
   },
   {
     "id": "r135",
@@ -11253,7 +11640,10 @@
     "batchCook": true,
     "familyStyle": true,
     "costPerServeAUD": 3.8,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/0dhtwr1763371444.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/0dhtwr1763371444.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 0,
+    "kidFriendlyReason": "disqualified: ingredient \"smoked paprika\""
   },
   {
     "id": "r136",
@@ -11344,7 +11734,10 @@
     ],
     "batchCook": true,
     "costPerServeAUD": 4.35,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/sstssx1487349585.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/sstssx1487349585.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 0,
+    "kidFriendlyReason": "disqualified: dish type (\\bcurry\\b)"
   },
   {
     "id": "r137",
@@ -11434,7 +11827,10 @@
     ],
     "batchCook": true,
     "costPerServeAUD": 3.65,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/9ptx0a1565090843.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/9ptx0a1565090843.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 0,
+    "kidFriendlyReason": "disqualified: ingredient \"chilli\""
   },
   {
     "id": "r138",
@@ -11519,7 +11915,10 @@
     "quickAssembly": true,
     "familyStyle": true,
     "costPerServeAUD": 3.9,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/tvttqv1504640475.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/tvttqv1504640475.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 0,
+    "kidFriendlyReason": "disqualified: ingredient \"sriracha\""
   },
   {
     "id": "r139",
@@ -11607,7 +12006,10 @@
       "all"
     ],
     "costPerServeAUD": 6.45,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/vwrpps1503068729.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/vwrpps1503068729.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 0,
+    "kidFriendlyReason": "disqualified: ingredient \"wine\""
   },
   {
     "id": "r140",
@@ -11690,7 +12092,10 @@
     ],
     "quickAssembly": true,
     "costPerServeAUD": 6.75,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/m0p0j81765568742.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/m0p0j81765568742.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 1,
+    "kidFriendlyReason": "neutral: no strong signals"
   },
   {
     "id": "r141",
@@ -11785,7 +12190,10 @@
       "summer"
     ],
     "costPerServeAUD": 5.95,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/st9shl1763755808.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/st9shl1763755808.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 1,
+    "kidFriendlyReason": "neutral: no strong signals"
   },
   {
     "id": "r142",
@@ -11870,7 +12278,10 @@
     "quickAssembly": true,
     "familyStyle": true,
     "costPerServeAUD": 5.25,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/xwutvy1511555540.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/xwutvy1511555540.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 1,
+    "kidFriendlyReason": "neutral: no strong signals"
   },
   {
     "id": "r143",
@@ -11962,7 +12373,10 @@
     "batchCook": true,
     "familyStyle": true,
     "costPerServeAUD": 8.6,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/bc8v651619789840.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/bc8v651619789840.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 0,
+    "kidFriendlyReason": "disqualified: ingredient \"wine\""
   },
   {
     "id": "r144",
@@ -12053,7 +12467,10 @@
     "batchCook": true,
     "familyStyle": true,
     "costPerServeAUD": 4.55,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/8ovxf41763253962.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/8ovxf41763253962.jpg",
+    "kidFriendly": true,
+    "kidFriendlyScore": 2,
+    "kidFriendlyReason": "kid-friendly: cottage pie"
   },
   {
     "id": "r145",
@@ -12137,7 +12554,10 @@
     ],
     "batchCook": true,
     "imageUrl": "https://www.themealdb.com/images/media/meals/tvttqv1504640475.jpg",
-    "costPerServeAUD": 6.2
+    "costPerServeAUD": 6.2,
+    "kidFriendly": false,
+    "kidFriendlyScore": 0,
+    "kidFriendlyReason": "disqualified: dish type (\\bcurry\\b)"
   },
   {
     "id": "r146",
@@ -12222,7 +12642,10 @@
     "batchCook": true,
     "familyStyle": true,
     "costPerServeAUD": 4.4,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/wvpsxx1468256321.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/wvpsxx1468256321.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 1,
+    "kidFriendlyReason": "neutral: no strong signals"
   },
   {
     "id": "r147",
@@ -12313,7 +12736,10 @@
     ],
     "batchCook": true,
     "costPerServeAUD": 4.1,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/1brbso1763585098.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/1brbso1763585098.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 0,
+    "kidFriendlyReason": "disqualified: ingredient \"smoked paprika\""
   },
   {
     "id": "r148",
@@ -12404,7 +12830,10 @@
     "batchCook": true,
     "familyStyle": true,
     "costPerServeAUD": 6.4,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/vptwyt1511450962.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/vptwyt1511450962.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 0,
+    "kidFriendlyReason": "disqualified: ingredient \"wine\""
   },
   {
     "id": "r149",
@@ -12488,7 +12917,10 @@
     "quickAssembly": true,
     "familyStyle": true,
     "costPerServeAUD": 6.15,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/ntafxw1763586291.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/ntafxw1763586291.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 1,
+    "kidFriendlyReason": "neutral: no strong signals"
   },
   {
     "id": "r150",
@@ -12578,7 +13010,10 @@
     "batchCook": true,
     "familyStyle": true,
     "costPerServeAUD": 6.65,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/gr4lo51763791826.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/gr4lo51763791826.jpg",
+    "kidFriendly": true,
+    "kidFriendlyScore": 2,
+    "kidFriendlyReason": "kid-friendly: bolognese"
   },
   {
     "id": "r151",
@@ -12662,7 +13097,10 @@
     ],
     "quickAssembly": true,
     "costPerServeAUD": 5.85,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/wpkfin1763597958.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/wpkfin1763597958.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 1,
+    "kidFriendlyReason": "neutral: no strong signals"
   },
   {
     "id": "r152",
@@ -12752,7 +13190,10 @@
     ],
     "batchCook": true,
     "costPerServeAUD": 6.2,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/6sarfo1762340107.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/6sarfo1762340107.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 1,
+    "kidFriendlyReason": "neutral: no strong signals"
   },
   {
     "id": "r153",
@@ -12836,7 +13277,10 @@
     ],
     "quickAssembly": true,
     "costPerServeAUD": 5.5,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/1529442316.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/1529442316.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 1,
+    "kidFriendlyReason": "neutral: no strong signals"
   },
   {
     "id": "r154",
@@ -12927,7 +13371,10 @@
     "quickAssembly": true,
     "familyStyle": true,
     "costPerServeAUD": 4.95,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/xrrtss1511555269.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/xrrtss1511555269.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 1,
+    "kidFriendlyReason": "neutral: no strong signals"
   },
   {
     "id": "r155",
@@ -13016,7 +13463,10 @@
       "autumn"
     ],
     "imageUrl": "https://www.themealdb.com/images/media/meals/nlxald1764112200.jpg",
-    "costPerServeAUD": 6.75
+    "costPerServeAUD": 6.75,
+    "kidFriendly": false,
+    "kidFriendlyScore": 1,
+    "kidFriendlyReason": "neutral: no strong signals"
   },
   {
     "id": "r156",
@@ -13102,7 +13552,10 @@
     "batchCook": true,
     "familyStyle": true,
     "costPerServeAUD": 4.65,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/wtsvxx1511296896.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/wtsvxx1511296896.jpg",
+    "kidFriendly": true,
+    "kidFriendlyScore": 2,
+    "kidFriendlyReason": "kid-friendly: meatball"
   },
   {
     "id": "r157",
@@ -13186,7 +13639,10 @@
     ],
     "quickAssembly": true,
     "costPerServeAUD": 4.3,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/wyxwsp1486979827.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/wyxwsp1486979827.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 0,
+    "kidFriendlyReason": "disqualified: dish type (\\bspicy\\b)"
   },
   {
     "id": "r158",
@@ -13271,7 +13727,10 @@
     "batchCook": true,
     "familyStyle": true,
     "imageUrl": "https://www.themealdb.com/images/media/meals/vussxq1511882648.jpg",
-    "costPerServeAUD": 10.5
+    "costPerServeAUD": 10.5,
+    "kidFriendly": false,
+    "kidFriendlyScore": 0,
+    "kidFriendlyReason": "disqualified: ingredient \"smoked paprika\""
   },
   {
     "id": "r159",
@@ -13360,7 +13819,10 @@
       "all"
     ],
     "imageUrl": "https://www.themealdb.com/images/media/meals/pbzcrx1763765096.jpg",
-    "costPerServeAUD": 6.4
+    "costPerServeAUD": 6.4,
+    "kidFriendly": false,
+    "kidFriendlyScore": 0,
+    "kidFriendlyReason": "disqualified: dish type (\\bpho\\b)"
   },
   {
     "id": "r160",
@@ -13451,7 +13913,10 @@
     ],
     "batchCook": true,
     "costPerServeAUD": 5.85,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/yxsurp1511304301.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/yxsurp1511304301.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 0,
+    "kidFriendlyReason": "disqualified: dish type (\\bcurry\\b)"
   },
   {
     "id": "r161",
@@ -13541,7 +14006,10 @@
     ],
     "quickAssembly": true,
     "costPerServeAUD": 4.75,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/tyywsw1505930373.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/tyywsw1505930373.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 1,
+    "kidFriendlyReason": "neutral: no strong signals"
   },
   {
     "id": "r162",
@@ -13629,7 +14097,10 @@
       "summer"
     ],
     "costPerServeAUD": 6.35,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/qysyss1511558054.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/qysyss1511558054.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 1,
+    "kidFriendlyReason": "neutral: no strong signals"
   },
   {
     "id": "r163",
@@ -13717,7 +14188,10 @@
       "winter"
     ],
     "costPerServeAUD": 11.25,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/qtuwxu1468233098.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/qtuwxu1468233098.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 0,
+    "kidFriendlyReason": "disqualified: ingredient \"wine\""
   },
   {
     "id": "r164",
@@ -13808,7 +14282,10 @@
     "batchCook": true,
     "familyStyle": true,
     "costPerServeAUD": 5.2,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/xutquv1505330523.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/xutquv1505330523.jpg",
+    "kidFriendly": true,
+    "kidFriendlyScore": 2,
+    "kidFriendlyReason": "kid-friendly: pasta bake"
   },
   {
     "id": "r165",
@@ -13893,7 +14370,10 @@
     ],
     "quickAssembly": true,
     "costPerServeAUD": 4.9,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/m0p0j81765568742.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/m0p0j81765568742.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 1,
+    "kidFriendlyReason": "neutral: no strong signals"
   },
   {
     "id": "r166",
@@ -13969,7 +14449,10 @@
       "all"
     ],
     "costPerServeAUD": 6.65,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/7xte3u1763757761.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/7xte3u1763757761.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 1,
+    "kidFriendlyReason": "neutral: no strong signals"
   },
   {
     "id": "r167",
@@ -14061,7 +14544,10 @@
     "quickAssembly": true,
     "familyStyle": true,
     "costPerServeAUD": 4.15,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/er4d081765186828.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/er4d081765186828.jpg",
+    "kidFriendly": true,
+    "kidFriendlyScore": 2,
+    "kidFriendlyReason": "kid-friendly: fried rice"
   },
   {
     "id": "r168",
@@ -14134,7 +14620,10 @@
     ],
     "quickAssembly": true,
     "costPerServeAUD": 5.45,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/0jv5gx1661040802.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/0jv5gx1661040802.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 1,
+    "kidFriendlyReason": "neutral: no strong signals"
   },
   {
     "id": "r169",
@@ -14212,7 +14701,10 @@
     ],
     "familyStyle": true,
     "costPerServeAUD": 4.7,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/ursuup1487348423.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/ursuup1487348423.jpg",
+    "kidFriendly": true,
+    "kidFriendlyScore": 2,
+    "kidFriendlyReason": "kid-friendly: sausages with apple mash rustic bangers and mash"
   },
   {
     "id": "r170",
@@ -14291,7 +14783,10 @@
     "quickAssembly": true,
     "familyStyle": true,
     "costPerServeAUD": 5.55,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/1oz4nb1765687990.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/1oz4nb1765687990.jpg",
+    "kidFriendly": true,
+    "kidFriendlyScore": 2,
+    "kidFriendlyReason": "kid-friendly: quesadilla"
   },
   {
     "id": "r171",
@@ -14382,7 +14877,10 @@
     ],
     "quickAssembly": true,
     "costPerServeAUD": 4.25,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/qpxvuq1511798906.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/qpxvuq1511798906.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 0,
+    "kidFriendlyReason": "disqualified: ingredient \"sriracha\""
   },
   {
     "id": "r172",
@@ -14471,7 +14969,10 @@
       "winter"
     ],
     "costPerServeAUD": 6.8,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/pbzcrx1763765096.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/pbzcrx1763765096.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 0,
+    "kidFriendlyReason": "disqualified: dish type (\\bramen\\b)"
   },
   {
     "id": "r173",
@@ -14556,7 +15057,10 @@
     ],
     "quickAssembly": true,
     "costPerServeAUD": 4.6,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/1525872624.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/1525872624.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 1,
+    "kidFriendlyReason": "neutral: no strong signals"
   },
   {
     "id": "r174",
@@ -14634,7 +15138,10 @@
     ],
     "batchCook": true,
     "costPerServeAUD": 10.8,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/xwutvy1511555540.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/xwutvy1511555540.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 1,
+    "kidFriendlyReason": "neutral: no strong signals"
   },
   {
     "id": "r175",
@@ -14723,7 +15230,10 @@
       "all"
     ],
     "costPerServeAUD": 9.45,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/bc8v651619789840.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/bc8v651619789840.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 1,
+    "kidFriendlyReason": "neutral: no strong signals"
   },
   {
     "id": "r176",
@@ -14808,7 +15318,10 @@
     ],
     "batchCook": true,
     "costPerServeAUD": 3.45,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/8ovxf41763253962.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/8ovxf41763253962.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 0,
+    "kidFriendlyReason": "disqualified: ingredient \"smoked paprika\""
   },
   {
     "id": "r177",
@@ -14886,7 +15399,10 @@
     ],
     "quickAssembly": true,
     "costPerServeAUD": 4.2,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/qrqywr1503066605.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/qrqywr1503066605.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 0,
+    "kidFriendlyReason": "disqualified: ingredient \"chilli\""
   },
   {
     "id": "r178",
@@ -14969,7 +15485,10 @@
     ],
     "batchCook": true,
     "costPerServeAUD": 5.85,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/wvpsxx1468256321.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/wvpsxx1468256321.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 0,
+    "kidFriendlyReason": "disqualified: ingredient \"smoked paprika\""
   },
   {
     "id": "r179",
@@ -15053,7 +15572,10 @@
     ],
     "quickAssembly": true,
     "costPerServeAUD": 9.25,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/1548772327.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/1548772327.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 1,
+    "kidFriendlyReason": "neutral: no strong signals"
   },
   {
     "id": "r180",
@@ -15136,7 +15658,10 @@
     ],
     "quickAssembly": true,
     "costPerServeAUD": 8.15,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/qtqvys1468573168.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/qtqvys1468573168.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 0,
+    "kidFriendlyReason": "disqualified: ingredient \"chilli\""
   },
   {
     "id": "r181",
@@ -15220,7 +15745,10 @@
     ],
     "quickAssembly": true,
     "imageUrl": "https://www.themealdb.com/images/media/meals/vvstvq1487342592.jpg",
-    "costPerServeAUD": 7.95
+    "costPerServeAUD": 7.95,
+    "kidFriendly": false,
+    "kidFriendlyScore": 0,
+    "kidFriendlyReason": "disqualified: dish type (\\bcurry\\b)"
   },
   {
     "id": "r182",
@@ -15303,7 +15831,10 @@
       "spring"
     ],
     "costPerServeAUD": 9.1,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/ikizdm1763760862.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/ikizdm1763760862.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 1,
+    "kidFriendlyReason": "neutral: no strong signals"
   },
   {
     "id": "r183",
@@ -15387,7 +15918,10 @@
     ],
     "quickAssembly": true,
     "costPerServeAUD": 6.75,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/ysxwuq1487323065.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/ysxwuq1487323065.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 0,
+    "kidFriendlyReason": "disqualified: ingredient \"smoked paprika\""
   },
   {
     "id": "r184",
@@ -15477,7 +16011,10 @@
       "all"
     ],
     "costPerServeAUD": 4.85,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/lqampv1762325397.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/lqampv1762325397.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 0,
+    "kidFriendlyReason": "disqualified: dish type (\\bcurry\\b)"
   },
   {
     "id": "r185",
@@ -15562,7 +16099,10 @@
     ],
     "quickAssembly": true,
     "costPerServeAUD": 7.3,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/uwvxpv1511557015.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/uwvxpv1511557015.jpg",
+    "kidFriendly": true,
+    "kidFriendlyScore": 2,
+    "kidFriendlyReason": "kid-friendly: fried rice"
   },
   {
     "id": "r186",
@@ -15645,7 +16185,10 @@
       "all"
     ],
     "costPerServeAUD": 9.5,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/xxrxux1503070723.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/xxrxux1503070723.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 1,
+    "kidFriendlyReason": "neutral: no strong signals"
   },
   {
     "id": "r187",
@@ -15736,7 +16279,10 @@
     ],
     "quickAssembly": true,
     "costPerServeAUD": 5.4,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/02s6gc1763799560.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/02s6gc1763799560.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 1,
+    "kidFriendlyReason": "neutral: no strong signals"
   },
   {
     "id": "r188",
@@ -15813,7 +16359,10 @@
     ],
     "quickAssembly": true,
     "costPerServeAUD": 9.05,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/30s7vf1763741844.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/30s7vf1763741844.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 0,
+    "kidFriendlyReason": "disqualified: ingredient \"wine\""
   },
   {
     "id": "r189",
@@ -15903,7 +16452,10 @@
       "summer"
     ],
     "costPerServeAUD": 11.85,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/yhi46r1763330279.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/yhi46r1763330279.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 0,
+    "kidFriendlyReason": "disqualified: ingredient \"mussels\""
   },
   {
     "id": "r190",
@@ -15980,7 +16532,10 @@
     ],
     "quickAssembly": true,
     "costPerServeAUD": 13.2,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/g373701551450225.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/g373701551450225.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 1,
+    "kidFriendlyReason": "neutral: no strong signals"
   },
   {
     "id": "r191",
@@ -16069,7 +16624,10 @@
       "summer"
     ],
     "costPerServeAUD": 6.9,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/8xuvhj1763794991.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/8xuvhj1763794991.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 1,
+    "kidFriendlyReason": "neutral: no strong signals"
   },
   {
     "id": "r192",
@@ -16153,7 +16711,10 @@
     "batchCook": true,
     "familyStyle": true,
     "costPerServeAUD": 11.75,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/vptwyt1511450962.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/vptwyt1511450962.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 0,
+    "kidFriendlyReason": "disqualified: ingredient \"wine\""
   },
   {
     "id": "r193",
@@ -16243,7 +16804,10 @@
     ],
     "batchCook": true,
     "costPerServeAUD": 6.35,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/ntafxw1763586291.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/ntafxw1763586291.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 1,
+    "kidFriendlyReason": "neutral: no strong signals"
   },
   {
     "id": "r194",
@@ -16327,7 +16891,10 @@
     ],
     "quickAssembly": true,
     "costPerServeAUD": 8.6,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/gr4lo51763791826.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/gr4lo51763791826.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 0,
+    "kidFriendlyReason": "disqualified: ingredient \"wine\""
   },
   {
     "id": "r195",
@@ -16416,7 +16983,10 @@
     ],
     "batchCook": true,
     "costPerServeAUD": 10.95,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/6sarfo1762340107.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/6sarfo1762340107.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 0,
+    "kidFriendlyReason": "disqualified: ingredient \"wine\""
   },
   {
     "id": "r196",
@@ -16507,7 +17077,10 @@
     ],
     "batchCook": true,
     "imageUrl": "https://www.themealdb.com/images/media/meals/nlxald1764112200.jpg",
-    "costPerServeAUD": 10.4
+    "costPerServeAUD": 10.4,
+    "kidFriendly": false,
+    "kidFriendlyScore": 1,
+    "kidFriendlyReason": "neutral: no strong signals"
   },
   {
     "id": "r197",
@@ -16603,7 +17176,10 @@
     ],
     "batchCook": true,
     "costPerServeAUD": 9.85,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/eo0yfb1763600916.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/eo0yfb1763600916.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 1,
+    "kidFriendlyReason": "neutral: no strong signals"
   },
   {
     "id": "r198",
@@ -16693,7 +17269,10 @@
     ],
     "batchCook": true,
     "costPerServeAUD": 7.15,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/0dhtwr1763371444.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/0dhtwr1763371444.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 0,
+    "kidFriendlyReason": "disqualified: dish type (\\bcurry\\b)"
   },
   {
     "id": "r199",
@@ -16783,7 +17362,10 @@
     ],
     "quickAssembly": true,
     "costPerServeAUD": 9.3,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/k29viq1585565980.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/k29viq1585565980.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 1,
+    "kidFriendlyReason": "neutral: no strong signals"
   },
   {
     "id": "r200",
@@ -16872,7 +17454,10 @@
     ],
     "batchCook": true,
     "costPerServeAUD": 7.45,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/sstssx1487349585.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/sstssx1487349585.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 0,
+    "kidFriendlyReason": "disqualified: dish type (\\bcurry\\b)"
   },
   {
     "id": "r201",
@@ -16967,7 +17552,10 @@
     ],
     "quickAssembly": true,
     "costPerServeAUD": 8.75,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/wf49qs1763075222.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/wf49qs1763075222.jpg",
+    "kidFriendly": true,
+    "kidFriendlyScore": 2,
+    "kidFriendlyReason": "kid-friendly: pizza"
   },
   {
     "id": "r202",
@@ -17056,7 +17644,10 @@
     ],
     "batchCook": true,
     "costPerServeAUD": 9.25,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/qtuwxu1468233098.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/qtuwxu1468233098.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 0,
+    "kidFriendlyReason": "disqualified: ingredient \"wine\""
   },
   {
     "id": "r203",
@@ -17147,7 +17738,10 @@
     ],
     "familyStyle": true,
     "imageUrl": "https://www.themealdb.com/images/media/meals/u5e9qq1763795441.jpg",
-    "costPerServeAUD": 3.45
+    "costPerServeAUD": 3.45,
+    "kidFriendly": false,
+    "kidFriendlyScore": 0,
+    "kidFriendlyReason": "disqualified: ingredient \"chilli\""
   },
   {
     "id": "r204",
@@ -17237,7 +17831,10 @@
     ],
     "batchCook": true,
     "costPerServeAUD": 4.2,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/tvttqv1504640475.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/tvttqv1504640475.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 0,
+    "kidFriendlyReason": "disqualified: dish type (\\bcurry\\b)"
   },
   {
     "id": "r205",
@@ -17333,7 +17930,10 @@
     ],
     "quickAssembly": true,
     "imageUrl": "https://www.themealdb.com/images/media/meals/yqwtvu1487426027.jpg",
-    "costPerServeAUD": 3.6
+    "costPerServeAUD": 3.6,
+    "kidFriendly": false,
+    "kidFriendlyScore": 1,
+    "kidFriendlyReason": "neutral: no strong signals"
   },
   {
     "id": "r206",
@@ -17422,7 +18022,10 @@
     ],
     "batchCook": true,
     "costPerServeAUD": 3.85,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/vwrpps1503068729.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/vwrpps1503068729.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 0,
+    "kidFriendlyReason": "disqualified: dish type (\\bdhal\\b|\\bdal\\b)"
   },
   {
     "id": "r207",
@@ -17508,7 +18111,10 @@
     "batchCook": true,
     "familyStyle": true,
     "costPerServeAUD": 4.15,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/ysqrus1487425681.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/ysqrus1487425681.jpg",
+    "kidFriendly": true,
+    "kidFriendlyScore": 2,
+    "kidFriendlyReason": "kid-friendly: frittata"
   },
   {
     "id": "r208",
@@ -17605,7 +18211,10 @@
     "quickAssembly": true,
     "familyStyle": true,
     "costPerServeAUD": 4.5,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/ae6clc1760524712.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/ae6clc1760524712.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 0,
+    "kidFriendlyReason": "disqualified: ingredient \"smoked paprika\""
   },
   {
     "id": "r209",
@@ -17688,7 +18297,10 @@
       "autumn"
     ],
     "costPerServeAUD": 4.35,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/llcbn01574260722.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/llcbn01574260722.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 1,
+    "kidFriendlyReason": "neutral: no strong signals"
   },
   {
     "id": "r210",
@@ -17779,7 +18391,10 @@
     "batchCook": true,
     "quickAssembly": true,
     "costPerServeAUD": 3.9,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/yxsurp1511304301.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/yxsurp1511304301.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 0,
+    "kidFriendlyReason": "disqualified: dish type (\\bcurry\\b)"
   },
   {
     "id": "r211",
@@ -17864,7 +18479,10 @@
     "quickAssembly": true,
     "familyStyle": true,
     "costPerServeAUD": 4.7,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/wrpwuu1511786491.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/wrpwuu1511786491.jpg",
+    "kidFriendly": true,
+    "kidFriendlyScore": 2,
+    "kidFriendlyReason": "kid-friendly: quesadilla"
   },
   {
     "id": "r212",
@@ -17954,7 +18572,10 @@
       "all"
     ],
     "costPerServeAUD": 4.25,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/wrustq1511475474.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/wrustq1511475474.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 0,
+    "kidFriendlyReason": "disqualified: dish type (pad\\s*thai)"
   },
   {
     "id": "r213",
@@ -18044,7 +18665,10 @@
     ],
     "batchCook": true,
     "costPerServeAUD": 4.6,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/ctg8jd1585563097.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/ctg8jd1585563097.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 1,
+    "kidFriendlyReason": "neutral: no strong signals"
   },
   {
     "id": "r214",
@@ -18135,7 +18759,10 @@
     "batchCook": true,
     "familyStyle": true,
     "costPerServeAUD": 3.55,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/y7h0lq1683208991.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/y7h0lq1683208991.jpg",
+    "kidFriendly": true,
+    "kidFriendlyScore": 2,
+    "kidFriendlyReason": "kid-friendly: bolognese"
   },
   {
     "id": "r215",
@@ -18225,7 +18852,10 @@
     ],
     "quickAssembly": true,
     "costPerServeAUD": 4.4,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/hcg6l91763596970.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/hcg6l91763596970.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 1,
+    "kidFriendlyReason": "neutral: no strong signals"
   },
   {
     "id": "r216",
@@ -18309,7 +18939,10 @@
     ],
     "quickAssembly": true,
     "costPerServeAUD": 6.85,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/sutysw1468247559.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/sutysw1468247559.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 1,
+    "kidFriendlyReason": "neutral: no strong signals"
   },
   {
     "id": "r217",
@@ -18406,7 +19039,10 @@
     "batchCook": true,
     "familyStyle": true,
     "costPerServeAUD": 3.75,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/c7lzrl1683208757.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/c7lzrl1683208757.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 0,
+    "kidFriendlyReason": "disqualified: ingredient \"chilli\""
   },
   {
     "id": "r218",
@@ -18494,7 +19130,10 @@
       "autumn"
     ],
     "costPerServeAUD": 5.95,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/wtsvxx1511296896.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/wtsvxx1511296896.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 0,
+    "kidFriendlyReason": "disqualified: ingredient \"wine\""
   },
   {
     "id": "r219",
@@ -18576,7 +19215,10 @@
       "winter"
     ],
     "imageUrl": "https://www.themealdb.com/images/media/meals/xvrrux1511783685.jpg",
-    "costPerServeAUD": 6.4
+    "costPerServeAUD": 6.4,
+    "kidFriendly": false,
+    "kidFriendlyScore": 0,
+    "kidFriendlyReason": "disqualified: ingredient \"wine\""
   },
   {
     "id": "r220",
@@ -18667,7 +19309,10 @@
     ],
     "batchCook": true,
     "costPerServeAUD": 3.5,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/7kb44y1763589084.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/7kb44y1763589084.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 1,
+    "kidFriendlyReason": "neutral: no strong signals"
   },
   {
     "id": "r221",
@@ -18749,7 +19394,10 @@
       "winter"
     ],
     "costPerServeAUD": 6.5,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/bopa2i1683209167.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/bopa2i1683209167.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 1,
+    "kidFriendlyReason": "neutral: no strong signals"
   },
   {
     "id": "r222",
@@ -18831,7 +19479,10 @@
       "autumn"
     ],
     "costPerServeAUD": 6.75,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/wpkfin1763597958.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/wpkfin1763597958.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 1,
+    "kidFriendlyReason": "neutral: no strong signals"
   },
   {
     "id": "r223",
@@ -18921,7 +19572,10 @@
       "summer"
     ],
     "costPerServeAUD": 4.05,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/xutquv1505330523.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/xutquv1505330523.jpg",
+    "kidFriendly": true,
+    "kidFriendlyScore": 2,
+    "kidFriendlyReason": "kid-friendly: pasta bake"
   },
   {
     "id": "r224",
@@ -19010,7 +19664,10 @@
     ],
     "batchCook": true,
     "costPerServeAUD": 3.4,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/xxtsvx1511814083.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/xxtsvx1511814083.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 1,
+    "kidFriendlyReason": "neutral: no strong signals"
   },
   {
     "id": "r225",
@@ -19100,7 +19757,10 @@
     ],
     "quickAssembly": true,
     "costPerServeAUD": 3.95,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/1529442316.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/1529442316.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 1,
+    "kidFriendlyReason": "neutral: no strong signals"
   },
   {
     "id": "r226",
@@ -19179,7 +19839,10 @@
     ],
     "quickAssembly": true,
     "costPerServeAUD": 3.45,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/1oz4nb1765687990.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/1oz4nb1765687990.jpg",
+    "kidFriendly": true,
+    "kidFriendlyScore": 2,
+    "kidFriendlyReason": "kid-friendly: omelette"
   },
   {
     "id": "r227",
@@ -19264,7 +19927,10 @@
     ],
     "quickAssembly": true,
     "costPerServeAUD": 4.88,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/jyylmo1763790808.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/jyylmo1763790808.jpg",
+    "kidFriendly": true,
+    "kidFriendlyScore": 2,
+    "kidFriendlyReason": "kid-friendly: scrambled egg"
   },
   {
     "id": "r228",
@@ -19340,7 +20006,10 @@
       "winter"
     ],
     "costPerServeAUD": 12.5,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/30s7vf1763741844.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/30s7vf1763741844.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 0,
+    "kidFriendlyReason": "disqualified: ingredient \"wine\""
   },
   {
     "id": "r229",
@@ -19417,7 +20086,10 @@
     ],
     "quickAssembly": true,
     "costPerServeAUD": 6.25,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/x0lk931587671540.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/x0lk931587671540.jpg",
+    "kidFriendly": true,
+    "kidFriendlyScore": 2,
+    "kidFriendlyReason": "kid-friendly: pizza"
   },
   {
     "id": "r230",
@@ -19501,7 +20173,10 @@
     ],
     "quickAssembly": true,
     "costPerServeAUD": 11.75,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/xxyupu1468262513.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/xxyupu1468262513.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 1,
+    "kidFriendlyReason": "neutral: no strong signals"
   },
   {
     "id": "r231",
@@ -19589,7 +20264,10 @@
       "all"
     ],
     "costPerServeAUD": 7.85,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/xquakq1619787532.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/xquakq1619787532.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 0,
+    "kidFriendlyReason": "disqualified: dish type (pad\\s*thai)"
   },
   {
     "id": "r232",
@@ -19666,7 +20344,10 @@
     ],
     "familyStyle": true,
     "costPerServeAUD": 11.2,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/h3ijwo1581013377.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/h3ijwo1581013377.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 1,
+    "kidFriendlyReason": "neutral: no strong signals"
   },
   {
     "id": "r233",
@@ -19761,7 +20442,10 @@
       "all"
     ],
     "costPerServeAUD": 6.4,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/4hzyvq1763792564.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/4hzyvq1763792564.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 0,
+    "kidFriendlyReason": "disqualified: dish type (\\bgochujang\\b)"
   },
   {
     "id": "r234",
@@ -19850,7 +20534,10 @@
       "winter"
     ],
     "costPerServeAUD": 5.95,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/uuuspp1468263334.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/uuuspp1468263334.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 0,
+    "kidFriendlyReason": "disqualified: dish type (\\bramen\\b)"
   },
   {
     "id": "r235",
@@ -19940,7 +20627,10 @@
       "all"
     ],
     "imageUrl": "https://www.themealdb.com/images/media/meals/d8f6qx1604182128.jpg",
-    "costPerServeAUD": 3.85
+    "costPerServeAUD": 3.85,
+    "kidFriendly": false,
+    "kidFriendlyScore": 0,
+    "kidFriendlyReason": "disqualified: dish type (\\bpho\\b)"
   },
   {
     "id": "r236",
@@ -20024,7 +20714,10 @@
     ],
     "quickAssembly": true,
     "costPerServeAUD": 9.6,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/yypwwq1511304979.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/yypwwq1511304979.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 1,
+    "kidFriendlyReason": "neutral: no strong signals"
   },
   {
     "id": "r237",
@@ -20108,7 +20801,10 @@
     ],
     "quickAssembly": true,
     "costPerServeAUD": 4.15,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/spswqs1511558697.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/spswqs1511558697.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 1,
+    "kidFriendlyReason": "neutral: no strong signals"
   },
   {
     "id": "r238",
@@ -20191,7 +20887,10 @@
     ],
     "quickAssembly": true,
     "costPerServeAUD": 7.55,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/g373701551450225.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/g373701551450225.jpg",
+    "kidFriendly": true,
+    "kidFriendlyScore": 2,
+    "kidFriendlyReason": "kid-friendly: toasted sand"
   },
   {
     "id": "r239",
@@ -20274,7 +20973,10 @@
     ],
     "quickAssembly": true,
     "costPerServeAUD": 13.85,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/eo0yfb1763600916.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/eo0yfb1763600916.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 0,
+    "kidFriendlyReason": "disqualified: ingredient \"wine\""
   },
   {
     "id": "r240",
@@ -20363,7 +21065,10 @@
     ],
     "quickAssembly": true,
     "costPerServeAUD": 8.75,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/4mhr3u1763481087.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/4mhr3u1763481087.jpg",
+    "kidFriendly": true,
+    "kidFriendlyScore": 2,
+    "kidFriendlyReason": "kid-friendly: fried rice"
   },
   {
     "id": "r241",
@@ -20445,7 +21150,10 @@
       "summer"
     ],
     "costPerServeAUD": 8.45,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/7xte3u1763757761.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/7xte3u1763757761.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 0,
+    "kidFriendlyReason": "disqualified: ingredient \"wine\""
   },
   {
     "id": "r242",
@@ -20535,7 +21243,10 @@
     ],
     "quickAssembly": true,
     "costPerServeAUD": 10.3,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/s73ytv1765567838.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/s73ytv1765567838.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 0,
+    "kidFriendlyReason": "disqualified: ingredient \"wasabi\""
   },
   {
     "id": "r243",
@@ -20624,7 +21335,10 @@
       "summer"
     ],
     "costPerServeAUD": 6.8,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/vvstvq1487342592.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/vvstvq1487342592.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 1,
+    "kidFriendlyReason": "neutral: no strong signals"
   },
   {
     "id": "r244",
@@ -20714,7 +21428,10 @@
     ],
     "batchCook": true,
     "imageUrl": "https://www.themealdb.com/images/media/meals/8ovxf41763253962.jpg",
-    "costPerServeAUD": 7.65
+    "costPerServeAUD": 7.65,
+    "kidFriendly": false,
+    "kidFriendlyScore": 0,
+    "kidFriendlyReason": "disqualified: ingredient \"smoked paprika\""
   },
   {
     "id": "r245",
@@ -20802,7 +21519,10 @@
       "all"
     ],
     "costPerServeAUD": 10.9,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/ursuup1487348423.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/ursuup1487348423.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 0,
+    "kidFriendlyReason": "disqualified: ingredient \"chilli\""
   },
   {
     "id": "r246",
@@ -20892,7 +21612,10 @@
     ],
     "batchCook": true,
     "costPerServeAUD": 7.95,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/xwutvy1511555540.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/xwutvy1511555540.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 1,
+    "kidFriendlyReason": "neutral: no strong signals"
   },
   {
     "id": "r247",
@@ -20982,7 +21705,10 @@
       "winter"
     ],
     "costPerServeAUD": 5.4,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/rg9ze01763479093.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/rg9ze01763479093.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 0,
+    "kidFriendlyReason": "disqualified: dish type (\\bramen\\b)"
   },
   {
     "id": "r248",
@@ -21072,7 +21798,10 @@
     ],
     "quickAssembly": true,
     "costPerServeAUD": 3.65,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/qstyvs1505931190.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/qstyvs1505931190.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 0,
+    "kidFriendlyReason": "disqualified: ingredient \"smoked paprika\""
   },
   {
     "id": "r249",
@@ -21163,7 +21892,10 @@
     "batchCook": true,
     "familyStyle": true,
     "costPerServeAUD": 6.15,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/0jv5gx1661040802.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/0jv5gx1661040802.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 1,
+    "kidFriendlyReason": "neutral: no strong signals"
   },
   {
     "id": "r250",
@@ -21252,6 +21984,2323 @@
       "summer"
     ],
     "costPerServeAUD": 8.85,
-    "imageUrl": "https://www.themealdb.com/images/media/meals/xvrrux1511783685.jpg"
+    "imageUrl": "https://www.themealdb.com/images/media/meals/xvrrux1511783685.jpg",
+    "kidFriendly": false,
+    "kidFriendlyScore": 0,
+    "kidFriendlyReason": "disqualified: dish type (\\bchowder\\b)"
+  },
+  {
+    "id": "r251",
+    "name": "Mac and Cheese (Baked)",
+    "description": "Creamy homemade macaroni and cheese, baked golden on top",
+    "baseServings": 4,
+    "cookTimeMinutes": 35,
+    "difficulty": "easy",
+    "cookingStyle": "mixed",
+    "healthTags": [
+      "standard"
+    ],
+    "budgetTags": [
+      "budget",
+      "standard"
+    ],
+    "leftoversFriendly": true,
+    "mealType": "both",
+    "estimatedCostBand": "low",
+    "ingredients": [
+      {
+        "name": "Macaroni pasta",
+        "quantity": 400,
+        "unit": "g",
+        "category": "grains"
+      },
+      {
+        "name": "Cheddar cheese",
+        "quantity": 200,
+        "unit": "g",
+        "category": "dairy"
+      },
+      {
+        "name": "Milk",
+        "quantity": 2,
+        "unit": "cups",
+        "category": "dairy"
+      },
+      {
+        "name": "Butter",
+        "quantity": 2,
+        "unit": "tbsp",
+        "category": "dairy"
+      },
+      {
+        "name": "Plain flour",
+        "quantity": 2,
+        "unit": "tbsp",
+        "category": "pantry"
+      },
+      {
+        "name": "Dijon mustard",
+        "quantity": 1,
+        "unit": "tsp",
+        "category": "condiments"
+      },
+      {
+        "name": "Breadcrumbs",
+        "quantity": 0.5,
+        "unit": "cup",
+        "category": "pantry"
+      }
+    ],
+    "instructions": [
+      "Cook macaroni per packet, drain.",
+      "Melt butter, whisk in flour to form roux.",
+      "Gradually add milk, stir until thickened.",
+      "Add 3/4 of cheese, mustard, season well.",
+      "Combine sauce with pasta in baking dish.",
+      "Top with remaining cheese and breadcrumbs.",
+      "Bake 180°C for 20 mins until golden."
+    ],
+    "proteinType": "none",
+    "cuisineType": "american",
+    "seasonTags": [
+      "all"
+    ],
+    "costPerServeAUD": 3.2,
+    "kidFriendly": true,
+    "kidFriendlyScore": 2,
+    "kidFriendlyReason": "mac and cheese: classic kid staple"
+  },
+  {
+    "id": "r252",
+    "name": "Homemade Chicken Nuggets",
+    "description": "Oven-baked crumbed chicken nuggets, crispy outside, juicy inside",
+    "baseServings": 4,
+    "cookTimeMinutes": 30,
+    "difficulty": "easy",
+    "cookingStyle": "mixed",
+    "healthTags": [
+      "standard",
+      "high-protein"
+    ],
+    "budgetTags": [
+      "budget",
+      "standard"
+    ],
+    "leftoversFriendly": false,
+    "mealType": "both",
+    "estimatedCostBand": "low",
+    "ingredients": [
+      {
+        "name": "Chicken breast",
+        "quantity": 600,
+        "unit": "g",
+        "category": "proteins"
+      },
+      {
+        "name": "Breadcrumbs",
+        "quantity": 1,
+        "unit": "cup",
+        "category": "pantry"
+      },
+      {
+        "name": "Parmesan cheese",
+        "quantity": 30,
+        "unit": "g",
+        "category": "dairy"
+      },
+      {
+        "name": "Egg",
+        "quantity": 2,
+        "unit": "whole",
+        "category": "dairy"
+      },
+      {
+        "name": "Plain flour",
+        "quantity": 0.5,
+        "unit": "cup",
+        "category": "pantry"
+      },
+      {
+        "name": "Garlic powder",
+        "quantity": 0.5,
+        "unit": "tsp",
+        "category": "herbs"
+      },
+      {
+        "name": "Olive oil spray",
+        "quantity": 1,
+        "unit": "spray",
+        "category": "condiments"
+      }
+    ],
+    "instructions": [
+      "Preheat oven to 200°C. Line tray with baking paper.",
+      "Cut chicken into nugget-sized pieces.",
+      "Set up crumbing station: flour, beaten egg, breadcrumb-parmesan mix.",
+      "Coat each piece in flour, egg, then breadcrumbs.",
+      "Place on tray, spray with oil.",
+      "Bake 20–22 mins, flipping halfway, until golden and cooked through.",
+      "Serve with tomato sauce or aioli."
+    ],
+    "proteinType": "chicken",
+    "cuisineType": "australian",
+    "seasonTags": [
+      "all"
+    ],
+    "costPerServeAUD": 3.8,
+    "kidFriendly": true,
+    "kidFriendlyScore": 2,
+    "kidFriendlyReason": "chicken nugget: quintessential kid meal"
+  },
+  {
+    "id": "r253",
+    "name": "Honey Soy Chicken Drumsticks",
+    "description": "Sticky, mild honey soy glazed drumsticks baked until caramelised",
+    "baseServings": 4,
+    "cookTimeMinutes": 50,
+    "difficulty": "easy",
+    "cookingStyle": "mixed",
+    "healthTags": [
+      "standard",
+      "high-protein"
+    ],
+    "budgetTags": [
+      "budget",
+      "standard"
+    ],
+    "leftoversFriendly": true,
+    "mealType": "dinner",
+    "estimatedCostBand": "low",
+    "ingredients": [
+      {
+        "name": "Chicken drumsticks",
+        "quantity": 8,
+        "unit": "whole",
+        "category": "proteins"
+      },
+      {
+        "name": "Soy sauce",
+        "quantity": 3,
+        "unit": "tbsp",
+        "category": "condiments"
+      },
+      {
+        "name": "Honey",
+        "quantity": 3,
+        "unit": "tbsp",
+        "category": "pantry"
+      },
+      {
+        "name": "Garlic",
+        "quantity": 2,
+        "unit": "cloves",
+        "category": "herbs"
+      },
+      {
+        "name": "Sesame oil",
+        "quantity": 1,
+        "unit": "tsp",
+        "category": "condiments"
+      },
+      {
+        "name": "Cornflour",
+        "quantity": 1,
+        "unit": "tsp",
+        "category": "pantry"
+      }
+    ],
+    "instructions": [
+      "Mix soy sauce, honey, minced garlic, sesame oil and cornflour.",
+      "Pour over drumsticks in a baking dish, toss to coat.",
+      "Marinate 30 mins (or overnight in fridge).",
+      "Bake at 180°C for 45–50 mins, turning once, until sticky and cooked through.",
+      "Serve with steamed rice and corn."
+    ],
+    "proteinType": "chicken",
+    "cuisineType": "asian",
+    "seasonTags": [
+      "all"
+    ],
+    "costPerServeAUD": 4.1,
+    "kidFriendly": true,
+    "kidFriendlyScore": 2,
+    "kidFriendlyReason": "honey soy chicken: mild, familiar sweet-savoury glaze"
+  },
+  {
+    "id": "r254",
+    "name": "Homemade Sausage Rolls",
+    "description": "Flaky pastry sausage rolls with beef and veggie filling, kid-tested favourite",
+    "baseServings": 4,
+    "cookTimeMinutes": 40,
+    "difficulty": "easy",
+    "cookingStyle": "mixed",
+    "healthTags": [
+      "standard"
+    ],
+    "budgetTags": [
+      "budget",
+      "standard"
+    ],
+    "leftoversFriendly": true,
+    "mealType": "both",
+    "estimatedCostBand": "low",
+    "ingredients": [
+      {
+        "name": "Beef mince",
+        "quantity": 500,
+        "unit": "g",
+        "category": "proteins"
+      },
+      {
+        "name": "Puff pastry sheets",
+        "quantity": 2,
+        "unit": "sheets",
+        "category": "pantry"
+      },
+      {
+        "name": "Onion",
+        "quantity": 1,
+        "unit": "whole",
+        "category": "vegetables"
+      },
+      {
+        "name": "Carrot",
+        "quantity": 1,
+        "unit": "whole",
+        "category": "vegetables"
+      },
+      {
+        "name": "Zucchini",
+        "quantity": 1,
+        "unit": "whole",
+        "category": "vegetables"
+      },
+      {
+        "name": "Egg",
+        "quantity": 1,
+        "unit": "whole",
+        "category": "dairy"
+      },
+      {
+        "name": "Tomato sauce",
+        "quantity": 2,
+        "unit": "tbsp",
+        "category": "condiments"
+      },
+      {
+        "name": "Worcestershire sauce",
+        "quantity": 1,
+        "unit": "tbsp",
+        "category": "condiments"
+      }
+    ],
+    "instructions": [
+      "Preheat oven to 200°C.",
+      "Grate carrot and zucchini. Finely dice onion.",
+      "Mix mince, grated veg, onion, sauces. Season.",
+      "Cut pastry sheets in half lengthways.",
+      "Spoon filling along one edge and roll up, sealing edge with egg wash.",
+      "Cut each roll into 4–5 pieces. Brush with egg.",
+      "Bake 25–30 mins until golden."
+    ],
+    "proteinType": "beef",
+    "cuisineType": "australian",
+    "seasonTags": [
+      "all"
+    ],
+    "costPerServeAUD": 4.5,
+    "kidFriendly": true,
+    "kidFriendlyScore": 2,
+    "kidFriendlyReason": "sausage roll: Aussie classic kid lunchbox staple"
+  },
+  {
+    "id": "r255",
+    "name": "Shepherd's Pie",
+    "description": "Classic shepherd's pie with beef mince and mashed potato topping",
+    "baseServings": 4,
+    "cookTimeMinutes": 55,
+    "difficulty": "easy",
+    "cookingStyle": "mixed",
+    "healthTags": [
+      "standard"
+    ],
+    "budgetTags": [
+      "budget",
+      "standard"
+    ],
+    "leftoversFriendly": true,
+    "mealType": "dinner",
+    "estimatedCostBand": "low",
+    "ingredients": [
+      {
+        "name": "Beef mince",
+        "quantity": 500,
+        "unit": "g",
+        "category": "proteins"
+      },
+      {
+        "name": "Potato",
+        "quantity": 800,
+        "unit": "g",
+        "category": "vegetables"
+      },
+      {
+        "name": "Onion",
+        "quantity": 1,
+        "unit": "whole",
+        "category": "vegetables"
+      },
+      {
+        "name": "Carrot",
+        "quantity": 2,
+        "unit": "whole",
+        "category": "vegetables"
+      },
+      {
+        "name": "Peas",
+        "quantity": 1,
+        "unit": "cup",
+        "category": "frozen"
+      },
+      {
+        "name": "Beef stock",
+        "quantity": 1,
+        "unit": "cup",
+        "category": "pantry"
+      },
+      {
+        "name": "Tomato paste",
+        "quantity": 2,
+        "unit": "tbsp",
+        "category": "pantry"
+      },
+      {
+        "name": "Butter",
+        "quantity": 2,
+        "unit": "tbsp",
+        "category": "dairy"
+      },
+      {
+        "name": "Milk",
+        "quantity": 0.5,
+        "unit": "cup",
+        "category": "dairy"
+      },
+      {
+        "name": "Cheddar cheese",
+        "quantity": 80,
+        "unit": "g",
+        "category": "dairy"
+      }
+    ],
+    "instructions": [
+      "Peel and boil potatoes until tender. Mash with butter and milk.",
+      "Brown mince in pan, drain fat.",
+      "Add diced onion, carrot; cook 3 mins.",
+      "Add tomato paste, stock; simmer 10 mins. Add peas.",
+      "Transfer to baking dish. Top with mash and cheese.",
+      "Bake 180°C for 25 mins until golden."
+    ],
+    "proteinType": "beef",
+    "cuisineType": "australian",
+    "seasonTags": [
+      "all"
+    ],
+    "costPerServeAUD": 4.8,
+    "kidFriendly": true,
+    "kidFriendlyScore": 2,
+    "kidFriendlyReason": "shepherd's pie: familiar mince and mash, loved by kids"
+  },
+  {
+    "id": "r256",
+    "name": "Toad in the Hole",
+    "description": "Sausages baked in fluffy Yorkshire batter — a fun, hearty family dinner",
+    "baseServings": 4,
+    "cookTimeMinutes": 40,
+    "difficulty": "easy",
+    "cookingStyle": "mixed",
+    "healthTags": [
+      "standard"
+    ],
+    "budgetTags": [
+      "budget",
+      "standard"
+    ],
+    "leftoversFriendly": false,
+    "mealType": "dinner",
+    "estimatedCostBand": "low",
+    "ingredients": [
+      {
+        "name": "Pork sausages",
+        "quantity": 8,
+        "unit": "whole",
+        "category": "proteins"
+      },
+      {
+        "name": "Plain flour",
+        "quantity": 1,
+        "unit": "cup",
+        "category": "pantry"
+      },
+      {
+        "name": "Egg",
+        "quantity": 3,
+        "unit": "whole",
+        "category": "dairy"
+      },
+      {
+        "name": "Milk",
+        "quantity": 1,
+        "unit": "cup",
+        "category": "dairy"
+      },
+      {
+        "name": "Oil",
+        "quantity": 2,
+        "unit": "tbsp",
+        "category": "condiments"
+      }
+    ],
+    "instructions": [
+      "Preheat oven to 220°C with oil in baking dish inside.",
+      "Whisk flour, eggs, milk into smooth batter. Rest 15 mins.",
+      "Brown sausages briefly in pan.",
+      "Carefully remove hot dish from oven, add sausages.",
+      "Pour batter around sausages immediately.",
+      "Bake 25–30 mins until batter is puffed and golden. Do not open oven early.",
+      "Serve with gravy and veg."
+    ],
+    "proteinType": "pork",
+    "cuisineType": "australian",
+    "seasonTags": [
+      "all"
+    ],
+    "costPerServeAUD": 3.9,
+    "kidFriendly": true,
+    "kidFriendlyScore": 2,
+    "kidFriendlyReason": "toad in the hole: fun batter dish kids love"
+  },
+  {
+    "id": "r257",
+    "name": "English Muffin Mini Pizzas",
+    "description": "Quick mini pizzas on English muffin bases — kids can add their own toppings",
+    "baseServings": 4,
+    "cookTimeMinutes": 20,
+    "difficulty": "easy",
+    "cookingStyle": "mixed",
+    "healthTags": [
+      "standard"
+    ],
+    "budgetTags": [
+      "budget",
+      "standard"
+    ],
+    "leftoversFriendly": false,
+    "mealType": "both",
+    "estimatedCostBand": "low",
+    "ingredients": [
+      {
+        "name": "English muffins",
+        "quantity": 4,
+        "unit": "whole",
+        "category": "grains"
+      },
+      {
+        "name": "Tomato paste",
+        "quantity": 4,
+        "unit": "tbsp",
+        "category": "pantry"
+      },
+      {
+        "name": "Mozzarella cheese",
+        "quantity": 200,
+        "unit": "g",
+        "category": "dairy"
+      },
+      {
+        "name": "Ham",
+        "quantity": 100,
+        "unit": "g",
+        "category": "proteins"
+      },
+      {
+        "name": "Capsicum",
+        "quantity": 1,
+        "unit": "whole",
+        "category": "vegetables"
+      },
+      {
+        "name": "Dried oregano",
+        "quantity": 1,
+        "unit": "tsp",
+        "category": "herbs"
+      }
+    ],
+    "instructions": [
+      "Preheat grill to high.",
+      "Split muffins and lightly toast cut side.",
+      "Spread tomato paste, add toppings and cheese.",
+      "Grill 5–7 mins until cheese melts and bubbles.",
+      "Serve immediately."
+    ],
+    "proteinType": "pork",
+    "cuisineType": "american",
+    "seasonTags": [
+      "all"
+    ],
+    "costPerServeAUD": 3.5,
+    "kidFriendly": true,
+    "kidFriendlyScore": 2,
+    "kidFriendlyReason": "mini pizza: interactive, familiar, easy to customise for kids"
+  },
+  {
+    "id": "r258",
+    "name": "Cheesy Pizza Scrolls",
+    "description": "Soft pull-apart scrolls with tomato, cheese and mild toppings — kids love these",
+    "baseServings": 4,
+    "cookTimeMinutes": 40,
+    "difficulty": "easy",
+    "cookingStyle": "mixed",
+    "healthTags": [
+      "standard"
+    ],
+    "budgetTags": [
+      "budget",
+      "standard"
+    ],
+    "leftoversFriendly": true,
+    "mealType": "both",
+    "estimatedCostBand": "low",
+    "ingredients": [
+      {
+        "name": "Self-raising flour",
+        "quantity": 2,
+        "unit": "cups",
+        "category": "pantry"
+      },
+      {
+        "name": "Greek yoghurt",
+        "quantity": 1,
+        "unit": "cup",
+        "category": "dairy"
+      },
+      {
+        "name": "Tomato paste",
+        "quantity": 4,
+        "unit": "tbsp",
+        "category": "pantry"
+      },
+      {
+        "name": "Mozzarella cheese",
+        "quantity": 150,
+        "unit": "g",
+        "category": "dairy"
+      },
+      {
+        "name": "Ham",
+        "quantity": 80,
+        "unit": "g",
+        "category": "proteins"
+      },
+      {
+        "name": "Dried oregano",
+        "quantity": 1,
+        "unit": "tsp",
+        "category": "herbs"
+      }
+    ],
+    "instructions": [
+      "Preheat oven to 200°C. Line tray with baking paper.",
+      "Mix flour and yoghurt to form soft dough. Knead briefly.",
+      "Roll out to rectangle on floured surface.",
+      "Spread tomato paste, scatter ham and cheese.",
+      "Roll up tightly. Cut into 8–10 rounds.",
+      "Place cut-side up on tray. Bake 20–25 mins until golden."
+    ],
+    "proteinType": "pork",
+    "cuisineType": "australian",
+    "seasonTags": [
+      "all"
+    ],
+    "costPerServeAUD": 3.2,
+    "kidFriendly": true,
+    "kidFriendlyScore": 2,
+    "kidFriendlyReason": "pizza scrolls: fun bake, minimal fuss, kid-favourite"
+  },
+  {
+    "id": "r259",
+    "name": "Mince and Pasta Bake",
+    "description": "Hearty tomato beef mince with pasta, baked under a golden cheese crust",
+    "baseServings": 4,
+    "cookTimeMinutes": 45,
+    "difficulty": "easy",
+    "cookingStyle": "mixed",
+    "healthTags": [
+      "standard"
+    ],
+    "budgetTags": [
+      "budget",
+      "standard"
+    ],
+    "leftoversFriendly": true,
+    "mealType": "dinner",
+    "estimatedCostBand": "low",
+    "ingredients": [
+      {
+        "name": "Penne pasta",
+        "quantity": 350,
+        "unit": "g",
+        "category": "grains"
+      },
+      {
+        "name": "Beef mince",
+        "quantity": 500,
+        "unit": "g",
+        "category": "proteins"
+      },
+      {
+        "name": "Crushed tomatoes",
+        "quantity": 400,
+        "unit": "g",
+        "category": "pantry"
+      },
+      {
+        "name": "Onion",
+        "quantity": 1,
+        "unit": "whole",
+        "category": "vegetables"
+      },
+      {
+        "name": "Garlic",
+        "quantity": 2,
+        "unit": "cloves",
+        "category": "herbs"
+      },
+      {
+        "name": "Tomato paste",
+        "quantity": 2,
+        "unit": "tbsp",
+        "category": "pantry"
+      },
+      {
+        "name": "Cheddar cheese",
+        "quantity": 150,
+        "unit": "g",
+        "category": "dairy"
+      },
+      {
+        "name": "Dried oregano",
+        "quantity": 1,
+        "unit": "tsp",
+        "category": "herbs"
+      }
+    ],
+    "instructions": [
+      "Cook pasta until al dente. Drain.",
+      "Brown mince with onion and garlic.",
+      "Add tomato paste, crushed tomatoes, oregano. Simmer 10 mins.",
+      "Mix sauce through pasta. Pour into baking dish.",
+      "Top with cheese. Bake 180°C for 20 mins until golden."
+    ],
+    "proteinType": "beef",
+    "cuisineType": "italian",
+    "seasonTags": [
+      "all"
+    ],
+    "costPerServeAUD": 4.6,
+    "kidFriendly": true,
+    "kidFriendlyScore": 2,
+    "kidFriendlyReason": "pasta bake: cheesy, familiar, reliably kid-approved"
+  },
+  {
+    "id": "r260",
+    "name": "Chicken and Sweet Corn Soup",
+    "description": "Mild, silky chicken and sweet corn soup — warm, simple, loved by kids",
+    "baseServings": 4,
+    "cookTimeMinutes": 25,
+    "difficulty": "easy",
+    "cookingStyle": "one-pan",
+    "healthTags": [
+      "healthy",
+      "high-protein"
+    ],
+    "budgetTags": [
+      "budget",
+      "standard"
+    ],
+    "leftoversFriendly": true,
+    "mealType": "both",
+    "estimatedCostBand": "low",
+    "ingredients": [
+      {
+        "name": "Chicken breast",
+        "quantity": 400,
+        "unit": "g",
+        "category": "proteins"
+      },
+      {
+        "name": "Creamed corn",
+        "quantity": 400,
+        "unit": "g",
+        "category": "pantry"
+      },
+      {
+        "name": "Chicken stock",
+        "quantity": 1,
+        "unit": "litre",
+        "category": "pantry"
+      },
+      {
+        "name": "Corn kernels",
+        "quantity": 1,
+        "unit": "cup",
+        "category": "vegetables"
+      },
+      {
+        "name": "Egg",
+        "quantity": 2,
+        "unit": "whole",
+        "category": "dairy"
+      },
+      {
+        "name": "Cornflour",
+        "quantity": 2,
+        "unit": "tbsp",
+        "category": "pantry"
+      },
+      {
+        "name": "Sesame oil",
+        "quantity": 1,
+        "unit": "tsp",
+        "category": "condiments"
+      },
+      {
+        "name": "Soy sauce",
+        "quantity": 1,
+        "unit": "tbsp",
+        "category": "condiments"
+      }
+    ],
+    "instructions": [
+      "Poach chicken in stock until cooked. Shred finely.",
+      "Return stock to pan, add creamed corn and corn kernels. Bring to simmer.",
+      "Mix cornflour with water, stir in to thicken.",
+      "Drizzle in beaten eggs while stirring to create egg ribbons.",
+      "Return chicken. Add sesame oil and soy. Adjust seasoning.",
+      "Serve with crusty bread."
+    ],
+    "proteinType": "chicken",
+    "cuisineType": "asian",
+    "seasonTags": [
+      "all"
+    ],
+    "costPerServeAUD": 3.4,
+    "kidFriendly": true,
+    "kidFriendlyScore": 2,
+    "kidFriendlyReason": "chicken corn soup: mild, smooth, popular with kids"
+  },
+  {
+    "id": "r261",
+    "name": "Baked Beans on Toast (Upgraded)",
+    "description": "Upgraded baked beans with cheese and bacon on thick toast — easy weeknight win",
+    "baseServings": 4,
+    "cookTimeMinutes": 15,
+    "difficulty": "easy",
+    "cookingStyle": "one-pan",
+    "healthTags": [
+      "standard"
+    ],
+    "budgetTags": [
+      "budget",
+      "standard"
+    ],
+    "leftoversFriendly": false,
+    "mealType": "both",
+    "estimatedCostBand": "low",
+    "ingredients": [
+      {
+        "name": "Canned baked beans",
+        "quantity": 2,
+        "unit": "cans",
+        "category": "pantry"
+      },
+      {
+        "name": "Thick-cut bread",
+        "quantity": 8,
+        "unit": "slices",
+        "category": "grains"
+      },
+      {
+        "name": "Cheddar cheese",
+        "quantity": 100,
+        "unit": "g",
+        "category": "dairy"
+      },
+      {
+        "name": "Bacon",
+        "quantity": 4,
+        "unit": "rashers",
+        "category": "proteins"
+      },
+      {
+        "name": "Butter",
+        "quantity": 2,
+        "unit": "tbsp",
+        "category": "dairy"
+      }
+    ],
+    "instructions": [
+      "Grill or pan-fry bacon until crispy.",
+      "Warm baked beans in saucepan.",
+      "Toast bread, butter generously.",
+      "Ladle beans over toast, top with cheese and bacon.",
+      "Grill briefly if desired until cheese melts."
+    ],
+    "proteinType": "pork",
+    "cuisineType": "australian",
+    "seasonTags": [
+      "all"
+    ],
+    "costPerServeAUD": 2.8,
+    "kidFriendly": true,
+    "kidFriendlyScore": 2,
+    "kidFriendlyReason": "baked beans: simple, filling, kids love it"
+  },
+  {
+    "id": "r262",
+    "name": "Cheesy Scrambled Eggs on Toast",
+    "description": "Creamy scrambled eggs loaded with cheese served on thick buttered toast",
+    "baseServings": 4,
+    "cookTimeMinutes": 15,
+    "difficulty": "easy",
+    "cookingStyle": "one-pan",
+    "healthTags": [
+      "healthy",
+      "high-protein"
+    ],
+    "budgetTags": [
+      "budget",
+      "standard"
+    ],
+    "leftoversFriendly": false,
+    "mealType": "both",
+    "estimatedCostBand": "low",
+    "ingredients": [
+      {
+        "name": "Egg",
+        "quantity": 8,
+        "unit": "whole",
+        "category": "dairy"
+      },
+      {
+        "name": "Milk",
+        "quantity": 4,
+        "unit": "tbsp",
+        "category": "dairy"
+      },
+      {
+        "name": "Cheddar cheese",
+        "quantity": 80,
+        "unit": "g",
+        "category": "dairy"
+      },
+      {
+        "name": "Butter",
+        "quantity": 2,
+        "unit": "tbsp",
+        "category": "dairy"
+      },
+      {
+        "name": "Thick-cut bread",
+        "quantity": 8,
+        "unit": "slices",
+        "category": "grains"
+      }
+    ],
+    "instructions": [
+      "Whisk eggs with milk, salt and pepper.",
+      "Melt butter in non-stick pan over low heat.",
+      "Add egg mixture, fold gently with spatula as it sets.",
+      "Remove from heat while still slightly soft, fold in cheese.",
+      "Serve immediately on buttered toast."
+    ],
+    "proteinType": "eggs",
+    "cuisineType": "australian",
+    "seasonTags": [
+      "all"
+    ],
+    "costPerServeAUD": 2.5,
+    "kidFriendly": true,
+    "kidFriendlyScore": 2,
+    "kidFriendlyReason": "scrambled eggs on toast: simple, protein-rich, universally liked by kids"
+  },
+  {
+    "id": "r263",
+    "name": "Tomato Soup with Cheesy Toast",
+    "description": "Smooth, sweet tomato soup served with melted cheese toast for dipping",
+    "baseServings": 4,
+    "cookTimeMinutes": 30,
+    "difficulty": "easy",
+    "cookingStyle": "one-pan",
+    "healthTags": [
+      "standard"
+    ],
+    "budgetTags": [
+      "budget",
+      "standard"
+    ],
+    "leftoversFriendly": true,
+    "mealType": "both",
+    "estimatedCostBand": "low",
+    "ingredients": [
+      {
+        "name": "Crushed tomatoes",
+        "quantity": 800,
+        "unit": "g",
+        "category": "pantry"
+      },
+      {
+        "name": "Onion",
+        "quantity": 1,
+        "unit": "whole",
+        "category": "vegetables"
+      },
+      {
+        "name": "Garlic",
+        "quantity": 2,
+        "unit": "cloves",
+        "category": "herbs"
+      },
+      {
+        "name": "Chicken stock",
+        "quantity": 2,
+        "unit": "cups",
+        "category": "pantry"
+      },
+      {
+        "name": "Cream",
+        "quantity": 0.25,
+        "unit": "cup",
+        "category": "dairy"
+      },
+      {
+        "name": "Sugar",
+        "quantity": 1,
+        "unit": "tsp",
+        "category": "pantry"
+      },
+      {
+        "name": "Thick-cut bread",
+        "quantity": 4,
+        "unit": "slices",
+        "category": "grains"
+      },
+      {
+        "name": "Cheddar cheese",
+        "quantity": 100,
+        "unit": "g",
+        "category": "dairy"
+      },
+      {
+        "name": "Butter",
+        "quantity": 1,
+        "unit": "tbsp",
+        "category": "dairy"
+      }
+    ],
+    "instructions": [
+      "Sauté diced onion and garlic in butter until soft.",
+      "Add crushed tomatoes, stock and sugar. Simmer 15 mins.",
+      "Blend until smooth. Stir in cream. Season.",
+      "Toast bread, top with cheese, grill until melted.",
+      "Serve soup in bowls with cheesy toast on the side."
+    ],
+    "proteinType": "none",
+    "cuisineType": "australian",
+    "seasonTags": [
+      "all"
+    ],
+    "costPerServeAUD": 3.1,
+    "kidFriendly": true,
+    "kidFriendlyScore": 2,
+    "kidFriendlyReason": "tomato soup: smooth, mild, beloved by kids"
+  },
+  {
+    "id": "r264",
+    "name": "Crumbed Chicken Tenders",
+    "description": "Golden crumbed chicken tenders — oven-baked, juicy inside and crispy outside",
+    "baseServings": 4,
+    "cookTimeMinutes": 30,
+    "difficulty": "easy",
+    "cookingStyle": "mixed",
+    "healthTags": [
+      "standard",
+      "high-protein"
+    ],
+    "budgetTags": [
+      "budget",
+      "standard"
+    ],
+    "leftoversFriendly": false,
+    "mealType": "both",
+    "estimatedCostBand": "low",
+    "ingredients": [
+      {
+        "name": "Chicken breast",
+        "quantity": 600,
+        "unit": "g",
+        "category": "proteins"
+      },
+      {
+        "name": "Breadcrumbs",
+        "quantity": 1,
+        "unit": "cup",
+        "category": "pantry"
+      },
+      {
+        "name": "Parmesan cheese",
+        "quantity": 40,
+        "unit": "g",
+        "category": "dairy"
+      },
+      {
+        "name": "Egg",
+        "quantity": 2,
+        "unit": "whole",
+        "category": "dairy"
+      },
+      {
+        "name": "Plain flour",
+        "quantity": 0.5,
+        "unit": "cup",
+        "category": "pantry"
+      },
+      {
+        "name": "Olive oil spray",
+        "quantity": 1,
+        "unit": "spray",
+        "category": "condiments"
+      }
+    ],
+    "instructions": [
+      "Preheat oven to 200°C. Line tray.",
+      "Slice chicken into thick strips.",
+      "Coat in flour, then beaten egg, then breadcrumb-parmesan mix.",
+      "Arrange on tray, spray with oil.",
+      "Bake 20–22 mins, turning halfway, until crispy and cooked through.",
+      "Serve with coleslaw and tomato sauce."
+    ],
+    "proteinType": "chicken",
+    "cuisineType": "australian",
+    "seasonTags": [
+      "all"
+    ],
+    "costPerServeAUD": 3.9,
+    "kidFriendly": true,
+    "kidFriendlyScore": 2,
+    "kidFriendlyReason": "crumbed chicken tenders: classic kid favourite format"
+  },
+  {
+    "id": "r265",
+    "name": "Sausages with Mashed Potato and Gravy",
+    "description": "Simple sausages with creamy mash and rich gravy — a weeknight classic",
+    "baseServings": 4,
+    "cookTimeMinutes": 35,
+    "difficulty": "easy",
+    "cookingStyle": "one-pan",
+    "healthTags": [
+      "standard"
+    ],
+    "budgetTags": [
+      "budget",
+      "standard"
+    ],
+    "leftoversFriendly": false,
+    "mealType": "dinner",
+    "estimatedCostBand": "low",
+    "ingredients": [
+      {
+        "name": "Beef sausages",
+        "quantity": 8,
+        "unit": "whole",
+        "category": "proteins"
+      },
+      {
+        "name": "Potato",
+        "quantity": 1,
+        "unit": "kg",
+        "category": "vegetables"
+      },
+      {
+        "name": "Butter",
+        "quantity": 3,
+        "unit": "tbsp",
+        "category": "dairy"
+      },
+      {
+        "name": "Milk",
+        "quantity": 0.5,
+        "unit": "cup",
+        "category": "dairy"
+      },
+      {
+        "name": "Beef stock",
+        "quantity": 1,
+        "unit": "cup",
+        "category": "pantry"
+      },
+      {
+        "name": "Onion",
+        "quantity": 1,
+        "unit": "whole",
+        "category": "vegetables"
+      },
+      {
+        "name": "Plain flour",
+        "quantity": 1,
+        "unit": "tbsp",
+        "category": "pantry"
+      }
+    ],
+    "instructions": [
+      "Boil peeled potato until tender. Mash with butter and milk.",
+      "Cook sausages in pan until browned all over.",
+      "Remove sausages. Sauté sliced onion in same pan.",
+      "Add flour, stir 1 min. Add stock, whisk until smooth gravy forms.",
+      "Serve sausages on mash, ladle gravy over."
+    ],
+    "proteinType": "beef",
+    "cuisineType": "australian",
+    "seasonTags": [
+      "all"
+    ],
+    "costPerServeAUD": 4.2,
+    "kidFriendly": true,
+    "kidFriendlyScore": 2,
+    "kidFriendlyReason": "sausages and mash: simple classic, universally liked by kids"
+  },
+  {
+    "id": "r266",
+    "name": "Loaded Potato Skins",
+    "description": "Crispy potato skins loaded with cheese, bacon and sour cream — a fun family share",
+    "baseServings": 4,
+    "cookTimeMinutes": 50,
+    "difficulty": "easy",
+    "cookingStyle": "mixed",
+    "healthTags": [
+      "standard"
+    ],
+    "budgetTags": [
+      "standard"
+    ],
+    "leftoversFriendly": false,
+    "mealType": "dinner",
+    "estimatedCostBand": "medium",
+    "ingredients": [
+      {
+        "name": "Large potatoes",
+        "quantity": 4,
+        "unit": "whole",
+        "category": "vegetables"
+      },
+      {
+        "name": "Cheddar cheese",
+        "quantity": 150,
+        "unit": "g",
+        "category": "dairy"
+      },
+      {
+        "name": "Bacon",
+        "quantity": 4,
+        "unit": "rashers",
+        "category": "proteins"
+      },
+      {
+        "name": "Sour cream",
+        "quantity": 0.5,
+        "unit": "cup",
+        "category": "dairy"
+      },
+      {
+        "name": "Chives",
+        "quantity": 2,
+        "unit": "tbsp",
+        "category": "herbs"
+      },
+      {
+        "name": "Olive oil",
+        "quantity": 2,
+        "unit": "tbsp",
+        "category": "condiments"
+      }
+    ],
+    "instructions": [
+      "Preheat oven to 200°C. Bake whole potatoes 40 mins until tender.",
+      "Halve potatoes, scoop out most of the flesh.",
+      "Brush skins with oil, bake further 10 mins until crispy.",
+      "Grill bacon until crispy, crumble.",
+      "Fill skins with cheese and bacon. Grill until cheese melts.",
+      "Serve with sour cream and chives."
+    ],
+    "proteinType": "pork",
+    "cuisineType": "american",
+    "seasonTags": [
+      "all"
+    ],
+    "costPerServeAUD": 4.8,
+    "kidFriendly": true,
+    "kidFriendlyScore": 2,
+    "kidFriendlyReason": "loaded potato skins: fun, cheesy, familiar kid-approved flavours"
+  },
+  {
+    "id": "r267",
+    "name": "Beef and Vegetable Pasties",
+    "description": "Flaky pastry filled with seasoned beef mince and veg — Aussie lunchbox icon",
+    "baseServings": 4,
+    "cookTimeMinutes": 50,
+    "difficulty": "easy",
+    "cookingStyle": "mixed",
+    "healthTags": [
+      "standard"
+    ],
+    "budgetTags": [
+      "budget",
+      "standard"
+    ],
+    "leftoversFriendly": true,
+    "mealType": "both",
+    "estimatedCostBand": "low",
+    "ingredients": [
+      {
+        "name": "Beef mince",
+        "quantity": 400,
+        "unit": "g",
+        "category": "proteins"
+      },
+      {
+        "name": "Shortcrust pastry sheets",
+        "quantity": 2,
+        "unit": "sheets",
+        "category": "pantry"
+      },
+      {
+        "name": "Potato",
+        "quantity": 2,
+        "unit": "whole",
+        "category": "vegetables"
+      },
+      {
+        "name": "Carrot",
+        "quantity": 2,
+        "unit": "whole",
+        "category": "vegetables"
+      },
+      {
+        "name": "Onion",
+        "quantity": 1,
+        "unit": "whole",
+        "category": "vegetables"
+      },
+      {
+        "name": "Peas",
+        "quantity": 0.5,
+        "unit": "cup",
+        "category": "frozen"
+      },
+      {
+        "name": "Worcestershire sauce",
+        "quantity": 1,
+        "unit": "tbsp",
+        "category": "condiments"
+      },
+      {
+        "name": "Beef stock",
+        "quantity": 0.5,
+        "unit": "cup",
+        "category": "pantry"
+      },
+      {
+        "name": "Egg",
+        "quantity": 1,
+        "unit": "whole",
+        "category": "dairy"
+      }
+    ],
+    "instructions": [
+      "Preheat oven to 200°C.",
+      "Dice potato and carrot small. Sauté onion and mince until browned.",
+      "Add potato, carrot, peas, stock and Worcestershire. Simmer until thickened. Cool.",
+      "Cut pastry into circles using a side plate as guide.",
+      "Place filling on one half, fold over and crimp edges.",
+      "Brush with beaten egg. Bake 25–30 mins until golden."
+    ],
+    "proteinType": "beef",
+    "cuisineType": "australian",
+    "seasonTags": [
+      "all"
+    ],
+    "costPerServeAUD": 4.4,
+    "kidFriendly": true,
+    "kidFriendlyScore": 2,
+    "kidFriendlyReason": "beef pastie: Aussie classic, familiar pastry format kids enjoy"
+  },
+  {
+    "id": "r268",
+    "name": "Spaghetti with Butter and Parmesan",
+    "description": "Silky pasta tossed in butter and parmesan — the simplest kid-friendly dinner",
+    "baseServings": 4,
+    "cookTimeMinutes": 15,
+    "difficulty": "easy",
+    "cookingStyle": "one-pan",
+    "healthTags": [
+      "standard"
+    ],
+    "budgetTags": [
+      "budget",
+      "standard"
+    ],
+    "leftoversFriendly": false,
+    "mealType": "both",
+    "estimatedCostBand": "low",
+    "ingredients": [
+      {
+        "name": "Spaghetti",
+        "quantity": 400,
+        "unit": "g",
+        "category": "grains"
+      },
+      {
+        "name": "Butter",
+        "quantity": 4,
+        "unit": "tbsp",
+        "category": "dairy"
+      },
+      {
+        "name": "Parmesan cheese",
+        "quantity": 80,
+        "unit": "g",
+        "category": "dairy"
+      },
+      {
+        "name": "Garlic",
+        "quantity": 1,
+        "unit": "clove",
+        "category": "herbs"
+      }
+    ],
+    "instructions": [
+      "Cook spaghetti per packet until al dente. Reserve 1/2 cup pasta water.",
+      "Melt butter in pan with garlic (optional, mild).",
+      "Toss drained pasta in butter.",
+      "Add pasta water a splash at a time to make silky sauce.",
+      "Remove from heat, toss through most of the parmesan.",
+      "Serve topped with remaining parmesan."
+    ],
+    "proteinType": "none",
+    "cuisineType": "italian",
+    "seasonTags": [
+      "all"
+    ],
+    "costPerServeAUD": 2.6,
+    "kidFriendly": true,
+    "kidFriendlyScore": 2,
+    "kidFriendlyReason": "butter pasta: simplest possible kid dinner, always a hit"
+  },
+  {
+    "id": "r269",
+    "name": "Potato Wedges with Dipping Sauce",
+    "description": "Crispy oven wedges with homemade tomato dipping sauce — great Friday night treat",
+    "baseServings": 4,
+    "cookTimeMinutes": 45,
+    "difficulty": "easy",
+    "cookingStyle": "mixed",
+    "healthTags": [
+      "standard"
+    ],
+    "budgetTags": [
+      "budget",
+      "standard"
+    ],
+    "leftoversFriendly": false,
+    "mealType": "both",
+    "estimatedCostBand": "low",
+    "ingredients": [
+      {
+        "name": "Large potatoes",
+        "quantity": 800,
+        "unit": "g",
+        "category": "vegetables"
+      },
+      {
+        "name": "Olive oil",
+        "quantity": 3,
+        "unit": "tbsp",
+        "category": "condiments"
+      },
+      {
+        "name": "Garlic powder",
+        "quantity": 0.5,
+        "unit": "tsp",
+        "category": "herbs"
+      },
+      {
+        "name": "Tomato sauce",
+        "quantity": 4,
+        "unit": "tbsp",
+        "category": "condiments"
+      },
+      {
+        "name": "Sour cream",
+        "quantity": 0.5,
+        "unit": "cup",
+        "category": "dairy"
+      }
+    ],
+    "instructions": [
+      "Preheat oven to 210°C.",
+      "Cut potatoes into wedges, toss with oil, garlic powder and salt.",
+      "Spread on baking tray in single layer.",
+      "Bake 35–40 mins, turning once, until crispy and golden.",
+      "Serve with tomato sauce and sour cream for dipping."
+    ],
+    "proteinType": "none",
+    "cuisineType": "australian",
+    "seasonTags": [
+      "all"
+    ],
+    "costPerServeAUD": 2.7,
+    "kidFriendly": true,
+    "kidFriendlyScore": 2,
+    "kidFriendlyReason": "potato wedges: simple, familiar, kids always enjoy dipping"
+  },
+  {
+    "id": "r270",
+    "name": "Cheese and Vegemite Scrolls",
+    "description": "Fluffy scrolls swirled with Vegemite and cheddar — an Aussie classic kids love",
+    "baseServings": 4,
+    "cookTimeMinutes": 35,
+    "difficulty": "easy",
+    "cookingStyle": "mixed",
+    "healthTags": [
+      "standard"
+    ],
+    "budgetTags": [
+      "budget",
+      "standard"
+    ],
+    "leftoversFriendly": true,
+    "mealType": "both",
+    "estimatedCostBand": "low",
+    "ingredients": [
+      {
+        "name": "Self-raising flour",
+        "quantity": 2,
+        "unit": "cups",
+        "category": "pantry"
+      },
+      {
+        "name": "Greek yoghurt",
+        "quantity": 1,
+        "unit": "cup",
+        "category": "dairy"
+      },
+      {
+        "name": "Vegemite",
+        "quantity": 2,
+        "unit": "tbsp",
+        "category": "condiments"
+      },
+      {
+        "name": "Cheddar cheese",
+        "quantity": 150,
+        "unit": "g",
+        "category": "dairy"
+      },
+      {
+        "name": "Butter",
+        "quantity": 1,
+        "unit": "tbsp",
+        "category": "dairy"
+      }
+    ],
+    "instructions": [
+      "Preheat oven to 200°C.",
+      "Mix flour and yoghurt to form soft dough.",
+      "Roll out to a rectangle on floured surface.",
+      "Spread Vegemite thinly, scatter cheese generously.",
+      "Roll up tightly. Slice into 8–10 rounds.",
+      "Place cut-side up on lined tray. Bake 20–22 mins until golden."
+    ],
+    "proteinType": "none",
+    "cuisineType": "australian",
+    "seasonTags": [
+      "all"
+    ],
+    "costPerServeAUD": 2.8,
+    "kidFriendly": true,
+    "kidFriendlyScore": 2,
+    "kidFriendlyReason": "vegemite cheese scrolls: iconic Aussie kid favourite"
+  },
+  {
+    "id": "r271",
+    "name": "Ham and Cheese Toasties",
+    "description": "Golden grilled ham and cheese toasted sandwiches — a quick, kid-proof dinner",
+    "baseServings": 4,
+    "cookTimeMinutes": 15,
+    "difficulty": "easy",
+    "cookingStyle": "one-pan",
+    "healthTags": [
+      "standard"
+    ],
+    "budgetTags": [
+      "budget",
+      "standard"
+    ],
+    "leftoversFriendly": false,
+    "mealType": "both",
+    "estimatedCostBand": "low",
+    "ingredients": [
+      {
+        "name": "Thick-cut bread",
+        "quantity": 8,
+        "unit": "slices",
+        "category": "grains"
+      },
+      {
+        "name": "Leg ham",
+        "quantity": 200,
+        "unit": "g",
+        "category": "proteins"
+      },
+      {
+        "name": "Cheddar cheese",
+        "quantity": 150,
+        "unit": "g",
+        "category": "dairy"
+      },
+      {
+        "name": "Butter",
+        "quantity": 3,
+        "unit": "tbsp",
+        "category": "dairy"
+      },
+      {
+        "name": "Dijon mustard",
+        "quantity": 1,
+        "unit": "tsp",
+        "category": "condiments"
+      }
+    ],
+    "instructions": [
+      "Butter outside of each bread slice.",
+      "Optionally spread mustard on inside.",
+      "Layer ham and cheese between two slices, buttered sides out.",
+      "Cook in sandwich press or frying pan over medium heat.",
+      "Press down, cook 3–4 mins per side until golden and cheese melts.",
+      "Serve with salad or tomato soup."
+    ],
+    "proteinType": "pork",
+    "cuisineType": "australian",
+    "seasonTags": [
+      "all"
+    ],
+    "costPerServeAUD": 3,
+    "kidFriendly": true,
+    "kidFriendlyScore": 2,
+    "kidFriendlyReason": "ham and cheese toastie: effortless, universally loved by kids"
+  },
+  {
+    "id": "r272",
+    "name": "Homemade Cheese and Tomato Pizza",
+    "description": "Simple homemade pizza with tomato base and melted cheese — kids can help make it",
+    "baseServings": 4,
+    "cookTimeMinutes": 30,
+    "difficulty": "easy",
+    "cookingStyle": "mixed",
+    "healthTags": [
+      "standard"
+    ],
+    "budgetTags": [
+      "budget",
+      "standard"
+    ],
+    "leftoversFriendly": false,
+    "mealType": "dinner",
+    "estimatedCostBand": "low",
+    "ingredients": [
+      {
+        "name": "Pizza bases (store-bought)",
+        "quantity": 2,
+        "unit": "whole",
+        "category": "grains"
+      },
+      {
+        "name": "Tomato paste",
+        "quantity": 6,
+        "unit": "tbsp",
+        "category": "pantry"
+      },
+      {
+        "name": "Mozzarella cheese",
+        "quantity": 250,
+        "unit": "g",
+        "category": "dairy"
+      },
+      {
+        "name": "Dried oregano",
+        "quantity": 1,
+        "unit": "tsp",
+        "category": "herbs"
+      },
+      {
+        "name": "Olive oil",
+        "quantity": 1,
+        "unit": "tbsp",
+        "category": "condiments"
+      }
+    ],
+    "instructions": [
+      "Preheat oven to 220°C.",
+      "Spread tomato paste over bases. Season.",
+      "Scatter mozzarella generously.",
+      "Add any toppings (kids' choice).",
+      "Drizzle with olive oil, sprinkle oregano.",
+      "Bake 12–15 mins until cheese bubbles and base is crispy."
+    ],
+    "proteinType": "none",
+    "cuisineType": "italian",
+    "seasonTags": [
+      "all"
+    ],
+    "costPerServeAUD": 3.8,
+    "kidFriendly": true,
+    "kidFriendlyScore": 2,
+    "kidFriendlyReason": "pizza: all-time kid favourite, interactive to make"
+  },
+  {
+    "id": "r273",
+    "name": "Fish Fingers with Oven Chips",
+    "description": "Crumbed white fish fingers with oven-baked chips — a classic kid tea",
+    "baseServings": 4,
+    "cookTimeMinutes": 35,
+    "difficulty": "easy",
+    "cookingStyle": "mixed",
+    "healthTags": [
+      "standard",
+      "high-protein"
+    ],
+    "budgetTags": [
+      "budget",
+      "standard"
+    ],
+    "leftoversFriendly": false,
+    "mealType": "dinner",
+    "estimatedCostBand": "low",
+    "ingredients": [
+      {
+        "name": "White fish fillets",
+        "quantity": 600,
+        "unit": "g",
+        "category": "proteins"
+      },
+      {
+        "name": "Breadcrumbs",
+        "quantity": 1,
+        "unit": "cup",
+        "category": "pantry"
+      },
+      {
+        "name": "Egg",
+        "quantity": 2,
+        "unit": "whole",
+        "category": "dairy"
+      },
+      {
+        "name": "Plain flour",
+        "quantity": 0.5,
+        "unit": "cup",
+        "category": "pantry"
+      },
+      {
+        "name": "Potato",
+        "quantity": 600,
+        "unit": "g",
+        "category": "vegetables"
+      },
+      {
+        "name": "Olive oil",
+        "quantity": 3,
+        "unit": "tbsp",
+        "category": "condiments"
+      },
+      {
+        "name": "Lemon",
+        "quantity": 1,
+        "unit": "whole",
+        "category": "fruit"
+      }
+    ],
+    "instructions": [
+      "Preheat oven to 210°C. Toss potato chips in oil, bake 30–35 mins.",
+      "Cut fish into finger shapes.",
+      "Coat fish in flour, beaten egg, breadcrumbs.",
+      "Bake on separate tray 15–18 mins until golden.",
+      "Serve with chips and lemon wedges."
+    ],
+    "proteinType": "seafood",
+    "cuisineType": "australian",
+    "seasonTags": [
+      "all"
+    ],
+    "costPerServeAUD": 4.5,
+    "kidFriendly": true,
+    "kidFriendlyScore": 2,
+    "kidFriendlyReason": "fish fingers: mild white fish, crumbed format kids love"
+  },
+  {
+    "id": "r274",
+    "name": "Plain Beef Noodle Stir-fry",
+    "description": "Simple beef and vegetable noodle stir-fry — mild sauce, no chilli",
+    "baseServings": 4,
+    "cookTimeMinutes": 25,
+    "difficulty": "easy",
+    "cookingStyle": "one-pan",
+    "healthTags": [
+      "standard",
+      "high-protein"
+    ],
+    "budgetTags": [
+      "budget",
+      "standard"
+    ],
+    "leftoversFriendly": true,
+    "mealType": "dinner",
+    "estimatedCostBand": "low",
+    "ingredients": [
+      {
+        "name": "Beef mince",
+        "quantity": 500,
+        "unit": "g",
+        "category": "proteins"
+      },
+      {
+        "name": "Hokkien noodles",
+        "quantity": 400,
+        "unit": "g",
+        "category": "grains"
+      },
+      {
+        "name": "Carrot",
+        "quantity": 2,
+        "unit": "whole",
+        "category": "vegetables"
+      },
+      {
+        "name": "Broccoli",
+        "quantity": 200,
+        "unit": "g",
+        "category": "vegetables"
+      },
+      {
+        "name": "Soy sauce",
+        "quantity": 3,
+        "unit": "tbsp",
+        "category": "condiments"
+      },
+      {
+        "name": "Oyster sauce",
+        "quantity": 2,
+        "unit": "tbsp",
+        "category": "condiments"
+      },
+      {
+        "name": "Sesame oil",
+        "quantity": 1,
+        "unit": "tsp",
+        "category": "condiments"
+      },
+      {
+        "name": "Garlic",
+        "quantity": 2,
+        "unit": "cloves",
+        "category": "herbs"
+      },
+      {
+        "name": "Cornflour",
+        "quantity": 1,
+        "unit": "tbsp",
+        "category": "pantry"
+      }
+    ],
+    "instructions": [
+      "Prepare noodles per packet.",
+      "Brown mince in wok, add garlic.",
+      "Add sliced carrot and broccoli, stir-fry 3 mins.",
+      "Mix soy, oyster sauce, sesame oil and cornflour with water.",
+      "Add noodles and sauce, toss everything together until coated.",
+      "Serve immediately."
+    ],
+    "proteinType": "beef",
+    "cuisineType": "asian",
+    "seasonTags": [
+      "all"
+    ],
+    "costPerServeAUD": 4.3,
+    "kidFriendly": true,
+    "kidFriendlyScore": 2,
+    "kidFriendlyReason": "mild noodle stir-fry: familiar format, no spice, kid-approved"
+  },
+  {
+    "id": "r275",
+    "name": "Baked Sausages with Roast Veg",
+    "description": "Oven-baked sausages with roasted potato, carrot and zucchini — one-pan family dinner",
+    "baseServings": 4,
+    "cookTimeMinutes": 45,
+    "difficulty": "easy",
+    "cookingStyle": "mixed",
+    "healthTags": [
+      "standard"
+    ],
+    "budgetTags": [
+      "budget",
+      "standard"
+    ],
+    "leftoversFriendly": true,
+    "mealType": "dinner",
+    "estimatedCostBand": "low",
+    "ingredients": [
+      {
+        "name": "Beef sausages",
+        "quantity": 8,
+        "unit": "whole",
+        "category": "proteins"
+      },
+      {
+        "name": "Potato",
+        "quantity": 400,
+        "unit": "g",
+        "category": "vegetables"
+      },
+      {
+        "name": "Carrot",
+        "quantity": 3,
+        "unit": "whole",
+        "category": "vegetables"
+      },
+      {
+        "name": "Zucchini",
+        "quantity": 2,
+        "unit": "whole",
+        "category": "vegetables"
+      },
+      {
+        "name": "Olive oil",
+        "quantity": 3,
+        "unit": "tbsp",
+        "category": "condiments"
+      },
+      {
+        "name": "Garlic powder",
+        "quantity": 0.5,
+        "unit": "tsp",
+        "category": "herbs"
+      }
+    ],
+    "instructions": [
+      "Preheat oven to 200°C.",
+      "Chop veg into large chunks, toss with oil and garlic powder.",
+      "Arrange veg in baking dish. Nestle sausages among veg.",
+      "Bake 35–40 mins, turning once, until sausages are cooked and veg is golden."
+    ],
+    "proteinType": "beef",
+    "cuisineType": "australian",
+    "seasonTags": [
+      "all"
+    ],
+    "costPerServeAUD": 4.2,
+    "kidFriendly": true,
+    "kidFriendlyScore": 2,
+    "kidFriendlyReason": "baked sausages and veg: simple tray bake kids enjoy"
+  },
+  {
+    "id": "r276",
+    "name": "Ham and Pineapple Mini Pizzas",
+    "description": "Hawaiian-style mini pizzas on English muffins — kid classic with sweet pineapple",
+    "baseServings": 4,
+    "cookTimeMinutes": 20,
+    "difficulty": "easy",
+    "cookingStyle": "mixed",
+    "healthTags": [
+      "standard"
+    ],
+    "budgetTags": [
+      "budget",
+      "standard"
+    ],
+    "leftoversFriendly": false,
+    "mealType": "both",
+    "estimatedCostBand": "low",
+    "ingredients": [
+      {
+        "name": "English muffins",
+        "quantity": 4,
+        "unit": "whole",
+        "category": "grains"
+      },
+      {
+        "name": "Tomato paste",
+        "quantity": 4,
+        "unit": "tbsp",
+        "category": "pantry"
+      },
+      {
+        "name": "Mozzarella cheese",
+        "quantity": 200,
+        "unit": "g",
+        "category": "dairy"
+      },
+      {
+        "name": "Ham",
+        "quantity": 120,
+        "unit": "g",
+        "category": "proteins"
+      },
+      {
+        "name": "Pineapple chunks",
+        "quantity": 0.5,
+        "unit": "cup",
+        "category": "fruit"
+      }
+    ],
+    "instructions": [
+      "Preheat grill or oven to 200°C.",
+      "Split and lightly toast muffins.",
+      "Spread tomato paste over each half.",
+      "Top with ham, pineapple and mozzarella.",
+      "Grill or bake 8–10 mins until cheese melts and bubbles."
+    ],
+    "proteinType": "pork",
+    "cuisineType": "american",
+    "seasonTags": [
+      "all"
+    ],
+    "costPerServeAUD": 3.4,
+    "kidFriendly": true,
+    "kidFriendlyScore": 2,
+    "kidFriendlyReason": "ham and pineapple pizza: classic kid-favourite Hawaiian combo"
+  },
+  {
+    "id": "r277",
+    "name": "Cheese and Capsicum Omelette",
+    "description": "Fluffy omelette filled with melted cheese and mild capsicum — quick protein-rich dinner",
+    "baseServings": 4,
+    "cookTimeMinutes": 20,
+    "difficulty": "easy",
+    "cookingStyle": "one-pan",
+    "healthTags": [
+      "healthy",
+      "high-protein"
+    ],
+    "budgetTags": [
+      "budget",
+      "standard"
+    ],
+    "leftoversFriendly": false,
+    "mealType": "both",
+    "estimatedCostBand": "low",
+    "ingredients": [
+      {
+        "name": "Egg",
+        "quantity": 8,
+        "unit": "whole",
+        "category": "dairy"
+      },
+      {
+        "name": "Milk",
+        "quantity": 4,
+        "unit": "tbsp",
+        "category": "dairy"
+      },
+      {
+        "name": "Cheddar cheese",
+        "quantity": 100,
+        "unit": "g",
+        "category": "dairy"
+      },
+      {
+        "name": "Capsicum",
+        "quantity": 1,
+        "unit": "whole",
+        "category": "vegetables"
+      },
+      {
+        "name": "Butter",
+        "quantity": 2,
+        "unit": "tbsp",
+        "category": "dairy"
+      }
+    ],
+    "instructions": [
+      "Whisk eggs with milk, salt and pepper.",
+      "Dice capsicum finely.",
+      "Melt butter in non-stick pan over medium heat.",
+      "Pour in egg mixture. As edges set, push them to centre.",
+      "When mostly set, scatter capsicum and cheese on one half.",
+      "Fold over and slide onto plate. Serve immediately."
+    ],
+    "proteinType": "eggs",
+    "cuisineType": "australian",
+    "seasonTags": [
+      "all"
+    ],
+    "costPerServeAUD": 2.9,
+    "kidFriendly": true,
+    "kidFriendlyScore": 2,
+    "kidFriendlyReason": "omelette: mild, familiar egg dish kids enjoy"
+  },
+  {
+    "id": "r278",
+    "name": "Savoury Bacon Pancakes",
+    "description": "Fluffy pancakes topped with crispy bacon and maple syrup — fun weekend dinner",
+    "baseServings": 4,
+    "cookTimeMinutes": 25,
+    "difficulty": "easy",
+    "cookingStyle": "one-pan",
+    "healthTags": [
+      "standard"
+    ],
+    "budgetTags": [
+      "budget",
+      "standard"
+    ],
+    "leftoversFriendly": false,
+    "mealType": "both",
+    "estimatedCostBand": "low",
+    "ingredients": [
+      {
+        "name": "Self-raising flour",
+        "quantity": 1.5,
+        "unit": "cups",
+        "category": "pantry"
+      },
+      {
+        "name": "Milk",
+        "quantity": 1,
+        "unit": "cup",
+        "category": "dairy"
+      },
+      {
+        "name": "Egg",
+        "quantity": 2,
+        "unit": "whole",
+        "category": "dairy"
+      },
+      {
+        "name": "Butter",
+        "quantity": 2,
+        "unit": "tbsp",
+        "category": "dairy"
+      },
+      {
+        "name": "Bacon",
+        "quantity": 8,
+        "unit": "rashers",
+        "category": "proteins"
+      },
+      {
+        "name": "Maple syrup",
+        "quantity": 4,
+        "unit": "tbsp",
+        "category": "pantry"
+      }
+    ],
+    "instructions": [
+      "Whisk flour, milk and eggs into smooth batter. Rest 5 mins.",
+      "Grill or fry bacon until crispy.",
+      "Heat non-stick pan, butter lightly.",
+      "Pour 1/4 cup batter per pancake. Cook until bubbles form, flip.",
+      "Serve pancakes topped with bacon and maple syrup."
+    ],
+    "proteinType": "pork",
+    "cuisineType": "american",
+    "seasonTags": [
+      "all"
+    ],
+    "costPerServeAUD": 3.8,
+    "kidFriendly": true,
+    "kidFriendlyScore": 2,
+    "kidFriendlyReason": "pancakes with bacon: fun, familiar, kids love sweet-savoury combo"
+  },
+  {
+    "id": "r279",
+    "name": "Chicken and Potato Bake",
+    "description": "Simple one-pan chicken thighs baked with potato and rosemary — minimal effort, big flavour",
+    "baseServings": 4,
+    "cookTimeMinutes": 55,
+    "difficulty": "easy",
+    "cookingStyle": "mixed",
+    "healthTags": [
+      "standard",
+      "high-protein"
+    ],
+    "budgetTags": [
+      "budget",
+      "standard"
+    ],
+    "leftoversFriendly": true,
+    "mealType": "dinner",
+    "estimatedCostBand": "low",
+    "ingredients": [
+      {
+        "name": "Chicken thighs",
+        "quantity": 8,
+        "unit": "whole",
+        "category": "proteins"
+      },
+      {
+        "name": "Potato",
+        "quantity": 800,
+        "unit": "g",
+        "category": "vegetables"
+      },
+      {
+        "name": "Olive oil",
+        "quantity": 3,
+        "unit": "tbsp",
+        "category": "condiments"
+      },
+      {
+        "name": "Garlic",
+        "quantity": 3,
+        "unit": "cloves",
+        "category": "herbs"
+      },
+      {
+        "name": "Rosemary",
+        "quantity": 2,
+        "unit": "sprigs",
+        "category": "herbs"
+      },
+      {
+        "name": "Lemon",
+        "quantity": 1,
+        "unit": "whole",
+        "category": "fruit"
+      }
+    ],
+    "instructions": [
+      "Preheat oven to 200°C.",
+      "Cut potatoes into chunks, toss with oil, garlic and rosemary.",
+      "Arrange in baking dish. Nestle chicken thighs skin-up.",
+      "Squeeze lemon over. Season well.",
+      "Bake 45–50 mins until chicken skin is crispy and potato is golden."
+    ],
+    "proteinType": "chicken",
+    "cuisineType": "australian",
+    "seasonTags": [
+      "all"
+    ],
+    "costPerServeAUD": 4.6,
+    "kidFriendly": true,
+    "kidFriendlyScore": 2,
+    "kidFriendlyReason": "chicken and potato bake: simple, familiar, mild one-pan winner"
+  },
+  {
+    "id": "r280",
+    "name": "Beef Mince and Vegetable Pie",
+    "description": "Hearty mince pie with veggie filling under a golden pastry lid — proper family comfort food",
+    "baseServings": 4,
+    "cookTimeMinutes": 60,
+    "difficulty": "easy",
+    "cookingStyle": "mixed",
+    "healthTags": [
+      "standard"
+    ],
+    "budgetTags": [
+      "budget",
+      "standard"
+    ],
+    "leftoversFriendly": true,
+    "mealType": "dinner",
+    "estimatedCostBand": "low",
+    "ingredients": [
+      {
+        "name": "Beef mince",
+        "quantity": 500,
+        "unit": "g",
+        "category": "proteins"
+      },
+      {
+        "name": "Shortcrust pastry sheets",
+        "quantity": 1,
+        "unit": "sheet",
+        "category": "pantry"
+      },
+      {
+        "name": "Puff pastry sheet",
+        "quantity": 1,
+        "unit": "sheet",
+        "category": "pantry"
+      },
+      {
+        "name": "Onion",
+        "quantity": 1,
+        "unit": "whole",
+        "category": "vegetables"
+      },
+      {
+        "name": "Carrot",
+        "quantity": 2,
+        "unit": "whole",
+        "category": "vegetables"
+      },
+      {
+        "name": "Peas",
+        "quantity": 1,
+        "unit": "cup",
+        "category": "frozen"
+      },
+      {
+        "name": "Beef stock",
+        "quantity": 1,
+        "unit": "cup",
+        "category": "pantry"
+      },
+      {
+        "name": "Tomato paste",
+        "quantity": 2,
+        "unit": "tbsp",
+        "category": "pantry"
+      },
+      {
+        "name": "Worcestershire sauce",
+        "quantity": 1,
+        "unit": "tbsp",
+        "category": "condiments"
+      },
+      {
+        "name": "Egg",
+        "quantity": 1,
+        "unit": "whole",
+        "category": "dairy"
+      }
+    ],
+    "instructions": [
+      "Preheat oven to 200°C.",
+      "Brown mince with onion, add carrot, tomato paste, stock and Worcestershire.",
+      "Simmer 15 mins until thick. Add peas. Cool.",
+      "Line pie dish with shortcrust pastry.",
+      "Fill with mince mixture. Top with puff pastry, crimp edges.",
+      "Brush with egg wash. Bake 30–35 mins until golden."
+    ],
+    "proteinType": "beef",
+    "cuisineType": "australian",
+    "seasonTags": [
+      "all"
+    ],
+    "costPerServeAUD": 5.2,
+    "kidFriendly": true,
+    "kidFriendlyScore": 2,
+    "kidFriendlyReason": "beef and veg pie: iconic Aussie comfort food kids love"
   }
 ]

@@ -28,9 +28,10 @@ const ICON = {
 
 // Per-badge colour tokens
 const BADGE = {
-  mealType:  { text: "#2A8F88", bg: "#E6F3F0" },
-  seasonal:  { text: "#5F7C50", bg: "#EAF3E2" },
-  prep:      { text: "#5E3A4C", bg: "#F3E8EE" },
+  mealType:    { text: "#2A8F88", bg: "#E6F3F0" },
+  seasonal:    { text: "#5F7C50", bg: "#EAF3E2" },
+  prep:        { text: "#5E3A4C", bg: "#F3E8EE" },
+  kidFriendly: { text: "#2A8F88", bg: "#E6F3F0" },
 };
 
 interface MealSlotCardProps {
@@ -44,6 +45,7 @@ interface MealSlotCardProps {
   onAutoSwap?: () => void;
   onHideRecipe?: () => void;
   seasonalMode?: boolean;
+  kidFriendlyFilter?: boolean;
 }
 
 export function MealSlotCard({
@@ -57,6 +59,7 @@ export function MealSlotCard({
   onAutoSwap,
   onHideRecipe,
   seasonalMode = false,
+  kidFriendlyFilter = false,
 }: MealSlotCardProps) {
   const [imgError, setImgError] = useState(false);
   const imageUrl = useRecipeImage(recipe?.id ?? "", recipe?.name ?? "", recipe?.imageUrl);
@@ -74,6 +77,7 @@ export function MealSlotCard({
     seasonalMode && recipe != null && currentSeason
       ? isRecipeSeasonal(recipe, currentSeason)
       : false;
+  const showKidBadge = kidFriendlyFilter && recipe != null && (recipe.kidFriendlyScore ?? 0) === 2;
   const slotLabel = slot === "lunch" ? "LUNCH" : "DINNER";
 
   const handleRemove = () => {
@@ -227,6 +231,13 @@ export function MealSlotCard({
             <Text style={[styles.recipeMeta, { color: C.textMuted }]}>
               {recipe.cookTimeMinutes} min · {recipe.difficulty}
             </Text>
+            {showKidBadge && (
+              <View style={[styles.kidBadge, { backgroundColor: BADGE.kidFriendly.bg }]}>
+                <Text style={[styles.kidBadgeText, { color: BADGE.kidFriendly.text }]}>
+                  ✓ Kid-friendly
+                </Text>
+              </View>
+            )}
             {showSeasonalBadge && (
               <View style={[styles.seasonalBadge, { backgroundColor: BADGE.seasonal.bg }]}>
                 <Text style={[styles.seasonalBadgeText, { color: BADGE.seasonal.text }]}>
@@ -382,6 +393,15 @@ const styles = StyleSheet.create({
     borderRadius: 6,
   },
   seasonalBadgeText: {
+    fontSize: 10,
+    fontFamily: "Inter_600SemiBold",
+  },
+  kidBadge: {
+    paddingHorizontal: 7,
+    paddingVertical: 2,
+    borderRadius: 6,
+  },
+  kidBadgeText: {
     fontSize: 10,
     fontFamily: "Inter_600SemiBold",
   },

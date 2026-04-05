@@ -1,0 +1,127 @@
+I'm working on the Dinner Sorted app (React Native/Expo). 
+
+I need to fix the kid-friendly recipe filter — right now it's too weak and lets 
+through things like curries, chowder, and complex dishes that kids won't eat.
+
+Please do the following:
+
+---
+
+STEP 1 — Define a strict kid-friendly standard in the codebase
+
+Create or update a file called `kidFriendlyRules.ts` that exports:
+
+A) A list of DISQUALIFYING ingredients/tags that automatically exclude a recipe 
+from kid-friendly results:
+- Chilli, chilli flakes, sriracha, harissa, curry paste, curry powder, 
+  garam masala, cayenne, paprika (smoked/hot), wasabi, horseradish
+- Fish sauce, anchovies, oyster sauce, blue cheese, brie, goat cheese
+- Lamb (many kids won't eat), offal, liver, mussels, oysters, squid, 
+  octopus, prawns in shells
+- Chowder, bisque, ramen, pho, laksa, tom yum, pad thai, biryani, 
+  butter chicken, tikka masala, vindaloo, korma, dhal
+- Wine, beer, spirits (even "cooked off")
+
+B) A list of QUALIFYING signals that positively identify kid-friendly meals:
+- Core proteins: chicken breast/thighs (plain), beef mince, pork mince, 
+  sausages, fish fillets (battered or crumbed), eggs, cheese
+- Kid-staple formats: pasta bake, spaghetti bolognese, mac and cheese, 
+  lasagne, pizza, tacos (mild), burgers, nuggets, schnitzels, 
+  fish and chips, fried rice (plain), quesadillas, wraps, 
+  toasted sandwiches, frittata, pancakes (savoury)
+- Vegetables kids typically accept: corn, peas, carrot, potato, 
+  sweet potato, broccoli, cucumber, capsicum (red/cooked)
+
+C) A scoring function: `getKidFriendlyScore(recipe)` that returns:
+- 0 = not kid friendly (has disqualifying ingredient or tag)
+- 1 = possibly okay (neutral, no positive or negative signals)  
+- 2 = kid friendly (has qualifying signals, no disqualifiers)
+
+---
+
+STEP 2 — Update the recipe filter logic
+
+In the planner/filter logic, update kid-friendly filtering so that:
+- Score 0 recipes are NEVER shown when kid-friendly is selected
+- Score 1 recipes are shown only if there aren't enough score-2 recipes 
+  to fill the week
+- Score 2 recipes are always preferred first
+
+---
+
+STEP 3 — Audit existing recipes.json
+
+Go through all recipes in recipes.json and:
+- Re-evaluate the kidFriendly field using the new rules above
+- Set kidFriendly: true only for score-2 recipes
+- Set kidFriendly: false for score-0 recipes
+- Add a new field kidFriendlyScore: 0 | 1 | 2 to each recipe
+
+Report how many recipes changed and what the new breakdown is.
+
+---
+
+STEP 4 — Add 40 new kid-friendly recipes to recipes.json
+
+Each new recipe must:
+- Pass the kidFriendlyScore: 2 standard above
+- Be realistic for an Australian family weeknight
+- Include all existing recipe fields: id, name, tags, ingredients, 
+  kidFriendly, kidFriendlyScore, costPerServeAUD, prepTime, cookTime, 
+  servings, etc.
+
+Target recipe list to add (adjust names to match your existing format):
+
+1. Spaghetti bolognese (classic)
+2. Mac and cheese (baked)
+3. Chicken nuggets and chips (homemade)
+4. Beef tacos (mild, build-your-own)
+5. Cheese quesadillas
+6. Penne pasta bake (tomato and mince)
+7. Chicken schnitzel and mash
+8. Sausages and mash with gravy
+9. Beef burgers (homemade patties)
+10. Fish fingers and chips
+11. Cheesy scrambled eggs on toast
+12. Ham and cheese toasted sandwiches
+13. Mini pizzas (English muffin base)
+14. Chicken fried rice (plain, no soy heavy)
+15. Corn fritters with sour cream
+16. Potato wedges and dipping sauce
+17. Crumbed chicken tenders with coleslaw
+18. Beef mince and vegetable pie
+19. Sausage rolls (homemade)
+20. Cheese and vegemite scrolls
+21. Creamy chicken pasta (no spice)
+22. Baked beans on toast (upgraded with cheese)
+23. Bowtie pasta with butter and parmesan
+24. Chicken and corn soup (mild)
+25. Egg fried rice (simple)
+26. Plain beef stir fry with noodles (no chilli)
+27. Tuna pasta bake
+28. Loaded potato skins (cheese and bacon)
+29. Crumbed fish with tartare sauce
+30. Chicken and sweet corn pastie
+31. Beef and vegetable pasties
+32. Mini meatballs in tomato sauce with pasta
+33. Spaghetti with butter and parmesan
+34. Pesto pasta (mild basil pesto, no chilli)
+35. Chicken and potato bake (one-pan)
+36. Baked sausages and roast veggies
+37. Honey soy chicken drumsticks (mild)
+38. Ham and pineapple mini pizzas
+39. Omelette with cheese and capsicum
+40. Pancakes (savoury, with bacon and maple)
+
+For each recipe, estimate costPerServeAUD using realistic Australian 
+supermarket prices (Woolworths/Coles range). Kid-friendly budget meals 
+should be between $2.50–$6.00 per serve.
+
+---
+
+STEP 5 — Confirm
+
+After completing all steps, tell me:
+- Total recipe count (before and after)
+- Number of kid-friendly score-2 recipes (before and after)  
+- Any recipes that were surprising disqualifications

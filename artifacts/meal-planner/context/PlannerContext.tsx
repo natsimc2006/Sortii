@@ -268,9 +268,11 @@ export function PlannerProvider({ children }: { children: React.ReactNode }) {
         score += getRecipeSeasonalScore(r, currentSeason) * 5;
       }
 
-      // Kid-friendly: up to 10 pts
+      // Kid-friendly: score-2 = +10, score-1 = +3, score-0 already filtered out
       if (p.kidFriendly) {
-        score += getKidFriendlyScore(r) ? 10 : 0;
+        const kfScore = r.kidFriendlyScore ?? getKidFriendlyScore(r);
+        if (kfScore === 2) score += 10;
+        else if (kfScore === 1) score += 3;
       }
 
       return score;
