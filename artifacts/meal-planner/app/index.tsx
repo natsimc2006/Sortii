@@ -430,6 +430,7 @@ export default function OnboardingScreen() {
     return (
       <View style={[styles.screen, { backgroundColor: C.background, paddingTop, height: windowHeight }]}>
         <ScrollView
+          style={{ flex: 1 }}
           contentContainerStyle={styles.welcomeContent}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
@@ -875,11 +876,11 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   welcomeHeadline: {
-    fontSize: 30,
+    fontSize: 22,
     fontFamily: "Manrope_600SemiBold",
     textAlign: "center",
-    lineHeight: 40,
-    letterSpacing: -0.3,
+    lineHeight: 31,
+    letterSpacing: -0.2,
   },
   welcomeSub: {
     fontSize: 16,
