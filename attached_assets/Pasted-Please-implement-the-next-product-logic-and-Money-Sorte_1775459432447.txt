@@ -1,0 +1,162 @@
+Please implement the next product-logic and Money Sorted improvements for Sortii. Keep the current Sortii brand, rounded styling, teal-led palette, soft premium feel, and calm tone. Do not redesign the app. This is a logic, hierarchy, and value-communication pass.
+
+PRIMARY GOAL
+Make the budget tiers feel genuinely different, reduce redundant planner actions, and make the Money Sorted page clearly show the value Sortii creates.
+
+MAKE BUDGET TIERS GENERATE DIFFERENT WEEKS
+
+Current issue:
+Super Budget, Budget, and Standard are returning very similar meals and costs. This makes the budget selector feel cosmetic and weak. Only Premium currently feels meaningfully different.
+
+Please update the meal-generation logic so each budget tier acts as a distinct meal-planning profile, not just a label.
+
+Budget tier behaviour
+Super Budget
+
+Meal profile:
+
+lowest-cost meals
+pantry-friendly meals
+batch-friendly meals
+simpler ingredient lists
+more overlap in ingredients across the week
+more practical family basics
+fewer premium proteins
+fewer speciality ingredients
+
+Generation priorities:
+
+lowest cost
+pantry overlap
+batch value
+simplicity
+variety
+Budget
+
+Meal profile:
+
+still cost-conscious
+practical, everyday meals
+slightly more variety than Super Budget
+moderate ingredient count
+balanced low-cost proteins
+simple prep
+
+Generation priorities:
+
+cost
+practicality
+prep ease
+balanced variety
+Standard
+
+Meal profile:
+
+more balanced and varied
+broader mix of meals
+more freshness and flexibility
+less repetition than Super Budget/Budget
+still sensible, but not tightly cost-led
+
+Generation priorities:
+
+variety
+balanced cost
+freshness
+interest across the week
+Premium
+
+Keep Premium as the broadest and most flexible tier:
+
+more indulgent meals
+more premium proteins
+more variety
+less cost sensitivity
+greater ingredient tolerance
+
+Generation priorities:
+
+variety
+indulgence
+premium ingredients
+lower cost sensitivity
+ADD / USE RECIPE TAGS TO SUPPORT BUDGET DIFFERENTIATION
+
+If not already in place, support recipe selection using tags or fields such as:
+
+budget_tier_min
+budget_tier_max
+low_cost
+moderate_cost
+higher_cost
+pantry_friendly
+batch
+repeat_friendly
+premium_protein
+family_basic
+indulgent
+quick
+simple_ingredients
+
+Use these to make the generated week visibly and financially different by tier.
+
+ENSURE COST DIFFERENTIATION BY TIER
+
+Please make sure the weekly estimated cost changes meaningfully by tier.
+
+Expected pattern:
+
+Super Budget = lowest estimate
+Budget = low-mid estimate
+Standard = mid estimate
+Premium = highest estimate
+
+Do not let Super Budget / Budget / Standard all return almost identical cost ranges unless the actual selected week genuinely overlaps by chance.
+
+If needed, widen tier cost bands so the user can feel the difference.
+
+MAKE BUDGET TIERS UNDERSTANDABLE TO THE USER
+
+In the budget quick-edit selector, add short helper descriptions for each tier so users understand the payoff of each option.
+
+Use copy like:
+
+Super Budget
+“Lowest-cost meals, more pantry and batch wins”
+
+Budget
+“Everyday value with a bit more variety”
+
+Standard
+“Balanced meals with more flexibility”
+
+Premium
+“More variety, nicer ingredients, less compromise”
+
+Keep this subtle and easy to scan.
+
+IMPROVE WHAT HAPPENS WHEN BUDGET CHANGES
+
+When the user changes budget tier from the top planner chip:
+
+If the current plan still fits the new tier:
+update the chip immediately
+update the price estimate if needed
+no rebuild prompt needed
+If the current plan no longer fits the new tier:
+either auto-refresh the week
+OR
+show a strong inline action bar
+
+If using an action bar, use copy like:
+
+Headline:
+“Your meals don’t match this budget yet”
+
+Supporting text:
+“Refresh this week to pull meals that better fit your selected budget.”
+
+CTA:
+“Refresh week”
+
+Do not use a weak tip-style message for this.

@@ -44,6 +44,7 @@ interface MealSlotCardProps {
   onViewRecipe?: () => void;
   onAutoSwap?: () => void;
   onHideRecipe?: () => void;
+  onAutoFill?: () => void;
   seasonalMode?: boolean;
   kidFriendlyFilter?: boolean;
 }
@@ -58,6 +59,7 @@ export function MealSlotCard({
   onViewRecipe,
   onAutoSwap,
   onHideRecipe,
+  onAutoFill,
   seasonalMode = false,
   kidFriendlyFilter = false,
 }: MealSlotCardProps) {
@@ -87,26 +89,41 @@ export function MealSlotCard({
 
   if (!recipe) {
     return (
-      <TouchableOpacity
-        onPress={() => {
-          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-          onAdd();
-        }}
-        activeOpacity={0.7}
-        style={[styles.emptySlot, { borderColor: C.inputBorder }]}
-      >
-        <View style={[styles.addIconBox, { backgroundColor: C.chipBg }]}>
-          <Feather name="plus" size={20} color={C.primary} />
-        </View>
-        <View style={styles.emptyText}>
-          <Text style={[styles.slotLabelText, { color: C.textMuted }]}>
-            {slotLabel}
-          </Text>
-          <Text style={[styles.addLabel, { color: C.primary }]}>
-            Add a meal
-          </Text>
-        </View>
-      </TouchableOpacity>
+      <View style={[styles.emptySlot, { borderColor: C.inputBorder }]}>
+        <TouchableOpacity
+          onPress={() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            onAdd();
+          }}
+          activeOpacity={0.7}
+          style={styles.emptySlotLeft}
+        >
+          <View style={[styles.addIconBox, { backgroundColor: C.chipBg }]}>
+            <Feather name="plus" size={20} color={C.primary} />
+          </View>
+          <View style={styles.emptyText}>
+            <Text style={[styles.slotLabelText, { color: C.textMuted }]}>
+              {slotLabel}
+            </Text>
+            <Text style={[styles.addLabel, { color: C.primary }]}>
+              Add a meal
+            </Text>
+          </View>
+        </TouchableOpacity>
+        {onAutoFill && (
+          <TouchableOpacity
+            onPress={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+              onAutoFill();
+            }}
+            activeOpacity={0.75}
+            style={[styles.autoFillBtn, { backgroundColor: C.primary }]}
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+          >
+            <Feather name="zap" size={16} color="#fff" />
+          </TouchableOpacity>
+        )}
+      </View>
     );
   }
 
@@ -265,6 +282,20 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     padding: 12,
     gap: 10,
+  },
+  emptySlotLeft: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+  },
+  autoFillBtn: {
+    width: 42,
+    height: 42,
+    borderRadius: 12,
+    alignItems: "center",
+    justifyContent: "center",
+    flexShrink: 0,
   },
   addIconBox: {
     width: 36,

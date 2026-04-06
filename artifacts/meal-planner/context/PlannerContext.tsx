@@ -46,6 +46,7 @@ interface PlannerContextType {
   getRecipeById: (id: string) => Recipe | undefined;
   setMealSlot: (day: string, slot: MealSlot, recipeId: string | null) => void;
   fillRemainingSlots: () => void;
+  fillSingleSlot: (day: string, slot: MealSlot) => void;
   autoGeneratePlan: (newPrefs?: PlanPreferences) => void;
   autoSwapSlot: (day: string, slot: MealSlot) => void;
   clearPlan: () => void;
@@ -210,6 +211,23 @@ export function PlannerProvider({ children }: { children: React.ReactNode }) {
     setCurrentPlan(updatedPlan);
   }, [currentPlan, preferences, hiddenRecipes, appRecipes, setCurrentPlan]);
 
+  const fillSingleSlot = useCallback((targetDay: string, targetSlot: MealSlot) => {
+    const filledIds = currentPlan
+      .filter((m) => m.recipeId)
+      .map((m) => m.recipeId as string);
+
+    const updatedPlan = currentPlan.map((entry) => {
+      if (entry.day !== targetDay || entry.slot !== targetSlot || entry.recipeId) return entry;
+      const pool = filterRecipes(preferences, entry.slot, entry.day, hiddenRecipes, appRecipes);
+      const picks = pickRecipes(pool, 1, preferences.mealVariety, filledIds);
+      if (picks.length > 0) {
+        return { ...entry, recipeId: picks[0].id };
+      }
+      return entry;
+    });
+    setCurrentPlan(updatedPlan);
+  }, [currentPlan, preferences, hiddenRecipes, appRecipes, setCurrentPlan]);
+
   const autoGeneratePlan = useCallback((newPrefs?: PlanPreferences) => {
     const p = newPrefs ?? preferences;
     const fresh = buildEmptyPlan(p);
@@ -308,7 +326,13 @@ export function PlannerProvider({ children }: { children: React.ReactNode }) {
       return score;
     };
 
+    // Only auto-fill up to mealVariety days (the first N days of the week)
+    const daysToFill = new Set(DAYS.slice(0, p.mealVariety));
+
     const generated = fresh.map((entry) => {
+      // Leave days beyond the selected count as empty — user adds manually
+      if (!daysToFill.has(entry.day)) return entry;
+
       const pool = filterRecipes(p, entry.slot, entry.day, hiddenRecipes, appRecipes);
 
       // Score all candidates with small random tie-breaker for variety
@@ -459,6 +483,7 @@ export function PlannerProvider({ children }: { children: React.ReactNode }) {
         getRecipeById,
         setMealSlot,
         fillRemainingSlots,
+        fillSingleSlot,
         autoGeneratePlan,
         autoSwapSlot,
         clearPlan,

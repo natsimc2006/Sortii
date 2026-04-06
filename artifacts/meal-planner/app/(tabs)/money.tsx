@@ -4,6 +4,7 @@ import { useRouter } from "expo-router";
 import React from "react";
 import {
   ActivityIndicator,
+  Image,
   Platform,
   ScrollView,
   StyleSheet,
@@ -11,6 +12,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Colors from "@/constants/Colors";
 import { usePlanner } from "@/context/PlannerContext";
@@ -28,6 +30,7 @@ import { SWAP_RULES } from "@/constants/swapRules";
 import type { Recipe } from "@/constants/recipes";
 
 const C = Colors.light;
+const sortiiLogo = require("@/assets/images/sortii-logo-orange.png");
 
 // ─── Shared card wrapper ────────────────────────────────────
 
@@ -472,7 +475,11 @@ export default function MoneyScreen() {
       showsVerticalScrollIndicator={false}
     >
       <View style={styles.pageHeader}>
-        <Text style={[styles.pageTitle, { color: C.text }]}>Money — sorted</Text>
+        <Image
+          source={sortiiLogo}
+          style={styles.moneyPageLogo}
+          resizeMode="contain"
+        />
         <Text style={[styles.pageSubtitle, { color: C.textSecondary }]}>
           A quick look at your week, with a few easy wins if you want them.
         </Text>
@@ -535,10 +542,10 @@ const styles = StyleSheet.create({
     gap: 6,
     marginBottom: 4,
   },
-  pageTitle: {
-    fontSize: 26,
-    fontFamily: "Manrope_700Bold",
-    lineHeight: 32,
+  moneyPageLogo: {
+    width: 170,
+    height: 58,
+    marginBottom: 2,
   },
   pageSubtitle: {
     fontSize: 14,

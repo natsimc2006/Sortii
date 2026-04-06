@@ -1,0 +1,127 @@
+IMPROVE MONEY SORTED PAGE WITH TARGETED SORTII ACCENTS
+
+The Money Sorted page is tidy, but it can use a little more Sortii personality.
+
+Do NOT redesign the page or over-colour it.
+
+Add subtle Sortii accents in the right places only:
+
+success/status pill
+positive numbers like “A$300 left this week”
+savings callouts
+key insight cards
+small header/icon accents if useful
+
+Keep the page mostly clean and neutral, but let Sortii show up in:
+
+wins
+savings
+actions
+positive feedback
+
+Goal:
+Make the page feel clearly part of Sortii without becoming loud or cluttered.
+
+ADD A NEW “WHAT SORTII SAVED YOU” INSIGHT CARD
+
+Please add a new card to the Money Sorted page that clearly communicates the value of the meal plan and swap logic.
+
+Preferred placement:
+
+below “Where groceries are going”
+above “Easy wins this week”
+
+Card title:
+“What Sortii saved you”
+
+Purpose:
+Show the estimated value created by meal planning, swaps, pantry use, or reduced spend logic.
+
+Suggested structure:
+
+Meal swaps applied: A$18
+Pantry-friendly choices: A$7
+Estimated weekly savings: A$25
+
+Or a simplified version:
+
+“You’ve saved about A$25 this week”
+
+Supporting line:
+“Compared with your original weekly meal mix.”
+
+If detailed breakdown is not yet available, start with a simplified version and structure the card so it can expand later.
+
+CREATE A SIMPLE SAVINGS CALCULATION LAYER
+
+Please add the underlying logic needed to estimate weekly savings.
+
+Start simple and do not over-engineer.
+
+Use a model such as:
+
+Estimated weekly savings =
+(original meal plan cost before swaps)
+minus
+(current optimised meal plan cost)
+
+If possible, optionally add:
+
+pantry efficiency estimate
+avoided takeaway estimate
+swap savings estimate
+
+Even if the first version is simple, make the value feel believable and useful.
+
+Important:
+
+do not pretend the number is exact if it is estimated
+frame it as approximate where needed
+
+Use copy like:
+
+“saved about A$25 this week”
+“estimated weekly savings”
+“about A$18 leaner than your original week”
+KEEP “WHERE GROCERIES ARE GOING” AS A SEPARATE IDEA
+
+Do not merge the grocery-share insight with the savings insight.
+
+These are separate ideas:
+
+how grocery money is allocated
+what Sortii helped save
+
+Keep them as separate cards/insights.
+
+OUTPUT REQUIRED AFTER IMPLEMENTATION
+
+After implementing, please provide:
+
+Summary of changes made
+What was changed in budget-tier generation logic
+What recipe tags/filters were added or updated
+How weekly cost differentiation now works
+What was changed in the planner action row above the bottom nav
+What targeted Sortii accents were added to the Money Sorted page
+How the “What Sortii saved you” card is calculated
+Any assumptions made
+A short manual test checklist covering:
+Super Budget generates a meaningfully cheaper/more pantry-friendly week
+Budget generates a slightly broader week than Super Budget
+Standard generates more variety than Budget
+Premium remains the most flexible/indulgent
+weekly cost estimates differ by tier
+changing tiers updates the planner clearly
+planner action row is simplified and still functional
+Money Sorted shows the new savings card
+grocery allocation and savings remain separate ideas
+page still feels clean and premium
+
+This pass should make the app feel:
+
+smarter
+more differentiated
+more valuable
+more trustworthy
+more distinctly Sortii

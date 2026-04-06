@@ -1,0 +1,208 @@
+Please update the meal plan generation logic so Super Budget, Budget, Standard, and Premium produce genuinely different weekly meal plans. Right now Super Budget / Budget / Standard are returning very similar meals and costs, which makes the budget filter feel cosmetic instead of valuable.
+
+PRIMARY GOAL
+Make each budget tier feel distinct in both:
+
+1. meal selection
+2. estimated weekly cost
+
+Do not treat budget tier as only a label. Treat it as a meal generation profile.
+
+---
+
+1. CREATE DISTINCT BUDGET TIER RULES
+
+---
+
+Define each budget tier with different recipe selection rules.
+
+### Super Budget
+
+Use recipes that are:
+
+* lowest cost
+* pantry-friendly
+* simpler ingredient lists
+* more batch-friendly
+* repeat-friendly
+* built around low-cost staples like pasta, rice, potatoes, mince, sausages, beans, soups, tray bakes
+
+Generation rules:
+
+* prioritise lowest-cost eligible meals
+* allow more repeated ingredients across the week
+* allow more “use what’s already in the fridge/pantry” style planning
+* reduce premium proteins and speciality ingredients
+
+### Budget
+
+Use recipes that are:
+
+* still cost-conscious
+* practical
+* slightly more variety than Super Budget
+* modest ingredient count
+* balanced between low-cost and everyday meals
+
+Generation rules:
+
+* prioritise lower-mid cost meals
+* allow moderate variety
+* still favour practical ingredients and easy prep
+
+### Standard
+
+Use recipes that are:
+
+* balanced
+* more varied
+* fresher
+* slightly less constrained by cost
+* more interest across the week
+
+Generation rules:
+
+* allow broader meal variety
+* include more fresh ingredients
+* reduce repetition compared with Budget/Super Budget
+* still avoid Premium-level indulgence
+
+### Premium
+
+Keep Premium as the broadest and most flexible tier:
+
+* more premium proteins
+* more indulgent meals
+* more variety
+* higher ingredient tolerance
+
+---
+
+2. ADD RECIPE TAGS / FILTER DIMENSIONS
+
+---
+
+If not already present, support meal generation using tags such as:
+
+* budget_tier_min
+* budget_tier_max
+* pantry_friendly
+* batch
+* premium_protein
+* low_cost
+* moderate_cost
+* higher_cost
+* repeat_friendly
+* quick
+* family_basic
+* indulgent
+
+Use these tags to make the budget tiers actually produce different recipe pools.
+
+---
+
+3. ENSURE WEEKLY COST CHANGES BY TIER
+
+---
+
+The estimated weekly cost should shift meaningfully by tier.
+
+Expected pattern:
+
+* Super Budget = lowest weekly estimate
+* Budget = low-mid estimate
+* Standard = mid estimate
+* Premium = highest estimate
+
+Do not let Super Budget / Budget / Standard all return nearly identical totals unless the actual selected meals truly overlap by chance.
+
+If needed, enforce wider cost bands between tiers.
+
+---
+
+4. GENERATION PRIORITY BY TIER
+
+---
+
+When generating the week, use different priorities by budget tier:
+
+Super Budget:
+
+1. lowest cost
+2. pantry overlap
+3. batch value
+4. simplicity
+5. variety
+
+Budget:
+
+1. cost
+2. practicality
+3. balanced variety
+4. prep ease
+
+Standard:
+
+1. variety
+2. balanced cost
+3. freshness
+4. interest across the week
+
+Premium:
+
+1. variety
+2. indulgence
+3. premium ingredients
+4. lower cost sensitivity
+
+---
+
+5. MAKE THE DIFFERENCE VISIBLE TO THE USER
+
+---
+
+When a user changes budget tier, the planner should visibly reflect the change.
+
+Examples:
+
+* Super Budget should show more batch, low-cost, practical meals
+* Standard should show more varied and less repetitive meals
+* Premium should clearly feel upgraded
+
+If the current week no longer matches the selected tier, refresh the week automatically or show a strong “Refresh week” action prompt.
+
+---
+
+6. OPTIONAL UX IMPROVEMENT
+
+---
+
+In the budget quick-edit selector, add short helper descriptions under each tier:
+
+Super Budget:
+“Lowest-cost meals, more pantry and batch wins”
+
+Budget:
+“Everyday value with a bit more variety”
+
+Standard:
+“Balanced meals with more flexibility”
+
+Premium:
+“More variety, nicer ingredients, less compromise”
+
+This helps the user understand why the tiers exist.
+
+---
+
+7. OUTPUT REQUIRED
+
+---
+
+After implementing, provide:
+
+1. what meal-generation rules were added for each tier
+2. what recipe tags/filters were introduced or updated
+3. how weekly cost differentiation now works
+4. how the planner responds when tiers change
+5. a short manual test checklist verifying that each tier now produces noticeably different meals and price ranges
