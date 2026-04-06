@@ -82,12 +82,12 @@ export function getRecipesForLocale(locale: AppLocale) {
     ingredients: r.ingredientsAU ?? r.ingredients,
     costPerServe: r.costPerServeAUD ?? null,
     currency: 'AUD',
-    currencySymbol: 'A$',
+    currencySymbol: '$',
   }));
 }
 
 export function getCostDisplay(recipe: any, locale: AppLocale): string {
-  const symbol = locale === 'UK' ? '£' : 'A$';
+  const symbol = locale === 'UK' ? '£' : '$';
   const cost = recipe.costPerServe;
   if (!cost) return '';
   return `${symbol}${cost.toFixed(2)}/serve`;

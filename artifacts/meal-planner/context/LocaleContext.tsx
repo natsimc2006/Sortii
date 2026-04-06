@@ -17,11 +17,11 @@ interface LocaleContextType {
 
 const LocaleContext = createContext<LocaleContextType>({
   locale: 'AU',
-  currencySymbol: 'A$',
+  currencySymbol: '$',
   appRecipes: [],
   isLocaleLoaded: false,
-  formatMoney: (amount: number) => `A$${Math.round(amount)}`,
-  formatMoneyRound: (amount: number) => `A$${Math.round(amount)}`,
+  formatMoney: (amount: number) => `$${Math.round(amount)}`,
+  formatMoneyRound: (amount: number) => `$${Math.round(amount)}`,
 });
 
 export function LocaleProvider({ children }: { children: React.ReactNode }) {
@@ -46,7 +46,7 @@ export function LocaleProvider({ children }: { children: React.ReactNode }) {
     })();
   }, []);
 
-  const currencySymbol = locale === 'UK' ? '£' : 'A$';
+  const currencySymbol = locale === 'UK' ? '£' : '$';
   const appRecipes = getRecipesForLocale(locale) as Recipe[];
 
   const boundFormatMoney = (amount: number) => formatMoney(amount, locale);

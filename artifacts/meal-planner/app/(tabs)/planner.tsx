@@ -532,7 +532,7 @@ export default function PlannerScreen() {
                 <Feather name="bookmark" size={15} color={C.textSecondary} />
               </TouchableOpacity>
               <TouchableOpacity
-                onPress={() => router.replace("/")}
+                onPress={() => router.push("/home")}
                 style={[styles.filterIconBtn, { backgroundColor: C.chipBg, borderWidth: 1.5, borderColor: C.border }]}
                 hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
               >

@@ -1,0 +1,191 @@
+Please complete a regional consistency and currency display pass across the Sortii app.
+
+Do not redesign the app. Keep the existing Sortii brand, layout, and logic direction. This is a localisation, consistency, and logic-parity review.
+
+PRIMARY GOAL
+
+1. Make the Australian version feel more local by removing “A$” from user-facing UI and using “$” instead.
+2. Review the UK regional overlay and ensure the same logic fixes and behavioural improvements applied to AU are also applied to UK, while preserving UK-specific calculations, wording, and currency.
+
+---
+
+1. AUSTRALIAN CURRENCY DISPLAY CLEANUP
+
+---
+
+Current issue:
+The Australian app currently displays values as “A$” instead of “$”.
+
+This makes the app feel slightly less local and more like a spreadsheet/international comparison tool.
+
+Please update the AU user-facing interface so that:
+
+* Australian currency displays as “$”
+* not “A$”
+
+Examples:
+
+* change “A$117–A$137” to “$117–$137”
+* change “A$300 left this week” to “$300 left this week”
+
+Important:
+
+* this change should apply to front-end user-facing UI only
+* do not blindly remove regional currency handling in the underlying logic if it is needed for multi-region support
+* backend or internal region-aware currency logic can remain intact
+* if there are admin/internal/debug values that need explicit currency metadata, those can stay region-specific
+
+Use locale-aware display rules:
+
+* AU user-facing display = $
+* UK user-facing display = £
+
+---
+
+2. ADD / REVIEW LOCALE-AWARE CURRENCY FORMATTING
+
+---
+
+Please review the app’s currency formatting system so that it is region aware.
+
+Requirements:
+
+* AU frontend display should use $
+* UK frontend display should use £
+* the correct symbol should appear consistently across:
+
+  * planner estimates
+  * money setup
+  * money sorted page
+  * savings cards
+  * grocery breakdowns
+  * CTA-related financial summaries
+  * budget chips
+  * any quick-edit budget/cost views
+
+Do not allow mixed or stale currency symbols across screens.
+
+---
+
+3. UK OVERLAY / UK REGION LOGIC PARITY REVIEW
+
+---
+
+Please review the UK overlay / regional mode and confirm that the same product logic fixes and UX improvements recently applied to AU are also applied to UK where appropriate.
+
+This is not a request to make UK identical in content or calculations.
+It is a request to ensure UK has the same quality of logic and behaviour.
+
+Apply AU logic fixes to UK where relevant, while preserving UK-specific:
+
+* currency symbol (£)
+* UK calculations
+* UK meal/recipe wording
+* UK regional assumptions
+* UK localisation choices
+
+---
+
+4. AREAS TO CHECK FOR AU/UK LOGIC PARITY
+
+---
+
+Please specifically review whether the following improvements now work correctly in both AU and UK versions:
+
+### Meal planner logic
+
+* budget-tier differentiation
+* quick-edit chip behaviour
+* planner state persistence
+* refresh/rebuild rules
+* pricing updates after budget changes
+* planner generation consistency
+
+### Money flow logic
+
+* money setup persistence
+* empty-state rules
+* CTA routing
+* sticky CTA behaviour
+* savings calculations
+* Money Sorted logic and card rendering
+
+### UX consistency
+
+* inline quick-edit menus
+* “refresh week” behaviour if needed
+* budget mismatch handling
+* correct fallback/empty state handling
+* helper text and messaging hierarchy
+
+---
+
+5. PRESERVE UK-SPECIFIC CALCULATIONS
+
+---
+
+Important:
+Do NOT overwrite UK-specific calculations just to match AU.
+
+Preserve:
+
+* UK grocery/budget assumptions
+* UK recipe/ingredient conventions
+* UK pricing structures where intentionally different
+* UK terminology and wording where already localised
+
+The goal is:
+same product quality and logic standards,
+different regional outputs where expected.
+
+---
+
+6. REVIEW FOR HARD-CODED AU ASSUMPTIONS
+
+---
+
+Please check whether any recent AU fixes accidentally introduced hard-coded assumptions that would break or weaken UK behaviour.
+
+Look for:
+
+* hard-coded “A$”
+* AU-only labels
+* AU-specific budget text reused in UK
+* AU route/state assumptions
+* AU-only savings or grocery logic that should instead be region-aware
+
+Where needed, convert these into locale-aware logic.
+
+---
+
+7. OUTPUT REQUIRED AFTER IMPLEMENTATION
+
+---
+
+After making the updates, please provide:
+
+1. Summary of what was changed for AU currency display
+2. Confirmation of where AU now uses “$” instead of “A$”
+3. Summary of UK overlay / parity review completed
+4. Which AU logic fixes were confirmed or replicated in UK
+5. Any UK-specific calculations or wording intentionally preserved
+6. Any hard-coded AU assumptions found and fixed
+7. Any assumptions made
+8. A short manual test checklist covering:
+
+   * AU displays $ consistently
+   * UK displays £ consistently
+   * no mixed symbols across screens
+   * AU planner and money flows still work correctly
+   * UK planner and money flows match AU behavioural quality
+   * UK calculations remain regionally correct
+   * savings, budgets, and money sorted logic work in both regions
+
+This pass should make the app feel:
+
+* more local in Australia
+* still correct in the UK
+* more consistent across regions
+* more trustworthy as a multi-region product
+
+My recommendation is: **yes, remove the A from the AU front end, but keep the app region-aware underneath.** That gives you the local feel without breaking multi-region logic.

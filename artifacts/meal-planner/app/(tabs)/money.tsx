@@ -30,7 +30,7 @@ import { SWAP_RULES } from "@/constants/swapRules";
 import type { Recipe } from "@/constants/recipes";
 
 const C = Colors.light;
-const sortiiLogo = require("@/assets/images/sortii-logo-orange.png");
+const sortiiLogo = require("@/assets/images/sortii-logo-money.png");
 
 // ─── Shared card wrapper ────────────────────────────────────
 
@@ -475,11 +475,20 @@ export default function MoneyScreen() {
       showsVerticalScrollIndicator={false}
     >
       <View style={styles.pageHeader}>
-        <Image
-          source={sortiiLogo}
-          style={styles.moneyPageLogo}
-          resizeMode="contain"
-        />
+        <View style={styles.moneyHeaderRow}>
+          <Image
+            source={sortiiLogo}
+            style={styles.moneyPageLogo}
+            resizeMode="contain"
+          />
+          <TouchableOpacity
+            onPress={() => router.push("/home")}
+            style={[styles.filterIconBtn, { backgroundColor: C.chipBg, borderWidth: 1.5, borderColor: C.border }]}
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+          >
+            <Feather name="home" size={15} color={C.textSecondary} />
+          </TouchableOpacity>
+        </View>
         <Text style={[styles.pageSubtitle, { color: C.textSecondary }]}>
           A quick look at your week, with a few easy wins if you want them.
         </Text>
@@ -542,10 +551,21 @@ const styles = StyleSheet.create({
     gap: 6,
     marginBottom: 4,
   },
+  moneyHeaderRow: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    justifyContent: "space-between",
+  },
   moneyPageLogo: {
-    width: 170,
-    height: 58,
-    marginBottom: 2,
+    width: 221,
+    height: 101,
+  },
+  filterIconBtn: {
+    width: 34,
+    height: 34,
+    borderRadius: 9,
+    alignItems: "center",
+    justifyContent: "center",
   },
   pageSubtitle: {
     fontSize: 14,
