@@ -14,7 +14,6 @@ import {
 } from "react-native";
 
 import { PressableScale } from "@/components/PressableScale";
-
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Colors from "@/constants/Colors";
 
@@ -45,10 +44,25 @@ const FEATURES: [string, string][] = [
   ["Cook once. Eat twice. Less waste.", "refresh-cw"],
 ];
 
+interface NavItem {
+  icon: string;
+  label: string;
+  route: string;
+}
+
+const NAV_ITEMS: NavItem[] = [
+  { icon: "calendar",      label: "Planner",  route: "/(tabs)/planner" },
+  { icon: "shopping-cart", label: "Shopping", route: "/(tabs)/shopping" },
+  { icon: "dollar-sign",   label: "Money",    route: "/(tabs)/money" },
+  { icon: "sliders",       label: "Settings", route: "/(tabs)/preferences" },
+];
+
 export default function HomeScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const C = Colors.light;
+
+  const PANEL_HEIGHT = Platform.OS === "web" ? 76 : 70 + insets.bottom;
 
   const handleBack = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -59,142 +73,149 @@ export default function HomeScreen() {
     }
   };
 
-  const handlePreferences = () => {
+  const handleNav = (route: string) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    router.push("/(tabs)/preferences");
+    router.push(route as any);
   };
 
   return (
-    <ScrollView
-      style={{ backgroundColor: C.background }}
-      contentContainerStyle={[
-        styles.container,
-        {
-          paddingTop: Platform.OS === "web" ? 6 : Math.floor(insets.top / 2),
-          paddingBottom: Platform.OS === "web" ? 60 : insets.bottom + 40,
-        },
-      ]}
-      showsVerticalScrollIndicator={false}
-    >
-      <TouchableOpacity
-        onPress={handleBack}
-        style={[styles.backBtn, { backgroundColor: C.chipBg }]}
-        hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+    <View style={{ flex: 1, backgroundColor: C.background }}>
+      <ScrollView
+        style={{ backgroundColor: C.background }}
+        contentContainerStyle={[
+          styles.container,
+          {
+            paddingTop: Platform.OS === "web" ? 6 : Math.floor(insets.top / 2),
+            paddingBottom: PANEL_HEIGHT + 20,
+          },
+        ]}
+        showsVerticalScrollIndicator={false}
       >
-        <Feather name="arrow-left" size={16} color={C.primary} />
-      </TouchableOpacity>
-
-      {/* Change 7: Three dots decoration */}
-      <View style={styles.dotsRow}>
-        <View style={[styles.dot, { width: 6, height: 6, backgroundColor: C.gold }]} />
-        <View style={[styles.dot, { width: 8, height: 8, backgroundColor: C.primary }]} />
-        <View style={[styles.dot, { width: 6, height: 6, backgroundColor: "#5E3A4C" }]} />
-      </View>
-
-      {/* Change 1: Hero with glow + Change 8: Updated copy */}
-      <View style={styles.heroSection}>
-        <LinearGradient
-          colors={["rgba(255,255,255,0.9)", "rgba(255,255,255,0)"]}
-          style={styles.heroGlow}
-        />
-        <Image
-          source={sortiiLogo}
-          style={styles.logoImage}
-          resizeMode="contain"
-        />
-        <Text style={styles.mainHeadline}>
-          {"No more\n\u201Cwhat\u2019s for dinner\u201D"}
-        </Text>
-        <Text style={styles.subheadline}>
-          Sortii plans your week in 60 seconds — meals, budget, shopping list. Sorted.
-        </Text>
-        <Text style={styles.supportingLine}>
-          Less stress. Fewer takeaways. More evenings back.
-        </Text>
-        {/* Change 2: Teal accent bar */}
-        <View style={[styles.accentBar, { backgroundColor: C.primary }]} />
-      </View>
-
-      {/* Change 4 + 3: Section label upgrade + card redesign */}
-      <View style={styles.stepsSection}>
-        <View style={styles.sectionLabelRow}>
-          <View style={[styles.sectionDot, { backgroundColor: C.primary }]} />
-          <Text style={[styles.sectionLabel, { color: C.primary }]}>
-            HOW IT WORKS
-          </Text>
-        </View>
-        {STEPS.map((step, i) => (
-          <View
-            key={i}
-            style={[styles.stepCard, { backgroundColor: "#FFFFFF", borderColor: C.cardBorder }]}
-          >
-            <View style={[styles.stepCardAccent, { backgroundColor: C.primary }]} />
-            <View style={[styles.stepNum, { backgroundColor: C.primary }]}>
-              <Text style={styles.stepNumText}>{i + 1}</Text>
-            </View>
-            <View style={[styles.stepIconBox, { backgroundColor: C.gold }]}>
-              <Feather name={step.icon as any} size={22} color="#FFFFFF" />
-            </View>
-            <View style={styles.stepText}>
-              <Text style={[styles.stepTitle, { color: C.text }]}>
-                {step.title}
-              </Text>
-              <Text style={[styles.stepDesc, { color: C.textSecondary }]}>
-                {step.desc}
-              </Text>
-            </View>
-          </View>
-        ))}
-      </View>
-
-      {/* Change 5: Feature bullets in card */}
-      <View style={[styles.featuresCard, { backgroundColor: "#FFFFFF", borderColor: C.cardBorder }]}>
-        <Text style={[styles.featuresCardHeading, { color: C.primary }]}>
-          WHAT'S INCLUDED
-        </Text>
-        {FEATURES.map(([label, icon], idx) => (
-          <View key={label}>
-            <View style={styles.featureRow}>
-              <Feather name={icon as any} size={16} color={C.primary} />
-              <Text style={[styles.featureLabel, { color: C.text }]}>
-                {label}
-              </Text>
-            </View>
-            {idx < FEATURES.length - 1 && (
-              <View style={[styles.featureDivider, { backgroundColor: C.cardBorder }]} />
-            )}
-          </View>
-        ))}
-      </View>
-
-      {/* Change 9: Plum accent line + Change 6: Upgraded button */}
-      <View style={styles.actions}>
-        <Text style={styles.plumAccent}>
-          The convenience of a meal kit. At supermarket prices.
-        </Text>
-        <PressableScale
-          onPress={handlePreferences}
-          style={[styles.primaryBtn, { backgroundColor: C.gold }]}
-        >
-          <Text style={styles.primaryBtnText}>Get started</Text>
-          <Feather name="arrow-right" size={20} color="#fff" style={{ marginLeft: 8 }} />
-        </PressableScale>
-
-        <PressableScale
+        <TouchableOpacity
           onPress={handleBack}
-          scaleTo={0.98}
-          style={[styles.secondaryBtn, { borderColor: C.inputBorder }]}
+          style={[styles.backBtn, { backgroundColor: C.chipBg }]}
+          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
         >
-          <Text style={[styles.secondaryBtnText, { color: C.text }]}>
-            Go to my plan →
-          </Text>
-        </PressableScale>
-      </View>
+          <Feather name="arrow-left" size={16} color={C.primary} />
+        </TouchableOpacity>
 
-      <Text style={[styles.note, { color: C.textMuted }]}>
-        No account required · All data stays on your device
-      </Text>
-    </ScrollView>
+        {/* Three dots decoration */}
+        <View style={styles.dotsRow}>
+          <View style={[styles.dot, { width: 6, height: 6, backgroundColor: C.gold }]} />
+          <View style={[styles.dot, { width: 8, height: 8, backgroundColor: C.primary }]} />
+          <View style={[styles.dot, { width: 6, height: 6, backgroundColor: "#5E3A4C" }]} />
+        </View>
+
+        {/* Hero */}
+        <View style={styles.heroSection}>
+          <LinearGradient
+            colors={["rgba(255,255,255,0.9)", "rgba(255,255,255,0)"]}
+            style={styles.heroGlow}
+          />
+          <Image
+            source={sortiiLogo}
+            style={styles.logoImage}
+            resizeMode="contain"
+          />
+          <Text style={styles.mainHeadline}>
+            {"No more\n\u201Cwhat\u2019s for dinner\u201D"}
+          </Text>
+          <Text style={styles.subheadline}>
+            Sortii plans your week in 60 seconds — meals, budget, shopping list. Sorted.
+          </Text>
+          <Text style={styles.supportingLine}>
+            Less stress. Fewer takeaways. More evenings back.
+          </Text>
+          <View style={[styles.accentBar, { backgroundColor: C.primary }]} />
+        </View>
+
+        {/* How it works */}
+        <View style={styles.stepsSection}>
+          <View style={styles.sectionLabelRow}>
+            <View style={[styles.sectionDot, { backgroundColor: C.primary }]} />
+            <Text style={[styles.sectionLabel, { color: C.primary }]}>HOW IT WORKS</Text>
+          </View>
+          {STEPS.map((step, i) => (
+            <View
+              key={i}
+              style={[styles.stepCard, { backgroundColor: "#FFFFFF", borderColor: C.cardBorder }]}
+            >
+              <View style={[styles.stepCardAccent, { backgroundColor: C.primary }]} />
+              <View style={[styles.stepNum, { backgroundColor: C.primary }]}>
+                <Text style={styles.stepNumText}>{i + 1}</Text>
+              </View>
+              <View style={[styles.stepIconBox, { backgroundColor: C.gold }]}>
+                <Feather name={step.icon as any} size={22} color="#FFFFFF" />
+              </View>
+              <View style={styles.stepText}>
+                <Text style={[styles.stepTitle, { color: C.text }]}>{step.title}</Text>
+                <Text style={[styles.stepDesc, { color: C.textSecondary }]}>{step.desc}</Text>
+              </View>
+            </View>
+          ))}
+        </View>
+
+        {/* What's included */}
+        <View style={[styles.featuresCard, { backgroundColor: "#FFFFFF", borderColor: C.cardBorder }]}>
+          <Text style={[styles.featuresCardHeading, { color: C.primary }]}>WHAT'S INCLUDED</Text>
+          {FEATURES.map(([label, icon], idx) => (
+            <View key={label}>
+              <View style={styles.featureRow}>
+                <Feather name={icon as any} size={16} color={C.primary} />
+                <Text style={[styles.featureLabel, { color: C.text }]}>{label}</Text>
+              </View>
+              {idx < FEATURES.length - 1 && (
+                <View style={[styles.featureDivider, { backgroundColor: C.cardBorder }]} />
+              )}
+            </View>
+          ))}
+        </View>
+
+        {/* Actions */}
+        <View style={styles.actions}>
+          <Text style={styles.plumAccent}>
+            The convenience of a meal kit. At supermarket prices.
+          </Text>
+          <PressableScale
+            onPress={() => handleNav("/(tabs)/planner")}
+            style={[styles.primaryBtn, { backgroundColor: C.gold }]}
+          >
+            <Text style={styles.primaryBtnText}>Go to my plan</Text>
+            <Feather name="arrow-right" size={20} color="#fff" style={{ marginLeft: 8 }} />
+          </PressableScale>
+        </View>
+
+        <Text style={[styles.note, { color: C.textMuted }]}>
+          No account required · All data stays on your device
+        </Text>
+      </ScrollView>
+
+      {/* ── Floating nav panel ─────────────────────────────── */}
+      <View
+        style={[
+          styles.floatingPanel,
+          {
+            backgroundColor: "#fff",
+            borderTopColor: C.border,
+            paddingBottom: Platform.OS === "web" ? 12 : insets.bottom + 6,
+          },
+        ]}
+      >
+        {NAV_ITEMS.map((item) => (
+          <TouchableOpacity
+            key={item.route}
+            onPress={() => handleNav(item.route)}
+            activeOpacity={0.72}
+            style={styles.navItem}
+          >
+            <View style={[styles.navIconWrap, { backgroundColor: C.tealTint }]}>
+              <Feather name={item.icon as any} size={18} color={C.primary} />
+            </View>
+            <Text style={[styles.navLabel, { color: C.textSecondary }]}>{item.label}</Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+    </View>
   );
 }
 
@@ -218,9 +239,7 @@ const styles = StyleSheet.create({
     gap: 8,
     marginTop: -8,
   },
-  dot: {
-    borderRadius: 999,
-  },
+  dot: { borderRadius: 999 },
   heroSection: {
     alignItems: "center",
     gap: 8,
@@ -260,7 +279,6 @@ const styles = StyleSheet.create({
     fontFamily: "Inter_400Regular",
     textAlign: "center",
     lineHeight: 28,
-    letterSpacing: 0,
     color: "#5F5F59",
     maxWidth: 310,
     zIndex: 1,
@@ -271,7 +289,6 @@ const styles = StyleSheet.create({
     fontStyle: "italic",
     textAlign: "center",
     lineHeight: 24,
-    letterSpacing: 0,
     color: "#6B4A5E",
     zIndex: 1,
   },
@@ -282,20 +299,14 @@ const styles = StyleSheet.create({
     marginTop: 4,
     zIndex: 1,
   },
-  stepsSection: {
-    gap: 12,
-  },
+  stepsSection: { gap: 12 },
   sectionLabelRow: {
     flexDirection: "row",
     alignItems: "center",
     gap: 6,
     marginBottom: 4,
   },
-  sectionDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-  },
+  sectionDot: { width: 6, height: 6, borderRadius: 3 },
   sectionLabel: {
     fontSize: 11,
     fontFamily: "Inter_600SemiBold",
@@ -355,19 +366,9 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginLeft: 20,
   },
-  stepText: {
-    flex: 1,
-    gap: 4,
-  },
-  stepTitle: {
-    fontSize: 15,
-    fontFamily: "Inter_600SemiBold",
-  },
-  stepDesc: {
-    fontSize: 13,
-    fontFamily: "Inter_400Regular",
-    lineHeight: 19,
-  },
+  stepText: { flex: 1, gap: 4 },
+  stepTitle: { fontSize: 15, fontFamily: "Inter_600SemiBold" },
+  stepDesc: { fontSize: 13, fontFamily: "Inter_400Regular", lineHeight: 19 },
   featuresCard: {
     borderRadius: 16,
     borderWidth: 1.5,
@@ -397,17 +398,9 @@ const styles = StyleSheet.create({
     gap: 12,
     paddingVertical: 10,
   },
-  featureDivider: {
-    height: 1,
-    marginHorizontal: 0,
-  },
-  featureLabel: {
-    fontSize: 15,
-    fontFamily: "Inter_400Regular",
-  },
-  actions: {
-    gap: 12,
-  },
+  featureDivider: { height: 1 },
+  featureLabel: { fontSize: 15, fontFamily: "Inter_400Regular" },
+  actions: { gap: 12 },
   plumAccent: {
     fontSize: 13,
     fontFamily: "Inter_400Regular",
@@ -439,20 +432,50 @@ const styles = StyleSheet.create({
     fontFamily: "Inter_700Bold",
     color: "#fff",
   },
-  secondaryBtn: {
-    borderWidth: 1.5,
-    borderRadius: 18,
-    paddingVertical: 16,
-    alignItems: "center",
-  },
-  secondaryBtnText: {
-    fontSize: 15,
-    fontFamily: "Inter_600SemiBold",
-  },
   note: {
     textAlign: "center",
     fontSize: 13,
     fontFamily: "Inter_400Regular",
     marginTop: -8,
+  },
+
+  // ── Floating nav panel ─────────────────────────────────────
+  floatingPanel: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    bottom: 0,
+    flexDirection: "row",
+    justifyContent: "space-around",
+    alignItems: "flex-start",
+    paddingTop: 10,
+    borderTopWidth: 1,
+    ...Platform.select({
+      web: { boxShadow: "0px -4px 20px rgba(0,0,0,0.08)" },
+      default: {
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: -3 },
+        shadowOpacity: 0.08,
+        shadowRadius: 10,
+        elevation: 10,
+      },
+    }),
+  },
+  navItem: {
+    flex: 1,
+    alignItems: "center",
+    gap: 5,
+    paddingBottom: 4,
+  },
+  navIconWrap: {
+    width: 42,
+    height: 42,
+    borderRadius: 13,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  navLabel: {
+    fontSize: 11,
+    fontFamily: "Inter_500Medium",
   },
 });

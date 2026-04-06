@@ -20,60 +20,27 @@ import { useUserWeek } from "@/context/UserWeekContext";
 const C = Colors.light;
 const sortiiLogo = require("@/assets/images/sortii-logo-yourweek.png");
 
-const GREETINGS = [
-  "Ready to sort this week's dinners?",
-  "Back for another sorted week?",
-  "Good to see you back.",
-];
-
 export default function ReturningScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { currentPlan, autoGeneratePlan, preferences, isContextLoaded } = usePlanner();
-  const { isLoaded, lastUpdatedAt, updateWeekKey } = useUserWeek();
+  const { isLoaded, updateWeekKey } = useUserWeek();
 
   const [generating, setGenerating] = useState(false);
   const fadeAnim = useRef(new Animated.Value(0)).current;
-  const slideAnim = useRef(new Animated.Value(18)).current;
-
-  const greeting = GREETINGS[0];
+  const slideAnim = useRef(new Animated.Value(20)).current;
 
   const filledMeals = currentPlan.filter((e) => e.recipeId);
   const mealCount = filledMeals.length;
 
-  const lastPlanLabel = (() => {
-    if (!lastUpdatedAt) return null;
-    const d = new Date(lastUpdatedAt);
-    const now = new Date();
-    const diffDays = Math.floor((now.getTime() - d.getTime()) / (1000 * 60 * 60 * 24));
-    if (diffDays === 0) return "You sorted this today";
-    if (diffDays === 1) return "You sorted this yesterday";
-    if (diffDays < 7) return `${diffDays} days ago`;
-    if (diffDays < 14) return "About a week ago";
-    return null;
-  })();
-
   useEffect(() => {
     Animated.parallel([
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: 380,
-        useNativeDriver: false,
-      }),
-      Animated.timing(slideAnim, {
-        toValue: 0,
-        duration: 380,
-        useNativeDriver: false,
-      }),
+      Animated.timing(fadeAnim, { toValue: 1, duration: 400, useNativeDriver: false }),
+      Animated.timing(slideAnim, { toValue: 0, duration: 400, useNativeDriver: false }),
     ]).start();
   }, []);
 
-  const handleSameAsLastWeek = () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    router.replace("/(tabs)/planner");
-  };
-
-  const handleNewPlan = async () => {
+  const handleFreshPlan = async () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     setGenerating(true);
     await new Promise((r) => setTimeout(r, 120));
@@ -82,108 +49,91 @@ export default function ReturningScreen() {
     router.replace("/(tabs)/planner");
   };
 
-  const paddingTop = Platform.OS === "web" ? 52 : insets.top + 20;
-  const paddingBottom = Platform.OS === "web" ? 52 : insets.bottom + 24;
+  const handleSameAsLastWeek = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    router.replace("/(tabs)/planner");
+  };
+
+  const paddingTop = Platform.OS === "web" ? 64 : insets.top + 28;
+  const paddingBottom = Platform.OS === "web" ? 52 : insets.bottom + 28;
 
   if (!isContextLoaded || !isLoaded) {
     return (
-      <View style={[styles.loadingWrap, { backgroundColor: C.background }]}>
+      <View style={[styles.loading, { backgroundColor: C.background }]}>
         <ActivityIndicator color={C.primary} />
       </View>
     );
   }
 
   return (
-    <View
-      style={[
-        styles.screen,
-        { backgroundColor: C.background, paddingTop, paddingBottom },
-      ]}
-    >
+    <View style={[styles.screen, { backgroundColor: C.background, paddingTop, paddingBottom }]}>
       <Animated.View
-        style={[
-          styles.inner,
-          { opacity: fadeAnim, transform: [{ translateY: slideAnim }] },
-        ]}
+        style={[styles.inner, { opacity: fadeAnim, transform: [{ translateY: slideAnim }] }]}
       >
         {/* Logo */}
-        <Image
-          source={sortiiLogo}
-          style={styles.logo}
-          resizeMode="contain"
-        />
+        <Image source={sortiiLogo} style={styles.logo} resizeMode="contain" />
 
-        {/* Headline */}
+        {/* Headline + sub */}
         <View style={styles.headlineBlock}>
-          <Text style={[styles.headline, { color: C.text }]}>{greeting}</Text>
-          {mealCount > 0 && (
-            <Text style={[styles.sub, { color: C.textSecondary }]}>
-              You've got{" "}
-              <Text style={{ fontFamily: "Inter_600SemiBold", color: C.primary }}>
-                {mealCount} dinner{mealCount !== 1 ? "s" : ""}
-              </Text>{" "}
-              saved from last week
-              {lastPlanLabel ? ` — ${lastPlanLabel}.` : "."}
-            </Text>
-          )}
+          <Text style={[styles.headline, { color: C.text }]}>New week. Same you.</Text>
+          <Text style={[styles.sub, { color: C.textSecondary }]}>
+            Your preferences are saved — want a fresh plan or the same meals?
+          </Text>
         </View>
 
         {/* Choices */}
         <View style={styles.choiceStack}>
-          {/* Same as last week */}
+
+          {/* Primary — Fresh plan */}
+          <TouchableOpacity
+            onPress={handleFreshPlan}
+            activeOpacity={0.82}
+            disabled={generating}
+            style={[styles.card, styles.cardPrimary, { backgroundColor: C.primary, borderColor: C.primary }]}
+          >
+            <View style={[styles.iconBadge, { backgroundColor: "rgba(255,255,255,0.18)" }]}>
+              {generating
+                ? <ActivityIndicator color="#fff" size="small" />
+                : <Feather name="refresh-cw" size={20} color="#fff" />
+              }
+            </View>
+            <View style={styles.cardText}>
+              <Text style={styles.cardLabelPrimary}>
+                {generating ? "Sorting your week…" : "Fresh plan, same settings"}
+              </Text>
+              <Text style={styles.cardSubPrimary}>
+                New meals based on your preferences
+              </Text>
+            </View>
+            {!generating && <Feather name="arrow-right" size={18} color="#fff" />}
+          </TouchableOpacity>
+
+          {/* Secondary — Same as last week */}
           <TouchableOpacity
             onPress={handleSameAsLastWeek}
             activeOpacity={0.82}
-            style={[
-              styles.choiceCard,
-              styles.choiceCardPrimary,
-              { backgroundColor: C.primary, borderColor: C.primary },
-            ]}
+            disabled={generating}
+            style={[styles.card, styles.cardSecondary, { backgroundColor: "#fff", borderColor: C.border }]}
           >
-            <View style={[styles.iconBadge, { backgroundColor: "rgba(255,255,255,0.18)" }]}>
-              <Feather name="copy" size={18} color="#fff" />
+            <View style={[styles.iconBadge, { backgroundColor: C.tealTint }]}>
+              <Feather name="copy" size={20} color={C.primary} />
             </View>
-            <View style={styles.choiceText}>
-              <Text style={styles.choiceLabelPrimary}>Same as last week</Text>
-              <Text style={styles.choiceSubPrimary}>
-                Keep your{mealCount > 0 ? ` ${mealCount}-dinner` : ""} plan and shopping list
+            <View style={styles.cardText}>
+              <Text style={[styles.cardLabelSecondary, { color: C.text }]}>
+                Same meals as last week
+              </Text>
+              <Text style={[styles.cardSubSecondary, { color: C.textMuted }]}>
+                Keep everything exactly as it was
+                {mealCount > 0 ? ` — ${mealCount} dinner${mealCount !== 1 ? "s" : ""} ready` : ""}
               </Text>
             </View>
-            <Feather name="arrow-right" size={18} color="#fff" />
+            <Feather name="arrow-right" size={18} color={C.textSecondary} />
           </TouchableOpacity>
 
-          {/* New plan */}
-          <TouchableOpacity
-            onPress={handleNewPlan}
-            activeOpacity={0.82}
-            disabled={generating}
-            style={[
-              styles.choiceCard,
-              styles.choiceCardSecondary,
-              { borderColor: C.border, backgroundColor: "#fff" },
-            ]}
-          >
-            {generating ? (
-              <ActivityIndicator color={C.primary} size="small" />
-            ) : (
-              <View style={[styles.iconBadge, { backgroundColor: C.tealTint }]}>
-                <Feather name="refresh-cw" size={18} color={C.primary} />
-              </View>
-            )}
-            <View style={styles.choiceText}>
-              <Text style={[styles.choiceLabelSecondary, { color: C.text }]}>
-                {generating ? "Sorting your week…" : "New plan"}
-              </Text>
-              <Text style={[styles.choiceSubSecondary, { color: C.textMuted }]}>
-                Fresh picks based on your preferences
-              </Text>
-            </View>
-            {!generating && <Feather name="arrow-right" size={18} color={C.textSecondary} />}
-          </TouchableOpacity>
         </View>
 
-        {/* Footer hint */}
-        <Text style={[styles.footerHint, { color: C.textMuted }]}>
+        {/* Footer */}
+        <Text style={[styles.footer, { color: C.textMuted }]}>
           Either way — dinner's sorted.
         </Text>
       </Animated.View>
@@ -192,18 +142,12 @@ export default function ReturningScreen() {
 }
 
 const styles = StyleSheet.create({
-  screen: {
-    flex: 1,
-  },
-  loadingWrap: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-  },
+  screen: { flex: 1 },
+  loading: { flex: 1, alignItems: "center", justifyContent: "center" },
   inner: {
     flex: 1,
     paddingHorizontal: 24,
-    gap: 32,
+    gap: 28,
     justifyContent: "center",
   },
   logo: {
@@ -211,23 +155,19 @@ const styles = StyleSheet.create({
     height: 92,
     alignSelf: "flex-start",
   },
-  headlineBlock: {
-    gap: 10,
-  },
+  headlineBlock: { gap: 10 },
   headline: {
-    fontSize: 28,
+    fontSize: 30,
     fontFamily: "Manrope_700Bold",
-    lineHeight: 36,
+    lineHeight: 38,
   },
   sub: {
     fontSize: 16,
     fontFamily: "Inter_400Regular",
     lineHeight: 24,
   },
-  choiceStack: {
-    gap: 14,
-  },
-  choiceCard: {
+  choiceStack: { gap: 14 },
+  card: {
     flexDirection: "row",
     alignItems: "center",
     gap: 14,
@@ -235,7 +175,7 @@ const styles = StyleSheet.create({
     borderWidth: 1.5,
     padding: 18,
     ...Platform.select({
-      web: { boxShadow: "0px 2px 12px rgba(0,0,0,0.07)" },
+      web: { boxShadow: "0px 2px 14px rgba(0,0,0,0.07)" },
       default: {
         shadowColor: "#000",
         shadowOffset: { width: 0, height: 2 },
@@ -245,41 +185,38 @@ const styles = StyleSheet.create({
       },
     }),
   },
-  choiceCardPrimary: {},
-  choiceCardSecondary: {},
+  cardPrimary: {},
+  cardSecondary: {},
   iconBadge: {
-    width: 40,
-    height: 40,
-    borderRadius: 12,
+    width: 42,
+    height: 42,
+    borderRadius: 13,
     alignItems: "center",
     justifyContent: "center",
     flexShrink: 0,
   },
-  choiceText: {
-    flex: 1,
-    gap: 3,
-  },
-  choiceLabelPrimary: {
+  cardText: { flex: 1, gap: 3 },
+  cardLabelPrimary: {
     fontSize: 17,
     fontFamily: "Inter_600SemiBold",
     color: "#fff",
   },
-  choiceSubPrimary: {
+  cardSubPrimary: {
     fontSize: 13,
     fontFamily: "Inter_400Regular",
     color: "rgba(255,255,255,0.82)",
     lineHeight: 18,
   },
-  choiceLabelSecondary: {
+  cardLabelSecondary: {
     fontSize: 17,
     fontFamily: "Inter_600SemiBold",
   },
-  choiceSubSecondary: {
+  cardSubSecondary: {
     fontSize: 13,
     fontFamily: "Inter_400Regular",
     lineHeight: 18,
   },
-  footerHint: {
+  footer: {
     fontSize: 13,
     fontFamily: "Inter_400Regular",
     textAlign: "center",
