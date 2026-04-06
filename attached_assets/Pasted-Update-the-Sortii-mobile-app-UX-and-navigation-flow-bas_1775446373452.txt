@@ -1,0 +1,255 @@
+Update the Sortii mobile app UX and navigation flow based on the following product changes. Keep the existing visual style, colour palette, spacing system, rounded corners, typography direction, and soft premium feel. Do not redesign the brand. This is a UX cleanup and navigation consistency pass.
+
+## PRIMARY GOAL
+Make the weekly planner feel clearer and easier to control. Improve the bottom navigation, restore key navigation shortcuts, and make all “update” flows work consistently.
+
+---
+
+## 1. BOTTOM NAVIGATION CHANGES
+
+### Replace the current centre “Sort” tab
+- Rename the tab from “Sort” to “Adjust”
+- Replace the current sliders/settings-style icon with an icon that better communicates “tweak/update/edit your week”
+- Preferred icon direction: edit / refresh / magic-wand / adjust
+- It should feel like the control centre for updating the user’s week, not a settings panel
+
+### New bottom nav order
+Use this order:
+1. Planner
+2. Recipes
+3. Adjust
+4. Shopping
+5. Money
+
+### Remove “Saved” from the bottom nav
+- Saved should no longer appear in the bottom navigation
+- This should free up space so the centre Adjust tab sits nicely and feels more intentional
+
+### Keep Adjust visually central
+- The Adjust tab should remain the visual hero in the centre of the nav bar
+- Preserve the current elevated / featured feel if possible, but ensure the new name and icon are clearer
+
+---
+
+## 2. MOVE SAVED TO THE TOP HEADER
+
+### Add Saved to header actions instead
+- Add a Saved / bookmark icon to the top header actions area
+- This should be available from key screens where it makes sense, especially the planner
+- Keep the icon style aligned with the rest of the app
+- Tapping it should open the Saved screen
+
+### Restore Home button to planner top right
+- Re-add the Home button/icon to the top right corner of the planner screen
+- This previously existed and should return
+- It should take the user back to the landing/home screen
+- Keep it visually consistent with the header icon style
+
+### Header action priority
+Where possible on Planner:
+- top right should support:
+  - Home
+  - Saved
+- keep layout clean and not crowded
+
+---
+
+## 3. ADJUST TAB / UPDATE SHEET IMPROVEMENTS
+
+When the user taps the new Adjust tab, open the existing bottom sheet/modal flow, but improve the naming and behaviour.
+
+### Update modal copy
+Change the modal heading from:
+- “What do you want to update?”
+
+To:
+- “What do you want to change?”
+
+Change the subheading to:
+- “Pick one — we’ll handle the rest.”
+
+### Update the three options to this structure
+
+#### Option 1
+Title: Meals
+Description: Change meals, preferences or budget level
+CTA button: Update meals
+
+#### Option 2
+Title: Money
+Description: Update your weekly numbers
+CTA button: Update budget
+
+#### Option 3
+Rename from “Both” to:
+Title: Start fresh
+Description: Rebuild your full week from scratch
+CTA button: Redo my week
+
+### Visual behaviour
+- Keep the cards large, tappable, and easy to scan
+- Retain colour-coded treatment if already implemented
+- “Start fresh” can feel slightly more reset-oriented, but should not feel alarming or destructive
+- Avoid making it look like an error state
+
+---
+
+## 4. FIX BROKEN “UPDATE BOTH / START FRESH” FLOW
+
+### Current issue
+The third option currently does nothing when tapped.
+
+### Required behaviour
+When the user taps Start fresh / Redo my week, it should trigger a full guided rebuild flow.
+
+### Desired flow
+1. Open the Meals setup screen first
+2. After completing or confirming Meals setup, move to the Money setup screen
+3. After Money setup is completed or skipped, regenerate / rebuild the week
+4. Return the user to the Planner with the refreshed weekly plan
+
+### Important
+- This flow must work end-to-end
+- If the user skips Money, the app should still continue and rebuild the week
+- Preserve current data only when appropriate; if this flow is “start fresh”, prioritise rebuilding from updated inputs
+
+---
+
+## 5. ADD MISSING BACK NAVIGATION TO MEALS SETUP
+
+### Current issue
+The Money update page has a back arrow, but the Meals update/settings screen does not.
+
+### Fix
+Add a back arrow button to the Meals setup/update screen.
+
+### Behaviour
+- Tapping the back arrow should return the user to the previous screen or modal state
+- Match the behaviour and placement used on the Money page so both update flows feel consistent
+
+### Consistency rule
+Any screen opened from the Adjust/update flow should always have a clear way back.
+
+---
+
+## 6. KEEP / IMPROVE THE NEW ADJUST SCREEN
+
+The new screen that opens from the centre tab is directionally good. Keep the structure, but refine the language so the purpose is clearer.
+
+### Add a supportive helper line near the top
+Use:
+- “Tweak your week — without starting over.”
+
+This should help users understand this area is for changes, not a scary reset/settings page.
+
+### Keep the setup sections
+Retain the current structure such as:
+- planning mode
+- household size
+- budget level
+etc.
+
+But ensure this screen feels like:
+- a weekly control centre
+- easy to update
+- not buried settings
+
+---
+
+## 7. MAKE PLANNER SUMMARY CHIPS ACTIONABLE
+
+On the planner screen, the summary chips such as:
+- household size
+- budget level
+- plan type
+- weekly estimated cost
+
+should become tappable shortcuts where appropriate.
+
+### Behaviour
+Tapping these chips should open the relevant Adjust / update flow instead of being passive display only.
+
+Examples:
+- tapping household size or budget level can open Meals setup
+- tapping weekly cost can open Money / budget update flow
+
+Do this only where it improves UX and is technically clean.
+
+---
+
+## 8. DISABLED BUTTON STATE IMPROVEMENT ON MONEY SCREEN
+
+### Current issue
+The disabled “See my week” button looks too dead / broken.
+
+### Improve disabled state
+- Keep it visibly disabled when required
+- But make it still feel intentional and polished, not like a UI bug
+- Adjust opacity / styling so it remains readable
+
+### Add helper text
+When the CTA is disabled because no inputs have been added, show supporting helper text such as:
+- “Add at least one number to continue”
+
+Place this in a subtle but visible position near the button.
+
+---
+
+## 9. UX CONSISTENCY RULES
+
+Apply these rules across the updated flow:
+
+### Navigation consistency
+- Every modal or pushed screen must have a clear close or back action
+- Users should never feel trapped inside an update flow
+
+### Naming consistency
+Use “Adjust” everywhere instead of “Sort” when referring to this control/update area
+
+### Tone consistency
+Keep the Sortii tone:
+- helpful
+- calm
+- lightly confident
+- not overly corporate
+- not overly playful
+
+### Visual consistency
+Do not introduce harsh shadows, new colour systems, or a different design language.
+This is a refinement pass, not a redesign.
+
+---
+
+## 10. TECHNICAL / STRUCTURAL EXPECTATIONS
+
+Please implement this cleanly and avoid hacks.
+
+### Requested output
+1. Update the navigation labels and icons
+2. Add/restore the Home and Saved header actions
+3. Fix the broken Start Fresh flow
+4. Add missing back navigation on Meals setup
+5. Update modal copy and CTA labels
+6. Make relevant planner chips actionable
+7. Improve disabled CTA styling on the Money page
+
+### Important
+After implementing, provide a summary of:
+- what files/components were changed
+- what navigation flows were updated
+- any assumptions made
+- anything still needing manual review/testing
+
+### Also include
+A short manual test checklist covering:
+- bottom nav behaviour
+- opening Adjust flow
+- Meals update back button
+- Money update back button
+- Start fresh full rebuild flow
+- Home button return to landing page
+- Saved button opening Saved screen
+- chip tap shortcuts
+- disabled CTA helper text on Money page
+
+Do not remove existing working functionality unless it directly conflicts with the changes above.

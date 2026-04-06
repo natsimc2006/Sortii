@@ -6,7 +6,7 @@ import React from "react";
 import { Platform, StyleSheet, Text, TouchableOpacity, View, useColorScheme } from "react-native";
 import Colors from "@/constants/Colors";
 
-function SortTabButton({ style }: { style?: any }) {
+function AdjustTabButton({ style }: { style?: any }) {
   const router = useRouter();
   const C = Colors.light;
 
@@ -35,10 +35,10 @@ function SortTabButton({ style }: { style?: any }) {
           elevation: 5,
         }}
       >
-        <Feather name="sliders" size={19} color="#fff" />
+        <Feather name="edit-2" size={18} color="#fff" />
       </View>
       <Text style={{ fontSize: 10, color: C.primary, fontFamily: "Inter_500Medium", marginTop: 1 }}>
-        Sort
+        Adjust
       </Text>
     </TouchableOpacity>
   );
@@ -102,7 +102,7 @@ export default function TabLayout() {
         name="refresh"
         options={{
           title: "",
-          tabBarButton: (props) => <SortTabButton style={props.style} />,
+          tabBarButton: (props) => <AdjustTabButton style={props.style} />,
         }}
       />
       <Tabs.Screen
@@ -127,9 +127,7 @@ export default function TabLayout() {
         name="saved"
         options={{
           title: "Saved",
-          tabBarIcon: ({ color }) => (
-            <Feather name="bookmark" size={22} color={color} />
-          ),
+          href: null,
         }}
       />
       <Tabs.Screen

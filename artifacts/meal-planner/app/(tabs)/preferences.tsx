@@ -1,6 +1,6 @@
 import { Feather } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
   Platform,
@@ -245,6 +245,8 @@ export default function PreferencesScreen() {
   };
 
   const router = useRouter();
+  const { flow } = useLocalSearchParams<{ flow?: string }>();
+  const isFreshFlow = flow === "fresh";
 
   const PLAN_AFFECTING_KEYS: (keyof PlanPreferences)[] = [
     "planningMode", "healthStyle", "cookingEffort", "mealVariety",
@@ -259,7 +261,11 @@ export default function PreferencesScreen() {
     );
 
   const handleClose = () => {
-    router.navigate("/(tabs)/planner");
+    if (isFreshFlow && router.canGoBack()) {
+      router.back();
+    } else {
+      router.navigate("/(tabs)/planner");
+    }
   };
 
   const handleSave = async () => {
@@ -276,7 +282,11 @@ export default function PreferencesScreen() {
     setSavedToast(true);
     setTimeout(() => {
       setSavedToast(false);
-      router.replace("/(tabs)/planner");
+      if (isFreshFlow) {
+        router.push("/money-setup?flow=fresh");
+      } else {
+        router.replace("/(tabs)/planner");
+      }
     }, 1200);
   };
 
@@ -314,6 +324,13 @@ export default function PreferencesScreen() {
       >
         <View style={styles.prefHero}>
           <View style={styles.prefHeroTopRow}>
+            <TouchableOpacity
+              onPress={handleClose}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+              style={styles.backBtn}
+            >
+              <Feather name="arrow-left" size={18} color={C.primary} />
+            </TouchableOpacity>
             <View style={{ flex: 1 }} />
             <TouchableOpacity onPress={handleClose} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }} style={styles.closeBtn}>
               <Feather name="x" size={22} color={C.textSecondary} />
@@ -706,6 +723,14 @@ const styles = StyleSheet.create({
   },
   closeBtn: {
     padding: 4,
+  },
+  backBtn: {
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    backgroundColor: "#E8F5F3",
+    alignItems: "center",
+    justifyContent: "center",
   },
   pageTitle: {
     fontSize: 26,

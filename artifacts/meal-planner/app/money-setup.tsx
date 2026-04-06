@@ -1,6 +1,6 @@
 import { Feather } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -16,6 +16,7 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Colors from "@/constants/Colors";
 import { useLocale } from "@/context/LocaleContext";
+import { usePlanner } from "@/context/PlannerContext";
 import { useUserWeek } from "@/context/UserWeekContext";
 import { WeekGoal } from "@/utils/yourWeekEngine";
 import {
@@ -76,6 +77,9 @@ const GOAL_OPTIONS: { value: WeekGoal; label: string; emoji: string }[] = [
 
 export default function MoneySetupScreen() {
   const router = useRouter();
+  const { flow } = useLocalSearchParams<{ flow?: string }>();
+  const isFreshFlow = flow === "fresh";
+  const { autoGeneratePlan } = usePlanner();
   const insets = useSafeAreaInsets();
   const { currencySymbol, locale } = useLocale();
   const { money: savedMoney, setMoney, setGoal: setContextGoal, updateWeekKey, isLoaded } = useUserWeek();
@@ -122,7 +126,12 @@ export default function MoneySetupScreen() {
     setContextGoal(selectedGoal);
     updateWeekKey();
     setTimeout(() => {
-      router.replace("/your-week");
+      if (isFreshFlow) {
+        autoGeneratePlan();
+        router.replace("/(tabs)/planner");
+      } else {
+        router.replace("/your-week");
+      }
     }, 400);
   };
 
@@ -292,24 +301,34 @@ export default function MoneySetupScreen() {
           },
         ]}
       >
+        {!canSave && (
+          <Text style={[styles.disabledHint, { color: C.textMuted }]}>
+            Add at least one number to continue
+          </Text>
+        )}
         <TouchableOpacity
-          onPress={handleSave}
-          activeOpacity={0.85}
-          disabled={saving}
+          onPress={canSave ? handleSave : undefined}
+          activeOpacity={canSave ? 0.85 : 1}
+          disabled={saving || !canSave}
           style={[
             styles.primaryCta,
-            { backgroundColor: canSave ? C.gold : C.border },
+            canSave
+              ? { backgroundColor: C.gold }
+              : { backgroundColor: "#D4D4D4", opacity: 0.7 },
           ]}
         >
-          <Text style={styles.primaryCtaText}>
+          <Text style={[styles.primaryCtaText, !canSave && { color: "#888" }]}>
             {saving ? "Saving…" : "See my week"}
           </Text>
-          <Feather name={saving ? "loader" : "arrow-right"} size={18} color="#fff" />
+          {canSave && <Feather name={saving ? "loader" : "arrow-right"} size={18} color="#fff" />}
         </TouchableOpacity>
         <TouchableOpacity
           onPress={() => {
             Haptics.selectionAsync();
-            if (hasMealsSetup) {
+            if (isFreshFlow) {
+              autoGeneratePlan();
+              router.replace("/(tabs)/planner");
+            } else if (hasMealsSetup) {
               router.replace("/(tabs)/planner");
             } else {
               router.replace("/your-week");
@@ -461,6 +480,12 @@ const styles = StyleSheet.create({
     paddingTop: 16,
     borderTopWidth: 1,
     gap: 8,
+  },
+  disabledHint: {
+    fontSize: 12.5,
+    fontFamily: "Inter_400Regular",
+    textAlign: "center",
+    marginBottom: 8,
   },
   primaryCta: {
     flexDirection: "row",

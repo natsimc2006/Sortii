@@ -499,6 +499,20 @@ export default function PlannerScreen() {
             </View>
             <View style={styles.headerIcons}>
               <TouchableOpacity
+                onPress={() => router.push("/(tabs)/saved")}
+                style={[styles.filterIconBtn, { backgroundColor: C.chipBg, borderWidth: 1.5, borderColor: C.border }]}
+                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+              >
+                <Feather name="bookmark" size={15} color={C.textSecondary} />
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => router.replace("/")}
+                style={[styles.filterIconBtn, { backgroundColor: C.chipBg, borderWidth: 1.5, borderColor: C.border }]}
+                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+              >
+                <Feather name="home" size={15} color={C.textSecondary} />
+              </TouchableOpacity>
+              <TouchableOpacity
                 onPress={() => router.push("/(tabs)/preferences")}
                 style={[styles.filterIconBtn, { backgroundColor: C.plumTint, borderWidth: 1.5, borderColor: C.plum }]}
                 hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
@@ -508,10 +522,22 @@ export default function PlannerScreen() {
             </View>
           </View>
           <View style={styles.filterChips}>
-            <FilterChip label={`${preferences.householdSize} people`} icon="users" />
-            <FilterChip label={budgeLabel} icon="dollar-sign" />
+            <FilterChip
+              label={`${preferences.householdSize} people`}
+              icon="users"
+              onPress={() => router.push("/(tabs)/preferences")}
+            />
+            <FilterChip
+              label={budgeLabel}
+              icon="dollar-sign"
+              onPress={() => router.push("/(tabs)/preferences")}
+            />
             <FilterChip label={healthLabel} icon="activity" />
-            <FilterChip label={estimatedCostBand} icon="shopping-bag" />
+            <FilterChip
+              label={estimatedCostBand}
+              icon="shopping-bag"
+              onPress={() => router.push("/money-setup")}
+            />
           </View>
           {planBudgetMismatch && (
             <TouchableOpacity
@@ -821,8 +847,22 @@ export default function PlannerScreen() {
   );
 }
 
-function FilterChip({ label, icon }: { label: string; icon: string }) {
+function FilterChip({ label, icon, onPress }: { label: string; icon: string; onPress?: () => void }) {
   const C = Colors.light;
+  if (onPress) {
+    return (
+      <TouchableOpacity
+        style={[styles.filterChip, { backgroundColor: C.chipBg }]}
+        onPress={onPress}
+        activeOpacity={0.75}
+        hitSlop={{ top: 4, bottom: 4, left: 4, right: 4 }}
+      >
+        <Feather name={icon as any} size={10} color={C.primary} />
+        <Text style={[styles.filterChipText, { color: C.chipText }]}>{label}</Text>
+        <Feather name="chevron-right" size={9} color={C.primary} style={{ marginLeft: 1 }} />
+      </TouchableOpacity>
+    );
+  }
   return (
     <View style={[styles.filterChip, { backgroundColor: C.chipBg }]}>
       <Feather name={icon as any} size={10} color={C.primary} />

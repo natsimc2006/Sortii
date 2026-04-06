@@ -11,7 +11,6 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Colors from "@/constants/Colors";
-import { usePlanner } from "@/context/PlannerContext";
 
 const C = Colors.light;
 
@@ -50,10 +49,9 @@ function OptionCard({ icon, accentColor, bgColor, title, sub, btnLabel, onPress 
   );
 }
 
-export default function SortHubScreen() {
+export default function AdjustHubScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { autoGeneratePlan } = usePlanner();
 
   const handleClose = () => {
     if (router.canGoBack()) {
@@ -73,10 +71,9 @@ export default function SortHubScreen() {
     router.push("/money-setup");
   };
 
-  const handleBoth = () => {
+  const handleStartFresh = () => {
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    autoGeneratePlan();
-    router.replace("/(tabs)/planner");
+    router.push("/(tabs)/preferences?flow=fresh");
   };
 
   const sheetPaddingBottom = Platform.OS === "web" ? 32 : insets.bottom + 20;
@@ -89,9 +86,9 @@ export default function SortHubScreen() {
 
         <View style={styles.sheetHeader}>
           <View style={styles.sheetHeaderText}>
-            <Text style={[styles.sheetTitle, { color: C.text }]}>What do you want to update?</Text>
+            <Text style={[styles.sheetTitle, { color: C.text }]}>What do you want to change?</Text>
             <Text style={[styles.sheetSub, { color: C.textSecondary }]}>
-              Pick one and we'll do the rest.
+              Pick one — we'll handle the rest.
             </Text>
           </View>
           <TouchableOpacity
@@ -103,13 +100,20 @@ export default function SortHubScreen() {
           </TouchableOpacity>
         </View>
 
+        <View style={styles.helperRow}>
+          <Feather name="edit-2" size={12} color={C.textMuted} />
+          <Text style={[styles.helperText, { color: C.textMuted }]}>
+            Tweak your week — without starting over.
+          </Text>
+        </View>
+
         <View style={styles.options}>
           <OptionCard
             icon="calendar"
             accentColor={C.primary}
             bgColor={C.tealTint}
             title="Meals"
-            sub="Change dinners, preferences, or budget level"
+            sub="Change meals, preferences or budget level"
             btnLabel="Update meals"
             onPress={handleMeals}
           />
@@ -118,18 +122,18 @@ export default function SortHubScreen() {
             accentColor={C.gold}
             bgColor="#FEF3C7"
             title="Money"
-            sub="Update your weekly numbers or savings goal"
-            btnLabel="Update money"
+            sub="Update your weekly numbers"
+            btnLabel="Update budget"
             onPress={handleMoney}
           />
           <OptionCard
             icon="refresh-cw"
             accentColor={C.plum}
             bgColor="#F3ECF5"
-            title="Both"
-            sub="Rebuild the whole week from scratch"
+            title="Start fresh"
+            sub="Rebuild your full week from scratch"
             btnLabel="Redo my week"
-            onPress={handleBoth}
+            onPress={handleStartFresh}
           />
         </View>
 
@@ -175,7 +179,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "flex-start",
     justifyContent: "space-between",
-    marginBottom: 20,
+    marginBottom: 10,
   },
   sheetHeaderText: {
     flex: 1,
@@ -194,6 +198,17 @@ const styles = StyleSheet.create({
   },
   closeBtn: {
     marginTop: 2,
+  },
+  helperRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 5,
+    marginBottom: 16,
+  },
+  helperText: {
+    fontSize: 12,
+    fontFamily: "Inter_400Regular",
+    fontStyle: "italic",
   },
   options: {
     gap: 12,
