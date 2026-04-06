@@ -16,6 +16,8 @@ export interface OnboardingState {
   hasMealsSetup: boolean;
   hasMoneySetup: boolean;
   moneySetup: MoneySetupData | null;
+  lastPlannedWeekKey: string | null;
+  lastUpdatedAt: string | null;
 }
 
 const KEY = '@sortii_onboarding_v2';
@@ -26,6 +28,8 @@ const DEFAULT_STATE: OnboardingState = {
   hasMealsSetup: false,
   hasMoneySetup: false,
   moneySetup: null,
+  lastPlannedWeekKey: null,
+  lastUpdatedAt: null,
 };
 
 export async function getOnboardingState(): Promise<OnboardingState> {

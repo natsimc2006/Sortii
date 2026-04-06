@@ -17,6 +17,8 @@ import { usePlanner } from "@/context/PlannerContext";
 import { useLocale } from "@/context/LocaleContext";
 import { useUserWeek } from "@/context/UserWeekContext";
 import { buildYourWeek, QuickFix } from "@/utils/yourWeekEngine";
+import { getCurrentWeekKey } from "@/utils/weekKey";
+import { WeeklyResetCard } from "@/components/WeeklyResetCard";
 
 const C = Colors.light;
 const sortiiLogo = require("@/assets/images/sortii-logo-orange.png");
@@ -87,9 +89,18 @@ function SuggestionRow({ fix }: { fix: QuickFix }) {
 export default function YourWeekScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { currentPlan, getRecipeById, preferences } = usePlanner();
+  const { currentPlan, getRecipeById, preferences, isOnboarded } = usePlanner();
   const { currencySymbol } = useLocale();
-  const { weeklyMode, goal, hasMealsSetup, hasMoneySetup, money } = useUserWeek();
+  const {
+    weeklyMode,
+    goal,
+    hasMealsSetup,
+    hasMoneySetup,
+    money,
+    lastPlannedWeekKey,
+    updateWeekKey,
+    resetUserWeek,
+  } = useUserWeek();
 
   const filledMeals = currentPlan.filter((e) => e.recipeId);
   const totalSlots = currentPlan.length;
@@ -133,6 +144,27 @@ export default function YourWeekScreen() {
       weeklyMode ?? "balanced"
     ] ?? "Stay on track";
 
+  const showResetCard =
+    (hasMealsSetup || hasMoneySetup) &&
+    lastPlannedWeekKey !== null &&
+    lastPlannedWeekKey !== getCurrentWeekKey();
+
+  const handleReuse = () => {
+    updateWeekKey();
+  };
+
+  const handleTweak = () => {
+    if (hasMoneySetup) {
+      router.push("/money-setup");
+    } else {
+      router.push("/preferences");
+    }
+  };
+
+  const handleStartFresh = () => {
+    resetUserWeek();
+  };
+
   const paddingTop = Platform.OS === "web" ? 24 : insets.top + 8;
   const paddingBottom = Platform.OS === "web" ? 60 : insets.bottom + 40;
 
@@ -165,6 +197,16 @@ export default function YourWeekScreen() {
           <Feather name="sliders" size={18} color={C.primary} />
         </TouchableOpacity>
       </View>
+
+      {showResetCard && (
+        <WeeklyResetCard
+          hasMealsSetup={hasMealsSetup}
+          hasMoneySetup={hasMoneySetup}
+          onReuse={handleReuse}
+          onTweak={handleTweak}
+          onStartFresh={handleStartFresh}
+        />
+      )}
 
       <View style={styles.heroSection}>
         <Text style={[styles.heroHeadline, { color: C.text }]}>{week.headline}</Text>
@@ -331,14 +373,25 @@ export default function YourWeekScreen() {
           <Text style={[styles.emptySub, { color: C.textSecondary }]}>
             Choose what you want to sort — meals, money, or both.
           </Text>
-          <TouchableOpacity
-            onPress={goToOnboarding}
-            activeOpacity={0.85}
-            style={[styles.primaryCta, { backgroundColor: C.gold }]}
-          >
-            <Text style={styles.primaryCtaText}>Get started</Text>
-            <Feather name="arrow-right" size={18} color="#fff" />
-          </TouchableOpacity>
+          {isOnboarded ? (
+            <TouchableOpacity
+              onPress={goToMoneySetup}
+              activeOpacity={0.85}
+              style={[styles.primaryCta, { backgroundColor: C.gold }]}
+            >
+              <Text style={styles.primaryCtaText}>Redo my week</Text>
+              <Feather name="arrow-right" size={18} color="#fff" />
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity
+              onPress={goToOnboarding}
+              activeOpacity={0.85}
+              style={[styles.primaryCta, { backgroundColor: C.gold }]}
+            >
+              <Text style={styles.primaryCtaText}>Get started</Text>
+              <Feather name="arrow-right" size={18} color="#fff" />
+            </TouchableOpacity>
+          )}
         </View>
       )}
 

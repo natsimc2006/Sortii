@@ -177,6 +177,7 @@ export default function OnboardingScreen() {
   const {
     setWeeklyMode: setContextWeeklyMode,
     setHasMealsSetup: setContextHasMealsSetup,
+    updateWeekKey,
   } = useUserWeek();
   const insets = useSafeAreaInsets();
   const [step, setStep] = useState<OnboardingStep>(0);
@@ -248,6 +249,7 @@ export default function OnboardingScreen() {
     await updateOnboardingState({ hasMealsSetup: true, scope, weeklyMode });
     setContextWeeklyMode(weeklyMode);
     setContextHasMealsSetup(true);
+    updateWeekKey();
     autoGeneratePlan(newPrefs);
     setStep(11);
   };
@@ -299,6 +301,7 @@ export default function OnboardingScreen() {
       await updateOnboardingState({ hasMealsSetup: true, scope, weeklyMode });
       setContextWeeklyMode(weeklyMode);
       setContextHasMealsSetup(true);
+      updateWeekKey();
       autoGeneratePlan(newPrefs);
       router.replace("/money-setup");
       return;

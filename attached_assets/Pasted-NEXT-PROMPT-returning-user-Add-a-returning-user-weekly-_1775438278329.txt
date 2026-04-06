@@ -1,0 +1,94 @@
+NEXT PROMPT (returning user)
+Add a returning-user weekly reset flow to my Sortii React Native / Expo app.
+Context:
+	∙	I already have persistence using AsyncStorage
+	∙	I already have UserWeekContext storing:
+	∙	weeklyMode
+	∙	goal
+	∙	hasMealsSetup
+	∙	hasMoneySetup
+	∙	meals
+	∙	money
+	∙	I already have a Home / Your Week screen
+	∙	I want a simple MVP weekly reset experience for returning users
+	∙	Do NOT redesign the app
+	∙	Keep implementation clean and modular
+Goal:
+	∙	Detect when a saved user opens the app in a new calendar week
+	∙	Show a lightweight weekly reset prompt on the home screen
+	∙	Let them reuse last week, tweak it, or start fresh
+	1.	Extend persisted context state
+Add:
+	∙	lastPlannedWeekKey: string | null
+	∙	lastUpdatedAt: string | null
+Persist both with the rest of the user week data.
+	2.	Add a week key utility
+Create a helper function like:
+getCurrentWeekKey()
+It should return a simple string for the current calendar week, such as:
+2026-W15
+This does not need to be perfect ISO week logic for MVP, but should be consistent.
+	3.	Determine whether to show the weekly reset prompt
+On the Home / Your Week screen:
+	∙	if user has saved setup (meals and/or money)
+	∙	and lastPlannedWeekKey is different from getCurrentWeekKey()
+	∙	show a weekly reset prompt card at the top of the home screen
+If there is no saved setup, do not show the prompt.
+	4.	Create a reusable WeeklyResetCard component
+Add a component with:
+Title:
+	∙	New week, same you?
+Body:
+	∙	Reuse last week’s setup, tweak it, or start fresh.
+Buttons:
+	∙	Reuse last week
+	∙	Tweak this week
+	∙	Start fresh
+Keep styling aligned with the existing Sortii card system:
+	∙	rounded card
+	∙	calm spacing
+	∙	no heavy modal unless simple to implement
+	∙	friendly premium tone
+	5.	Button behaviour
+Reuse last week:
+	∙	keep all saved setup values as they are
+	∙	update lastPlannedWeekKey to the current week
+	∙	update lastUpdatedAt to now
+	∙	hide the reset prompt
+Tweak this week:
+	∙	navigate user into setup flow
+	∙	prefill onboarding/setup screens with existing saved values where possible
+	∙	update lastPlannedWeekKey only after they complete setup again
+Start fresh:
+	∙	call resetUserWeek()
+	∙	send user to onboarding or show empty-state home
+	6.	Home screen integration
+Render WeeklyResetCard above the YourWeekCard when needed.
+Do not block the whole app with a modal.
+Keep it as a lightweight top card for MVP.
+	7.	Keep UX simple
+	∙	same week = no prompt
+	∙	new week + saved setup = show prompt
+	∙	no saved setup = no prompt
+	8.	Optional nice touch
+After Reuse last week, show a subtle confirmation line or state like:
+	∙	Done — your week’s back on track.
+Do not overcomplicate with animations unless easy.
+	9.	Preserve current behaviour
+Do not break:
+	∙	persistence
+	∙	existing home screen
+	∙	existing onboarding flow
+	∙	Your Week engine logic
+Add this as a calm returning-user layer on top.
+
+When navigating to setup for "Tweak this week":
+- pass current context values as route params or read from context directly
+- money setup screen should pre-populate all number fields from saved money object
+- meal setup screen should pre-populate household size, budget level, and dinnersPlanned
+- do NOT reset hasMealsSetup or hasMoneySetup during tweaking — only update after save
+
+WeeklyResetCard button copy should adapt to setup scope:
+- if hasMealsSetup only: body = "Reuse your meal plan, tweak it, or start fresh."
+- if hasMoneySetup only: body = "Reuse your budget setup, tweak it, or start fresh."
+- if both: body = "Reuse last week's setup, tweak it, or start fresh." (as written)

@@ -1,10 +1,12 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import {
   WeeklyMode,
+  clearOnboardingState,
   getOnboardingState,
   updateOnboardingState,
 } from '@/utils/onboardingState';
 import { WeekGoal } from '@/utils/yourWeekEngine';
+import { getCurrentWeekKey } from '@/utils/weekKey';
 
 export type { WeekGoal };
 
@@ -22,11 +24,15 @@ interface UserWeekContextType {
   hasMealsSetup: boolean;
   hasMoneySetup: boolean;
   money: MoneyInput | null;
+  lastPlannedWeekKey: string | null;
+  lastUpdatedAt: string | null;
   isLoaded: boolean;
   setWeeklyMode: (mode: WeeklyMode) => void;
   setGoal: (goal: WeekGoal) => void;
   setHasMealsSetup: (v: boolean) => void;
   setMoney: (money: MoneyInput) => void;
+  updateWeekKey: () => void;
+  resetUserWeek: () => void;
 }
 
 const UserWeekContext = createContext<UserWeekContextType>({
@@ -35,11 +41,15 @@ const UserWeekContext = createContext<UserWeekContextType>({
   hasMealsSetup: false,
   hasMoneySetup: false,
   money: null,
+  lastPlannedWeekKey: null,
+  lastUpdatedAt: null,
   isLoaded: false,
   setWeeklyMode: () => {},
   setGoal: () => {},
   setHasMealsSetup: () => {},
   setMoney: () => {},
+  updateWeekKey: () => {},
+  resetUserWeek: () => {},
 });
 
 export function UserWeekProvider({ children }: { children: React.ReactNode }) {
@@ -48,6 +58,8 @@ export function UserWeekProvider({ children }: { children: React.ReactNode }) {
   const [hasMealsSetup, setHasMealsSetupState] = useState(false);
   const [hasMoneySetup, setHasMoneySetupState] = useState(false);
   const [money, setMoneyState] = useState<MoneyInput | null>(null);
+  const [lastPlannedWeekKey, setLastPlannedWeekKey] = useState<string | null>(null);
+  const [lastUpdatedAt, setLastUpdatedAt] = useState<string | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
@@ -63,6 +75,8 @@ export function UserWeekProvider({ children }: { children: React.ReactNode }) {
           eatingOutWeekly: state.moneySetup.eatingOut,
         });
       }
+      if (state.lastPlannedWeekKey) setLastPlannedWeekKey(state.lastPlannedWeekKey);
+      if (state.lastUpdatedAt) setLastUpdatedAt(state.lastUpdatedAt);
       setIsLoaded(true);
     });
   }, []);
@@ -95,6 +109,25 @@ export function UserWeekProvider({ children }: { children: React.ReactNode }) {
     });
   };
 
+  const updateWeekKey = () => {
+    const weekKey = getCurrentWeekKey();
+    const now = new Date().toISOString();
+    setLastPlannedWeekKey(weekKey);
+    setLastUpdatedAt(now);
+    updateOnboardingState({ lastPlannedWeekKey: weekKey, lastUpdatedAt: now });
+  };
+
+  const resetUserWeek = () => {
+    setWeeklyModeState(null);
+    setGoalState('none');
+    setHasMealsSetupState(false);
+    setHasMoneySetupState(false);
+    setMoneyState(null);
+    setLastPlannedWeekKey(null);
+    setLastUpdatedAt(null);
+    clearOnboardingState();
+  };
+
   return (
     <UserWeekContext.Provider
       value={{
@@ -103,11 +136,15 @@ export function UserWeekProvider({ children }: { children: React.ReactNode }) {
         hasMealsSetup,
         hasMoneySetup,
         money,
+        lastPlannedWeekKey,
+        lastUpdatedAt,
         isLoaded,
         setWeeklyMode,
         setGoal,
         setHasMealsSetup,
         setMoney,
+        updateWeekKey,
+        resetUserWeek,
       }}
     >
       {children}

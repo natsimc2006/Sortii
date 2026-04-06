@@ -77,7 +77,7 @@ export default function MoneySetupScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { currencySymbol, locale } = useLocale();
-  const { setMoney, setGoal: setContextGoal } = useUserWeek();
+  const { money: savedMoney, setMoney, setGoal: setContextGoal, updateWeekKey } = useUserWeek();
 
   const [weeklyIncome, setWeeklyIncome] = useState("");
   const [fixedCosts, setFixedCosts] = useState("");
@@ -91,6 +91,16 @@ export default function MoneySetupScreen() {
     getOnboardingState().then((state) => {
       setHasMealsSetup(state.hasMealsSetup);
     });
+  }, []);
+
+  useEffect(() => {
+    if (savedMoney) {
+      if (savedMoney.weeklyIncome > 0) setWeeklyIncome(String(savedMoney.weeklyIncome));
+      if (savedMoney.fixedWeeklyCosts > 0) setFixedCosts(String(savedMoney.fixedWeeklyCosts));
+      if (savedMoney.groceriesWeekly > 0) setGroceries(String(savedMoney.groceriesWeekly));
+      if (savedMoney.eatingOutWeekly && savedMoney.eatingOutWeekly > 0)
+        setEatingOut(String(savedMoney.eatingOutWeekly));
+    }
   }, []);
 
   const income = parseFloat(weeklyIncome) || 0;
@@ -109,6 +119,7 @@ export default function MoneySetupScreen() {
       eatingOutWeekly: eating,
     });
     setContextGoal(selectedGoal);
+    updateWeekKey();
     setTimeout(() => {
       router.replace("/your-week");
     }, 400);
