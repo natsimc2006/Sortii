@@ -1,0 +1,87 @@
+Refine the Sortii weekly update flow so there is one clear, intuitive way for users to change their week, and ensure all preference update paths correctly affect meal pricing and weekly outputs.
+
+Current issue:
+- The top-right preferences icon on the planner appears to open a settings flow that does NOT consistently update meal price outcomes
+- The centre bottom navigation action opens a different “Let’s sort your week / Redo my week” page that DOES affect pricing outcomes
+- This is confusing because there appear to be two different ways to change the week, but they do not behave the same
+- The current “Let’s sort your week” page also feels too vague and not clear enough for users
+
+Goals:
+1. Make the update flow simpler and clearer
+2. Ensure all preference edit paths update the same source of truth
+3. Ensure both entry points correctly affect meal pricing and planner results
+4. Make the centre action feel purposeful, not confusing
+
+Please make these changes:
+
+1. Unify preference state + regeneration logic
+- Ensure both:
+  - the planner top-right preferences icon
+  - the centre bottom action
+  route into the same underlying weekly setup state and regeneration logic
+- Saving changes from either path must update meal pricing, plan generation, and weekly summaries consistently
+- Remove any duplicate or disconnected preference state paths
+
+2. Reposition the centre bottom action
+- The centre bottom button should represent the app’s main action:
+  “Sort / Re-sort my week”
+- It should not behave like a confusing home button
+- Keep it central and visually important, but clarify its purpose
+
+3. Replace the current vague “Let’s sort your week / Redo my week” full screen
+- Replace it with a much clearer update hub or bottom sheet
+- Use this structure:
+
+Title:
+“What do you want to update?”
+
+Subline:
+“Pick one and we’ll do the rest.”
+
+Three clear options:
+- Meals
+  - “Change dinners, preferences, or budget level”
+  - button: “Update meals”
+- Money
+  - “Update your weekly numbers or savings goal”
+  - button: “Update money”
+- Both
+  - “Rebuild the whole week from scratch”
+  - button: “Redo my week”
+
+Add a simple Close / Cancel option
+
+4. Top-right planner icon behaviour
+- Keep the top-right icon as “Preferences”
+- It should open meal preferences/defaults
+- Saving changes here must trigger the same weekly regeneration logic as the main update flow
+- Do not let this be a disconnected settings-only screen
+
+5. Navigation cleanup
+- Ensure bottom navigation remains:
+  - Planner
+  - Recipes
+  - Sort (centre hero action)
+  - Shopping
+  - Money
+  - Saved
+- Do not turn the centre action into a misleading house/home button
+- If icons are mismatched, correct them
+
+6. UX goal
+- Users should clearly understand:
+  - where to tweak meals
+  - where to tweak money
+  - how to redo the whole week
+- There should not be two conflicting preference flows
+
+7. Preserve visual style
+- Keep existing Sortii styling
+- Maintain calm rounded cards, premium spacing, and the current colour system
+- Do not redesign the app from scratch
+
+Important:
+After implementing, confirm:
+- whether the top-right planner preferences path now updates meal pricing correctly
+- whether the centre action now uses the same shared weekly setup state
+- what files/components were changed

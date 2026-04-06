@@ -250,6 +250,7 @@ export default function PreferencesScreen() {
     "planningMode", "healthStyle", "cookingEffort", "mealVariety",
     "cookingStyle", "cuisinePreference", "mealCoverage", "exclusions",
     "seasonalMode", "minimiseWaste", "leftoversMode", "weekendOverrides",
+    "budgetLevel", "householdSize", "dietType", "kidFriendly", "prepStyle",
   ];
 
   const isPlanAffecting = (a: PlanPreferences, b: PlanPreferences) =>
@@ -270,9 +271,7 @@ export default function PreferencesScreen() {
     };
     await setPreferences(finalPrefs);
     await setIsOnboarded(true);
-    if (isPlanAffecting(finalPrefs, preferences)) {
-      autoGeneratePlan(finalPrefs);
-    }
+    autoGeneratePlan(finalPrefs);
     setPreferencesDirty(false);
     setSavedToast(true);
     setTimeout(() => {

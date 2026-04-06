@@ -3,16 +3,16 @@ import * as Haptics from "expo-haptics";
 import { BlurView } from "expo-blur";
 import { Tabs, useRouter } from "expo-router";
 import React from "react";
-import { Platform, StyleSheet, TouchableOpacity, View, useColorScheme } from "react-native";
+import { Platform, StyleSheet, Text, TouchableOpacity, View, useColorScheme } from "react-native";
 import Colors from "@/constants/Colors";
 
-function HomeTabButton({ style }: { style?: any }) {
+function SortTabButton({ style }: { style?: any }) {
   const router = useRouter();
   const C = Colors.light;
 
   return (
     <TouchableOpacity
-      style={[style, { flex: 1, alignItems: "center", justifyContent: "flex-end", paddingBottom: 4 }]}
+      style={[style, { flex: 1, alignItems: "center", justifyContent: "flex-end", paddingBottom: 2 }]}
       onPress={() => {
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
         router.navigate("/your-week");
@@ -27,7 +27,7 @@ function HomeTabButton({ style }: { style?: any }) {
           backgroundColor: C.primary,
           alignItems: "center",
           justifyContent: "center",
-          marginBottom: Platform.OS === "ios" ? 0 : 4,
+          marginBottom: Platform.OS === "ios" ? 0 : 2,
           shadowColor: C.primary,
           shadowOffset: { width: 0, height: 3 },
           shadowOpacity: 0.28,
@@ -35,8 +35,11 @@ function HomeTabButton({ style }: { style?: any }) {
           elevation: 5,
         }}
       >
-        <Feather name="home" size={20} color="#fff" />
+        <Feather name="sliders" size={19} color="#fff" />
       </View>
+      <Text style={{ fontSize: 10, color: C.primary, fontFamily: "Inter_500Medium", marginTop: 1 }}>
+        Sort
+      </Text>
     </TouchableOpacity>
   );
 }
@@ -99,7 +102,7 @@ export default function TabLayout() {
         name="refresh"
         options={{
           title: "",
-          tabBarButton: (props) => <HomeTabButton style={props.style} />,
+          tabBarButton: (props) => <SortTabButton style={props.style} />,
         }}
       />
       <Tabs.Screen

@@ -85,7 +85,10 @@ export default function RootLayout() {
                   <Stack.Screen name="index" />
                   <Stack.Screen name="(tabs)" />
                   <Stack.Screen name="home" />
-                  <Stack.Screen name="your-week" />
+                  <Stack.Screen
+                    name="your-week"
+                    options={{ presentation: "transparentModal", animation: "slide_from_bottom" }}
+                  />
                   <Stack.Screen name="money-setup" />
                   <Stack.Screen
                     name="preferences"
