@@ -1,7 +1,7 @@
 import { Feather } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
-import React from "react";
+import React, { useMemo } from "react";
 import {
   Platform,
   StyleSheet,
@@ -11,8 +11,25 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Colors from "@/constants/Colors";
+import { usePlanner } from "@/context/PlannerContext";
+import { Recipe, getRecipePrepStyles } from "@/constants/recipes";
 
 const C = Colors.light;
+
+const BUDGET_LABELS: Record<string, string> = {
+  "super-budget": "Super Budget",
+  "budget": "Budget",
+  "standard": "Standard",
+  "premium": "Premium",
+};
+
+type Suggestion = {
+  id: string;
+  icon: string;
+  message: string;
+  cta: string;
+  onPress: () => void;
+};
 
 type OptionConfig = {
   icon: string;
@@ -38,13 +55,30 @@ function OptionCard({ icon, accentColor, bgColor, title, sub, btnLabel, onPress 
         <Text style={[styles.optionTitle, { color: C.text }]}>{title}</Text>
         <Text style={[styles.optionSub, { color: C.textSecondary }]}>{sub}</Text>
       </View>
-      <TouchableOpacity
-        style={[styles.optionBtn, { backgroundColor: accentColor }]}
-        onPress={onPress}
-        activeOpacity={0.85}
-      >
+      <View style={[styles.optionBtn, { backgroundColor: accentColor }]}>
         <Text style={styles.optionBtnText}>{btnLabel}</Text>
-      </TouchableOpacity>
+      </View>
+    </TouchableOpacity>
+  );
+}
+
+function SuggestionCard({ suggestion }: { suggestion: Suggestion }) {
+  return (
+    <TouchableOpacity
+      style={styles.suggestionCard}
+      onPress={suggestion.onPress}
+      activeOpacity={0.88}
+    >
+      <View style={styles.suggestionIcon}>
+        <Feather name={suggestion.icon as any} size={14} color={C.primary} />
+      </View>
+      <View style={styles.suggestionBody}>
+        <Text style={[styles.suggestionMessage, { color: C.text }]}>{suggestion.message}</Text>
+      </View>
+      <View style={styles.suggestionCta}>
+        <Text style={[styles.suggestionCtaText, { color: C.primary }]}>{suggestion.cta}</Text>
+        <Feather name="chevron-right" size={12} color={C.primary} />
+      </View>
     </TouchableOpacity>
   );
 }
@@ -52,6 +86,78 @@ function OptionCard({ icon, accentColor, bgColor, title, sub, btnLabel, onPress 
 export default function AdjustHubScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const { currentPlan, preferences, getRecipeById, estimatedCostBand } = usePlanner();
+
+  const filledMeals = currentPlan.filter((e) => e.recipeId);
+  const hasPlan = filledMeals.length > 0;
+
+  const filledRecipes = useMemo(
+    () => filledMeals.map((e) => getRecipeById(e.recipeId!)).filter(Boolean) as Recipe[],
+    [filledMeals, getRecipeById]
+  );
+
+  const budgetLabel = BUDGET_LABELS[preferences.budgetLevel] ?? "Standard";
+
+  const planSummary = hasPlan
+    ? `${preferences.householdSize} ${preferences.householdSize === 1 ? "person" : "people"} · ${budgetLabel} · ${estimatedCostBand}/wk`
+    : `${preferences.householdSize} ${preferences.householdSize === 1 ? "person" : "people"} · ${budgetLabel}`;
+
+  const suggestions = useMemo<Suggestion[]>(() => {
+    if (filledRecipes.length < 2) return [];
+    const result: Suggestion[] = [];
+
+    const budgetLevel = preferences.budgetLevel;
+    const hasHighCostMeals = filledRecipes.some((r) => r.estimatedCostBand === "high");
+    const isLowBudgetPlan = budgetLevel === "super-budget" || budgetLevel === "budget";
+
+    if (hasHighCostMeals && isLowBudgetPlan) {
+      result.push({
+        id: "budget",
+        icon: "alert-circle",
+        message: "Some meals are over budget. Want cheaper swaps?",
+        cta: "Find cheaper swaps",
+        onPress: () => {
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+          router.replace("/(tabs)/preferences");
+        },
+      });
+    }
+
+    if (result.length < 2) {
+      const avgCookTime =
+        filledRecipes.reduce((sum, r) => sum + (r.cookTimeMinutes ?? 30), 0) / filledRecipes.length;
+      if (avgCookTime > 35) {
+        result.push({
+          id: "time",
+          icon: "clock",
+          message: "Busy week? Your meals average over 35 mins each.",
+          cta: "Switch to faster meals",
+          onPress: () => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            router.replace("/(tabs)/preferences");
+          },
+        });
+      }
+    }
+
+    if (result.length < 2 && filledRecipes.length >= 3) {
+      const hasBatch = filledRecipes.some((r) => getRecipePrepStyles(r).batchCook);
+      if (!hasBatch) {
+        result.push({
+          id: "effort",
+          icon: "zap",
+          message: "No batch meals this week — want to make cooking easier?",
+          cta: "Add a batch meal",
+          onPress: () => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            router.replace("/(tabs)/preferences");
+          },
+        });
+      }
+    }
+
+    return result.slice(0, 2);
+  }, [filledRecipes, preferences.budgetLevel, router]);
 
   const handleClose = () => {
     if (router.canGoBack()) {
@@ -86,7 +192,9 @@ export default function AdjustHubScreen() {
 
         <View style={styles.sheetHeader}>
           <View style={styles.sheetHeaderText}>
-            <Text style={[styles.sheetTitle, { color: C.text }]}>What do you want to change?</Text>
+            <Text style={[styles.sheetTitle, { color: C.text }]}>
+              {hasPlan ? "What do you want to tweak?" : "Let's set up your week"}
+            </Text>
             <Text style={[styles.sheetSub, { color: C.textSecondary }]}>
               Pick one — we'll handle the rest.
             </Text>
@@ -100,12 +208,22 @@ export default function AdjustHubScreen() {
           </TouchableOpacity>
         </View>
 
-        <View style={styles.helperRow}>
-          <Feather name="edit-2" size={12} color={C.textMuted} />
-          <Text style={[styles.helperText, { color: C.textMuted }]}>
-            Tweak your week — without starting over.
-          </Text>
+        <Text style={[styles.helperText, { color: "#777" }]}>
+          Tweak your week — without starting over.
+        </Text>
+
+        <View style={styles.planSummaryRow}>
+          <Feather name="bar-chart-2" size={12} color={C.primary} />
+          <Text style={[styles.planSummaryText, { color: C.textSecondary }]}>{planSummary}</Text>
         </View>
+
+        {suggestions.length > 0 && (
+          <View style={styles.suggestionsBlock}>
+            {suggestions.map((s) => (
+              <SuggestionCard key={s.id} suggestion={s} />
+            ))}
+          </View>
+        )}
 
         <View style={styles.options}>
           <OptionCard
@@ -126,6 +244,11 @@ export default function AdjustHubScreen() {
             btnLabel="Update budget"
             onPress={handleMoney}
           />
+
+          <View style={styles.freshDivider}>
+            <View style={[styles.freshDividerLine, { backgroundColor: C.border }]} />
+          </View>
+
           <OptionCard
             icon="refresh-cw"
             accentColor={C.plum}
@@ -179,7 +302,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "flex-start",
     justifyContent: "space-between",
-    marginBottom: 10,
+    marginBottom: 6,
   },
   sheetHeaderText: {
     flex: 1,
@@ -199,20 +322,78 @@ const styles = StyleSheet.create({
   closeBtn: {
     marginTop: 2,
   },
-  helperRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 5,
-    marginBottom: 16,
-  },
   helperText: {
     fontSize: 12,
     fontFamily: "Inter_400Regular",
-    fontStyle: "italic",
+    marginBottom: 10,
+  },
+  planSummaryRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    backgroundColor: "#F4FAF9",
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 7,
+    marginBottom: 14,
+  },
+  planSummaryText: {
+    fontSize: 12.5,
+    fontFamily: "Inter_500Medium",
+    flex: 1,
+  },
+  suggestionsBlock: {
+    gap: 8,
+    marginBottom: 14,
+  },
+  suggestionCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    backgroundColor: "#F0FAF9",
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: "rgba(37,133,127,0.18)",
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+  },
+  suggestionIcon: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: "#E1F4F3",
+    alignItems: "center",
+    justifyContent: "center",
+    flexShrink: 0,
+  },
+  suggestionBody: {
+    flex: 1,
+  },
+  suggestionMessage: {
+    fontSize: 12.5,
+    fontFamily: "Inter_500Medium",
+    lineHeight: 17,
+  },
+  suggestionCta: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 2,
+    flexShrink: 0,
+  },
+  suggestionCtaText: {
+    fontSize: 11.5,
+    fontFamily: "Inter_600SemiBold",
   },
   options: {
-    gap: 12,
-    marginBottom: 18,
+    gap: 10,
+    marginBottom: 16,
+  },
+  freshDivider: {
+    paddingVertical: 2,
+  },
+  freshDividerLine: {
+    height: 1,
+    borderRadius: 1,
   },
   optionCard: {
     borderRadius: 14,

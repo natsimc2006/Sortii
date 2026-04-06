@@ -1,0 +1,261 @@
+Refine the Sortii mobile app UX to a polished, high-quality product level. This is NOT a redesign. Maintain the existing brand, colours, layout system, and structure. Focus on hierarchy, clarity, responsiveness, and introducing smart, dynamic behaviour that makes the app feel intelligent and helpful.
+
+---
+
+## PRIMARY GOAL
+Elevate the experience from “functional planner” to “smart weekly decision engine”.
+
+Focus areas:
+1. Visual polish and hierarchy
+2. Reduce UI noise
+3. Improve clarity of actions
+4. Introduce dynamic messaging and smart suggestions
+5. Make the app feel responsive to user behaviour
+
+---
+
+## 1. HEADER CLEANUP (REDUCE CLUTTER)
+
+### Current issue
+Too many equal-weight icons in the top right (Saved, Home, Adjust/settings).
+
+### Fix
+- Keep ONLY:
+  - Home icon
+  - Saved (bookmark) icon
+- Remove the Adjust/settings icon from the header (Adjust already exists in bottom nav)
+
+### Styling
+- Ensure icons are evenly spaced
+- Keep visual weight light and minimal
+- Maintain existing icon style
+
+---
+
+## 2. BOTTOM SHEET MICRO-POLISH (ADJUST MODAL)
+
+### Update helper text styling
+Current:
+- italic
+- too faint
+
+### Change to:
+- regular font (not italic)
+- slightly darker grey
+- no icon
+
+Text:
+“Tweak your week — without starting over.”
+
+---
+
+### Improve “Start fresh” separation
+
+Add a subtle divider above the “Start fresh” card OR increase spacing above it.
+
+Goal:
+- Clearly separate:
+  - Safe changes (Meals, Money)
+  - Full reset (Start fresh)
+
+Do NOT make it alarming — just slightly more distinct.
+
+---
+
+## 3. ADJUST SCREEN → MAKE IT A CONTROL CENTRE
+
+### Add a top summary section
+
+At the top of the Adjust screen, before any inputs, display:
+
+Your current plan
+- [Household size]
+- [Budget level]
+- [Estimated weekly cost]
+
+Example:
+Your current plan  
+4 people • Super Budget • ~$113–$133/week
+
+### Behaviour
+- This should dynamically reflect the current planner state
+- Update live if user changes inputs
+
+---
+
+## 4. PLANNER CHIPS → CLEAR INTERACTIVITY
+
+### Current issue
+Chips look slightly interactive but not clearly enough.
+
+### Fix
+- Ensure ALL chips have consistent affordance:
+  - add chevron (›) OR
+  - consistent tap feedback (slight colour change or elevation)
+
+### Behaviour
+- Tapping chips opens relevant Adjust flow:
+  - household size → Meals setup
+  - budget → Meals setup
+  - cost → Money setup
+
+---
+
+## 5. DYNAMIC HEADLINE (MAKE APP FEEL ALIVE)
+
+Update the Adjust modal headline dynamically:
+
+### If user already has a plan:
+“What do you want to tweak?”
+
+### If user has no plan yet:
+“Let’s set up your week”
+
+Subheading remains:
+“Pick one — we’ll handle the rest.”
+
+---
+
+## 6. SMART SUGGESTIONS SYSTEM (CORE FEATURE)
+
+Introduce a new “Smart Suggestions” section inside the Adjust experience.
+
+This should appear:
+- at the top of the Adjust screen (below the summary)
+OR
+- as a highlighted card above the options in the modal
+
+---
+
+### Smart Suggestion Types
+
+#### 1. Budget-Based Suggestion
+
+Trigger:
+- If estimated weekly cost is above “Super Budget” threshold OR user is in Standard/Premium
+
+Show:
+“You’re overspending — want to save this week?”
+
+CTA:
+“Find cheaper swaps”
+
+Behaviour:
+- Opens swap suggestions or applies cost-saving adjustments
+
+---
+
+#### 2. Time-Based Suggestion
+
+Trigger:
+- If meals selected include many long cook times (e.g. >30–40 mins)
+
+Show:
+“Busy week? Want quicker dinners?”
+
+CTA:
+“Switch to faster meals”
+
+Behaviour:
+- Suggest or auto-apply quicker recipes
+
+---
+
+#### 3. Effort-Based Suggestion (optional but preferred)
+
+Trigger:
+- Too many complex meals or no batch meals
+
+Show:
+“Want to make this week easier?”
+
+CTA:
+“Add a batch meal”
+
+---
+
+### Design requirements
+- Use soft card UI consistent with current design
+- Slight highlight colour (teal or soft accent)
+- Should feel helpful, not pushy
+
+---
+
+## 7. SMART SUGGESTION LOGIC (IMPLEMENTATION)
+
+Create a simple rules engine:
+
+Inputs:
+- total weekly cost
+- selected budget tier
+- meal cook times
+- meal complexity tags (quick, batch, etc.)
+
+Outputs:
+- 0–2 suggestions max at a time
+- priority:
+  1. budget
+  2. time
+  3. effort
+
+Do NOT overload user with suggestions.
+
+---
+
+## 8. ADJUST BUTTON VISUAL BALANCE
+
+### Issue
+The Adjust button is slightly too visually heavy compared to other nav items.
+
+### Fix
+- Slightly reduce icon size OR
+- slightly reduce background intensity
+
+Goal:
+- still central and important
+- but not visually dominant or bulky
+
+---
+
+## 9. CONSISTENCY IMPROVEMENTS
+
+### Navigation
+- All screens must have:
+  - back OR close option
+- no dead ends
+
+### Copy tone
+- Keep tone:
+  - calm
+  - helpful
+  - lightly confident
+- avoid overly playful or overly corporate tone
+
+---
+
+## 10. OUTPUT REQUIREMENTS
+
+After implementing:
+
+### Provide summary of:
+- updated components/screens
+- new smart suggestion logic
+- any assumptions made
+
+### Provide manual test checklist including:
+- header icons (Home + Saved)
+- Adjust modal dynamic headline
+- smart suggestions appearing correctly
+- tapping suggestions triggers correct behaviour
+- planner chips navigation
+- Adjust screen summary updating live
+- Start fresh still functioning end-to-end
+
+---
+
+## IMPORTANT
+Do NOT redesign layout or colours.
+Do NOT remove working features.
+Focus on polish, clarity, and intelligence layer.
+
+This is the final step to make the app feel premium and intuitive.

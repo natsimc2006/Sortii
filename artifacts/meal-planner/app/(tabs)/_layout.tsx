@@ -21,21 +21,21 @@ function AdjustTabButton({ style }: { style?: any }) {
     >
       <View
         style={{
-          width: 50,
-          height: 50,
-          borderRadius: 25,
+          width: 46,
+          height: 46,
+          borderRadius: 23,
           backgroundColor: C.primary,
           alignItems: "center",
           justifyContent: "center",
           marginBottom: Platform.OS === "ios" ? 0 : 2,
           shadowColor: C.primary,
           shadowOffset: { width: 0, height: 3 },
-          shadowOpacity: 0.28,
-          shadowRadius: 8,
-          elevation: 5,
+          shadowOpacity: 0.22,
+          shadowRadius: 7,
+          elevation: 4,
         }}
       >
-        <Feather name="edit-2" size={18} color="#fff" />
+        <Feather name="edit-2" size={16} color="#fff" />
       </View>
       <Text style={{ fontSize: 10, color: C.primary, fontFamily: "Inter_500Medium", marginTop: 1 }}>
         Adjust

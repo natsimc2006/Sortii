@@ -512,13 +512,6 @@ export default function PlannerScreen() {
               >
                 <Feather name="home" size={15} color={C.textSecondary} />
               </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => router.push("/(tabs)/preferences")}
-                style={[styles.filterIconBtn, { backgroundColor: C.plumTint, borderWidth: 1.5, borderColor: C.plum }]}
-                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-              >
-                <Feather name="sliders" size={15} color={C.plum} />
-              </TouchableOpacity>
             </View>
           </View>
           <View style={styles.filterChips}>
