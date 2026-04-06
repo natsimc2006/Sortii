@@ -88,6 +88,9 @@ export default function MoneySetupScreen() {
   const [fixedCosts, setFixedCosts] = useState("");
   const [groceries, setGroceries] = useState("");
   const [eatingOut, setEatingOut] = useState("");
+  const [streaming, setStreaming] = useState("");
+  const [coffeeSpend, setCoffeeSpend] = useState("");
+  const [entertainment, setEntertainment] = useState("");
   const [selectedGoal, setSelectedGoal] = useState<WeekGoal>('none');
   const [saving, setSaving] = useState(false);
   const [hasMealsSetup, setHasMealsSetup] = useState(false);
@@ -112,7 +115,13 @@ export default function MoneySetupScreen() {
   const fixed = parseFloat(fixedCosts) || 0;
   const grocery = parseFloat(groceries) || 0;
   const eating = parseFloat(eatingOut) || 0;
-  const discretionary = income > 0 ? Math.max(0, income - fixed - grocery - eating) : null;
+  const streamingVal = parseFloat(streaming) || 0;
+  const coffeeVal = parseFloat(coffeeSpend) || 0;
+  const entertainmentVal = parseFloat(entertainment) || 0;
+  const lifestyleTotal = streamingVal + coffeeVal + entertainmentVal;
+  const discretionary = income > 0
+    ? Math.max(0, income - fixed - grocery - eating - lifestyleTotal)
+    : null;
 
   const handleSave = async () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
@@ -122,6 +131,7 @@ export default function MoneySetupScreen() {
       fixedWeeklyCosts: fixed,
       groceriesWeekly: grocery,
       eatingOutWeekly: eating,
+      otherWeeklySpend: lifestyleTotal > 0 ? lifestyleTotal : undefined,
     });
     setContextGoal(selectedGoal);
     updateWeekKey();
@@ -130,7 +140,7 @@ export default function MoneySetupScreen() {
         autoGeneratePlan();
         router.replace("/(tabs)/planner");
       } else {
-        router.replace("/your-week");
+        router.replace("/(tabs)/money");
       }
     }, 400);
   };
@@ -226,6 +236,43 @@ export default function MoneySetupScreen() {
             helper="Optional, but helpful."
             value={eatingOut}
             onChange={setEatingOut}
+            optional
+            currencySymbol={currencySymbol}
+          />
+        </View>
+
+        <View style={[styles.lifestyleCard, { borderColor: "rgba(37,133,127,0.22)" }]}>
+          <View style={styles.lifestyleHeader}>
+            <Feather name="coffee" size={14} color={C.primary} />
+            <Text style={[styles.lifestyleTitle, { color: C.text }]}>Lifestyle spending</Text>
+            <Text style={[styles.lifestyleOptionalBadge, { color: C.textMuted, backgroundColor: C.chipBg }]}>optional</Text>
+          </View>
+          <Text style={[styles.lifestyleSubtitle, { color: C.textMuted }]}>
+            Adding these gives you a more realistic picture of your week.
+          </Text>
+          <MoneyField
+            label="Streaming & subscriptions"
+            helper="Netflix, Spotify, apps, memberships"
+            value={streaming}
+            onChange={setStreaming}
+            optional
+            currencySymbol={currencySymbol}
+          />
+          <View style={[styles.divider, { backgroundColor: C.border }]} />
+          <MoneyField
+            label="Coffee & café"
+            helper="Coffee runs, snacks, extra café spend"
+            value={coffeeSpend}
+            onChange={setCoffeeSpend}
+            optional
+            currencySymbol={currencySymbol}
+          />
+          <View style={[styles.divider, { backgroundColor: C.border }]} />
+          <MoneyField
+            label="Entertainment"
+            helper="Movies, drinks, weekend fun"
+            value={entertainment}
+            onChange={setEntertainment}
             optional
             currencySymbol={currencySymbol}
           />
@@ -526,6 +573,50 @@ const styles = StyleSheet.create({
   skipText: {
     fontSize: 13,
     fontFamily: "Inter_400Regular",
+  },
+  lifestyleCard: {
+    borderRadius: 18,
+    borderWidth: 1.5,
+    overflow: "hidden",
+    backgroundColor: "#fff",
+    ...Platform.select({
+      web: { boxShadow: "0px 2px 8px rgba(0,0,0,0.05)" },
+      default: {
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.05,
+        shadowRadius: 6,
+        elevation: 1,
+      },
+    }),
+  },
+  lifestyleHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    paddingHorizontal: 18,
+    paddingTop: 16,
+    paddingBottom: 6,
+  },
+  lifestyleTitle: {
+    fontSize: 15,
+    fontFamily: "Inter_600SemiBold",
+    flex: 1,
+  },
+  lifestyleOptionalBadge: {
+    fontSize: 11,
+    fontFamily: "Inter_400Regular",
+    borderRadius: 8,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    overflow: "hidden",
+  },
+  lifestyleSubtitle: {
+    fontSize: 12,
+    fontFamily: "Inter_400Regular",
+    lineHeight: 17,
+    paddingHorizontal: 18,
+    paddingBottom: 8,
   },
   goalCard: {
     borderRadius: 18,

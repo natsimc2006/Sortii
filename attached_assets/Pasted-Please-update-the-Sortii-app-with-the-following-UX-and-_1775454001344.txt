@@ -1,0 +1,238 @@
+Please update the Sortii app with the following UX and flow improvements. Keep the existing Sortii brand, rounded styling, teal-led palette, and soft premium feel. Do not redesign the app. This is a feature refinement and flow-improvement pass.
+
+PRIMARY GOAL
+Make the Money flow more useful and complete, improve CTA flow, and allow faster on-page editing from the Meal Planner without always opening the full preferences screen.
+
+⸻
+
+	1.	ADD OPTIONAL FIELDS TO THE MONEY FILTER
+
+⸻
+
+Please expand the Money / budget preferences screen to include additional OPTIONAL lifestyle spending fields.
+
+These must be clearly marked as optional and should not feel mandatory.
+
+Add optional fields for:
+	•	Streaming services / subscriptions
+	•	Coffee / takeaway / café spend
+	•	Entertainment / fun money
+
+These should:
+	•	sit naturally beneath the core required money inputs
+	•	feel lightweight and skippable
+	•	help the user create a more realistic weekly picture
+	•	not clutter the page
+
+Suggested field labels:
+	•	Streaming & subscriptions (optional)
+	•	Coffee & takeaway (optional)
+	•	Entertainment (optional)
+
+If helpful, include subtle helper text under each field or as section copy, for example:
+	•	“Netflix, Spotify, apps, memberships”
+	•	“Coffee runs, snacks, takeaway extras”
+	•	“Movies, drinks, weekend fun”
+
+Important:
+	•	these fields are optional only
+	•	do not block CTA progression if left empty
+	•	include them in weekly budget calculations only if populated
+
+⸻
+
+	2.	FIX “SEE MY WEEK” CTA DESTINATION
+
+⸻
+
+Current issue:
+The “See my week” button currently routes the user back to the “What do you want to tweak?” menu.
+
+This is incorrect.
+
+Please update the flow so that:
+	•	tapping “See my week” on the Money page takes the user to the Money Sorted page
+	•	it should not return the user to the tweak modal
+	•	this should feel like a forward/progress action, not a backward step
+
+Desired behaviour:
+Money preferences page
+→ tap “See my week”
+→ open Money Sorted page
+
+If there is any intermediate state saving required, do that automatically before navigation.
+
+⸻
+
+	3.	UPDATE THE “SEE MY WEEK” BUTTON COLOUR
+
+⸻
+
+Change the “See my week” CTA button so it uses the same orange/golden tone as the other key CTAs in the app.
+
+Requirements:
+	•	keep the same rounded premium button style
+	•	use the same CTA colour family as the other warm action buttons
+	•	disabled state should still look polished and intentional
+	•	enabled state should feel more alive and clearly actionable
+
+Do not make it neon or harsh.
+Keep it soft, warm, premium, and consistent with Sortii.
+
+⸻
+
+	4.	TOP PLANNER CHIPS: INLINE QUICK-EDIT MENUS
+
+⸻
+
+On the Meal Planner page, update the top chips so they can edit their specific setting inline without opening the full preferences screen.
+
+Current issue:
+Tapping a chip opens the full filter/preferences experience.
+
+Preferred new behaviour:
+Each chip should open a small focused quick-edit menu for that setting only, while keeping the user on the Meal Planner page.
+
+Do this for:
+	•	Household size chip
+	•	Budget level chip
+	•	Weekly cost chip (if appropriate)
+
+⸻
+
+	5.	QUICK-EDIT MENU BEHAVIOUR
+
+⸻
+
+Household size chip
+
+When tapped:
+	•	open a small inline menu, popover, bottom sheet, or compact selector
+	•	allow user to increase/decrease household size directly
+	•	apply the change without sending them into the full Meals preferences flow
+
+Budget level chip
+
+When tapped:
+	•	open a compact selector with options such as:
+	•	Super Budget
+	•	Budget
+	•	Standard
+	•	Premium
+	•	allow immediate update from the planner page
+
+Weekly cost chip
+
+Preferred behaviour:
+	•	tapping this should open a compact Money shortcut menu, not the full Money form
+	•	this could offer:
+	•	“Update weekly spend”
+	•	“Adjust budget settings”
+	•	“Open Money page”
+
+If a fully inline cost editor is too messy, use a small action menu that then routes intelligently.
+
+⸻
+
+	6.	QUICK-EDIT DESIGN REQUIREMENTS
+
+⸻
+
+The quick-edit interactions should:
+	•	feel light and fast
+	•	keep the user anchored on the planner page
+	•	avoid making the page feel cluttered
+	•	use the existing Sortii visual language
+	•	feel like a shortcut, not a second full settings system
+
+Design options can include:
+	•	mini bottom sheet
+	•	dropdown card
+	•	anchored popover
+	•	compact modal
+
+Choose the cleanest option for mobile usability.
+
+Important:
+	•	quick-edit menus must be easy to dismiss
+	•	changes should apply smoothly
+	•	use subtle animation if already supported
+	•	avoid disorienting page jumps
+
+⸻
+
+	7.	KEEP FULL PREFERENCES PAGES AVAILABLE
+
+⸻
+
+Do not remove the full Meals and Money preferences pages.
+
+The new top-chip quick-edit menus should act as shortcuts only.
+
+Users should still be able to access the full preferences flows from:
+	•	Adjust tab
+	•	tweak/change modal
+	•	other deeper edit points where relevant
+
+⸻
+
+	8.	FLOW + STATE LOGIC
+
+⸻
+
+Please ensure:
+	•	chip quick-edits update planner state immediately
+	•	planner reflects changes correctly after update
+	•	weekly cost recalculates if relevant
+	•	any changed settings persist correctly
+	•	CTA routing is not broken
+
+For Money:
+	•	optional fields should be saved when entered
+	•	leaving optional fields blank should not create errors
+	•	“See my week” should always move forward correctly
+
+⸻
+
+	9.	VISUAL CONSISTENCY
+
+⸻
+
+Ensure these updates still feel distinctly Sortii:
+	•	soft rounded shapes
+	•	teal-led structure
+	•	warm orange CTA where relevant
+	•	clean spacing
+	•	premium but friendly tone
+
+The new quick-edit menus should match the app’s current style and not feel like a different component library.
+
+⸻
+
+	10.	OUTPUT REQUIRED AFTER IMPLEMENTATION
+
+⸻
+
+After making the changes, please provide:
+	1.	Summary of changes made
+	2.	Components/screens updated
+	3.	What optional Money fields were added
+	4.	What route the “See my week” button now uses
+	5.	How the planner quick-edit chip interactions were implemented
+	6.	Any assumptions made
+	7.	A short manual test checklist covering:
+	•	optional Money fields appear and are skippable
+	•	optional fields save correctly when used
+	•	“See my week” button goes to Money Sorted page
+	•	“See my week” button uses the orange CTA tone
+	•	household size chip opens quick-edit menu
+	•	budget chip opens quick-edit menu
+	•	weekly cost chip opens correct shortcut/action menu
+	•	planner updates correctly after inline changes
+	•	no broken navigation or state issues
+
+This pass should improve:
+	•	speed of editing
+	•	realism of the money layer
+	•	clarity of CTA flow
+	•	usefulness of the planner page
