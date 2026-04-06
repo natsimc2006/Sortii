@@ -326,11 +326,16 @@ export function PlannerProvider({ children }: { children: React.ReactNode }) {
       return score;
     };
 
-    // Only auto-fill up to mealVariety days (the first N days of the week)
-    const daysToFill = new Set(DAYS.slice(0, p.mealVariety));
+    // Always fill the preference-set days, but also preserve any days the user
+    // has manually added meals to (via zap or manual search) beyond mealVariety.
+    const mealVarietyDays = new Set(DAYS.slice(0, p.mealVariety));
+    const currentlyFilledDays = new Set(
+      currentPlan.filter((e) => e.recipeId != null).map((e) => e.day)
+    );
+    const daysToFill = new Set([...mealVarietyDays, ...currentlyFilledDays]);
 
     const generated = fresh.map((entry) => {
-      // Leave days beyond the selected count as empty — user adds manually
+      // Leave days beyond active set as empty — user adds manually
       if (!daysToFill.has(entry.day)) return entry;
 
       const pool = filterRecipes(p, entry.slot, entry.day, hiddenRecipes, appRecipes);
@@ -379,7 +384,7 @@ export function PlannerProvider({ children }: { children: React.ReactNode }) {
     setPlanHasLimitedVariety(hadToRepeat);
     setCurrentPlan(generated);
     setPreferencesDirtyState(false);
-  }, [preferences, hiddenRecipes, appRecipes, setCurrentPlan]);
+  }, [preferences, currentPlan, hiddenRecipes, appRecipes, setCurrentPlan]);
 
   const clearPlan = useCallback(() => {
     setCurrentPlan(buildEmptyPlan(preferences));
