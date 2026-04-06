@@ -1,13 +1,18 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { AppLocale, detectLocale, getStoredLocale, storeLocale } from '@/utils/locale';
 import { getRecipesForLocale } from '@/utils/recipeService';
+import { formatMoney, formatMoneyRound, formatMoneyRange } from '@/utils/formatMoney';
 import { Recipe } from '@/constants/recipes';
+
+export { formatMoney, formatMoneyRound, formatMoneyRange };
 
 interface LocaleContextType {
   locale: AppLocale;
   currencySymbol: string;
   appRecipes: Recipe[];
   isLocaleLoaded: boolean;
+  formatMoney: (amount: number) => string;
+  formatMoneyRound: (amount: number) => string;
 }
 
 const LocaleContext = createContext<LocaleContextType>({
@@ -15,6 +20,8 @@ const LocaleContext = createContext<LocaleContextType>({
   currencySymbol: 'A$',
   appRecipes: [],
   isLocaleLoaded: false,
+  formatMoney: (amount: number) => `A$${Math.round(amount)}`,
+  formatMoneyRound: (amount: number) => `A$${Math.round(amount)}`,
 });
 
 export function LocaleProvider({ children }: { children: React.ReactNode }) {
@@ -42,8 +49,18 @@ export function LocaleProvider({ children }: { children: React.ReactNode }) {
   const currencySymbol = locale === 'UK' ? '£' : 'A$';
   const appRecipes = getRecipesForLocale(locale) as Recipe[];
 
+  const boundFormatMoney = (amount: number) => formatMoney(amount, locale);
+  const boundFormatMoneyRound = (amount: number) => formatMoneyRound(amount, locale);
+
   return (
-    <LocaleContext.Provider value={{ locale, currencySymbol, appRecipes, isLocaleLoaded }}>
+    <LocaleContext.Provider value={{
+      locale,
+      currencySymbol,
+      appRecipes,
+      isLocaleLoaded,
+      formatMoney: boundFormatMoney,
+      formatMoneyRound: boundFormatMoneyRound,
+    }}>
       {children}
     </LocaleContext.Provider>
   );

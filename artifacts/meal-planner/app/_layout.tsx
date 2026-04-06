@@ -83,6 +83,8 @@ export default function RootLayout() {
                   <Stack.Screen name="index" />
                   <Stack.Screen name="(tabs)" />
                   <Stack.Screen name="home" />
+                  <Stack.Screen name="your-week" />
+                  <Stack.Screen name="money-setup" />
                   <Stack.Screen
                     name="preferences"
                     options={{ presentation: "modal" }}

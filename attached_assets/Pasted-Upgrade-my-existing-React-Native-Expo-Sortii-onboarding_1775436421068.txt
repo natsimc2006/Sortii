@@ -1,0 +1,365 @@
+Upgrade my existing React Native / Expo Sortii onboarding and preference flow so it supports a combined Meals + Money weekly planning experience, while reusing as much of my current meal planner preference UI as possible.
+
+Before building any new Money or Your Week logic, standardise locale/currency handling across the app by reusing the existing locale-aware logic already present in the meal planner layer.
+
+Important context:
+- The meal planner already uses locale-aware behaviour / auto-detected user location
+- I do NOT want a second separate currency system added for the Money layer
+- I want one shared source of truth for locale and currency across the whole app
+
+Requirements:
+1. Find the existing locale / country / currency detection logic already used in the meal planner.
+2. Promote that logic into a shared app-level utility, config, or context if it is not already shared.
+3. Use this shared source of truth for:
+   - Meals screens
+   - Your Week home screen
+   - Money screen
+   - suggestion impacts
+   - any displayed money values
+4. Do NOT hardcode "$" anywhere in new components.
+5. Keep money values numeric in logic/engine files.
+6. Apply currency formatting only in the UI layer using the shared locale/currency helper.
+7. Ensure:
+   - AU uses AUD-style formatting
+   - UK uses GBP-style formatting
+8. Reuse the existing auto-detected locale flow where possible rather than rebuilding detection from scratch.
+9. Keep implementation simple and modular.
+
+Preferred structure:
+- shared locale config file
+- shared formatMoney helper
+- shared country/locale value in existing app context or a small dedicated locale context
+
+Do not redesign the app.
+Do not rebuild the existing meal locale system unless necessary.
+Just refactor it into a shared pattern so both Meal and Money layers use the same source of truth.
+
+Context:
+
+- My app already has:
+  - a home screen
+  - an existing meal preferences/settings screen with sections like:
+    - Quick Setup
+    - Make it yours
+    - Make it smarter
+    - Advanced
+  - a meal planner flow already working
+- I have already updated the home screen in earlier passes to include:
+  - Hero
+  - YourWeekCard
+  - QuickFixSection
+  - HowItHelpsSection
+  - WhatsIncludedSection
+- I do NOT want a total redesign
+- I want to evolve the current setup into a clearer weekly planning flow
+- Keep the current Sortii visual style:
+  - rounded cards
+  - premium white background
+  - teal / gold / plum accents
+  - clean modern spacing
+  - friendly lightly cheeky tone
+
+Goals:
+
+1. Create a single “Get started” flow
+1. Let users choose Meals, Money, or Both
+1. Reuse my existing meal setup UI where possible
+1. Add a lightweight money setup flow
+1. Make onboarding feel fast and low-friction
+1. Land all users on the new “Your Week” home after setup
+1. Support incomplete setup states so users can add the missing layer later
+
+Build the following:
+
+1. Add a simple onboarding flow with these screens
+
+SCREEN 1 — Welcome
+
+- headline: No more “what’s for dinner”
+- subline: Sortii sorts your week in 60 seconds — meals, budget, shopping list. Sorted.
+- support line: Less stress. Fewer takeaways. More money left.
+- CTA: Get started
+- optional tiny line: Takes about a minute. Promise.
+
+SCREEN 2 — Scope chooser
+Headline:
+
+- What are we sorting this week?
+
+Three choice cards:
+
+- Meals
+  - Dinner… sorted.
+- Money
+  - Budget… sorted.
+- Both
+  - Whole week… sorted.
+
+Microcopy:
+
+- You can always add the other later.
+
+Important:
+
+- This screen must determine which setup path the user enters next
+- Keep it visually simple and clear
+- Cards should feel like choices, not settings
+
+SCREEN 3 — Weekly style / intention
+Replace the vague “What feels right for this week?” concept with a clearer version.
+
+Use:
+Headline:
+
+- How do you want this week to feel?
+
+Support line:
+
+- We’ll shape your meals and spending to match.
+
+Three options:
+
+- Keep it easy
+  - Quick meals. Low effort. No overthinking.
+- Stay on track
+  - Balanced meals. Sensible spend.
+- Save where I can
+  - More budget-friendly choices. Fewer extras.
+
+This screen should set a weekly mode or persona that can later influence:
+
+- meal generation
+- savings suggestions
+- tone/microcopy
+
+1. Branch the flow after weekly style selection
+
+PATH A — Meals only
+
+- Route into my existing meal setup screen
+- Reuse my current setup sections and controls wherever possible
+- Do not rebuild from scratch
+- Update copy only where needed to better match the broader weekly-planning positioning
+
+After meal setup is saved:
+
+- go to the new Your Week home
+- home should show meal summary and a soft prompt to add money later
+
+PATH B — Money only
+
+- Route into a new lightweight money setup screen
+- Keep it intentionally simple and non-finance-app-like
+
+Fields:
+
+- Weekly income
+- Fixed weekly costs
+  - helper text: Rent, mortgage, bills, loans — the usual.
+- Groceries (rough weekly spend)
+  - helper text: Ballpark is fine — we’ll do the rest.
+
+-Other weekly spend
+- helper: Coffee, fuel, subscriptions — anything that doesn't fit above.
+
+Optional field:
+
+- Weekly eating out / takeaway budget
+
+CTA:
+
+- See my week
+
+After money setup is saved:
+
+- go to the new Your Week home
+- home should show money summary and a soft prompt to add meals later
+
+PATH C — Both
+
+- Route through:
+1. Meal setup
+1. Then lightweight money setup
+1. Then land on Your Week home
+- Add a short transition between these two steps:
+  - headline: Nice — dinners sorted.
+  - subline: Now let’s make sure the numbers line up.
+  - CTA: Next
+
+1. Refine my existing meal preference screen rather than replacing it
+
+My current meal preference screen already includes sections like:
+
+- Quick Setup
+- Make it yours
+- Make it smarter
+- Advanced
+
+Keep this structure.
+
+Update only:
+
+- headings
+- helper copy
+- hierarchy if needed
+
+Recommended copy updates:
+
+- Quick Setup
+  - Set the basics for your weekly plan.
+- Planning mode
+  - We’ve got this.
+- Household size
+  - We’ll size everything for you.
+- Budget level
+  - No judgement. Just dinner.
+- Meals per week
+  - Even three nights is a win.
+- Dietary preferences
+  - Hard no’s only. We’ll handle the rest.
+- Ingredient exclusions
+  - Tap anything to skip it.
+- Make it yours
+  - Optional — tweak it if you like.
+- Make it smarter
+  - Let us do a bit of thinking for you.
+- Advanced
+  - Extra controls if you want them.
+
+Also:
+
+- Add support for passing the weekly mode / persona into this screen so meal setup can reflect the chosen weekly style
+- Keep all existing toggles/options intact if already working
+
+1. Build the new lightweight money setup screen
+
+This screen should feel like Sortii, not a spreadsheet.
+
+Design:
+
+- use the same rounded card style as the meal setup screen
+- same spacing rhythm
+- same typography feel
+- keep fields minimal
+
+Structure:
+
+- top heading
+- short support line
+- one main setup card
+- CTA button at bottom
+
+Recommended copy:
+Headline:
+
+- Let’s map your week
+
+Support:
+
+- Ballpark is fine. We’re aiming for helpful, not perfect.
+
+Fields:
+
+- Weekly income
+- Fixed weekly costs
+  - helper: Rent, mortgage, bills, loans — the usual.
+- Groceries (rough weekly spend)
+  - helper: Includes the weekly shop — we’ll estimate the dinner share from there.
+- Eating out / takeaway
+  - helper: Optional, but helpful.
+
+Optional small note:
+
+- No spreadsheets required.
+
+1. Support incomplete setup states across the app
+
+Add a simple setup completeness model:
+
+- hasMealsSetup
+- hasMoneySetup
+
+Use this to control:
+
+- routing after onboarding
+- what the home screen shows
+- soft prompts to add the missing layer later
+
+Examples:
+
+- meals only completed:
+  - home prompt: Want to add a budget layer?
+- money only completed:
+  - home prompt: Want dinners planned around this budget?
+- neither fully completed:
+  - home prompt: Let’s sort your week
+- both completed:
+  - full weekly experience
+
+1. Add a setup flow state / routing model
+
+Implement a simple onboarding state that tracks:
+
+- whether the user has completed welcome
+- chosen scope (meals, money, both)
+- chosen weekly mode
+- completed meal setup
+- completed money setup
+
+Keep this simple and local if possible.
+No need for complex global state unless required.
+
+1. Keep the tone consistent throughout
+   Tone rules:
+
+- helpful first
+- cheeky second
+- never vague
+- never judgmental
+- never too finance-heavy
+- avoid generic fintech wording
+
+Use phrases like:
+
+- We’ve got this.
+- Ballpark is fine.
+- No judgement. Just dinner.
+- Takes about a minute. Promise.
+- We’ll do the thinking from here.
+
+1. Reuse existing components wherever possible
+   Prefer adapting current:
+
+- accordion sections
+- option chips
+- save button
+- card wrappers
+- helper text patterns
+
+Only create new components where truly needed for:
+
+- ScopeChooserScreen
+- WeeklyStyleScreen
+- MoneySetupScreen
+- TransitionScreen (between meals and money in Both flow)
+
+1. Deliverables
+   Provide:
+
+- updated onboarding/navigation flow
+- new screen components for:
+  - Welcome
+  - Scope chooser
+  - Weekly style chooser
+  - Money setup
+  - Transition between meal and money setup
+- light updates to existing meal setup screen copy and integration
+- routing logic to land users on Your Week home after setup
+- support for incomplete setup states
+
+Important:
+
+- Do not redesign the whole app
+- Evolve what already exists
+- Keep the flow simple, modular, and buildable
+- Preserve the Sortii brand feel

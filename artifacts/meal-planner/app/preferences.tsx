@@ -21,6 +21,7 @@ import {
   WeekendOverrides,
 } from "@/constants/recipes";
 import { usePlanner } from "@/context/PlannerContext";
+import { useLocale } from "@/context/LocaleContext";
 
 function OptionRow({
   options,
@@ -191,6 +192,7 @@ function SectionBlock({ title, children }: { title: string; children: React.Reac
 
 export default function PreferencesModal() {
   const { preferences, setPreferences, setIsOnboarded, autoGeneratePlan, setPreferencesDirty } = usePlanner();
+  const { currencySymbol } = useLocale();
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const C = Colors.light;
@@ -372,7 +374,7 @@ export default function PreferencesModal() {
               onSelect={(v) => update("budgetLevel", v)}
             />
             {prefs.budgetLevel === "super-budget" && (
-              <Hint text="~$5 per serve. The leanest meals in the collection." />
+              <Hint text={`~${currencySymbol}5 per serve. The leanest meals in the collection.`} />
             )}
           </SectionBlock>
 
@@ -421,7 +423,7 @@ export default function PreferencesModal() {
                 />
               ))}
             </View>
-            <Hint text="Optional — tap anything to exclude it." />
+            <Hint text="Tap anything to skip it." />
           </SectionBlock>
         </TierSection>
 

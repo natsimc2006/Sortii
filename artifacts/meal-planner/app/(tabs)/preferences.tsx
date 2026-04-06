@@ -21,6 +21,7 @@ import {
   WeekendOverrides,
 } from "@/constants/recipes";
 import { usePlanner } from "@/context/PlannerContext";
+import { useLocale } from "@/context/LocaleContext";
 
 const TAB_BAR_HEIGHT = Platform.OS === "web" ? 60 : 49;
 
@@ -205,6 +206,7 @@ function SectionBlock({ title, children }: { title: string; children: React.Reac
 
 export default function PreferencesScreen() {
   const { preferences, setPreferences, setIsOnboarded, autoGeneratePlan, setPreferencesDirty } = usePlanner();
+  const { currencySymbol } = useLocale();
   const insets = useSafeAreaInsets();
   const C = Colors.light;
 
@@ -403,7 +405,7 @@ export default function PreferencesScreen() {
               onSelect={(v) => update("budgetLevel", v)}
             />
             {prefs.budgetLevel === "super-budget" && (
-              <Hint text="~$5 per serve. The leanest meals in the collection." />
+              <Hint text={`~${currencySymbol}5 per serve. The leanest meals in the collection.`} />
             )}
             <Hint text="No judgement. Just dinner." />
           </SectionBlock>
@@ -455,7 +457,7 @@ export default function PreferencesScreen() {
                 />
               ))}
             </View>
-            <Hint text="Optional — tap anything to exclude it." />
+            <Hint text="Tap anything to skip it." />
           </SectionBlock>
         </TierSection>
 
