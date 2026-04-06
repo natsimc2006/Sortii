@@ -415,7 +415,11 @@ export default function OnboardingScreen() {
   if (step === 0) {
     return (
       <View style={[styles.screen, { backgroundColor: C.background, paddingTop }]}>
-        <View style={styles.welcomeContent}>
+        <ScrollView
+          contentContainerStyle={styles.welcomeContent}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+        >
           <Image source={sortiiLogo} style={styles.logo} resizeMode="contain" />
           <Text style={[styles.welcomeHeadline, { color: C.text }]}>
             No more "what's for dinner"{"\n"}Or "what can we afford this week?"
@@ -426,7 +430,7 @@ export default function OnboardingScreen() {
           <Text style={[styles.welcomeSupport, { color: "#6B4A5E" }]}>
             Less stress. Fewer takeaways. More money left.
           </Text>
-        </View>
+        </ScrollView>
         <View style={[styles.welcomeActions, { paddingBottom: paddingBottom + 16 }]}>
           <TouchableOpacity
             onPress={() => {
@@ -845,15 +849,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
   },
   welcomeContent: {
-    flex: 1,
     alignItems: "center",
     justifyContent: "flex-start",
     paddingTop: 20,
+    paddingBottom: 24,
     gap: 14,
   },
   logo: {
-    width: 390,
-    height: 179,
+    width: 507,
+    height: 233,
     marginBottom: 4,
   },
   welcomeHeadline: {
