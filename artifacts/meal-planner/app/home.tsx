@@ -23,8 +23,8 @@ const sortiiLogo = require("@/assets/images/sortii-logo-orange.png");
 const STEPS = [
   {
     icon: "sliders",
-    title: "Tell us about your household",
-    desc: "Tell us who you're feeding and what you've got to spend. Takes 60 seconds.",
+    title: "Tell us about your week",
+    desc: "Who you're feeding and what you want to spend. Takes 60 seconds.",
   },
   {
     icon: "calendar",

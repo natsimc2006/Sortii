@@ -1,0 +1,196 @@
+Refine and tighten my Sortii app to unify Meals + Money into one cohesive weekly experience.
+
+Do NOT redesign the app from scratch.
+Do NOT remove existing functionality.
+This is a refinement pass to fix flow, messaging, and integration.
+
+-----------------------------------
+1. LANDING PAGE UPDATES
+-----------------------------------
+
+Update the hero messaging to reflect both meals and money.
+
+Replace:
+“No more what’s for dinner”
+
+With:
+“No more ‘what’s for dinner’ or ‘where did my money go’”
+
+Update subtext to:
+“Sortii plans your week in 60 seconds — meals, budget, shopping list. Sorted.”
+
+Update “How it works” step 1:
+From:
+“Tell us about your household”
+
+To:
+“Tell us about your week — who you’re feeding and what you want to spend”
+
+Keep steps 2 and 3 mostly unchanged.
+
+-----------------------------------
+2. PREFERENCES FLOW (ADD LIGHT MONEY INPUTS)
+-----------------------------------
+
+Extend the existing setup screen (do NOT create a separate money onboarding).
+
+Add a new section below meals setup:
+
+Section title:
+“Your weekly spend (optional)”
+
+Fields:
+- Groceries (weekly)
+- Eating out / takeaway (optional)
+- Fixed weekly costs (optional, simple single field)
+
+Keep tone:
+“Ballpark is fine — we’re aiming for helpful, not perfect.”
+
+Do NOT overcomplicate with categories.
+
+-----------------------------------
+3. POST-SETUP FLOW (CRITICAL CHANGE)
+-----------------------------------
+
+Currently the app routes users directly to the meal planner.
+
+Change this:
+
+After setup, route users to a new combined home screen:
+“Your Week”
+
+This screen should:
+- summarise meals + money together
+- act as the main entry point
+
+-----------------------------------
+4. ADD “YOUR WEEK” SUMMARY CARD
+-----------------------------------
+
+At the top of the home screen, add:
+
+Title:
+“Your week — sorted”
+
+Content:
+- number of dinners planned
+- estimated dinner cost
+- total grocery spend
+- remaining money
+
+Add a short insight line:
+Example:
+“A little dinner-heavy this week — easy fix 👇”
+or
+“Nice — you’re on track this week.”
+
+-----------------------------------
+5. MONEY PAGE RESTRUCTURE
+-----------------------------------
+
+Update the Money tab to be a proper overview screen.
+
+Remove or replace:
+“Plan dinners around this budget”
+
+Replace with:
+
+Header:
+“Money — sorted”
+
+Subtext:
+“A quick look at your week, with a few easy wins if you want them.”
+
+Add sections:
+
+1. Weekly snapshot
+- income
+- fixed costs
+- groceries
+- eating out
+- remaining
+
+2. Food impact
+- estimated dinner share vs actual
+
+3. Suggestions
+- simple savings ideas
+
+4. Goal reminder
+
+Ensure this page includes:
+- bottom navigation bar
+- consistent colour accents (teal, plum, amber)
+
+-----------------------------------
+6. EMPTY STATE FIX (MONEY PAGE)
+-----------------------------------
+
+Update empty state:
+
+Title:
+“No money setup yet”
+
+Body:
+“Add your weekly numbers to see how your week is tracking.”
+
+Button:
+“Add my numbers”
+
+Also include a close/back option.
+
+-----------------------------------
+7. NAVIGATION CLEANUP
+-----------------------------------
+
+Fix bottom navigation:
+
+- Planner
+- Recipes
+- Home (center action)
+- Shopping
+- Money
+- Saved
+
+Ensure consistency across ALL screens.
+
+The floating refresh button should:
+- remain central
+- but not visually overpower navigation
+
+-----------------------------------
+8. MEAL COSTING BUG CHECK
+-----------------------------------
+
+Review meal pricing logic:
+
+Ensure:
+- budget level (Super Budget / Budget / Standard / Premium) is still applied
+- meal cost calculations are not overridden by money inputs
+- weekly meal cost reflects selected budget level
+
+-----------------------------------
+9. VISUAL CONSISTENCY
+-----------------------------------
+
+Ensure Money screens use:
+- same colour system as meals
+- teal / plum / amber accents
+- same card styles and spacing
+
+Avoid flat/grey look.
+
+-----------------------------------
+
+Goal:
+This should feel like ONE product:
+A weekly planning system that includes both meals and money.
+
+Not two separate tools.
+
+Keep tone:
+- helpful
+- light
+- slightly cheeky
+- not corporate

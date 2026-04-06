@@ -307,21 +307,24 @@ function QuickEditCard({ onPress }: { onPress: () => void }) {
 
 // ─── Empty state ────────────────────────────────────────────
 
-function MoneyEmptyState({ onSetup }: { onSetup: () => void }) {
+function MoneyEmptyState({ onSetup, onBack }: { onSetup: () => void; onBack: () => void }) {
   return (
     <View style={styles.emptyState}>
       <Feather name="dollar-sign" size={40} color={C.border} />
       <Text style={[styles.emptyHeadline, { color: C.text }]}>No money setup yet</Text>
       <Text style={[styles.emptySub, { color: C.textSecondary }]}>
-        Add your weekly income and costs to see your money snapshot.
+        Add your weekly numbers to see how your week is tracking.
       </Text>
       <TouchableOpacity
         onPress={onSetup}
         activeOpacity={0.85}
         style={[styles.emptyBtn, { backgroundColor: C.gold }]}
       >
-        <Text style={styles.emptyBtnText}>Set up my money</Text>
+        <Text style={styles.emptyBtnText}>Add my numbers</Text>
         <Feather name="arrow-right" size={16} color="#fff" />
+      </TouchableOpacity>
+      <TouchableOpacity onPress={onBack} activeOpacity={0.7} style={styles.emptyBack}>
+        <Text style={[styles.emptyBackText, { color: C.textMuted }]}>Maybe later</Text>
       </TouchableOpacity>
     </View>
   );
@@ -342,6 +345,11 @@ export default function MoneyScreen() {
   const goToMoneySetup = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     router.push("/money-setup");
+  };
+
+  const goBack = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    router.push("/your-week");
   };
 
   if (!isLoaded) {
@@ -387,7 +395,7 @@ export default function MoneyScreen() {
       </View>
 
       {!hasMoneySetup ? (
-        <MoneyEmptyState onSetup={goToMoneySetup} />
+        <MoneyEmptyState onSetup={goToMoneySetup} onBack={goBack} />
       ) : (
         <>
           <WeeklySnapshotCard
@@ -672,5 +680,14 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontFamily: "Inter_600SemiBold",
     color: "#fff",
+  },
+  emptyBack: {
+    alignItems: "center",
+    paddingVertical: 4,
+  },
+  emptyBackText: {
+    fontSize: 13,
+    fontFamily: "Inter_400Regular",
+    textDecorationLine: "underline",
   },
 });

@@ -5,10 +5,8 @@ import { Tabs, useRouter } from "expo-router";
 import React from "react";
 import { Platform, StyleSheet, TouchableOpacity, View, useColorScheme } from "react-native";
 import Colors from "@/constants/Colors";
-import { usePlanner } from "@/context/PlannerContext";
 
-function RefreshTabButton({ style }: { style?: any }) {
-  const { autoGeneratePlan } = usePlanner();
+function HomeTabButton({ style }: { style?: any }) {
   const router = useRouter();
   const C = Colors.light;
 
@@ -17,28 +15,27 @@ function RefreshTabButton({ style }: { style?: any }) {
       style={[style, { flex: 1, alignItems: "center", justifyContent: "flex-end", paddingBottom: 4 }]}
       onPress={() => {
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-        router.navigate("/(tabs)/planner");
-        autoGeneratePlan();
+        router.navigate("/your-week");
       }}
       activeOpacity={0.82}
     >
       <View
         style={{
-          width: 52,
-          height: 52,
-          borderRadius: 26,
-          backgroundColor: C.gold,
+          width: 50,
+          height: 50,
+          borderRadius: 25,
+          backgroundColor: C.primary,
           alignItems: "center",
           justifyContent: "center",
           marginBottom: Platform.OS === "ios" ? 0 : 4,
-          shadowColor: "#000",
+          shadowColor: C.primary,
           shadowOffset: { width: 0, height: 3 },
-          shadowOpacity: 0.18,
+          shadowOpacity: 0.28,
           shadowRadius: 8,
-          elevation: 6,
+          elevation: 5,
         }}
       >
-        <Feather name="refresh-cw" size={20} color="#fff" />
+        <Feather name="home" size={20} color="#fff" />
       </View>
     </TouchableOpacity>
   );
@@ -102,7 +99,7 @@ export default function TabLayout() {
         name="refresh"
         options={{
           title: "",
-          tabBarButton: (props) => <RefreshTabButton style={props.style} />,
+          tabBarButton: (props) => <HomeTabButton style={props.style} />,
         }}
       />
       <Tabs.Screen

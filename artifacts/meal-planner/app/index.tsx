@@ -31,7 +31,7 @@ import {
 } from "@/utils/onboardingState";
 
 const C = Colors.light;
-const sortiiLogo = require("@/assets/images/sortii-logo.png");
+const sortiiLogo = require("@/assets/images/sortii-logo-yourweek.png");
 
 const ROTATING_MESSAGES = [
   "Sorting your week…",
@@ -374,10 +374,10 @@ export default function OnboardingScreen() {
         <View style={styles.welcomeContent}>
           <Image source={sortiiLogo} style={styles.logo} resizeMode="contain" />
           <Text style={[styles.welcomeHeadline, { color: C.text }]}>
-            No more{"\n"}"what's for dinner"
+            No more "what's for dinner" or "where did my money go"
           </Text>
           <Text style={[styles.welcomeSub, { color: C.textSecondary }]}>
-            Sortii sorts your week in 60 seconds — meals, budget, shopping list. Sorted.
+            Sortii plans your week in 60 seconds — meals, budget, shopping list. Sorted.
           </Text>
           <Text style={[styles.welcomeSupport, { color: "#6B4A5E" }]}>
             Less stress. Fewer takeaways. More money left.
