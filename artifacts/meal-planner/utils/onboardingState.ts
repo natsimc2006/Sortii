@@ -8,6 +8,7 @@ export interface MoneySetupData {
   fixedWeeklyCosts: number;
   groceries: number;
   eatingOut: number;
+  otherWeeklySpend?: number;
 }
 
 export interface OnboardingState {
@@ -16,6 +17,7 @@ export interface OnboardingState {
   hasMealsSetup: boolean;
   hasMoneySetup: boolean;
   moneySetup: MoneySetupData | null;
+  goal: string | null;
   lastPlannedWeekKey: string | null;
   lastUpdatedAt: string | null;
 }
@@ -28,6 +30,7 @@ const DEFAULT_STATE: OnboardingState = {
   hasMealsSetup: false,
   hasMoneySetup: false,
   moneySetup: null,
+  goal: null,
   lastPlannedWeekKey: null,
   lastUpdatedAt: null,
 };

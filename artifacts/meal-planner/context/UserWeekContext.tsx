@@ -66,15 +66,26 @@ export function UserWeekProvider({ children }: { children: React.ReactNode }) {
     getOnboardingState().then((state) => {
       if (state.weeklyMode) setWeeklyModeState(state.weeklyMode);
       setHasMealsSetupState(state.hasMealsSetup);
-      setHasMoneySetupState(state.hasMoneySetup);
+      if (state.goal) setGoalState(state.goal as WeekGoal);
+
+      // Restore money data — treat as set-up if moneySetup exists with any values,
+      // even if the hasMoneySetup flag somehow didn't persist.
       if (state.moneySetup) {
+        const m = state.moneySetup;
+        const hasValues = m.weeklyIncome > 0 || m.groceries > 0 || m.fixedWeeklyCosts > 0;
+        const isSetup = state.hasMoneySetup || hasValues;
+        setHasMoneySetupState(isSetup);
         setMoneyState({
-          weeklyIncome: state.moneySetup.weeklyIncome,
-          fixedWeeklyCosts: state.moneySetup.fixedWeeklyCosts,
-          groceriesWeekly: state.moneySetup.groceries,
-          eatingOutWeekly: state.moneySetup.eatingOut,
+          weeklyIncome: m.weeklyIncome,
+          fixedWeeklyCosts: m.fixedWeeklyCosts,
+          groceriesWeekly: m.groceries,
+          eatingOutWeekly: m.eatingOut,
+          otherWeeklySpend: m.otherWeeklySpend,
         });
+      } else {
+        setHasMoneySetupState(state.hasMoneySetup);
       }
+
       if (state.lastPlannedWeekKey) setLastPlannedWeekKey(state.lastPlannedWeekKey);
       if (state.lastUpdatedAt) setLastUpdatedAt(state.lastUpdatedAt);
       setIsLoaded(true);
@@ -88,6 +99,7 @@ export function UserWeekProvider({ children }: { children: React.ReactNode }) {
 
   const setGoal = (g: WeekGoal) => {
     setGoalState(g);
+    updateOnboardingState({ goal: g });
   };
 
   const setHasMealsSetup = (v: boolean) => {
@@ -105,6 +117,7 @@ export function UserWeekProvider({ children }: { children: React.ReactNode }) {
         fixedWeeklyCosts: m.fixedWeeklyCosts,
         groceries: m.groceriesWeekly,
         eatingOut: m.eatingOutWeekly ?? 0,
+        otherWeeklySpend: m.otherWeeklySpend,
       },
     });
   };

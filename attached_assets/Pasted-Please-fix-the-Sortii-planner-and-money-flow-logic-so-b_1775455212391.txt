@@ -1,0 +1,280 @@
+Please fix the Sortii planner and money flow logic so budget changes, money persistence, and refresh behaviour work clearly and reliably. Keep the existing Sortii brand, palette, rounded styling, and overall design language. This is a logic, persistence, and UX clarity pass — not a redesign.
+
+PRIMARY GOAL  
+Make the planner feel trustworthy:
+- money settings should persist properly
+- budget chip updates should behave consistently
+- meal plan changes should happen clearly and predictably
+- any refresh/rebuild messaging should feel intentional, not like a weak tip
+
+--------------------------------------------------
+1. FIX MONEY STATE PERSISTENCE
+--------------------------------------------------
+
+Current issue:
+- the Money nav sometimes shows the “No money setup yet” empty state even after the user has entered numbers
+- when returning to the app, Money data does not appear to persist the way meal planner data does
+
+Please fix this so Money settings persist correctly across:
+- app navigation
+- leaving and returning to the app
+- switching between Planner / Adjust / Money / other tabs
+
+Required behaviour:
+- if the user has entered Money values before, those values should be saved and restored
+- the Money nav should open the populated Money page, not the empty state
+- only show the “No money setup yet” empty state if the user genuinely has never completed or saved any money setup
+
+Please review:
+- local storage / persisted state logic
+- route hydration on app load
+- any reset/default logic that may be overwriting saved Money state
+
+Important:
+- Money persistence should work the same way meal planner preferences currently work
+- do not accidentally wipe saved money data when moving between screens
+
+--------------------------------------------------
+2. FIX BUDGET CHIP UPDATE LOGIC ON THE MEAL PLANNER
+--------------------------------------------------
+
+Current issue:
+- the planner top chips now open quick-edit menus nicely
+- but changing budget level is not firing in a clean or reliable way
+
+Observed behaviour:
+- selecting Super Budget / Budget / Standard often leaves the same meals and same price
+- selecting Premium, or switching back from Premium, sometimes triggers a “tap to refresh” style message
+- only after tapping that message do meals and price update
+
+This feels inconsistent and confusing.
+
+Required behaviour:
+Changing the budget chip should trigger a clear and consistent update flow.
+
+--------------------------------------------------
+3. DEFINE CLEAR BUDGET CHANGE RULES
+--------------------------------------------------
+
+Please implement consistent rules for budget-level changes.
+
+When the user changes budget level from the planner chip:
+
+### Rule A: If current meals still fit the new budget
+- update the chip immediately
+- update any calculated labels/pricing immediately
+- no rebuild needed
+- no warning banner needed
+
+### Rule B: If some current meals no longer fit the new budget
+- show a clear rebuild/update prompt
+- make it obvious that the current plan does not match the selected budget
+- allow the user to refresh the week to match the new budget
+
+### Rule C: If the new budget should obviously change meal selection
+- either automatically rebuild the week
+OR
+- show a strong, clear action prompt to rebuild now
+
+Do not leave the user in a half-updated state where:
+- chip says one thing
+- meals still belong to another budget tier
+- price appears unchanged
+- user has to guess what to do next
+
+--------------------------------------------------
+4. PREFERRED UX FOR BUDGET CHIP CHANGES
+--------------------------------------------------
+
+Choose one of these approaches and implement it cleanly:
+
+### Preferred option:
+When the user changes budget tier from the chip:
+- immediately update the tier
+- immediately check whether the current meal plan still fits
+- if not, show a strong inline action bar:
+  “Your current meals don’t match this budget”
+  CTA: “Refresh week”
+
+This action bar should be clearly styled as an action/status message, not like a weak pantry tip.
+
+OR
+
+### Acceptable option:
+Automatically refresh the weekly meal plan as soon as the new budget is selected, with a subtle loading/update state.
+
+If automatic refresh is used:
+- make sure it feels fast and intentional
+- preserve UX clarity
+- avoid jarring full page jumps
+
+Preferred overall principle:
+Budget changes should feel immediate and logical.
+
+--------------------------------------------------
+5. REPLACE THE CURRENT WEAK “TAP TO REFRESH” MESSAGE
+--------------------------------------------------
+
+Current issue:
+The current refresh message/tip feels too weak and too similar to a passive tip.
+
+Please replace it with a clearer UI pattern.
+
+If a rebuild is needed, use a more obvious message block such as:
+
+Headline:
+“Your meals don’t match this budget yet”
+
+Supporting copy:
+“Refresh this week to pull meals that better fit your selected budget.”
+
+CTA:
+“Refresh week”
+
+Alternative shorter version:
+“Selected budget changed — refresh week to update meals and pricing.”
+
+Design requirements:
+- should look like an action/status banner, not a pantry tip
+- must stand out from the other helper/tip components
+- use Sortii styling, but stronger hierarchy
+- CTA must be obvious and easy to tap
+
+--------------------------------------------------
+6. MAKE PRICE UPDATES RELIABLE
+--------------------------------------------------
+
+When budget changes:
+- recalculate the estimated weekly cost correctly
+- ensure cost chip reflects the latest current state
+- do not leave stale price ranges visible
+
+If the plan is not yet refreshed:
+- either keep price range aligned to the current displayed meals
+- OR clearly indicate that a refresh is needed before a new estimate can be shown
+
+Do not let price appear misleadingly unchanged if the budget selection implies a different plan.
+
+--------------------------------------------------
+7. BUDGET TIER MAPPING / PLAN GENERATION LOGIC
+--------------------------------------------------
+
+Please review and tighten the mapping between:
+- Super Budget
+- Budget
+- Standard
+- Premium
+
+Current issue suggests the rules may not be aligned properly.
+
+Review:
+- which recipes belong in which budget bands
+- how current meal plans are validated against selected budget
+- when a plan should be considered compatible vs incompatible
+- whether Premium is currently the only tier triggering a mismatch check
+
+Required:
+- mismatch detection should work consistently for all budget tiers
+- not only when moving to/from Premium
+
+The system should treat all budget changes consistently.
+
+--------------------------------------------------
+8. EMPTY MONEY STATE RULES
+--------------------------------------------------
+
+Refine the empty Money page logic.
+
+Only show:
+“No money setup yet”
+
+if ALL of the following are true:
+- no saved money values exist
+- no money onboarding completed
+- no partial setup is present
+
+If partial values exist:
+- restore them
+- open the populated Money experience or draft state
+- do not throw the user back to an empty onboarding page
+
+--------------------------------------------------
+9. SAVE TIMING / AUTO-SAVE
+--------------------------------------------------
+
+Please make sure Money data is saved at sensible moments, for example:
+- on field change
+- on blur
+- on CTA tap
+- before route transition where needed
+
+The app should not rely only on the final button press if that risks losing data.
+
+Goal:
+- user enters numbers
+- app remembers them reliably
+
+--------------------------------------------------
+10. MANUAL TEST CASES TO SUPPORT
+--------------------------------------------------
+
+Please test and confirm these scenarios:
+
+### Money persistence
+- enter Money values
+- leave the page
+- return via Money nav
+- values are still there
+
+- close app / reload app
+- values are restored
+- Money nav does not show empty state incorrectly
+
+### Budget chip quick edit
+- change Premium → Budget
+- planner responds correctly
+- meals/price update or strong refresh prompt appears
+
+- change Budget → Super Budget
+- planner responds correctly
+- meals/price update or strong refresh prompt appears
+
+- change Standard → Premium
+- planner responds correctly
+- meals/price update or strong refresh prompt appears
+
+### Refresh prompt
+- prompt appears only when needed
+- prompt is clear and action-oriented
+- prompt styling is distinct from pantry tips / passive helper chips
+
+### Price reliability
+- displayed price always matches current displayed plan state
+- no stale estimates after budget changes
+
+--------------------------------------------------
+11. OUTPUT REQUIRED AFTER IMPLEMENTATION
+--------------------------------------------------
+
+After making the changes, please provide:
+
+1. Summary of what was fixed
+2. What was changed in Money persistence
+3. What was changed in budget chip update logic
+4. What rules now determine whether a refresh/rebuild is needed
+5. What component replaced the weak refresh tip
+6. Any assumptions made
+7. A short manual test checklist covering:
+   - Money state persistence
+   - correct empty-state logic
+   - budget chip behaviour across all tiers
+   - refresh prompt clarity
+   - price update accuracy
+   - no broken navigation/state issues
+
+This pass should make the app feel:
+- more trustworthy
+- more intelligent
+- more consistent
+- less confusing
+- more premium
