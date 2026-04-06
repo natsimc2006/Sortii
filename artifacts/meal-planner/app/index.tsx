@@ -431,7 +431,10 @@ export default function OnboardingScreen() {
       <View style={[styles.screen, { backgroundColor: C.background, paddingTop, height: windowHeight }]}>
         <ScrollView
           style={{ flex: 1 }}
-          contentContainerStyle={styles.welcomeContent}
+          contentContainerStyle={[
+            styles.welcomeContent,
+            Platform.OS === 'web' && { paddingBottom: 130 },
+          ]}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
         >
@@ -446,7 +449,22 @@ export default function OnboardingScreen() {
             Less stress. Fewer takeaways. More money left.
           </Text>
         </ScrollView>
-        <View style={[styles.welcomeActions, { paddingBottom: paddingBottom + 16 }]}>
+        <View
+          style={[
+            styles.welcomeActions,
+            { paddingBottom: paddingBottom + 16 },
+            Platform.OS === 'web' && {
+              position: 'fixed' as any,
+              bottom: 0,
+              left: 0,
+              right: 0,
+              backgroundColor: C.background,
+              paddingHorizontal: 24,
+              paddingTop: 12,
+              zIndex: 10,
+            },
+          ]}
+        >
           <TouchableOpacity
             onPress={() => {
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
