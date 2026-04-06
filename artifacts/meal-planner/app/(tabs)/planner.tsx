@@ -925,9 +925,14 @@ export default function PlannerScreen() {
                     <TouchableOpacity
                       key={lvl}
                       onPress={() => {
-                        setPreferences({ ...preferences, budgetLevel: lvl });
-                        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                        setTimeout(() => setActiveChip(null), 220);
+                        const newPrefs = { ...preferences, budgetLevel: lvl };
+                        setPreferences(newPrefs);
+                        autoGeneratePlan(newPrefs);
+                        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                        setTimeout(() => {
+                          setActiveChip(null);
+                          showToast({ message: "Plan updated for new budget", variant: "success" });
+                        }, 220);
                       }}
                       activeOpacity={0.75}
                       style={[

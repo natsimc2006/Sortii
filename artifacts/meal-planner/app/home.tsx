@@ -18,7 +18,7 @@ import { PressableScale } from "@/components/PressableScale";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Colors from "@/constants/Colors";
 
-const sortiiLogo = require("@/assets/images/sortii-logo-orange.png");
+const sortiiLogo = require("@/assets/images/sortii-logo-yourweek.png");
 
 const STEPS = [
   {
@@ -237,11 +237,11 @@ const styles = StyleSheet.create({
     zIndex: 0,
   },
   logoImage: {
-    width: 500,
+    width: 320,
     maxWidth: "92%",
-    height: 230,
-    marginTop: -38,
-    marginBottom: 38,
+    height: 148,
+    marginTop: 0,
+    marginBottom: 16,
     zIndex: 1,
   },
   mainHeadline: {
