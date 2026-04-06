@@ -23,7 +23,7 @@ import {
 import { usePlanner } from "@/context/PlannerContext";
 import { useLocale } from "@/context/LocaleContext";
 
-const TAB_BAR_HEIGHT = Platform.OS === "web" ? 60 : 49;
+const TAB_BAR_HEIGHT = Platform.OS === "web" ? 72 : 58;
 
 function OptionRow({
   options,

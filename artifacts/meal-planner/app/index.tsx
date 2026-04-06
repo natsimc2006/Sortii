@@ -43,7 +43,7 @@ const ROTATING_MESSAGES = [
 
 const MEAL_SETUP_STEPS = 6;
 
-type OnboardingStep = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11;
+type OnboardingStep = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
 
 function ProgressDots({ current, total }: { current: number; total: number }) {
   return (
@@ -222,7 +222,7 @@ export default function OnboardingScreen() {
       clearInterval(interval);
       setGeneratingDone(true);
       setTimeout(() => {
-        router.replace("/your-week");
+        setStep(12 as OnboardingStep);
       }, 900);
     }, 2500);
 
@@ -368,9 +368,53 @@ export default function OnboardingScreen() {
     );
   }
 
+  if (step === 12) {
+    return (
+      <View style={[styles.screen, { backgroundColor: C.background, paddingTop }]}>
+        <View style={styles.generatingCenter}>
+          <View style={[styles.transitionIcon, { backgroundColor: C.tealTint }]}>
+            <Feather name="check" size={36} color={C.primary} />
+          </View>
+          <Text style={[styles.transitionHeadline, { color: C.text }]}>
+            Your week is sorted!
+          </Text>
+          <Text style={[styles.transitionSub, { color: C.textSecondary }]}>
+            Want to see what this means for your budget this week?
+          </Text>
+          <Text style={[styles.transitionHelper, { color: C.textMuted }]}>
+            We can show you how your week looks — food, spending, and what's left.
+          </Text>
+        </View>
+        <View style={[styles.bridgeActions, { paddingBottom: paddingBottom + 8 }]}>
+          <TouchableOpacity
+            onPress={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+              router.replace("/money-setup");
+            }}
+            activeOpacity={0.85}
+            style={[styles.primaryCta, { backgroundColor: C.gold }]}
+          >
+            <Feather name="dollar-sign" size={18} color="#fff" />
+            <Text style={styles.primaryCtaText}>Set my numbers</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              router.replace("/(tabs)/planner");
+            }}
+            activeOpacity={0.7}
+            style={styles.skipBtn}
+          >
+            <Text style={[styles.skipBtnText, { color: C.textMuted }]}>Skip for now</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
+  }
+
   if (step === 0) {
     return (
-      <View style={[styles.screen, { backgroundColor: C.background, paddingTop, paddingBottom }]}>
+      <View style={[styles.screen, { backgroundColor: C.background, paddingTop }]}>
         <View style={styles.welcomeContent}>
           <Image source={sortiiLogo} style={styles.logo} resizeMode="contain" />
           <Text style={[styles.welcomeHeadline, { color: C.text }]}>
@@ -383,7 +427,7 @@ export default function OnboardingScreen() {
             Less stress. Fewer takeaways. More money left.
           </Text>
         </View>
-        <View style={styles.welcomeActions}>
+        <View style={[styles.welcomeActions, { paddingBottom: paddingBottom + 16 }]}>
           <TouchableOpacity
             onPress={() => {
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
@@ -1008,6 +1052,22 @@ const styles = StyleSheet.create({
     textAlign: "center",
     lineHeight: 24,
     maxWidth: 280,
+  },
+  transitionHelper: {
+    fontSize: 14,
+    fontFamily: "Inter_400Regular",
+    textAlign: "center",
+    lineHeight: 21,
+    maxWidth: 280,
+  },
+  bridgeActions: {
+    gap: 12,
+    paddingHorizontal: 4,
+  },
+  skipBtnText: {
+    fontSize: 14,
+    fontFamily: "Inter_400Regular",
+    textAlign: "center",
   },
   stepFooter: {
     gap: 8,

@@ -1,7 +1,7 @@
 import { Feather } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
-import React, { useMemo, useState } from "react";
+import React, { useMemo } from "react";
 import {
   Platform,
   StyleSheet,
@@ -12,7 +12,6 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Colors from "@/constants/Colors";
 import { usePlanner } from "@/context/PlannerContext";
-import { useUserWeek } from "@/context/UserWeekContext";
 import { Recipe, getRecipePrepStyles } from "@/constants/recipes";
 
 const C = Colors.light;
@@ -88,9 +87,6 @@ export default function AdjustHubScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { currentPlan, preferences, getRecipeById, estimatedCostBand } = usePlanner();
-  const { hasMoneySetup } = useUserWeek();
-  const [moneyBridgeDismissed, setMoneyBridgeDismissed] = useState(false);
-  const showMoneyBridge = !hasMoneySetup && !moneyBridgeDismissed;
 
   const filledMeals = currentPlan.filter((e) => e.recipeId);
   const hasPlan = filledMeals.length > 0;
@@ -270,44 +266,6 @@ export default function AdjustHubScreen() {
         </TouchableOpacity>
       </View>
 
-      {showMoneyBridge && (
-        <View style={[styles.bridgeOverlay, { paddingBottom: sheetPaddingBottom }]}>
-          <View style={styles.bridgeInner}>
-            <View style={[styles.bridgeIconBadge, { backgroundColor: C.goldTint }]}>
-              <Feather name="trending-up" size={22} color={C.goldDark} />
-            </View>
-            <Text style={[styles.bridgeTitle, { color: C.text }]}>
-              Want to see what this means for your budget?
-            </Text>
-            <Text style={[styles.bridgeSub, { color: C.textSecondary }]}>
-              We can show you how your week looks — food, spending, and what's left.
-            </Text>
-            <TouchableOpacity
-              onPress={() => {
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-                setMoneyBridgeDismissed(true);
-                router.push("/money-setup");
-              }}
-              style={[styles.bridgePrimary, { backgroundColor: C.gold }]}
-              activeOpacity={0.85}
-            >
-              <Feather name="dollar-sign" size={16} color="#fff" />
-              <Text style={styles.bridgePrimaryText}>Set my numbers</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => {
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                setMoneyBridgeDismissed(true);
-                router.replace("/(tabs)/planner");
-              }}
-              style={styles.bridgeSkip}
-              activeOpacity={0.7}
-            >
-              <Text style={[styles.bridgeSkipText, { color: C.textMuted }]}>Skip for now</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      )}
     </View>
   );
 }
@@ -492,76 +450,6 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
   },
   cancelText: {
-    fontSize: 14,
-    fontFamily: "Inter_400Regular",
-  },
-  bridgeOverlay: {
-    position: "absolute",
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: "#FFFFFF",
-    borderTopWidth: 1.5,
-    borderTopColor: "rgba(37,133,127,0.18)",
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
-    paddingHorizontal: 24,
-    paddingTop: 24,
-    ...Platform.select({
-      web: { boxShadow: "0px -4px 24px rgba(0,0,0,0.10)" },
-      default: {
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: -4 },
-        shadowOpacity: 0.10,
-        shadowRadius: 16,
-        elevation: 16,
-      },
-    }),
-  },
-  bridgeInner: {
-    alignItems: "center",
-    gap: 12,
-  },
-  bridgeIconBadge: {
-    width: 52,
-    height: 52,
-    borderRadius: 26,
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 4,
-  },
-  bridgeTitle: {
-    fontSize: 18,
-    fontFamily: "Inter_600SemiBold",
-    lineHeight: 25,
-    textAlign: "center",
-  },
-  bridgeSub: {
-    fontSize: 14,
-    fontFamily: "Inter_400Regular",
-    lineHeight: 21,
-    textAlign: "center",
-  },
-  bridgePrimary: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-    borderRadius: 14,
-    paddingVertical: 14,
-    paddingHorizontal: 32,
-    marginTop: 4,
-    alignSelf: "stretch",
-    justifyContent: "center",
-  },
-  bridgePrimaryText: {
-    fontSize: 16,
-    fontFamily: "Inter_600SemiBold",
-    color: "#FFFFFF",
-  },
-  bridgeSkip: {
-    paddingVertical: 10,
-  },
-  bridgeSkipText: {
     fontSize: 14,
     fontFamily: "Inter_400Regular",
   },

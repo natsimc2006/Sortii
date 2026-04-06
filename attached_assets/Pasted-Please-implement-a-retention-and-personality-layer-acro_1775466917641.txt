@@ -1,0 +1,130 @@
+Please implement a retention and personality layer across the Sortii app.
+
+Do not redesign the app. Enhance existing flows with smart prompts, nudges, and improved microcopy.
+
+---
+
+1. ADD WEEKLY RETENTION LOOP
+
+---
+
+Implement 3 key moments:
+
+A. MID-WEEK CHECK-IN (trigger after ~3–4 days)
+
+Show banner or card:
+“You’re halfway through — here’s how you’re tracking”
+
+Include:
+
+* meals completed (e.g. 3/7)
+* budget status (on track / slightly over / under)
+* 1 suggestion:
+  e.g. “Fridge night = save ~$15”
+
+---
+
+B. END-OF-WEEK PROMPT
+
+Show:
+“Next week? Want us to do it again in 10 seconds?”
+
+Buttons:
+
+* “Same again”
+* “Tweak it”
+
+---
+
+C. SUNDAY RESET
+
+Show:
+“Ready to sort next week?”
+
+Include:
+
+* pre-filled preferences
+* one-tap regenerate CTA
+
+---
+
+2. ADD LIGHT CHEEKY MICROCOPY (CONTROLLED)
+
+---
+
+Enhance key moments only:
+
+Success states:
+
+* “Dinner? Handled. Go be interesting.”
+* “Future you says thanks.”
+
+Savings:
+
+* “That’s basically a takeaway you didn’t need.”
+
+Empty states:
+
+* “We can’t work magic without numbers… yet.”
+
+CTAs:
+
+* “Fix my week”
+* “Make it better”
+
+IMPORTANT:
+Do NOT add humour to financial inputs or totals.
+
+---
+
+3. ADD “SMART ACTIONS” (HIGH VALUE)
+
+---
+
+Add quick action options:
+
+* “Do it again — but cheaper”
+* “Do it again — but quicker”
+* “Save me $X this week”
+
+These should:
+
+* adjust meals
+* re-run plan logic
+* update pricing instantly
+
+---
+
+4. ADD SAVINGS FEEDBACK LOOP
+
+---
+
+Enhance savings messaging:
+
+Show:
+“You saved ~$X this week vs takeaway”
+
+Also optionally:
+“~$X/month if you keep this up”
+
+---
+
+5. OUTPUT REQUIRED
+
+---
+
+Provide:
+
+1. Where each retention moment was added
+2. Updated microcopy examples used
+3. Smart actions implemented
+4. How savings are calculated/displayed
+5. Any assumptions made
+6. Manual testing checklist
+
+Goal:
+Make the app feel:
+
+* rewarding to return to
+* slightly addictive
+* helpful but with personality

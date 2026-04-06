@@ -62,6 +62,10 @@ export default function TabLayout() {
           borderTopWidth: 1,
           borderTopColor: isDark ? "#222" : "#E8EDE8",
           elevation: 0,
+          height: Platform.OS === "web" ? 72 : undefined,
+        },
+        tabBarItemStyle: {
+          paddingBottom: Platform.OS === "web" ? 8 : 4,
         },
         tabBarBackground: () =>
           isIOS ? (

@@ -403,7 +403,7 @@ export default function ShoppingScreen() {
   };
 
   // ─── FOOTER HEIGHT ───────────────────────────────────────────────────────
-  const TAB_BAR_HEIGHT = Platform.OS === "web" ? 60 : 49;
+  const TAB_BAR_HEIGHT = Platform.OS === "web" ? 72 : 58;
   const footerBottom = TAB_BAR_HEIGHT + (Platform.OS !== "web" ? insets.bottom : 0);
   const footerH = 185 + footerBottom;
 

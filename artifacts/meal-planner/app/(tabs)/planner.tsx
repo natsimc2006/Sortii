@@ -449,7 +449,7 @@ export default function PlannerScreen() {
             ? "Family Friendly"
             : "Standard";
 
-  const TAB_BAR_HEIGHT = Platform.OS === "web" ? 60 : 49;
+  const TAB_BAR_HEIGHT = Platform.OS === "web" ? 72 : 58;
 
   const sharedIngredients = useMemo(() => {
     if (!preferences.minimiseWaste) return [];
