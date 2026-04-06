@@ -296,15 +296,14 @@ export default function PlannerScreen() {
   };
 
   const handleMealRemove = (day: string, slot: MealSlot) => {
-    undoSnapshotRef.current = [...currentPlan];
+    const entry = getEntry(day, slot);
+    const recipe = entry?.recipeId ? getRecipeById(entry.recipeId) ?? null : null;
+    if (!recipe) {
+      setMealSlot(day, slot, null);
+      return;
+    }
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    setMealSlot(day, slot, null);
-    showToast({
-      message: pickRandom(TOAST_CLEAR_MEAL),
-      variant: "undo",
-      actionLabel: "Undo",
-      onAction: handleUndo,
-    });
+    setPendingMealAction({ type: "remove", day, slot, recipe });
   };
 
   const handleMealSwap = (day: string, slot: MealSlot) => {
@@ -748,12 +747,12 @@ export default function PlannerScreen() {
         <View style={[styles.confirmBar, { backgroundColor: C.card, borderTopColor: C.cardBorder }]}>
           <Text style={[styles.confirmTitle, { color: C.text }]}>
             {pendingMealAction.type === "remove"
-              ? "Not feeling this one?"
+              ? "Remove this meal?"
               : "Let's try something else."}
           </Text>
           <Text style={[styles.confirmBody, { color: C.textSecondary }]}>
             {pendingMealAction.type === "remove"
-              ? "We'll line up a replacement."
+              ? "This slot will be cleared."
               : "We'll find a better fit."}
           </Text>
           <View style={styles.confirmBtns}>
@@ -777,7 +776,7 @@ export default function PlannerScreen() {
                 styles.confirmOkText,
                 { color: pendingMealAction.type === "remove" ? C.danger : "#fff" },
               ]}>
-                {pendingMealAction.type === "remove" ? "Replace it" : "Swap it"}
+                {pendingMealAction.type === "remove" ? "Clear this day" : "Swap it"}
               </Text>
             </TouchableOpacity>
           </View>

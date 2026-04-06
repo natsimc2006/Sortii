@@ -405,7 +405,7 @@ export default function ShoppingScreen() {
   // ─── FOOTER HEIGHT ───────────────────────────────────────────────────────
   const TAB_BAR_HEIGHT = Platform.OS === "web" ? 60 : 49;
   const footerBottom = TAB_BAR_HEIGHT + (Platform.OS !== "web" ? insets.bottom : 0);
-  const footerH = 72 + footerBottom;
+  const footerH = 185 + footerBottom;
 
   // ─── Empty state ─────────────────────────────────────────────────────────
   if (allItems.length === 0) {
@@ -505,75 +505,21 @@ export default function ShoppingScreen() {
           </View>
         ))}
 
-        {/* Add your own section */}
-        <View style={styles.section}>
-          <View style={styles.catHeader}>
-            <Text style={styles.catEmoji}>✏️</Text>
-            <View style={styles.flex}>
-              <Text style={[styles.catLabel, { color: C.text }]}>Add your own</Text>
-              <Text style={[styles.addHint, { color: C.textMuted }]}>Toilet paper, snacks, whatever.</Text>
-            </View>
+        {/* Custom added items — input is in sticky footer */}
+        {uncheckedExtras.length > 0 && (
+          <View style={[styles.section, { paddingTop: 0 }]}>
+            {uncheckedExtras.map((extra) => (
+              <ExtraRow
+                key={extra.id}
+                extra={extra}
+                checked={false}
+                onCheck={() => toggleExtraCheck(extra.id)}
+                onDelete={() => deleteExtra(extra.id)}
+                C={C}
+              />
+            ))}
           </View>
-
-          {permDeniedBanner && (
-            <View style={[styles.permBanner, { backgroundColor: C.chipBg }]}>
-              <Text style={[styles.permBannerText, { color: C.primary }]}>
-                Enable microphone access in Settings to use voice input.
-              </Text>
-              <TouchableOpacity onPress={() => setPermDeniedBanner(false)} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
-                <Feather name="x" size={15} color={C.primary} />
-              </TouchableOpacity>
-            </View>
-          )}
-
-          <View style={[styles.addRow, { backgroundColor: C.card, borderColor: C.cardBorder }]}>
-            <TextInput
-              value={isListening ? voiceText : extraInput}
-              onChangeText={isListening ? undefined : setExtraInput}
-              onSubmitEditing={isListening ? undefined : addExtra}
-              placeholder={isListening ? "Listening..." : "Item name"}
-              placeholderTextColor={isListening ? C.primary : C.textMuted}
-              returnKeyType="done"
-              editable={!isListening}
-              style={[
-                styles.addInput,
-                { color: isListening ? C.textSecondary : C.text, fontStyle: isListening ? "italic" : "normal" },
-              ]}
-            />
-            {voiceSupported && (
-              <TouchableOpacity
-                onPress={isListening ? stopListening : startListening}
-                style={[
-                  styles.micBtn,
-                  isListening
-                    ? { backgroundColor: C.primary }
-                    : { backgroundColor: "transparent", borderWidth: 1.5, borderColor: C.primary },
-                ]}
-                activeOpacity={0.75}
-              >
-                <Animated.View style={{ opacity: isListening ? pulseAnim : 1 }}>
-                  <Feather name="mic" size={15} color={isListening ? "#fff" : C.primary} />
-                </Animated.View>
-              </TouchableOpacity>
-            )}
-            <TouchableOpacity
-              onPress={addExtra}
-              style={[styles.addBtn, { backgroundColor: C.primary, opacity: extraInput.trim() && !isListening ? 1 : 0.4 }]}
-            >
-              <Text style={styles.addBtnText}>+ Add</Text>
-            </TouchableOpacity>
-          </View>
-          {uncheckedExtras.map((extra) => (
-            <ExtraRow
-              key={extra.id}
-              extra={extra}
-              checked={false}
-              onCheck={() => toggleExtraCheck(extra.id)}
-              onDelete={() => deleteExtra(extra.id)}
-              C={C}
-            />
-          ))}
-        </View>
+        )}
 
         {/* Already have it */}
         {(checkedItems.length > 0 || checkedExtras.length > 0) && (
@@ -626,6 +572,64 @@ export default function ShoppingScreen() {
           { paddingBottom: 12, bottom: footerBottom, borderTopColor: C.cardBorder, backgroundColor: C.card },
         ]}
       >
+        {/* Add your own — sticky input */}
+        <View style={styles.catHeader}>
+          <Text style={styles.catEmoji}>✏️</Text>
+          <View style={styles.flex}>
+            <Text style={[styles.catLabel, { color: C.text }]}>Add your own</Text>
+            <Text style={[styles.addHint, { color: C.textMuted }]}>Toilet paper, snacks, whatever.</Text>
+          </View>
+        </View>
+
+        {permDeniedBanner && (
+          <View style={[styles.permBanner, { backgroundColor: C.chipBg }]}>
+            <Text style={[styles.permBannerText, { color: C.primary }]}>
+              Enable microphone access in Settings to use voice input.
+            </Text>
+            <TouchableOpacity onPress={() => setPermDeniedBanner(false)} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+              <Feather name="x" size={15} color={C.primary} />
+            </TouchableOpacity>
+          </View>
+        )}
+
+        <View style={[styles.addRow, { backgroundColor: C.background, borderColor: C.cardBorder, marginBottom: 10 }]}>
+          <TextInput
+            value={isListening ? voiceText : extraInput}
+            onChangeText={isListening ? undefined : setExtraInput}
+            onSubmitEditing={isListening ? undefined : addExtra}
+            placeholder={isListening ? "Listening..." : "Item name"}
+            placeholderTextColor={isListening ? C.primary : C.textMuted}
+            returnKeyType="done"
+            editable={!isListening}
+            style={[
+              styles.addInput,
+              { color: isListening ? C.textSecondary : C.text, fontStyle: isListening ? "italic" : "normal" },
+            ]}
+          />
+          {voiceSupported && (
+            <TouchableOpacity
+              onPress={isListening ? stopListening : startListening}
+              style={[
+                styles.micBtn,
+                isListening
+                  ? { backgroundColor: C.primary }
+                  : { backgroundColor: "transparent", borderWidth: 1.5, borderColor: C.primary },
+              ]}
+              activeOpacity={0.75}
+            >
+              <Animated.View style={{ opacity: isListening ? pulseAnim : 1 }}>
+                <Feather name="mic" size={15} color={isListening ? "#fff" : C.primary} />
+              </Animated.View>
+            </TouchableOpacity>
+          )}
+          <TouchableOpacity
+            onPress={addExtra}
+            style={[styles.addBtn, { backgroundColor: C.primary, opacity: extraInput.trim() && !isListening ? 1 : 0.4 }]}
+          >
+            <Text style={styles.addBtnText}>+ Add</Text>
+          </TouchableOpacity>
+        </View>
+
         <TouchableOpacity
           style={[styles.shareBtn, { backgroundColor: C.gold }]}
           onPress={() => { setShareSubView(null); setShareOpen(true); }}
