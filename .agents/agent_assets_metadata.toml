@@ -29,3 +29,9 @@ id = "NTopD53MCSupPad_vDPkT"
 uri = "file://artifacts/meal-planner/data/recipes.json"
 type = "unspecified"
 title = "recipes.json (275 recipes)"
+
+[[outputs]]
+id = "SQ7Tb71uHAe__IQ4NgsyQ"
+uri = "file://.local/exports/sortii-money-page-rules.md"
+type = "text"
+title = "Sortii — Money Page Rules & Logic"
