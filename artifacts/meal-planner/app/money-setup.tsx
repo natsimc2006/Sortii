@@ -3,6 +3,7 @@ import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
+  ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -77,7 +78,7 @@ export default function MoneySetupScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { currencySymbol, locale } = useLocale();
-  const { money: savedMoney, setMoney, setGoal: setContextGoal, updateWeekKey } = useUserWeek();
+  const { money: savedMoney, setMoney, setGoal: setContextGoal, updateWeekKey, isLoaded } = useUserWeek();
 
   const [weeklyIncome, setWeeklyIncome] = useState("");
   const [fixedCosts, setFixedCosts] = useState("");
@@ -129,6 +130,22 @@ export default function MoneySetupScreen() {
 
   const paddingTop = Platform.OS === "web" ? 60 : insets.top;
   const paddingBottom = Platform.OS === "web" ? 40 : insets.bottom + 24;
+
+  if (!isLoaded) {
+    return (
+      <View
+        style={{
+          flex: 1,
+          backgroundColor: C.background,
+          alignItems: "center",
+          justifyContent: "center",
+          paddingTop,
+        }}
+      >
+        <ActivityIndicator color={C.primary} size="large" />
+      </View>
+    );
+  }
 
   return (
     <KeyboardAvoidingView

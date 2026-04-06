@@ -1,0 +1,86 @@
+NEXT STAGE - MONEY PAGE (money control panel page)
+Build a new Money screen for my Sortii React Native / Expo app using the existing Sortii visual style and component language.
+Design goal:
+	∙	This should feel like a light weekly money control panel
+	∙	NOT a full budgeting dashboard
+	∙	Keep it clean, calm, and premium
+	∙	Reuse the existing rounded card style, spacing rhythm, and tabs
+	∙	Keep the tone friendly and lightly cheeky
+Create the screen structure in this order:
+	1.	TopTabs
+	∙	same organiser-tab style as the rest of the app
+	∙	tabs: Your Week, Meals, Money
+	∙	Money tab active
+	2.	MoneyPageHeader
+	∙	title: Money — sorted
+	∙	subtitle: A quick look at your week, with a few easy wins if you want them.
+	3.	WeeklySnapshotCard
+Show:
+	∙	income
+	∙	fixed weekly costs
+	∙	groceries
+	∙	eating out
+	∙	optional other spend
+	∙	remaining
+	∙	state pill / headline
+Use example headline states like:
+	∙	You’re in a good spot this week.
+	∙	A little tight — easy fix though.
+	∙	Slight overspend — easy fix 👇
+	4.	FoodFocusCard
+Show:
+	∙	estimated dinner spend
+	∙	actual dinner plan spend
+	∙	dinner insight line
+Use title:
+	∙	Where groceries are going
+Optional helper text:
+	∙	We estimate dinners from your weekly grocery spend — close enough, not spreadsheet-level.
+	5.	SavingsSuggestionsSection
+Use heading:
+	∙	Easy wins this week
+Render suggestion cards from suggestion data:
+	∙	label
+	∙	impact
+	∙	optional reason
+	6.	GoalProgressCard
+Show a small goal reminder / motivation block if a goal exists.
+Examples:
+	∙	Trip fund ✈️
+	∙	Deposit goal
+	∙	Wedding fund
+	∙	Saving goal
+	7.	QuickEditCard
+Use:
+	∙	title: Need to tweak a number?
+	∙	helper: Groceries, eating out, or fixed costs — easy.
+	∙	button: Update my numbers
+Implementation notes:
+	∙	Do not add graphs or charts
+	∙	Do not make this feel like a traditional budgeting app
+	∙	Keep the page lighter than the Meals page
+	∙	Use existing card styles and button styles where possible
+	∙	Make each section a reusable component
+	∙	Use mock data or current context data if available
+	∙	Keep the layout mobile-first and scrollable
+
+QuickEditCard button behaviour:
+- navigate to MoneySetupScreen in "edit mode"
+- prefill all fields from current context money object
+- on save, update context and navigate back to Money screen
+- show a brief confirmation: "Updated. Your week's been adjusted."
+
+Also guard MoneySetupScreen and MealSetupScreen:
+- if isHydrating, show brief loading placeholder
+- do not render form inputs until hydration is complete
+
+Format suggestion impact as: "Save ~$X" 
+Use gold (#D29A22) for the impact amount to signal opportunity, not alarm.
+
+Remaining amount display:
+- positive remaining: teal (#2A8F88) text
+- negative remaining: red (#B86557) text
+- show as: "$X left this week" or "–$X over this week"
+
+
+

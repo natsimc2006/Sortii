@@ -1,5 +1,12 @@
 import { WeeklyMode } from './onboardingState';
 
+export interface MoneySuggestion {
+  id: string;
+  label: string;
+  impactAmount: number;
+  reason?: string;
+}
+
 export type WeekGoal = 'holiday' | 'house' | 'wedding' | 'general' | 'none';
 export type WeeklyState = 'over' | 'tight' | 'ok' | 'good' | 'great';
 
@@ -143,5 +150,118 @@ export function buildYourWeek(inputs: YourWeekInputs): YourWeekResult {
     suggestions,
     goalNudge: goalNudgeFor(goal),
     weeklyState,
+  };
+}
+
+// ─── Money page ───────────────────────────────────────────────
+
+const MONEY_SUGGESTIONS: MoneySuggestion[] = [
+  {
+    id: 'm1',
+    label: 'Swap one takeaway for a home cook',
+    impactAmount: 25,
+    reason: 'The easiest saving you\'ll make all week.',
+  },
+  {
+    id: 'm2',
+    label: 'Batch one dinner — it covers two nights',
+    impactAmount: 15,
+    reason: 'Cook once, eat twice. Less faff, less cost.',
+  },
+  {
+    id: 'm3',
+    label: 'Pick the cheaper protein this week',
+    impactAmount: 12,
+    reason: 'Chicken thighs beat chicken breast every time.',
+  },
+  {
+    id: 'm4',
+    label: 'One fridge-raid night — skip the shop',
+    impactAmount: 20,
+  },
+  {
+    id: 'm5',
+    label: 'Check the freezer before you shop',
+    impactAmount: 10,
+    reason: 'Avoid buying what you already have.',
+  },
+  {
+    id: 'm6',
+    label: 'Meal-prep lunch instead of buying it',
+    impactAmount: 30,
+    reason: 'Four bought lunches add up faster than you think.',
+  },
+];
+
+export interface MoneyPageResult {
+  weeklyState: WeeklyState | null;
+  snapshotHeadline: string;
+  remaining: number;
+  suggestions: MoneySuggestion[];
+  dinnerInsight: string;
+  estimatedDinnerSpend: number;
+}
+
+function snapshotHeadlineFor(state: WeeklyState): string {
+  switch (state) {
+    case 'over':  return 'Slight overspend — easy fix 👇';
+    case 'tight': return 'A little tight — easy fix though.';
+    case 'ok':    return "Holding steady this week.";
+    case 'good':  return "You're in a good spot this week.";
+    case 'great': return "You're in a great spot this week.";
+  }
+}
+
+export function buildMoneyPage(
+  inputs: YourWeekInputs,
+  dinnerPlanCost: number,
+): MoneyPageResult {
+  const { weeklyMode, goal, hasMealsSetup, money } = inputs;
+
+  if (!money) {
+    return {
+      weeklyState: null,
+      snapshotHeadline: "Add your numbers to see a snapshot.",
+      remaining: 0,
+      suggestions: [],
+      dinnerInsight: 'No dinners planned yet.',
+      estimatedDinnerSpend: 0,
+    };
+  }
+
+  const {
+    weeklyIncome,
+    fixedWeeklyCosts,
+    groceriesWeekly,
+    eatingOutWeekly = 0,
+    otherWeeklySpend = 0,
+  } = money;
+
+  const weeklyState = computeWeeklyState(money);
+  const remaining = weeklyIncome - fixedWeeklyCosts - groceriesWeekly - eatingOutWeekly - otherWeeklySpend;
+
+  const isOver = weeklyState === 'over' || weeklyState === 'tight';
+  const suggestions = isOver ? MONEY_SUGGESTIONS.slice(0, 3) : MONEY_SUGGESTIONS.slice(3, 5);
+
+  const estimatedDinnerSpend = Math.round(groceriesWeekly * 0.65);
+
+  let dinnerInsight: string;
+  if (!hasMealsSetup || dinnerPlanCost === 0) {
+    dinnerInsight = `We estimate dinners take about ${Math.round(65)}% of your grocery spend.`;
+  } else if (dinnerPlanCost < estimatedDinnerSpend) {
+    dinnerInsight = 'Your planned dinners come in under the grocery estimate. Nice.';
+  } else if (dinnerPlanCost > estimatedDinnerSpend * 1.15) {
+    dinnerInsight = 'Your dinner plan is a little over the estimate — a swap or two could help.';
+  } else {
+    dinnerInsight = 'Your planned dinners track close to the estimate. Looks good.';
+  }
+
+  return {
+    weeklyState,
+    snapshotHeadline: snapshotHeadlineFor(weeklyState),
+    remaining,
+    suggestions,
+    dinnerInsight,
+    estimatedDinnerSpend,
   };
 }
