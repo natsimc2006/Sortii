@@ -261,6 +261,8 @@ export default function OnboardingScreen() {
     if (step === 2) { setStep(1); return; }
     if (step === 3) { setStep(2); return; }
     if (step === 10) { setStep(8); return; }
+    // Step 12 is the post-generation money bridge — go back to meal filters
+    if (step === 12) { setStep(8); return; }
     setStep((s) => (s - 1) as OnboardingStep);
   };
 
@@ -337,7 +339,10 @@ export default function OnboardingScreen() {
 
   const paddingTop = Platform.OS === "web" ? 60 : insets.top;
   const paddingBottom = Platform.OS === "web" ? 40 : insets.bottom + 24;
-  const { height: windowHeight } = useWindowDimensions();
+  const { height: windowHeight, width: windowWidth } = useWindowDimensions();
+  // Logo: 72% of window width, capped at 340px — maintains aspect ratio (507:233 ≈ 2.176)
+  const logoWidth = Math.min(Math.round(windowWidth * 0.72), 340);
+  const logoHeight = Math.round(logoWidth / 2.176);
 
   const mealStep = step >= 3 && step <= 8 ? step - 2 : 0;
 
@@ -373,6 +378,13 @@ export default function OnboardingScreen() {
   if (step === 12) {
     return (
       <View style={[styles.screen, { backgroundColor: C.background, paddingTop }]}>
+        <TouchableOpacity
+          onPress={goBack}
+          style={[styles.backBtn, { backgroundColor: C.chipBg, alignSelf: "flex-start", marginBottom: 8 }]}
+          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+        >
+          <Feather name="arrow-left" size={18} color={C.primary} />
+        </TouchableOpacity>
         <View style={styles.generatingCenter}>
           <View style={[styles.transitionIcon, { backgroundColor: C.tealTint }]}>
             <Feather name="check" size={36} color={C.primary} />
@@ -422,7 +434,7 @@ export default function OnboardingScreen() {
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
         >
-          <Image source={sortiiLogo} style={styles.logo} resizeMode="contain" />
+          <Image source={sortiiLogo} style={[styles.logo, { width: logoWidth, height: logoHeight }]} resizeMode="contain" />
           <Text style={[styles.welcomeHeadline, { color: C.text }]}>
             No more "what's for dinner"{"\n"}Or "what can we afford this week?"
           </Text>
