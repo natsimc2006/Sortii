@@ -24,6 +24,7 @@ import {
   MoneyPageResult,
   WeekGoal,
   WeeklyState,
+  LifestyleSpendData,
 } from "@/utils/yourWeekEngine";
 import { getSwapsForRecipe } from "@/utils/getSwapsForRecipe";
 import { SWAP_RULES } from "@/constants/swapRules";
@@ -107,10 +108,16 @@ function StatePill({ state }: { state: WeeklyState | null }) {
 function WeeklySnapshotCard({
   money,
   result,
+  lifestyleSpend,
+  dinnerPlanCost,
+  hasMealsSetup,
   fmt,
 }: {
   money: NonNullable<ReturnType<typeof useUserWeek>["money"]>;
   result: MoneyPageResult;
+  lifestyleSpend: LifestyleSpendData | null;
+  dinnerPlanCost: number;
+  hasMealsSetup: boolean;
   fmt: (n: number) => string;
 }) {
   const { weeklyIncome, fixedWeeklyCosts, groceriesWeekly, eatingOutWeekly, otherWeeklySpend } = money;
@@ -121,6 +128,11 @@ function WeeklySnapshotCard({
   const remainingLabel = isNeg
     ? `${fmt(Math.abs(remaining))} over this week`
     : `${fmt(remaining)} left this week`;
+
+  // lifestyle_combined_callout
+  const ls = lifestyleSpend ?? { streaming: 0, coffee: 0, entertainment: 0 };
+  const lifestyleTotal = ls.streaming + ls.coffee;
+  const showLifestyleCallout = lifestyleTotal > 0;
 
   return (
     <Card>
@@ -141,6 +153,16 @@ function WeeklySnapshotCard({
       )}
       {(otherWeeklySpend ?? 0) > 0 && (
         <SnapshotRow label="Other spend" value={fmt(otherWeeklySpend ?? 0)} muted />
+      )}
+
+      {showLifestyleCallout && (
+        <View style={styles.snapshotRow}>
+          <Text style={[styles.snapshotLabel, { color: C.textMuted, fontStyle: "italic" }]}>
+            {hasMealsSetup && dinnerPlanCost > 0
+              ? `Streaming + coffee: ${fmt(Math.round(lifestyleTotal))}. Dinner plan: ${fmt(Math.round(dinnerPlanCost))}.`
+              : `Streaming + coffee this week: ${fmt(Math.round(lifestyleTotal))}.`}
+          </Text>
+        </View>
       )}
 
       <View style={styles.divider} />
@@ -169,6 +191,7 @@ function FoodFocusCard({
   householdSize,
   hasGroceries,
   hasEatingOutData,
+  coffeeSpend,
   fmt,
 }: {
   estimatedDinnerSpend: number;
@@ -180,20 +203,22 @@ function FoodFocusCard({
   householdSize: number;
   hasGroceries: boolean;
   hasEatingOutData: boolean;
+  coffeeSpend: number;
   fmt: (n: number) => string;
 }) {
-  // Takeaway savings: benchmark $13/person/meal; only show when meals are planned
+  // Takeaway savings: benchmark $13/person/meal
   const TAKEAWAY_PER_PERSON_PER_MEAL = 13;
   const benchmarkTotal = numMeals * householdSize * TAKEAWAY_PER_PERSON_PER_MEAL;
-
-  // If user entered eating-out data, use that (scaled to numMeals); otherwise use benchmark
-  const takeawayComparison = benchmarkTotal;
-  const takeawaySaving = takeawayComparison - dinnerPlanCost;
-
-  // Only show if meals planned, costs known, meaningful saving, AND groceries entered
+  const takeawaySaving = benchmarkTotal - dinnerPlanCost;
   const showSaving = hasMealsSetup && hasGroceries && dinnerPlanCost > 0 && numMeals > 0 && takeawaySaving > 2;
 
-  // Display label for estimated figure (proportional or full-week)
+  // coffee_vs_dinner_comparison
+  const showCoffeeComparison =
+    coffeeSpend > 0 &&
+    hasMealsSetup &&
+    dinnerPlanCost > 0 &&
+    Math.abs(coffeeSpend - dinnerPlanCost) <= 30;
+
   const estimateLabel = hasMealsSetup && numMeals > 0 && numMeals < 7
     ? `~${numMeals} dinners covered`
     : "Estimated dinners";
@@ -231,8 +256,17 @@ function FoodFocusCard({
 
           <Text style={[styles.foodInsight, { color: C.textSecondary }]}>{dinnerInsight}</Text>
 
+          {showCoffeeComparison && (
+            <View style={[styles.coffeeCallout, { backgroundColor: C.goldTint, borderColor: C.goldDark }]}>
+              <Feather name="coffee" size={13} color={C.goldDark} />
+              <Text style={[styles.coffeeCalloutText, { color: C.goldDark }]}>
+                Your coffee spend ({fmt(Math.round(coffeeSpend))}) is close to your dinner plan ({fmt(Math.round(dinnerPlanCost))}). Just something we noticed.
+              </Text>
+            </View>
+          )}
+
           {showSaving && (
-            <View style={[styles.takeawaySavingRow, { backgroundColor: C.plumTint ?? "#F5EEF8", borderColor: C.plum }]}>
+            <View style={[styles.takeawaySavingRow, { backgroundColor: "#EDD8E4", borderColor: C.plum }]}>
               <Feather name="award" size={14} color={C.plum} />
               <View style={{ flex: 1 }}>
                 <Text style={[styles.takeawaySavingText, { color: C.plum }]}>
@@ -272,6 +306,7 @@ function SortiiSavingsCard({
 
   const roundedSwap = Math.round(swapSavings);
   const roundedPantry = Math.round(pantryEfficiency);
+  const monthlySaving = Math.round(total * 4);
 
   return (
     <Card style={{ borderColor: C.primary, backgroundColor: C.tealTint }}>
@@ -279,7 +314,7 @@ function SortiiSavingsCard({
         <View style={[styles.savingsIconBadge, { backgroundColor: C.primary }]}>
           <Feather name="trending-down" size={14} color="#fff" />
         </View>
-        <Text style={[styles.cardTitle, { color: C.primary, flex: 1 }]}>What Sortii saved you</Text>
+        <Text style={[styles.cardTitle, { color: C.primary, flex: 1 }]}>What Sortii sorted for you ✨</Text>
       </View>
 
       <View style={styles.savingsAmountRow}>
@@ -306,8 +341,12 @@ function SortiiSavingsCard({
         )}
       </View>
 
+      <Text style={[styles.savingsMonthly, { color: C.primary }]}>
+        That's ~{fmt(monthlySaving)}/month if you keep this up.
+      </Text>
+
       <Text style={[styles.savingsDisclaimer, { color: C.textMuted }]}>
-        Compared with a less-planned weekly mix. Estimated, not exact.
+        Compared with a less-planned week — estimated, not exact.
       </Text>
     </Card>
   );
@@ -322,18 +361,32 @@ function SuggestionCard({
   suggestion: MoneySuggestion;
   fmt: (n: number) => string;
 }) {
+  const isSpecial = suggestion.isGoalProjection || suggestion.isMonthlyNudge;
+
   return (
-    <View style={[styles.suggCard, { backgroundColor: "#F7EEF5", borderColor: C.plum }]}>
+    <View style={[styles.suggCard, { backgroundColor: "#EDD8E4", borderColor: C.plum }]}>
       <View style={styles.suggTop}>
-        <View style={[styles.suggDot, { backgroundColor: C.plum }]} />
+        {suggestion.isGoalProjection && suggestion.goalEmoji ? (
+          <Text style={styles.suggEmoji}>{suggestion.goalEmoji}</Text>
+        ) : (
+          <View style={[styles.suggDot, { backgroundColor: C.plum }]} />
+        )}
         <Text style={[styles.suggLabel, { color: C.text }]}>{suggestion.label}</Text>
       </View>
       {suggestion.reason && (
         <Text style={[styles.suggReason, { color: C.textMuted }]}>{suggestion.reason}</Text>
       )}
-      <Text style={[styles.suggImpact, { color: C.plum }]}>
-        Save ~{fmt(suggestion.impactAmount)}
-      </Text>
+      {!isSpecial && suggestion.impactAmount > 0 && (
+        <Text style={[styles.suggImpact, { color: C.plum }]}>
+          Save ~{fmt(suggestion.impactAmount)}
+        </Text>
+      )}
+      {suggestion.isMonthlyNudge && (
+        <View style={styles.suggTickRow}>
+          <Feather name="check-circle" size={13} color={C.primary} />
+          <Text style={[styles.suggTickText, { color: C.primary }]}>Keep it up</Text>
+        </View>
+      )}
     </View>
   );
 }
@@ -349,8 +402,9 @@ function SavingsSuggestionsSection({
   return (
     <View style={styles.suggestionsSection}>
       <View style={styles.sectionHeadingRow}>
-        <Feather name="zap" size={14} color={C.plum} />
-        <Text style={[styles.sectionHeading, { color: C.plum }]}>Easy wins this week</Text>
+        <Text style={[styles.sectionHeading, { color: C.plum }]}>
+          A few quick wins, if you want them.
+        </Text>
       </View>
       {suggestions.map((s) => (
         <SuggestionCard key={s.id} suggestion={s} fmt={fmt} />
@@ -458,7 +512,7 @@ export default function MoneyScreen() {
   const insets = useSafeAreaInsets();
   const { currentPlan, getRecipeById, preferences } = usePlanner();
   const { formatMoneyRound } = useLocale();
-  const { weeklyMode, goal, hasMealsSetup, hasMoneySetup, money, isLoaded } = useUserWeek();
+  const { weeklyMode, goal, hasMealsSetup, hasMoneySetup, money, lifestyleSpend, isLoaded } = useUserWeek();
 
   const paddingTop = Platform.OS === "web" ? 24 : insets.top + 8;
   const paddingBottom = Platform.OS === "web" ? 60 : insets.bottom + 80;
@@ -489,7 +543,6 @@ export default function MoneyScreen() {
   }, 0);
 
   // ─── Sortii savings calculation ────────────────────────────
-  // Swap savings: count matched swap rules across all planned meals
   const swapSavings = (() => {
     const ruleCount: Record<string, number> = {};
     for (const entry of filledMeals) {
@@ -506,11 +559,17 @@ export default function MoneyScreen() {
     }, 0);
   })();
 
-  // Pantry efficiency: batch/leftover-friendly recipes save ~$1.80/serve vs convenience alternatives
   const pantryEfficiency = filledMeals.filter((e) => {
     const r = getRecipeById(e.recipeId!) as Recipe | null;
     return r && (r.batchCook || r.leftoversFriendly);
   }).length * 1.8 * (preferences.householdSize ?? 4);
+
+  const weeklySortiiSaving = swapSavings + pantryEfficiency;
+
+  const hasBatchMeal = filledMeals.some((e) => {
+    const r = getRecipeById(e.recipeId!) as Recipe | null;
+    return r && (r.batchCook || r.leftoversFriendly);
+  });
 
   const result = buildMoneyPage(
     {
@@ -524,6 +583,10 @@ export default function MoneyScreen() {
       money,
     },
     dinnerPlanCost,
+    weeklySortiiSaving,
+    lifestyleSpend,
+    hasBatchMeal,
+    formatMoneyRound,
   );
 
   return (
@@ -559,6 +622,9 @@ export default function MoneyScreen() {
           <WeeklySnapshotCard
             money={money!}
             result={result}
+            lifestyleSpend={lifestyleSpend}
+            dinnerPlanCost={dinnerPlanCost}
+            hasMealsSetup={hasMealsSetup}
             fmt={formatMoneyRound}
           />
 
@@ -594,6 +660,7 @@ export default function MoneyScreen() {
               householdSize={preferences.householdSize ?? 4}
               hasGroceries={result.hasGroceries}
               hasEatingOutData={result.hasEatingOutData}
+              coffeeSpend={lifestyleSpend?.coffee ?? 0}
               fmt={formatMoneyRound}
             />
           )}
@@ -714,6 +781,7 @@ const styles = StyleSheet.create({
   snapshotLabel: {
     fontSize: 14,
     fontFamily: "Inter_400Regular",
+    flex: 1,
   },
   snapshotValue: {
     fontSize: 14,
@@ -757,6 +825,22 @@ const styles = StyleSheet.create({
     lineHeight: 18,
     fontStyle: "italic",
   },
+  coffeeCallout: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: 8,
+    borderRadius: 10,
+    borderWidth: 1.5,
+    paddingHorizontal: 12,
+    paddingVertical: 9,
+  },
+  coffeeCalloutText: {
+    fontSize: 12.5,
+    fontFamily: "Inter_400Regular",
+    lineHeight: 18,
+    flex: 1,
+    fontStyle: "italic",
+  },
   partialNudge: {
     flexDirection: "row",
     alignItems: "flex-start",
@@ -776,9 +860,6 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   sectionHeadingRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
     marginBottom: 2,
   },
   sectionHeading: {
@@ -810,7 +891,6 @@ const styles = StyleSheet.create({
   suggCard: {
     borderRadius: 14,
     borderWidth: 1.5,
-    backgroundColor: "#FFFFFF",
     padding: 16,
     gap: 6,
     ...Platform.select({
@@ -834,6 +914,12 @@ const styles = StyleSheet.create({
     height: 7,
     borderRadius: 4,
     marginTop: 6,
+    flexShrink: 0,
+  },
+  suggEmoji: {
+    fontSize: 15,
+    lineHeight: 20,
+    flexShrink: 0,
   },
   suggLabel: {
     flex: 1,
@@ -852,6 +938,16 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontFamily: "Inter_700Bold",
     marginLeft: 17,
+  },
+  suggTickRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    marginLeft: 17,
+  },
+  suggTickText: {
+    fontSize: 12,
+    fontFamily: "Inter_500Medium",
   },
   goalRow: {
     flexDirection: "row",
@@ -972,6 +1068,11 @@ const styles = StyleSheet.create({
   savingsBreakdownValue: {
     fontSize: 13,
     fontFamily: "Inter_600SemiBold",
+  },
+  savingsMonthly: {
+    fontSize: 14,
+    fontFamily: "Inter_500Medium",
+    lineHeight: 20,
   },
   savingsDisclaimer: {
     fontSize: 11,

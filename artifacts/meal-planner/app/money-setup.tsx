@@ -82,7 +82,7 @@ export default function MoneySetupScreen() {
   const { autoGeneratePlan } = usePlanner();
   const insets = useSafeAreaInsets();
   const { currencySymbol, locale } = useLocale();
-  const { money: savedMoney, setMoney, setGoal: setContextGoal, updateWeekKey, isLoaded } = useUserWeek();
+  const { money: savedMoney, lifestyleSpend: savedLifestyle, setMoney, setLifestyleSpend, setGoal: setContextGoal, updateWeekKey, isLoaded } = useUserWeek();
 
   const [weeklyIncome, setWeeklyIncome] = useState("");
   const [fixedCosts, setFixedCosts] = useState("");
@@ -109,6 +109,11 @@ export default function MoneySetupScreen() {
       if (savedMoney.eatingOutWeekly && savedMoney.eatingOutWeekly > 0)
         setEatingOut(String(savedMoney.eatingOutWeekly));
     }
+    if (savedLifestyle) {
+      if (savedLifestyle.streaming > 0) setStreaming(String(savedLifestyle.streaming));
+      if (savedLifestyle.coffee > 0) setCoffeeSpend(String(savedLifestyle.coffee));
+      if (savedLifestyle.entertainment > 0) setEntertainment(String(savedLifestyle.entertainment));
+    }
   }, []);
 
   const income = parseFloat(weeklyIncome) || 0;
@@ -132,6 +137,11 @@ export default function MoneySetupScreen() {
       groceriesWeekly: grocery,
       eatingOutWeekly: eating,
       otherWeeklySpend: lifestyleTotal > 0 ? lifestyleTotal : undefined,
+    });
+    setLifestyleSpend({
+      streaming: streamingVal,
+      coffee: coffeeVal,
+      entertainment: entertainmentVal,
     });
     setContextGoal(selectedGoal);
     updateWeekKey();

@@ -11,12 +11,19 @@ export interface MoneySetupData {
   otherWeeklySpend?: number;
 }
 
+export interface LifestyleSpendData {
+  streaming: number;
+  coffee: number;
+  entertainment: number;
+}
+
 export interface OnboardingState {
   scope: OnboardingScope | null;
   weeklyMode: WeeklyMode | null;
   hasMealsSetup: boolean;
   hasMoneySetup: boolean;
   moneySetup: MoneySetupData | null;
+  lifestyleSpend: LifestyleSpendData | null;
   goal: string | null;
   lastPlannedWeekKey: string | null;
   lastUpdatedAt: string | null;
@@ -30,6 +37,7 @@ const DEFAULT_STATE: OnboardingState = {
   hasMealsSetup: false,
   hasMoneySetup: false,
   moneySetup: null,
+  lifestyleSpend: null,
   goal: null,
   lastPlannedWeekKey: null,
   lastUpdatedAt: null,

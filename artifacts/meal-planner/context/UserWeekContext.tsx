@@ -4,11 +4,13 @@ import {
   clearOnboardingState,
   getOnboardingState,
   updateOnboardingState,
+  LifestyleSpendData,
 } from '@/utils/onboardingState';
 import { WeekGoal } from '@/utils/yourWeekEngine';
 import { getCurrentWeekKey } from '@/utils/weekKey';
 
 export type { WeekGoal };
+export type { LifestyleSpendData as LifestyleSpend };
 
 export interface MoneyInput {
   weeklyIncome: number;
@@ -24,6 +26,7 @@ interface UserWeekContextType {
   hasMealsSetup: boolean;
   hasMoneySetup: boolean;
   money: MoneyInput | null;
+  lifestyleSpend: LifestyleSpendData | null;
   lastPlannedWeekKey: string | null;
   lastUpdatedAt: string | null;
   isLoaded: boolean;
@@ -31,6 +34,7 @@ interface UserWeekContextType {
   setGoal: (goal: WeekGoal) => void;
   setHasMealsSetup: (v: boolean) => void;
   setMoney: (money: MoneyInput) => void;
+  setLifestyleSpend: (v: LifestyleSpendData) => void;
   updateWeekKey: () => void;
   resetUserWeek: () => void;
 }
@@ -41,6 +45,7 @@ const UserWeekContext = createContext<UserWeekContextType>({
   hasMealsSetup: false,
   hasMoneySetup: false,
   money: null,
+  lifestyleSpend: null,
   lastPlannedWeekKey: null,
   lastUpdatedAt: null,
   isLoaded: false,
@@ -48,6 +53,7 @@ const UserWeekContext = createContext<UserWeekContextType>({
   setGoal: () => {},
   setHasMealsSetup: () => {},
   setMoney: () => {},
+  setLifestyleSpend: () => {},
   updateWeekKey: () => {},
   resetUserWeek: () => {},
 });
@@ -58,6 +64,7 @@ export function UserWeekProvider({ children }: { children: React.ReactNode }) {
   const [hasMealsSetup, setHasMealsSetupState] = useState(false);
   const [hasMoneySetup, setHasMoneySetupState] = useState(false);
   const [money, setMoneyState] = useState<MoneyInput | null>(null);
+  const [lifestyleSpend, setLifestyleSpendState] = useState<LifestyleSpendData | null>(null);
   const [lastPlannedWeekKey, setLastPlannedWeekKey] = useState<string | null>(null);
   const [lastUpdatedAt, setLastUpdatedAt] = useState<string | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
@@ -68,8 +75,6 @@ export function UserWeekProvider({ children }: { children: React.ReactNode }) {
       setHasMealsSetupState(state.hasMealsSetup);
       if (state.goal) setGoalState(state.goal as WeekGoal);
 
-      // Restore money data — treat as set-up if moneySetup exists with any values,
-      // even if the hasMoneySetup flag somehow didn't persist.
       if (state.moneySetup) {
         const m = state.moneySetup;
         const hasValues = m.weeklyIncome > 0 || m.groceries > 0 || m.fixedWeeklyCosts > 0;
@@ -84,6 +89,10 @@ export function UserWeekProvider({ children }: { children: React.ReactNode }) {
         });
       } else {
         setHasMoneySetupState(state.hasMoneySetup);
+      }
+
+      if (state.lifestyleSpend) {
+        setLifestyleSpendState(state.lifestyleSpend);
       }
 
       if (state.lastPlannedWeekKey) setLastPlannedWeekKey(state.lastPlannedWeekKey);
@@ -122,6 +131,11 @@ export function UserWeekProvider({ children }: { children: React.ReactNode }) {
     });
   };
 
+  const setLifestyleSpend = (v: LifestyleSpendData) => {
+    setLifestyleSpendState(v);
+    updateOnboardingState({ lifestyleSpend: v });
+  };
+
   const updateWeekKey = () => {
     const weekKey = getCurrentWeekKey();
     const now = new Date().toISOString();
@@ -136,6 +150,7 @@ export function UserWeekProvider({ children }: { children: React.ReactNode }) {
     setHasMealsSetupState(false);
     setHasMoneySetupState(false);
     setMoneyState(null);
+    setLifestyleSpendState(null);
     setLastPlannedWeekKey(null);
     setLastUpdatedAt(null);
     clearOnboardingState();
@@ -149,6 +164,7 @@ export function UserWeekProvider({ children }: { children: React.ReactNode }) {
         hasMealsSetup,
         hasMoneySetup,
         money,
+        lifestyleSpend,
         lastPlannedWeekKey,
         lastUpdatedAt,
         isLoaded,
@@ -156,6 +172,7 @@ export function UserWeekProvider({ children }: { children: React.ReactNode }) {
         setGoal,
         setHasMealsSetup,
         setMoney,
+        setLifestyleSpend,
         updateWeekKey,
         resetUserWeek,
       }}

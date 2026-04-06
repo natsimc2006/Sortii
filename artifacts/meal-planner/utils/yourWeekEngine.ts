@@ -1,12 +1,20 @@
 import { WeeklyMode } from './onboardingState';
+import type { LifestyleSpendData } from './onboardingState';
+
+export type { LifestyleSpendData };
 
 export interface MoneySuggestion {
   id: string;
   label: string;
   impactAmount: number;
   reason?: string;
+  category?: SuggestionCategory;
+  isGoalProjection?: boolean;
+  isMonthlyNudge?: boolean;
+  goalEmoji?: string;
 }
 
+export type SuggestionCategory = 'money' | 'meals' | 'combined';
 export type WeekGoal = 'holiday' | 'house' | 'wedding' | 'general' | 'none';
 export type WeeklyState = 'over' | 'tight' | 'ok' | 'good' | 'great';
 
@@ -96,7 +104,7 @@ function dinnerInsightFor(
   return label;
 }
 
-const ALL_SUGGESTIONS: QuickFix[] = [
+const PLANNER_QUICK_FIXES: QuickFix[] = [
   { id: '1', text: 'Cook once, eat twice — batch one dinner to cover tomorrow night' },
   { id: '2', text: 'Swap one takeaway meal for a home cook this week' },
   { id: '3', text: 'Check the freezer before the weekly shop — avoid buying doubles' },
@@ -142,7 +150,7 @@ export function buildYourWeek(inputs: YourWeekInputs): YourWeekResult {
   };
 
   const showSuggestions = weeklyState === 'over' || weeklyState === 'tight';
-  const suggestions = showSuggestions ? ALL_SUGGESTIONS.slice(0, 3) : [];
+  const suggestions = showSuggestions ? PLANNER_QUICK_FIXES.slice(0, 3) : [];
 
   return {
     headline,
@@ -155,59 +163,18 @@ export function buildYourWeek(inputs: YourWeekInputs): YourWeekResult {
 
 // ─── Money page ───────────────────────────────────────────────
 
-const MONEY_SUGGESTIONS: MoneySuggestion[] = [
-  {
-    id: 'm1',
-    label: 'Swap one takeaway for a home cook',
-    impactAmount: 25,
-    reason: 'The easiest saving you\'ll make all week.',
-  },
-  {
-    id: 'm2',
-    label: 'Batch one dinner — it covers two nights',
-    impactAmount: 15,
-    reason: 'Cook once, eat twice. Less faff, less cost.',
-  },
-  {
-    id: 'm3',
-    label: 'Pick the cheaper protein this week',
-    impactAmount: 12,
-    reason: 'Chicken thighs beat chicken breast every time.',
-  },
-  {
-    id: 'm4',
-    label: 'One fridge-raid night — skip the shop',
-    impactAmount: 20,
-  },
-  {
-    id: 'm5',
-    label: 'Check the freezer before you shop',
-    impactAmount: 10,
-    reason: 'Avoid buying what you already have.',
-  },
-  {
-    id: 'm6',
-    label: 'Meal-prep lunch instead of buying it',
-    impactAmount: 30,
-    reason: 'Four bought lunches add up faster than you think.',
-  },
-];
-
 export interface MoneyPageResult {
   weeklyState: WeeklyState | null;
   snapshotHeadline: string;
   remaining: number;
   suggestions: MoneySuggestion[];
   dinnerInsight: string;
-  // Proportional estimate — scaled to meals actually planned (not full-week)
   estimatedDinnerSpend: number;
-  // Full-week dinner allocation (65% of groceries, all 7 nights)
   fullWeekDinnerEstimate: number;
   plannedMealsCount: number;
-  // Gating flags for conditional UI
   hasGroceries: boolean;
   hasEatingOutData: boolean;
-  isPartialSetup: boolean;   // true when income/fixed costs entered but no groceries
+  isPartialSetup: boolean;
 }
 
 function snapshotHeadlineFor(state: WeeklyState): string {
@@ -220,11 +187,244 @@ function snapshotHeadlineFor(state: WeeklyState): string {
   }
 }
 
+// ─── Dynamic suggestion builder ───────────────────────────────
+
+const GOAL_TARGETS: Partial<Record<WeekGoal, number>> = {
+  holiday: 500,
+  house: 800,
+  wedding: 600,
+  general: 300,
+};
+
+const GOAL_LABELS: Partial<Record<WeekGoal, string>> = {
+  holiday: 'trip fund',
+  house: 'deposit goal',
+  wedding: 'wedding fund',
+  general: 'savings goal',
+};
+
+const GOAL_EMOJIS: Partial<Record<WeekGoal, string>> = {
+  holiday: '✈️',
+  house: '🏠',
+  wedding: '💍',
+  general: '🐷',
+};
+
+function buildDynamicSuggestions(
+  weeklyState: WeeklyState | null,
+  money: MoneyEngineInput | null,
+  hasMealsSetup: boolean,
+  dinnerPlanCost: number,
+  weeklySortiiSaving: number,
+  lifestyleSpend: LifestyleSpendData | null,
+  hasBatchMeal: boolean,
+  goal: WeekGoal,
+  fmt: (n: number) => string,
+): MoneySuggestion[] {
+  if (!weeklyState) return [];
+
+  const ls = lifestyleSpend ?? { streaming: 0, coffee: 0, entertainment: 0 };
+  const eatingOutWeekly = money?.eatingOutWeekly ?? 0;
+  const groceriesWeekly = money?.groceriesWeekly ?? 0;
+  const isOverOrTight = weeklyState === 'over' || weeklyState === 'tight';
+  const isOkOrBetter = !isOverOrTight;
+
+  const candidatesOverTight: MoneySuggestion[] = [];
+  const candidatesOkPlus: MoneySuggestion[] = [];
+  const alwaysLast: MoneySuggestion[] = [];
+
+  // ── over/tight candidates ──────────────────────────────────
+
+  // pause_subscription (personalised)
+  if (ls.streaming > 0 && isOverOrTight) {
+    const impact = Math.round(ls.streaming * 0.5);
+    if (impact > 0) {
+      candidatesOverTight.push({
+        id: 'pause_subscription',
+        label: `You've got ${fmt(ls.streaming)} on streaming this week. Pause one.`,
+        reason: "When did you last actually watch it?",
+        impactAmount: impact,
+        category: 'money',
+      });
+    }
+  }
+
+  // skip_coffee (personalised) — over/tight only
+  if (ls.coffee > 0 && isOverOrTight) {
+    const impact = Math.round(ls.coffee / 4);
+    if (impact > 0) {
+      const coffeeCount = Math.round(ls.coffee / 5);
+      candidatesOverTight.push({
+        id: 'skip_coffee',
+        label: `You've got ${fmt(ls.coffee)} going to coffee this week. Skip one run.`,
+        reason: `That's roughly ${coffeeCount} coffee${coffeeCount !== 1 ? 's' : ''}. One less is still a win.`,
+        impactAmount: impact,
+        category: 'money',
+      });
+    }
+  }
+
+  // skip_entertainment (personalised)
+  if (ls.entertainment > 30 && isOverOrTight) {
+    const impact = Math.round(ls.entertainment * 0.4);
+    if (impact > 0) {
+      candidatesOverTight.push({
+        id: 'skip_entertainment',
+        label: `One less night out this week could save you ~${fmt(impact)}.`,
+        reason: "The dinners are sorted — that's already a win.",
+        impactAmount: impact,
+        category: 'money',
+      });
+    }
+  }
+
+  // eating_out_swap
+  if (eatingOutWeekly >= 40 && hasMealsSetup) {
+    candidatesOverTight.push({
+      id: 'eating_out_swap',
+      label: "Swap one meal out for a planned dinner.",
+      reason: "Your plan's already there — use it.",
+      impactAmount: 22,
+      category: 'combined',
+    });
+  }
+
+  // swap_takeaway (static)
+  candidatesOverTight.push({
+    id: 'swap_takeaway',
+    label: "Skip one takeaway this week.",
+    reason: "We've already planned dinner — you're 90% there.",
+    impactAmount: 25,
+    category: 'money',
+  });
+
+  // fridge_raid (static)
+  candidatesOverTight.push({
+    id: 'fridge_raid',
+    label: "One night: open the fridge, see what happens.",
+    reason: "We call it a win.",
+    impactAmount: 20,
+    category: 'money',
+  });
+
+  // leftover_night / batch_meal
+  if (hasMealsSetup && hasBatchMeal) {
+    candidatesOverTight.push({
+      id: 'leftover_night',
+      label: "You've got a batch meal this week. Let it cover two nights.",
+      reason: "Cook once. Eat twice. The shopping list already accounts for it.",
+      impactAmount: 15,
+      category: 'meals',
+    });
+  } else {
+    candidatesOverTight.push({
+      id: 'batch_meal',
+      label: "Cook once, eat twice. Pick your biggest meal and double it.",
+      reason: "Less faff. Less cost. Future you approves.",
+      impactAmount: 15,
+      category: 'meals',
+    });
+  }
+
+  // grocery_trim
+  if (groceriesWeekly > 200 && isOverOrTight) {
+    candidatesOverTight.push({
+      id: 'grocery_trim',
+      label: "Your grocery spend is on the higher side. One swap could help.",
+      reason: "Try one own-brand swap on something you buy every week.",
+      impactAmount: 18,
+      category: 'money',
+    });
+  }
+
+  // ── ok/good/great candidates ──────────────────────────────
+
+  // leftover_night
+  if (hasMealsSetup && hasBatchMeal) {
+    candidatesOkPlus.push({
+      id: 'leftover_night',
+      label: "You've got a batch meal this week. Let it cover two nights.",
+      reason: "Cook once. Eat twice. The shopping list already accounts for it.",
+      impactAmount: 15,
+      category: 'meals',
+    });
+  }
+
+  // freezer_check (static)
+  candidatesOkPlus.push({
+    id: 'freezer_check',
+    label: "Quick freezer check before you shop.",
+    reason: "You probably have more than you think.",
+    impactAmount: 10,
+    category: 'money',
+  });
+
+  // ── always-last nudges ────────────────────────────────────
+
+  // monthly_projection_nudge
+  if (isOkOrBetter && hasMealsSetup && weeklySortiiSaving > 0) {
+    const monthlyProjection = Math.round(weeklySortiiSaving * 4);
+    if (monthlyProjection > 0) {
+      alwaysLast.push({
+        id: 'monthly_projection_nudge',
+        label: `You're tracking well. Keep this up and you save ~${fmt(monthlyProjection)}/month.`,
+        impactAmount: 0,
+        category: 'combined',
+        isMonthlyNudge: true,
+      });
+    }
+  }
+
+  // goal_projection_forward
+  if (
+    goal !== 'none' &&
+    isOkOrBetter &&
+    hasMealsSetup &&
+    dinnerPlanCost > 0 &&
+    weeklySortiiSaving > 0
+  ) {
+    const target = GOAL_TARGETS[goal];
+    const goalLabel = GOAL_LABELS[goal];
+    const goalEmoji = GOAL_EMOJIS[goal];
+    if (target && goalLabel && goalEmoji) {
+      const monthlyRate = weeklySortiiSaving * 4;
+      const weeksToGoal = Math.ceil(target / monthlyRate);
+      if (weeksToGoal >= 4 && weeksToGoal <= 52) {
+        alwaysLast.push({
+          id: 'goal_projection_forward',
+          label: `At this rate, you're hitting your ${goalLabel} in about ${weeksToGoal} weeks.`,
+          reason: "Small habit. Real result.",
+          impactAmount: 0,
+          category: 'combined',
+          isGoalProjection: true,
+          goalEmoji,
+        });
+      }
+    }
+  }
+
+  // ── Apply state limits ────────────────────────────────────
+  let selected: MoneySuggestion[] = [];
+  if (isOverOrTight) {
+    const sorted = [...candidatesOverTight].sort((a, b) => b.impactAmount - a.impactAmount);
+    selected = sorted.slice(0, 3);
+  } else {
+    const sorted = [...candidatesOkPlus].sort((a, b) => b.impactAmount - a.impactAmount);
+    selected = [...sorted.slice(0, 2), ...alwaysLast];
+  }
+
+  return selected;
+}
+
 export function buildMoneyPage(
   inputs: YourWeekInputs,
   dinnerPlanCost: number,
+  weeklySortiiSaving: number = 0,
+  lifestyleSpend: LifestyleSpendData | null = null,
+  hasBatchMeal: boolean = false,
+  fmt: (n: number) => string = (n) => `$${n}`,
 ): MoneyPageResult {
-  const { hasMealsSetup, money, meals } = inputs;
+  const { hasMealsSetup, money, meals, goal } = inputs;
 
   const dinnersPlanned = meals?.dinnersPlanned ?? 0;
   const TOTAL_DINNERS_IN_WEEK = 7;
@@ -255,14 +455,10 @@ export function buildMoneyPage(
 
   const hasGroceries = groceriesWeekly > 0;
   const hasEatingOutData = eatingOutWeekly > 0;
-  // Partial setup: user has income/fixed costs but hasn't entered grocery spend yet
   const isPartialSetup = weeklyIncome > 0 && !hasGroceries;
 
   const weeklyState = computeWeeklyState(money);
   const remaining = weeklyIncome - fixedWeeklyCosts - groceriesWeekly - eatingOutWeekly - otherWeeklySpend;
-
-  const isOver = weeklyState === 'over' || weeklyState === 'tight';
-  const suggestions = isOver ? MONEY_SUGGESTIONS.slice(0, 3) : MONEY_SUGGESTIONS.slice(3, 5);
 
   // Full-week estimate: ~65% of groceries covers all 7 dinners
   const fullWeekDinnerEstimate = Math.round(groceriesWeekly * 0.65);
@@ -273,7 +469,7 @@ export function buildMoneyPage(
     ? Math.round(fullWeekDinnerEstimate * proportion)
     : 0;
 
-  // Dinner insight — proportional and coverage-aware
+  // Dinner insight
   let dinnerInsight: string;
   if (!hasGroceries) {
     dinnerInsight = 'Add your weekly grocery spend to see how your dinners track.';
@@ -292,6 +488,18 @@ export function buildMoneyPage(
       dinnerInsight = `${coverageNote}Your planned dinners track close to the estimate. Looks good.`;
     }
   }
+
+  const suggestions = buildDynamicSuggestions(
+    weeklyState,
+    money,
+    hasMealsSetup,
+    dinnerPlanCost,
+    weeklySortiiSaving,
+    lifestyleSpend,
+    hasBatchMeal,
+    goal,
+    fmt,
+  );
 
   return {
     weeklyState,

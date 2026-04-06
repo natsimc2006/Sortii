@@ -1,0 +1,219 @@
+Update the Money page savings suggestions in my Sortii React Native / Expo app.
+Do NOT redesign any screens. Update copy, logic, and suggestion rules only.
+
+---
+
+PART 1 — Rewrite suggestion copy (voice update)
+
+Update the label and reason text for all existing suggestions
+to match the Sortii brand voice: confident, cheeky, specific, human.
+
+Replace current suggestion text with the following:
+
+Suggestion 1 (swap_takeaway):
+  label: "Skip one takeaway this week."
+  reason: "We've already planned dinner — you're 90% there."
+  impact: 25
+
+Suggestion 2 (batch_meal):
+  label: "Cook once, eat twice. Pick your biggest meal and double it."
+  reason: "Less faff. Less cost. Future you approves."
+  impact: 15
+
+Suggestion 3 (cheaper_protein):
+  label: "Chicken thighs over breast this week."
+  reason: "Same flavour. Less money. Done."
+  impact: 12
+
+Suggestion 4 (fridge_raid):
+  label: "One night: open the fridge, see what happens."
+  reason: "We call it a win."
+  impact: 20
+
+Suggestion 5 (freezer_check):
+  label: "Quick freezer check before you shop."
+  reason: "You probably have more than you think."
+  impact: 10
+
+Suggestion 6 (pause_subscription):
+  label: "One subscription you haven't used this week. Pause it."
+  reason: "When did you last actually watch it?"
+  impact: 18
+
+Suggestion 7 (skip_coffee):
+  label: "One less coffee run this week."
+  reason: "Sounds small. Adds up faster than you think."
+  impact: 20
+
+---
+
+PART 2 — Add new dynamic suggestions
+
+Add the following new suggestion entries to the suggestion engine.
+Each has a condition that must be true for it to appear.
+If the condition is not met, the suggestion must not render at all.
+
+All new suggestions follow this structure:
+{
+  id: string,
+  label: string,
+  reason?: string,
+  impact: number,
+  category: SuggestionCategory,
+  condition: () => boolean
+}
+
+NEW SUGGESTION 1 — pause_subscription (personalised)
+  condition: lifestyleSpend.streaming > 0 AND weeklyState is 'tight' OR 'over'
+  label: "You've got $X on streaming this week. Pause one."
+  reason: "When did you last actually watch it?"
+  impact: Math.round(lifestyleSpend.streaming * 0.5)
+  category: 'money'
+  note: Replace $X with actual streaming value from context.
+        Impact = 50% of their entered streaming spend.
+
+NEW SUGGESTION 2 — skip_coffee (personalised)
+  condition: lifestyleSpend.coffee > 0
+  label: "You've got $X going to coffee this week. Skip one run."
+  reason: "That's roughly X coffees. One less is still a win."
+  impact: Math.round(lifestyleSpend.coffee / 4)
+  category: 'money'
+  note: Replace $X with actual coffee value.
+        Impact = 25% of weekly coffee spend (approx 1 of 4 runs).
+        coffeeCount = Math.round(lifestyleSpend.coffee / 5)
+        Use coffeeCount in reason text.
+
+NEW SUGGESTION 3 — skip_entertainment (personalised)
+  condition: lifestyleSpend.entertainment > 30
+        AND weeklyState is 'tight' OR 'over'
+  label: "One less night out this week could save you ~$X."
+  reason: "The dinners are sorted — that's already a win."
+  impact: Math.round(lifestyleSpend.entertainment * 0.4)
+  category: 'money'
+
+NEW SUGGESTION 4 — eating_out_swap
+  condition: money.eatingOutWeekly >= 40
+        AND hasMealsSetup is true
+  label: "Swap one meal out for a planned dinner."
+  reason: "Your plan's already there — use it."
+  impact: 22
+  category: 'combined'
+
+NEW SUGGESTION 5 — leftover_night (contextual)
+  condition: hasMealsSetup is true
+        AND at least 1 planned meal is tagged batchCook OR leftoversFriendly
+  label: "You've got a batch meal this week. Let it cover two nights."
+  reason: "Cook once. Eat twice. The shopping list already accounts for it."
+  impact: 15
+  category: 'meals'
+
+NEW SUGGESTION 6 — grocery_trim
+  condition: money.groceriesWeekly > 200
+        AND weeklyState is 'tight' OR 'over'
+  label: "Your grocery spend is on the higher side. One swap could help."
+  reason: "Try one own-brand swap on something you buy every week."
+  impact: 18
+  category: 'money'
+
+NEW SUGGESTION 7 — monthly_projection_nudge
+  condition: weeklyState is 'on_track' OR 'good' OR 'great'
+        AND hasMealsSetup is true
+  label: "You're tracking well. Keep this up and you save ~$X/month."
+  reason: null
+  impact: 0
+  category: 'combined'
+  note: $X = (estimated weekly saving from meal plan) × 4.
+        This is a positive reinforcement nudge, not a fix.
+        Show it at the bottom of the suggestions list only.
+        Do not show a Save ~$X impact pill for this one — show nothing
+        or a subtle tick instead.
+
+---
+
+PART 3 — Update suggestion display rules
+
+Update which suggestions show and when:
+
+When weeklyState is 'over' or 'tight':
+  Show up to 3 suggestions.
+  Priority order:
+    1. Any personalised suggestions (streaming, coffee, entertainment)
+       if their conditions are met — these always come first.
+    2. eating_out_swap if condition met.
+    3. swap_takeaway.
+    4. fridge_raid.
+    5. batch_meal or leftover_night if condition met.
+
+When weeklyState is 'ok', 'good', or 'great':
+  Show up to 2 suggestions.
+  Priority order:
+    1. leftover_night if condition met.
+    2. freezer_check.
+    3. monthly_projection_nudge if condition met (always last).
+
+Never show a suggestion if its condition is not met.
+Never show more suggestions than the state limit.
+
+---
+
+PART 4 — Update "What Sortii saved you" card
+
+Update the display copy and layout of the savings card.
+
+Current title: "What Sortii saved you"
+New title: "What Sortii sorted for you ✨"
+
+Update the monthly projection:
+  - Calculate: monthlySaving = weeklyTotal × 4
+  - Display as a prominent line ABOVE the disclaimer:
+    "That's ~$X/month if you keep this up."
+  - Style this line in teal (#2A8F88), medium weight
+  - Keep the existing disclaimer below it:
+    "Compared with a less-planned week — estimated, not exact."
+
+Update breakdown labels:
+  "Smarter ingredient choices"     → keep as is
+  "Pantry-friendly meal selection" → keep as is
+
+---
+
+PART 5 — Update "Easy wins this week" section heading
+
+Change the section heading copy from:
+  "⚡ Easy wins this week"
+To:
+  "A few quick wins, if you want them."
+
+Keep the lightning bolt icon if it's separate from the text.
+If it's inline, remove it — the new copy doesn't need it.
+
+---
+
+PART 6 — Deepen plum tint on suggestion cards
+
+The "Easy wins" suggestion cards currently have a very pale plum tint
+that reads almost white.
+
+Update background fill for suggestion cards to:
+  #EDD8E4
+
+Keep the existing plum border colour as is.
+Apply this to all suggestion cards in the Easy wins section.
+
+Also update the "Your meal plan saves you ~$X" highlight box
+inside the "Where groceries are going" card to use:
+  background: #EDD8E4
+  border: existing plum border (keep as is)
+
+Do NOT change any other card backgrounds.
+Do NOT change teal card backgrounds.
+
+---
+
+IMPORTANT
+- Do not redesign any screen layouts
+- Do not add new screens
+- Do not change any colour values except those specified in Part 6
+- Do not change the snapshot card, food focus card, or tweak card
+- Only update: suggestion logic, suggestion copy, savings card copy,
+  section heading, and the two plum tint values
