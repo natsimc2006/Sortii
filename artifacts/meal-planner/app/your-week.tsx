@@ -1,7 +1,7 @@
 import { Feather } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import {
   Image,
   Platform,
@@ -15,10 +15,8 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Colors from "@/constants/Colors";
 import { usePlanner } from "@/context/PlannerContext";
 import { useLocale } from "@/context/LocaleContext";
-import {
-  OnboardingState,
-  getOnboardingState,
-} from "@/utils/onboardingState";
+import { useUserWeek } from "@/context/UserWeekContext";
+import { buildYourWeek, QuickFix } from "@/utils/yourWeekEngine";
 
 const C = Colors.light;
 const sortiiLogo = require("@/assets/images/sortii-logo-orange.png");
@@ -33,20 +31,11 @@ function WeekCard({
   accentColor?: string;
 }) {
   return (
-    <View
-      style={[
-        styles.weekCard,
-        { borderColor: C.border },
-      ]}
-    >
+    <View style={[styles.weekCard, { borderColor: C.border }]}>
       {accentColor && (
-        <View
-          style={[styles.weekCardAccent, { backgroundColor: accentColor }]}
-        />
+        <View style={[styles.weekCardAccent, { backgroundColor: accentColor }]} />
       )}
-      <Text style={[styles.weekCardTitle, { color: C.textSecondary }]}>
-        {title}
-      </Text>
+      <Text style={[styles.weekCardTitle, { color: C.textSecondary }]}>{title}</Text>
       {children}
     </View>
   );
@@ -86,40 +75,63 @@ function PromptCard({
   );
 }
 
+function SuggestionRow({ fix }: { fix: QuickFix }) {
+  return (
+    <View style={[styles.suggestionRow, { borderColor: C.border }]}>
+      <View style={[styles.suggestionDot, { backgroundColor: C.gold }]} />
+      <Text style={[styles.suggestionText, { color: C.text }]}>{fix.text}</Text>
+    </View>
+  );
+}
+
 export default function YourWeekScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { currentPlan, estimatedCostBand, getRecipeById, preferences } = usePlanner();
+  const { currentPlan, getRecipeById, preferences } = usePlanner();
   const { currencySymbol } = useLocale();
-
-  const [obState, setObState] = useState<OnboardingState | null>(null);
-
-  useEffect(() => {
-    getOnboardingState().then(setObState);
-  }, []);
+  const { weeklyMode, goal, hasMealsSetup, hasMoneySetup, money } = useUserWeek();
 
   const filledMeals = currentPlan.filter((e) => e.recipeId);
   const totalSlots = currentPlan.length;
-  const hasMeals = obState?.hasMealsSetup ?? false;
-  const hasMoney = obState?.hasMoneySetup ?? false;
-  const moneySetup = obState?.moneySetup;
+
+  const dinnerPlanCost = filledMeals.reduce((sum, entry) => {
+    const recipe = getRecipeById(entry.recipeId!);
+    const costPerServe = recipe?.costPerServe ?? recipe?.costPerServeAUD ?? 0;
+    return sum + costPerServe * (preferences.householdSize ?? 4);
+  }, 0);
+
+  const engineMeals = hasMealsSetup
+    ? {
+        dinnersPlanned: filledMeals.length,
+        dinnerPlanCost,
+        householdSize: preferences.householdSize,
+      }
+    : null;
+
+  const week = buildYourWeek({
+    weeklyMode,
+    goal,
+    hasMealsSetup,
+    hasMoneySetup,
+    meals: engineMeals,
+    money,
+  });
 
   const breathingRoom =
-    moneySetup && moneySetup.weeklyIncome > 0
+    money && money.weeklyIncome > 0
       ? Math.max(
           0,
-          moneySetup.weeklyIncome -
-            moneySetup.fixedWeeklyCosts -
-            moneySetup.groceries -
-            moneySetup.eatingOut
+          money.weeklyIncome -
+            money.fixedWeeklyCosts -
+            money.groceriesWeekly -
+            (money.eatingOutWeekly ?? 0)
         )
       : null;
 
-  const weeklyModeLabel = {
-    easy: "Keep it easy",
-    balanced: "Stay on track",
-    budget: "Save where I can",
-  }[obState?.weeklyMode ?? "balanced"] ?? "Stay on track";
+  const weeklyModeLabel =
+    { easy: "Keep it easy", balanced: "Stay on track", budget: "Save where I can" }[
+      weeklyMode ?? "balanced"
+    ] ?? "Stay on track";
 
   const paddingTop = Platform.OS === "web" ? 24 : insets.top + 8;
   const paddingBottom = Platform.OS === "web" ? 60 : insets.bottom + 40;
@@ -128,12 +140,10 @@ export default function YourWeekScreen() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     router.replace("/(tabs)/planner");
   };
-
   const goToMoneySetup = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     router.push("/money-setup");
   };
-
   const goToOnboarding = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     router.push("/");
@@ -142,10 +152,7 @@ export default function YourWeekScreen() {
   return (
     <ScrollView
       style={{ backgroundColor: C.background }}
-      contentContainerStyle={[
-        styles.container,
-        { paddingTop, paddingBottom },
-      ]}
+      contentContainerStyle={[styles.container, { paddingTop, paddingBottom }]}
       showsVerticalScrollIndicator={false}
     >
       <View style={styles.headerRow}>
@@ -160,22 +167,26 @@ export default function YourWeekScreen() {
       </View>
 
       <View style={styles.heroSection}>
-        <Text style={[styles.heroHeadline, { color: C.text }]}>Your week</Text>
-        {obState?.weeklyMode && (
+        <Text style={[styles.heroHeadline, { color: C.text }]}>{week.headline}</Text>
+        {weeklyMode && (
           <View style={[styles.modePill, { backgroundColor: C.tealTint }]}>
-            <Text style={[styles.modePillText, { color: C.primary }]}>
-              {weeklyModeLabel}
-            </Text>
+            <Text style={[styles.modePillText, { color: C.primary }]}>{weeklyModeLabel}</Text>
           </View>
         )}
-        {!hasMeals && !hasMoney && (
+        {week.summary.dinnerInsight !== 'No meals planned yet' && hasMealsSetup && (
           <Text style={[styles.heroSub, { color: C.textSecondary }]}>
-            Let's sort your week. Takes 60 seconds.
+            {week.summary.dinnerInsight}
           </Text>
         )}
       </View>
 
-      {hasMeals && (
+      {week.goalNudge && (
+        <View style={[styles.goalNudge, { backgroundColor: C.tealTint, borderColor: C.primary }]}>
+          <Text style={[styles.goalNudgeText, { color: C.primary }]}>{week.goalNudge}</Text>
+        </View>
+      )}
+
+      {hasMealsSetup && (
         <WeekCard title="THIS WEEK'S MEALS" accentColor={C.primary}>
           <View style={styles.mealSummaryRow}>
             <View style={styles.mealStat}>
@@ -189,20 +200,18 @@ export default function YourWeekScreen() {
             <View style={[styles.mealStatDivider, { backgroundColor: C.border }]} />
             <View style={styles.mealStat}>
               <Text style={[styles.mealStatNumber, { color: C.text }]}>
-                {estimatedCostBand || `${currencySymbol}0–${currencySymbol}0`}
+                {dinnerPlanCost > 0
+                  ? `${currencySymbol}${Math.round(dinnerPlanCost)}`
+                  : `${currencySymbol}—`}
               </Text>
-              <Text style={[styles.mealStatLabel, { color: C.textMuted }]}>
-                est. weekly cost
-              </Text>
+              <Text style={[styles.mealStatLabel, { color: C.textMuted }]}>est. cost</Text>
             </View>
             <View style={[styles.mealStatDivider, { backgroundColor: C.border }]} />
             <View style={styles.mealStat}>
               <Text style={[styles.mealStatNumber, { color: C.text }]}>
                 {preferences.householdSize}
               </Text>
-              <Text style={[styles.mealStatLabel, { color: C.textMuted }]}>
-                people
-              </Text>
+              <Text style={[styles.mealStatLabel, { color: C.textMuted }]}>people</Text>
             </View>
           </View>
           {filledMeals.length > 0 && (
@@ -238,14 +247,14 @@ export default function YourWeekScreen() {
         </WeekCard>
       )}
 
-      {hasMoney && moneySetup && (
+      {hasMoneySetup && money && (
         <WeekCard title="THIS WEEK'S MONEY" accentColor="#F0AC2E">
           <View style={styles.mealSummaryRow}>
-            {moneySetup.weeklyIncome > 0 && (
+            {money.weeklyIncome > 0 && (
               <>
                 <View style={styles.mealStat}>
                   <Text style={[styles.mealStatNumber, { color: C.text }]}>
-                    {currencySymbol}{Math.round(moneySetup.weeklyIncome)}
+                    {currencySymbol}{Math.round(money.weeklyIncome)}
                   </Text>
                   <Text style={[styles.mealStatLabel, { color: C.textMuted }]}>income</Text>
                 </View>
@@ -254,7 +263,7 @@ export default function YourWeekScreen() {
             )}
             <View style={styles.mealStat}>
               <Text style={[styles.mealStatNumber, { color: C.text }]}>
-                {currencySymbol}{Math.round(moneySetup.groceries)}
+                {currencySymbol}{Math.round(money.groceriesWeekly)}
               </Text>
               <Text style={[styles.mealStatLabel, { color: C.textMuted }]}>groceries</Text>
             </View>
@@ -286,7 +295,16 @@ export default function YourWeekScreen() {
         </WeekCard>
       )}
 
-      {hasMeals && !hasMoney && (
+      {week.suggestions.length > 0 && (
+        <View style={[styles.suggestionsCard, { borderColor: C.border }]}>
+          <Text style={[styles.suggestionsTitle, { color: C.text }]}>Quick fixes</Text>
+          {week.suggestions.map((fix) => (
+            <SuggestionRow key={fix.id} fix={fix} />
+          ))}
+        </View>
+      )}
+
+      {hasMealsSetup && !hasMoneySetup && (
         <PromptCard
           icon="dollar-sign"
           headline="Want to add a budget layer?"
@@ -296,7 +314,7 @@ export default function YourWeekScreen() {
         />
       )}
 
-      {hasMoney && !hasMeals && (
+      {hasMoneySetup && !hasMealsSetup && (
         <PromptCard
           icon="calendar"
           headline="Want dinners planned around this budget?"
@@ -306,12 +324,10 @@ export default function YourWeekScreen() {
         />
       )}
 
-      {!hasMeals && !hasMoney && (
+      {!hasMealsSetup && !hasMoneySetup && (
         <View style={styles.emptyState}>
           <Feather name="sunrise" size={40} color={C.border} />
-          <Text style={[styles.emptyHeadline, { color: C.text }]}>
-            Let's sort your week
-          </Text>
+          <Text style={[styles.emptyHeadline, { color: C.text }]}>Let's sort your week</Text>
           <Text style={[styles.emptySub, { color: C.textSecondary }]}>
             Choose what you want to sort — meals, money, or both.
           </Text>
@@ -327,7 +343,7 @@ export default function YourWeekScreen() {
       )}
 
       <View style={styles.navRow}>
-        {hasMeals && (
+        {hasMealsSetup && (
           <>
             <TouchableOpacity
               onPress={goToPlanner}
@@ -386,9 +402,9 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   heroHeadline: {
-    fontSize: 32,
+    fontSize: 28,
     fontFamily: "Manrope_700Bold",
-    lineHeight: 38,
+    lineHeight: 34,
     letterSpacing: -0.5,
   },
   modePill: {
@@ -402,9 +418,20 @@ const styles = StyleSheet.create({
     fontFamily: "Inter_600SemiBold",
   },
   heroSub: {
-    fontSize: 15,
+    fontSize: 14,
     fontFamily: "Inter_400Regular",
-    lineHeight: 22,
+    lineHeight: 20,
+  },
+  goalNudge: {
+    borderRadius: 14,
+    borderWidth: 1.5,
+    paddingVertical: 14,
+    paddingHorizontal: 18,
+  },
+  goalNudgeText: {
+    fontSize: 14,
+    fontFamily: "Inter_600SemiBold",
+    lineHeight: 20,
   },
   weekCard: {
     borderRadius: 18,
@@ -502,6 +529,40 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: "Inter_600SemiBold",
     color: "#fff",
+  },
+  suggestionsCard: {
+    borderRadius: 16,
+    borderWidth: 1.5,
+    padding: 18,
+    gap: 12,
+    backgroundColor: "#fff",
+  },
+  suggestionsTitle: {
+    fontSize: 14,
+    fontFamily: "Inter_600SemiBold",
+    letterSpacing: 0.5,
+    textTransform: "uppercase",
+    marginBottom: 2,
+  },
+  suggestionRow: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: 10,
+    paddingBottom: 12,
+    borderBottomWidth: 1,
+  },
+  suggestionDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    marginTop: 6,
+    flexShrink: 0,
+  },
+  suggestionText: {
+    flex: 1,
+    fontSize: 14,
+    fontFamily: "Inter_400Regular",
+    lineHeight: 20,
   },
   promptCard: {
     borderRadius: 16,

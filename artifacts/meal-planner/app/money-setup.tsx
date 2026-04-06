@@ -15,9 +15,10 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Colors from "@/constants/Colors";
 import { useLocale } from "@/context/LocaleContext";
+import { useUserWeek } from "@/context/UserWeekContext";
+import { WeekGoal } from "@/utils/yourWeekEngine";
 import {
   getOnboardingState,
-  updateOnboardingState,
 } from "@/utils/onboardingState";
 
 const C = Colors.light;
@@ -65,15 +66,24 @@ function MoneyField({
   );
 }
 
+const GOAL_OPTIONS: { value: WeekGoal; label: string; emoji: string }[] = [
+  { value: 'holiday', label: 'Holiday', emoji: '✈️' },
+  { value: 'house',   label: 'House deposit', emoji: '🏠' },
+  { value: 'wedding', label: 'Wedding', emoji: '💍' },
+  { value: 'general', label: 'Just saving', emoji: '🐷' },
+];
+
 export default function MoneySetupScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { currencySymbol, locale } = useLocale();
+  const { setMoney, setGoal: setContextGoal } = useUserWeek();
 
   const [weeklyIncome, setWeeklyIncome] = useState("");
   const [fixedCosts, setFixedCosts] = useState("");
   const [groceries, setGroceries] = useState("");
   const [eatingOut, setEatingOut] = useState("");
+  const [selectedGoal, setSelectedGoal] = useState<WeekGoal>('none');
   const [saving, setSaving] = useState(false);
   const [hasMealsSetup, setHasMealsSetup] = useState(false);
 
@@ -92,15 +102,13 @@ export default function MoneySetupScreen() {
   const handleSave = async () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     setSaving(true);
-    await updateOnboardingState({
-      hasMoneySetup: true,
-      moneySetup: {
-        weeklyIncome: income,
-        fixedWeeklyCosts: fixed,
-        groceries: grocery,
-        eatingOut: eating,
-      },
+    setMoney({
+      weeklyIncome: income,
+      fixedWeeklyCosts: fixed,
+      groceriesWeekly: grocery,
+      eatingOutWeekly: eating,
     });
+    setContextGoal(selectedGoal);
     setTimeout(() => {
       router.replace("/your-week");
     }, 400);
@@ -190,6 +198,56 @@ export default function MoneySetupScreen() {
             </Text>
           </View>
         )}
+
+        <View style={[styles.goalCard, { borderColor: C.border }]}>
+          <Text style={[styles.goalHeading, { color: C.text }]}>
+            Got something you're saving for?
+          </Text>
+          <View style={styles.goalGrid}>
+            {GOAL_OPTIONS.map((opt) => {
+              const selected = selectedGoal === opt.value;
+              return (
+                <TouchableOpacity
+                  key={opt.value}
+                  onPress={() => {
+                    Haptics.selectionAsync();
+                    setSelectedGoal(selected ? 'none' : opt.value);
+                  }}
+                  activeOpacity={0.75}
+                  style={[
+                    styles.goalChip,
+                    {
+                      borderColor: selected ? C.primary : C.border,
+                      backgroundColor: selected ? C.tealTint : C.card,
+                    },
+                  ]}
+                >
+                  <Text style={styles.goalEmoji}>{opt.emoji}</Text>
+                  <Text
+                    style={[
+                      styles.goalLabel,
+                      { color: selected ? C.primary : C.text },
+                    ]}
+                  >
+                    {opt.label}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+          {selectedGoal !== 'none' && (
+            <TouchableOpacity
+              onPress={() => {
+                Haptics.selectionAsync();
+                setSelectedGoal('none');
+              }}
+            >
+              <Text style={[styles.goalSkip, { color: C.textMuted }]}>
+                Skip — no goal for now
+              </Text>
+            </TouchableOpacity>
+          )}
+        </View>
 
         <Text style={[styles.footNote, { color: C.textMuted }]}>
           No spreadsheets required. All numbers stay on your device.
@@ -401,5 +459,47 @@ const styles = StyleSheet.create({
   skipText: {
     fontSize: 13,
     fontFamily: "Inter_400Regular",
+  },
+  goalCard: {
+    borderRadius: 18,
+    borderWidth: 1.5,
+    padding: 20,
+    gap: 14,
+    backgroundColor: "#fff",
+  },
+  goalHeading: {
+    fontSize: 16,
+    fontFamily: "Inter_600SemiBold",
+    lineHeight: 22,
+  },
+  goalGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 10,
+  },
+  goalChip: {
+    flexBasis: "47%",
+    flexGrow: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    paddingVertical: 14,
+    paddingHorizontal: 14,
+    borderRadius: 14,
+    borderWidth: 1.5,
+  },
+  goalEmoji: {
+    fontSize: 20,
+  },
+  goalLabel: {
+    fontSize: 14,
+    fontFamily: "Inter_600SemiBold",
+    flex: 1,
+  },
+  goalSkip: {
+    fontSize: 13,
+    fontFamily: "Inter_400Regular",
+    textAlign: "center",
+    textDecorationLine: "underline",
   },
 });

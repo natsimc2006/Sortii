@@ -23,6 +23,7 @@ import {
 } from "@/constants/recipes";
 import { usePlanner } from "@/context/PlannerContext";
 import { useLocale } from "@/context/LocaleContext";
+import { useUserWeek } from "@/context/UserWeekContext";
 import {
   OnboardingScope,
   WeeklyMode,
@@ -173,6 +174,10 @@ export default function OnboardingScreen() {
   const router = useRouter();
   const { setPreferences, setIsOnboarded, isOnboarded, isContextLoaded, autoGeneratePlan } = usePlanner();
   const { currencySymbol } = useLocale();
+  const {
+    setWeeklyMode: setContextWeeklyMode,
+    setHasMealsSetup: setContextHasMealsSetup,
+  } = useUserWeek();
   const insets = useSafeAreaInsets();
   const [step, setStep] = useState<OnboardingStep>(0);
 
@@ -241,6 +246,8 @@ export default function OnboardingScreen() {
     await setPreferences(newPrefs);
     await setIsOnboarded(true);
     await updateOnboardingState({ hasMealsSetup: true, scope, weeklyMode });
+    setContextWeeklyMode(weeklyMode);
+    setContextHasMealsSetup(true);
     autoGeneratePlan(newPrefs);
     setStep(11);
   };
@@ -260,6 +267,7 @@ export default function OnboardingScreen() {
     if (step === 2) {
       if (scope === "money") {
         await updateOnboardingState({ scope, weeklyMode });
+        setContextWeeklyMode(weeklyMode);
         router.replace("/money-setup");
         return;
       }
@@ -289,6 +297,8 @@ export default function OnboardingScreen() {
       await setPreferences(newPrefs);
       await setIsOnboarded(true);
       await updateOnboardingState({ hasMealsSetup: true, scope, weeklyMode });
+      setContextWeeklyMode(weeklyMode);
+      setContextHasMealsSetup(true);
       autoGeneratePlan(newPrefs);
       router.replace("/money-setup");
       return;

@@ -22,6 +22,7 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { LocaleProvider } from "@/context/LocaleContext";
 import { PlannerProvider } from "@/context/PlannerContext";
+import { UserWeekProvider } from "@/context/UserWeekContext";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -78,6 +79,7 @@ export default function RootLayout() {
           <GestureHandlerRootView style={{ flex: 1 }}>
             <KeyboardProvider>
               <LocaleProvider>
+              <UserWeekProvider>
               <PlannerProvider>
                 <Stack screenOptions={{ headerShown: false }}>
                   <Stack.Screen name="index" />
@@ -91,6 +93,7 @@ export default function RootLayout() {
                   />
                 </Stack>
               </PlannerProvider>
+              </UserWeekProvider>
               </LocaleProvider>
             </KeyboardProvider>
           </GestureHandlerRootView>

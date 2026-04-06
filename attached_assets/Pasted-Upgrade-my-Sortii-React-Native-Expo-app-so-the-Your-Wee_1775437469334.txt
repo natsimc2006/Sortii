@@ -1,0 +1,257 @@
+Upgrade my Sortii React Native / Expo app so the Your Week engine uses real user inputs instead of demoWeekInputs.
+
+Context:
+
+- I already have:
+  - /src/logic/yourWeekEngine.ts (buildYourWeek function)
+  - onboarding screens for:
+    - scope (meals / money / both)
+    - weekly mode (easy / balanced / save)
+    - meal setup (existing screen)
+    - money setup (new screen)
+  - home screen with:
+    - YourWeekCard
+    - QuickFixSection
+    - goal nudge area
+
+Goal:
+
+- Capture user inputs from onboarding/setup
+- Store them in a simple global state
+- Pass them into buildYourWeek()
+- Render real, user-driven results on the home screen
+
+Do NOT:
+
+- add backend
+- overcomplicate state management
+- redesign UI
+
+-----
+
+1. Create a simple global state (Context)
+
+-----
+
+Create:
+/src/context/UserWeekContext.tsx
+
+This context should store:
+
+{
+weeklyMode: ‘easy’ | ‘balanced’ | ‘save’,
+goal: ‘holiday’ | ‘house’ | ‘wedding’ | ‘general’ | ‘none’,
+
+hasMealsSetup: boolean,
+hasMoneySetup: boolean,
+
+meals: {
+dinnersPlanned: number,
+dinnerPlanCost: number,
+householdSize?: number
+} | null,
+
+money: {
+weeklyIncome: number,
+fixedWeeklyCosts: number,
+groceriesWeekly: number,
+eatingOutWeekly?: number,
+otherWeeklySpend?: number
+} | null
+}
+
+Also provide setter functions:
+
+- setWeeklyMode
+- setGoal
+- setMeals
+- setMoney
+- setHasMealsSetup
+- setHasMoneySetup
+
+Wrap the app in this provider in App.tsx.
+
+-----
+
+1. Capture onboarding inputs
+
+-----
+
+Update onboarding screens:
+
+A. Weekly style screen
+
+- on selection → call setWeeklyMode(mode)
+
+B. Scope screen
+
+- store selection temporarily if needed (meals / money / both)
+
+C. Meal setup screen
+
+- when user taps “Plan my week”:
+  - build meals object:
+    {
+    dinnersPlanned,
+    dinnerPlanCost,
+    householdSize
+    }
+  - call:
+    setMeals(meals)
+    setHasMealsSetup(true)
+
+D. Money setup screen
+
+- when user taps “See my week”:
+  - build money object:
+    {
+    weeklyIncome,
+    fixedWeeklyCosts,
+    groceriesWeekly,
+    eatingOutWeekly,
+    otherWeeklySpend
+    }
+  - call:
+    setMoney(money)
+    setHasMoneySetup(true)
+
+-----
+
+1. Handle routing after setup
+
+-----
+
+After setup completes:
+
+- navigate to Home / YourWeek screen
+
+For “Both” flow:
+
+- Meal setup → then Money setup → then Home
+
+For “Meals only”:
+
+- Meal setup → Home
+
+For “Money only”:
+
+- Money setup → Home
+
+-----
+
+1. Use real data in Home screen
+
+-----
+
+In HomeScreen:
+
+Import:
+import { useUserWeek } from ‘../context/UserWeekContext’;
+import { buildYourWeek } from ‘../logic/yourWeekEngine’;
+
+Inside component:
+
+const { weeklyMode, goal, meals, money, hasMealsSetup, hasMoneySetup } = useUserWeek();
+
+Build inputs:
+
+const inputs = {
+weeklyMode,
+goal,
+hasMealsSetup,
+hasMoneySetup,
+meals,
+money
+};
+
+Then:
+
+const week = buildYourWeek(inputs);
+
+-----
+
+1. Update UI bindings
+
+-----
+
+Replace demo data with:
+
+YourWeekCard:
+
+- dinnersPlanned → week.summary.dinnersPlanned
+- dinnerCost → week.summary.dinnerPlanCost
+- groceryInput → week.summary.groceriesWeekly
+- state → week.summary.weeklyState
+- headline → week.headline
+- insight → week.summary.dinnerInsight
+
+QuickFixSection:
+
+- data → week.suggestions
+- show only if:
+  weeklyState === “over” OR “tight”
+
+Goal nudge:
+
+- show week.goalNudge if exists
+
+-----
+
+1. Handle incomplete states cleanly
+
+-----
+
+If hasMealsSetup === false AND hasMoneySetup === false:
+
+- show:
+  “Let’s sort your week”
+
+If meals exists but money missing:
+
+- show:
+  “Add a budget layer”
+
+If money exists but meals missing:
+
+- show:
+  “Plan dinners around this budget”
+
+Do NOT show suggestions in incomplete states
+
+-----
+
+1. Keep it simple
+
+-----
+
+- No async storage yet (optional later)
+- No API calls
+- No Redux
+- Keep Context + useState only
+- Use safe defaults if values are missing
+
+-----
+
+1. Final result
+
+-----
+
+Ensure:
+
+- onboarding inputs flow into context
+- context feeds engine
+- engine feeds UI
+- home screen updates immediately after setup
+- no crashes if data is partial
+
+When user taps "Plan my week":
+- calculate dinnerPlanCost from:
+    sum of (recipe.costPerServeAUD × householdSize) for each planned dinner
+- include this in the meals object passed to setMeals()
+
+
+Add optional goal selection at the bottom of MoneySetupScreen and also 
+- heading: Got something you're saving for?
+- options: Holiday ✈️ / House deposit 🏠 / Wedding 💍 / Just saving / Skip
+- store as goal in context via setGoal()
+- keep it lightweight — one tap, no form
