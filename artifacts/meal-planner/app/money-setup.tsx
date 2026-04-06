@@ -43,7 +43,7 @@ function MoneyField({
   return (
     <View style={styles.fieldBlock}>
       <View style={styles.fieldLabelRow}>
-        <Text style={[styles.fieldLabel, { color: C.text }]}>{label}</Text>
+        <Text style={[styles.fieldLabel, { color: C.primary }]}>{label}</Text>
         {optional && (
           <Text style={[styles.fieldOptional, { color: C.textMuted }]}>optional</Text>
         )}
@@ -166,7 +166,7 @@ export default function MoneySetupScreen() {
           styles.header,
           {
             paddingTop,
-            borderBottomColor: C.cardBorder,
+            borderBottomColor: "rgba(37,133,127,0.18)",
           },
         ]}
       >
@@ -197,7 +197,7 @@ export default function MoneySetupScreen() {
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
-        <View style={[styles.setupCard, { borderColor: C.border }]}>
+        <View style={[styles.setupCard, { borderColor: "rgba(37,133,127,0.28)" }]}>
           <MoneyField
             label="Weekly income"
             value={weeklyIncome}
@@ -243,7 +243,7 @@ export default function MoneySetupScreen() {
           </View>
         )}
 
-        <View style={[styles.goalCard, { borderColor: C.border }]}>
+        <View style={[styles.goalCard, { borderColor: "rgba(37,133,127,0.20)" }]}>
           <Text style={[styles.goalHeading, { color: C.text }]}>
             Got something you're saving for?
           </Text>

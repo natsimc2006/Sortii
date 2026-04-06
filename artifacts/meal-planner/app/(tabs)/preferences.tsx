@@ -317,7 +317,7 @@ export default function PreferencesScreen() {
           styles.container,
           {
             paddingTop: Platform.OS === "web" ? 56 : insets.top + 6,
-            paddingBottom: TAB_BAR_HEIGHT + insets.bottom + 40,
+            paddingBottom: 24,
           },
         ]}
         showsVerticalScrollIndicator={false}
@@ -694,7 +694,18 @@ export default function PreferencesScreen() {
           <Feather name="rotate-ccw" size={13} color={C.textMuted} />
           <Text style={[styles.resetText, { color: C.textMuted }]}>Reset to defaults</Text>
         </TouchableOpacity>
+      </ScrollView>
 
+      <View
+        style={[
+          styles.prefFooter,
+          {
+            paddingBottom: TAB_BAR_HEIGHT + insets.bottom + 6,
+            backgroundColor: C.background,
+            borderTopColor: C.cardBorder,
+          },
+        ]}
+      >
         <TouchableOpacity
           onPress={handleSave}
           activeOpacity={0.85}
@@ -703,7 +714,7 @@ export default function PreferencesScreen() {
           <Feather name="check" size={20} color="#fff" />
           <Text style={styles.saveBtnText}>Save settings</Text>
         </TouchableOpacity>
-      </ScrollView>
+      </View>
     </View>
   );
 }
@@ -726,9 +737,9 @@ const styles = StyleSheet.create({
     padding: 4,
   },
   backBtn: {
-    width: 34,
-    height: 34,
-    borderRadius: 17,
+    width: 40,
+    height: 40,
+    borderRadius: 12,
     backgroundColor: "#E8F5F3",
     alignItems: "center",
     justifyContent: "center",
@@ -902,18 +913,24 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontFamily: "Inter_400Regular",
   },
+  prefFooter: {
+    paddingHorizontal: 24,
+    paddingTop: 16,
+    borderTopWidth: 1,
+    gap: 8,
+  },
   saveBtn: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
     gap: 10,
-    paddingVertical: 16,
-    borderRadius: 16,
+    paddingVertical: 18,
+    borderRadius: 18,
     shadowColor: "#F0AC2E",
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.30,
+    shadowOpacity: 0.32,
     shadowRadius: 16,
-    elevation: 5,
+    elevation: 6,
   },
   saveBtnText: {
     fontSize: 17,

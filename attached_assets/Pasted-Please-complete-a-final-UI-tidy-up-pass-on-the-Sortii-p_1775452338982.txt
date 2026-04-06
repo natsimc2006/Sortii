@@ -1,0 +1,223 @@
+Please complete a final UI tidy-up pass on the Sortii planner and preferences flows. Do not redesign the product. Keep the existing Sortii brand, rounded styling, teal-led palette, and soft premium feel. This is a layout, consistency, and polish pass.
+
+PRIMARY GOAL
+Make the lower action chips on the planner page feel more balanced and comfortable, and make the Meals + Money preference screens feel like one unified Sortii system.
+
+⸻
+
+	1.	TIDY THE LOWER ACTION CHIPS ON THE PLANNER PAGE
+
+⸻
+
+On the meal planner screen, improve the layout and spacing of the lower action chips/buttons:
+	•	Fill Gaps
+	•	Save
+	•	Bin/Delete
+
+Current issue:
+	•	they feel slightly cramped / awkwardly placed
+	•	spacing and alignment do not feel fully intentional
+	•	they need to sit more comfortably above the bottom navigation
+
+Please refine this area so it feels balanced and premium.
+
+Requirements:
+	•	increase spacing between the chips/buttons
+	•	ensure equal visual rhythm between them
+	•	ensure vertical spacing from the bottom nav is comfortable
+	•	align heights consistently
+	•	maintain rounded card/button style
+	•	preserve the existing functionality
+
+Visual goal:
+	•	this row should feel light, tidy, and easy to tap
+	•	it should not feel jammed between the meal cards and the bottom nav
+
+If needed:
+	•	slightly reduce width of individual chips
+	•	slightly increase horizontal gap
+	•	keep the row visually centred and balanced
+
+⸻
+
+	2.	ALIGN THE MEALS + MONEY PREFERENCE SCREENS
+
+⸻
+
+The Meals preferences screen and Money preferences screen still feel too different.
+
+Goal:
+Make them feel like the same product system, while keeping the strongest parts of each.
+
+Use this principle:
+	•	keep the stronger layout structure of the Money page
+	•	bring more Sortii colour and warmth into the Money page
+	•	make the Meals page adopt the same CTA/sticky bottom treatment as the Money page
+
+⸻
+
+	3.	ADD STICKY BOTTOM CTA TO THE MEALS PREFERENCES PAGE
+
+⸻
+
+The Money page currently has the better interaction pattern with a sticky bottom CTA area.
+
+Apply the same concept to the Meals preferences page.
+
+Meals page should include:
+	•	a sticky bottom action area
+	•	primary CTA anchored at the bottom
+	•	the CTA should remain visible while scrolling
+	•	helper/supporting text can appear above the CTA if needed
+	•	the CTA should feel consistent with the Money page CTA pattern
+
+Important:
+	•	keep this bottom area elegant and not too bulky
+	•	make sure it does not hide important content
+	•	respect safe area / bottom nav spacing
+
+⸻
+
+	4.	MAKE THE MONEY PAGE FEEL MORE “SORTII”
+
+⸻
+
+Current issue:
+	•	the Money preferences page layout is clean
+	•	but it feels too neutral and loses some Sortii personality
+
+Please bring more Sortii colour and warmth into the Money page without making it cluttered.
+
+Adjust:
+	•	accent colour usage
+	•	subtle teal highlights
+	•	section headers / icons / small accents where appropriate
+	•	bottom CTA area styling if needed
+	•	helper text tone and visual warmth
+
+Do NOT:
+	•	over-colour the whole page
+	•	make it loud or childish
+	•	reduce readability
+
+Goal:
+The Money page should feel:
+	•	calm
+	•	modern
+	•	helpful
+	•	premium
+	•	unmistakably part of Sortii
+
+⸻
+
+	5.	STANDARDISE HEADER + PAGE STRUCTURE
+
+⸻
+
+Ensure the Meals and Money preference pages use the same visual system for:
+	•	page title size
+	•	page title weight
+	•	subheading size
+	•	subheading tone
+	•	back arrow treatment
+	•	close icon treatment
+	•	top spacing
+	•	card width
+	•	section spacing
+	•	divider style
+	•	corner radius
+	•	button treatment
+
+Both screens should feel like they belong to the same product family.
+
+⸻
+
+	6.	MERGE THE BEST OF BOTH SCREENS
+
+⸻
+
+Please combine the best qualities of each screen:
+
+From the Meals page, keep:
+	•	stronger Sortii personality
+	•	better colour presence
+	•	more branded feel
+
+From the Money page, keep:
+	•	stronger structure
+	•	clean form layout
+	•	sticky bottom CTA behaviour
+	•	clear completion flow
+
+End result:
+	•	both screens should feel equally polished
+	•	neither should feel more “finished” than the other
+
+⸻
+
+	7.	CTA / FLOW CONSISTENCY
+
+⸻
+
+Ensure both preferences flows have a clear next action.
+
+Meals page:
+	•	add sticky CTA at bottom
+	•	CTA should clearly move the user forward / apply preferences / continue
+
+Money page:
+	•	keep sticky CTA behaviour
+	•	refine styling so it feels slightly more branded and alive
+
+If a CTA is disabled:
+	•	keep helper text visible
+	•	maintain polished disabled styling
+	•	ensure it still looks intentional, not broken
+
+⸻
+
+	8.	VISUAL POLISH DETAILS
+
+⸻
+
+Please review and refine:
+	•	spacing between heading and first card
+	•	spacing inside cards
+	•	spacing between sections
+	•	chip/button padding
+	•	line-height in helper text
+	•	bottom safe-area spacing
+	•	visual balance between content and sticky CTA area
+
+The overall result should feel:
+	•	easier to scan
+	•	more deliberate
+	•	more comfortable to use
+
+⸻
+
+	9.	OUTPUT REQUIRED AFTER IMPLEMENTATION
+
+⸻
+
+After making the changes, please provide:
+	1.	Summary of updates made
+	2.	Components/screens changed
+	3.	What was adjusted on the planner action chip row
+	4.	What was changed on the Meals preferences page
+	5.	What was changed on the Money preferences page
+	6.	Any assumptions made
+	7.	A short manual test checklist covering:
+	•	planner bottom action chip spacing
+	•	sticky CTA on Meals page
+	•	sticky CTA on Money page
+	•	header consistency across both pages
+	•	improved colour treatment on Money page
+	•	visual consistency between Meals and Money flows
+	•	no broken scrolling or overlap with bottom nav/safe area
+
+This should be a final polish pass focused on:
+	•	comfort
+	•	consistency
+	•	brand cohesion
+	•	premium Sortii feel

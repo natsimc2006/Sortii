@@ -797,7 +797,7 @@ export default function PlannerScreen() {
         style={[
           styles.actionBar,
           {
-            paddingBottom: 10,
+            paddingBottom: 16,
             backgroundColor: C.background,
             borderTopColor: C.cardBorder,
             shadowColor: "#000",
@@ -1087,9 +1087,9 @@ const styles = StyleSheet.create({
   actionBar: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 8,
-    paddingHorizontal: 16,
-    paddingTop: 12,
+    gap: 12,
+    paddingHorizontal: 20,
+    paddingTop: 16,
     borderTopWidth: 1,
   },
   actionBtnSecondary: {
@@ -1097,9 +1097,9 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    gap: 5,
-    paddingVertical: 13,
-    borderRadius: 14,
+    gap: 6,
+    paddingVertical: 15,
+    borderRadius: 16,
   },
   actionBtnPrimary: {
     flex: 2,
@@ -1116,14 +1116,14 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   actionBtnDestructive: {
-    width: 44,
-    height: 44,
-    borderRadius: 14,
+    width: 48,
+    height: 48,
+    borderRadius: 16,
     alignItems: "center",
     justifyContent: "center",
   },
   actionBtnText: {
-    fontSize: 12,
+    fontSize: 13,
     fontFamily: "Inter_600SemiBold",
   },
   actionBtnPrimaryText: {
