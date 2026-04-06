@@ -852,8 +852,8 @@ const styles = StyleSheet.create({
     gap: 14,
   },
   logo: {
-    width: 300,
-    height: 138,
+    width: 390,
+    height: 179,
     marginBottom: 4,
   },
   welcomeHeadline: {
