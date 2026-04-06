@@ -399,6 +399,19 @@ export default function PlannerScreen() {
           ? "Standard"
           : "Premium";
 
+  const planBudgetMismatch = useMemo(() => {
+    const filled = currentPlan.filter((e) => e.recipeId);
+    if (filled.length === 0) return false;
+    const budget = preferences.budgetLevel;
+    return filled.some((e) => {
+      const recipe = getRecipeById(e.recipeId!);
+      if (!recipe) return false;
+      if (budget === "super-budget") return recipe.estimatedCostBand !== "low";
+      if (budget === "premium") return recipe.estimatedCostBand === "low";
+      return false;
+    });
+  }, [currentPlan, preferences.budgetLevel, getRecipeById]);
+
   const healthLabel =
     preferences.healthStyle === "healthy"
       ? "Healthy"
@@ -507,6 +520,18 @@ export default function PlannerScreen() {
             <FilterChip label={healthLabel} icon="activity" />
             <FilterChip label={estimatedCostBand} icon="shopping-bag" />
           </View>
+          {planBudgetMismatch && (
+            <TouchableOpacity
+              onPress={() => setConfirmAction("auto")}
+              style={{ flexDirection: "row", alignItems: "center", gap: 6, marginTop: 6, paddingHorizontal: 4 }}
+              activeOpacity={0.7}
+            >
+              <Feather name="refresh-cw" size={11} color={C.gold} />
+              <Text style={{ fontSize: 11.5, color: C.gold, fontFamily: "Inter_500Medium" }}>
+                Some meals don't match your {budgeLabel} budget — tap to refresh
+              </Text>
+            </TouchableOpacity>
+          )}
           {preferences.kidFriendly && (
             <Text style={styles.kidFriendlyNote}>
               Showing kid-friendly meals only
