@@ -164,17 +164,28 @@ function FoodFocusCard({
   dinnerPlanCost,
   dinnerInsight,
   hasMealsSetup,
+  numMeals,
+  householdSize,
   fmt,
 }: {
   estimatedDinnerSpend: number;
   dinnerPlanCost: number;
   dinnerInsight: string;
   hasMealsSetup: boolean;
+  numMeals: number;
+  householdSize: number;
   fmt: (n: number) => string;
 }) {
+  const takeawayCostPerMeal = householdSize * 13;
+  const takeawayTotal = numMeals * takeawayCostPerMeal;
+  const takeawaySaving = takeawayTotal - dinnerPlanCost;
+  const showSaving = hasMealsSetup && dinnerPlanCost > 0 && takeawaySaving > 2;
+
   return (
-    <Card>
-      <Text style={[styles.cardTitle, { color: C.text }]}>Where groceries are going</Text>
+    <Card style={{ borderColor: C.primary }}>
+      <View style={[styles.cardHeader]}>
+        <Text style={[styles.cardTitle, { color: C.text }]}>Where groceries are going</Text>
+      </View>
 
       <View style={styles.foodRow}>
         <View style={styles.foodCell}>
@@ -193,6 +204,15 @@ function FoodFocusCard({
       </View>
 
       <Text style={[styles.foodInsight, { color: C.textSecondary }]}>{dinnerInsight}</Text>
+
+      {showSaving && (
+        <View style={[styles.takeawaySavingRow, { backgroundColor: C.plumTint ?? "#F5EEF8", borderColor: C.plum }]}>
+          <Feather name="award" size={14} color={C.plum} />
+          <Text style={[styles.takeawaySavingText, { color: C.plum }]}>
+            Your meal plan saves you ~{fmt(Math.round(takeawaySaving))} vs takeaways this week
+          </Text>
+        </View>
+      )}
 
       <Text style={[styles.foodHelper, { color: C.textMuted }]}>
         We estimate dinners from your weekly grocery spend — close enough, not spreadsheet-level.
@@ -268,15 +288,15 @@ function SuggestionCard({
   fmt: (n: number) => string;
 }) {
   return (
-    <View style={[styles.suggCard, { borderColor: C.border }]}>
+    <View style={[styles.suggCard, { backgroundColor: "#F7EEF5", borderColor: C.plum }]}>
       <View style={styles.suggTop}>
-        <View style={[styles.suggDot, { backgroundColor: C.goldDark }]} />
+        <View style={[styles.suggDot, { backgroundColor: C.plum }]} />
         <Text style={[styles.suggLabel, { color: C.text }]}>{suggestion.label}</Text>
       </View>
       {suggestion.reason && (
         <Text style={[styles.suggReason, { color: C.textMuted }]}>{suggestion.reason}</Text>
       )}
-      <Text style={[styles.suggImpact, { color: C.goldDark }]}>
+      <Text style={[styles.suggImpact, { color: C.plum }]}>
         Save ~{fmt(suggestion.impactAmount)}
       </Text>
     </View>
@@ -293,7 +313,10 @@ function SavingsSuggestionsSection({
   if (suggestions.length === 0) return null;
   return (
     <View style={styles.suggestionsSection}>
-      <Text style={[styles.sectionHeading, { color: C.text }]}>Easy wins this week</Text>
+      <View style={styles.sectionHeadingRow}>
+        <Feather name="zap" size={14} color={C.plum} />
+        <Text style={[styles.sectionHeading, { color: C.plum }]}>Easy wins this week</Text>
+      </View>
       {suggestions.map((s) => (
         <SuggestionCard key={s.id} suggestion={s} fmt={fmt} />
       ))}
@@ -510,6 +533,8 @@ export default function MoneyScreen() {
               dinnerPlanCost={dinnerPlanCost}
               dinnerInsight={result.dinnerInsight}
               hasMealsSetup={hasMealsSetup}
+              numMeals={filledMeals.length}
+              householdSize={preferences.householdSize ?? 4}
               fmt={formatMoneyRound}
             />
           )}
@@ -676,11 +701,31 @@ const styles = StyleSheet.create({
   suggestionsSection: {
     gap: 10,
   },
+  sectionHeadingRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    marginBottom: 2,
+  },
   sectionHeading: {
     fontSize: 17,
     fontFamily: "Manrope_700Bold",
     lineHeight: 24,
-    marginBottom: 2,
+  },
+  takeawaySavingRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    borderRadius: 10,
+    borderWidth: 1.5,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+  },
+  takeawaySavingText: {
+    fontSize: 13,
+    fontFamily: "Inter_600SemiBold",
+    lineHeight: 18,
+    flex: 1,
   },
   suggCard: {
     borderRadius: 14,

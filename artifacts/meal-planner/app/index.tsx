@@ -374,10 +374,10 @@ export default function OnboardingScreen() {
         <View style={styles.welcomeContent}>
           <Image source={sortiiLogo} style={styles.logo} resizeMode="contain" />
           <Text style={[styles.welcomeHeadline, { color: C.text }]}>
-            No more "what's for dinner" or "where did my money go"
+            No more "what's for dinner"{"\n"}Or "what can we afford this week?"
           </Text>
           <Text style={[styles.welcomeSub, { color: C.textSecondary }]}>
-            Sortii plans your week in 60 seconds — meals, budget, shopping list. Sorted.
+            Sortii plans your week in 60 seconds — meals, budget, shopping list. Done.
           </Text>
           <Text style={[styles.welcomeSupport, { color: "#6B4A5E" }]}>
             Less stress. Fewer takeaways. More money left.

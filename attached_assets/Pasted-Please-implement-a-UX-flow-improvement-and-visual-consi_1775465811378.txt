@@ -1,0 +1,139 @@
+Please implement a UX flow improvement and visual consistency pass across the Sortii app.
+
+Do not redesign the app. Keep the current structure, but improve flow, clarity, and consistency.
+
+---
+
+1. ADD MEAL → MONEY HANDOFF (CRITICAL FLOW FIX)
+
+---
+
+Current issue:
+After completing meal setup, the user is taken directly to the planner.
+
+Fix:
+After saving meal preferences, trigger a modal or bottom sheet:
+
+Title:
+“Want to see what this means for your budget?”
+
+Body:
+“We can show you how your week looks — food, spending, and what’s left.”
+
+Buttons:
+
+* Primary (gold): “Set my numbers”
+* Secondary: “Skip for now”
+
+Behaviour:
+
+* “Set my numbers” → open Money setup screen
+* “Skip for now” → continue to planner
+
+This should only show:
+
+* first time after setup
+* or if no money data exists
+
+---
+
+2. IMPROVE LANDING PAGE COPY (SHARPER HOOK)
+
+---
+
+Update hero section text:
+
+Replace:
+“No more ‘what’s for dinner’”
+
+With:
+“No more ‘what’s for dinner’
+Or ‘what can we afford this week?’”
+
+Update subtext to:
+“Sortii plans your week in 60 seconds — meals, budget, shopping list. Done.”
+
+Update final line to:
+“Less stress. Fewer takeaways. More money left.”
+
+Do not change layout — text only.
+
+---
+
+3. ADD SAVINGS FEEDBACK INTO MONEY SCREEN
+
+---
+
+On Money Sorted screen:
+
+Under “Where groceries are going”, add:
+
+“Your meal plan is saving you ~$X this week vs takeaways”
+
+Logic:
+
+* estimate takeaway equivalent (simple multiplier is fine)
+* subtract planned meal cost
+* show approximate savings
+
+If exact calculation is not available, estimate and label clearly as approximate.
+
+---
+
+4. IMPROVE COLOUR CONSISTENCY ACROSS SCREENS
+
+---
+
+Goal:
+Ensure the app feels like one unified system.
+
+Apply consistent colour roles:
+
+* Teal → structure, headers, key UI elements
+* Gold → CTA buttons and positive actions
+* Plum → savings, smart tips, “wins”
+* Grey → background and neutral areas
+
+Money screen updates:
+
+* add subtle teal accents (headers, borders, or highlights)
+* ensure “save” amounts use gold
+* use light plum backgrounds for “easy wins” cards
+
+Do not overuse colour — keep clean, but consistent.
+
+---
+
+5. ENSURE FLOW CONSISTENCY
+
+---
+
+Check:
+
+* Meal setup → money prompt works correctly
+* “See my week” routes correctly
+* Money setup persists data
+* Returning users do not get stuck in empty states
+
+---
+
+6. OUTPUT REQUIRED
+
+---
+
+Provide:
+
+1. Summary of flow changes added
+2. Confirmation that meal → money prompt works
+3. Updated landing page copy
+4. Where savings calculation was added
+5. Summary of colour consistency updates
+6. Any assumptions made
+7. Manual test checklist
+
+This update should make the app feel:
+
+* more intentional
+* more connected (meals + money)
+* more rewarding to use
+* closer to a complete product experience
