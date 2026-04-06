@@ -296,14 +296,15 @@ export default function PlannerScreen() {
   };
 
   const handleMealRemove = (day: string, slot: MealSlot) => {
-    const entry = getEntry(day, slot);
-    const recipe = entry?.recipeId ? getRecipeById(entry.recipeId) ?? null : null;
-    if (!recipe) {
-      setMealSlot(day, slot, null);
-      return;
-    }
+    undoSnapshotRef.current = [...currentPlan];
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    setPendingMealAction({ type: "remove", day, slot, recipe });
+    setMealSlot(day, slot, null);
+    showToast({
+      message: pickRandom(TOAST_CLEAR_MEAL),
+      variant: "undo",
+      actionLabel: "Undo",
+      onAction: handleUndo,
+    });
   };
 
   const handleMealSwap = (day: string, slot: MealSlot) => {
