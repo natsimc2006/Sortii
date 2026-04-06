@@ -208,9 +208,14 @@ function FoodFocusCard({
       {showSaving && (
         <View style={[styles.takeawaySavingRow, { backgroundColor: C.plumTint ?? "#F5EEF8", borderColor: C.plum }]}>
           <Feather name="award" size={14} color={C.plum} />
-          <Text style={[styles.takeawaySavingText, { color: C.plum }]}>
-            Your meal plan saves you ~{fmt(Math.round(takeawaySaving))} vs takeaways this week
-          </Text>
+          <View style={{ flex: 1 }}>
+            <Text style={[styles.takeawaySavingText, { color: C.plum }]}>
+              Your meal plan saves you ~{fmt(Math.round(takeawaySaving))} vs takeaways this week
+            </Text>
+            <Text style={[styles.takeawaySavingMontly, { color: C.plum }]}>
+              That's ~{fmt(Math.round(takeawaySaving * 4))}/month if you keep this up
+            </Text>
+          </View>
         </View>
       )}
 
@@ -725,7 +730,13 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontFamily: "Inter_600SemiBold",
     lineHeight: 18,
-    flex: 1,
+  },
+  takeawaySavingMontly: {
+    fontSize: 11.5,
+    fontFamily: "Inter_400Regular",
+    lineHeight: 16,
+    opacity: 0.8,
+    marginTop: 2,
   },
   suggCard: {
     borderRadius: 14,

@@ -127,12 +127,33 @@ export function MealSlotCard({
     );
   }
 
-  const cookIcon =
-    recipe.cookingStyle === "air-fryer"
-      ? "wind"
-      : recipe.cookingStyle === "one-pan"
-        ? "layers"
-        : "coffee";
+  const CUISINE_BG: Record<string, string> = {
+    italian:        "#FFF3E8",
+    asian:          "#E8F3F0",
+    mexican:        "#FEF5E4",
+    mediterranean:  "#EAF0FB",
+    indian:         "#FFF0E6",
+    american:       "#F5EBE0",
+    australian:     "#EAF3E2",
+    "middle-eastern": "#F3F0E8",
+    other:          "#F0F0F0",
+  };
+
+  const CUISINE_EMOJI: Record<string, string> = {
+    italian:        "🍝",
+    asian:          "🍜",
+    mexican:        "🌮",
+    mediterranean:  "🫙",
+    indian:         "🍛",
+    american:       "🍔",
+    australian:     "🥩",
+    "middle-eastern": "🧆",
+    other:          "🍽️",
+  };
+
+  const cuisineKey = recipe.cuisineType ?? "other";
+  const placeholderBg = CUISINE_BG[cuisineKey] ?? "#F0F0F0";
+  const placeholderEmoji = CUISINE_EMOJI[cuisineKey] ?? "🍽️";
 
   const showImage = !!imageUrl && !imgError;
   const prepLabel = getPrepStyleLabel(recipe);
@@ -217,7 +238,7 @@ export function MealSlotCard({
         disabled={!onViewRecipe}
         style={styles.recipeRow}
       >
-        <View style={[styles.recipeIconBox, { backgroundColor: ICON.recipe.bg }]}>
+        <View style={[styles.recipeIconBox, { backgroundColor: showImage ? ICON.recipe.bg : placeholderBg }]}>
           {showImage ? (
             <Animated.Image
               source={{ uri: imageUrl! }}
@@ -227,7 +248,7 @@ export function MealSlotCard({
               onLoad={handleImageLoad}
             />
           ) : (
-            <Feather name={cookIcon as any} size={16} color={ICON.recipe.icon} />
+            <Text style={styles.placeholderEmoji}>{placeholderEmoji}</Text>
           )}
         </View>
 
@@ -378,6 +399,11 @@ const styles = StyleSheet.create({
   recipeThumbnail: {
     width: 52,
     height: 52,
+  },
+  placeholderEmoji: {
+    fontSize: 24,
+    lineHeight: 30,
+    textAlign: "center",
   },
   recipeInfo: {
     flex: 1,
