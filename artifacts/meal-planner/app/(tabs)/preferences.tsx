@@ -331,15 +331,16 @@ export default function PreferencesScreen() {
             >
               <Feather name="arrow-left" size={18} color={C.primary} />
             </TouchableOpacity>
-            <View style={{ flex: 1 }} />
+            <View style={{ flex: 1, marginHorizontal: 12 }}>
+              <Text style={[styles.prefHeroHeading, { color: C.text }]}>Make it yours.</Text>
+              <Text style={[styles.prefHeroSub, { color: C.textSecondary }]}>
+                Set your preferences — we'll handle the rest.
+              </Text>
+            </View>
             <TouchableOpacity onPress={handleClose} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }} style={styles.closeBtn}>
               <Feather name="x" size={22} color={C.textSecondary} />
             </TouchableOpacity>
           </View>
-          <Text style={[styles.prefHeroHeading, { color: C.text }]}>Make it yours.</Text>
-          <Text style={[styles.prefHeroSub, { color: C.textSecondary }]}>
-            Set it once. Sortii handles the rest.
-          </Text>
         </View>
 
         <TierSection
@@ -937,25 +938,23 @@ const styles = StyleSheet.create({
     fontFamily: "Inter_600SemiBold",
   },
   prefHero: {
-    gap: 4,
     paddingTop: 2,
     paddingBottom: 6,
   },
   prefHeroTopRow: {
     flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 4,
+    alignItems: "flex-start",
+    marginBottom: 8,
   },
   prefHeroHeading: {
-    fontSize: 28,
-    fontFamily: "PlayfairDisplay_700Bold",
-    textAlign: "center",
+    fontSize: 22,
+    fontFamily: "Inter_700Bold",
+    lineHeight: 28,
   },
   prefHeroSub: {
     fontSize: 14,
     fontFamily: "Inter_400Regular",
-    textAlign: "center",
     lineHeight: 20,
-    fontStyle: "italic",
+    marginTop: 3,
   },
 });

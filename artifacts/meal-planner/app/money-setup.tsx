@@ -177,12 +177,19 @@ export default function MoneySetupScreen() {
         >
           <Feather name="arrow-left" size={18} color={C.primary} />
         </TouchableOpacity>
-        <View style={{ flex: 1 }}>
-          <Text style={[styles.pageTitle, { color: C.text }]}>Let's map your week</Text>
+        <View style={{ flex: 1, marginHorizontal: 12 }}>
+          <Text style={[styles.pageTitle, { color: C.text }]}>Make it yours.</Text>
           <Text style={[styles.pageHelper, { color: C.textSecondary }]}>
-            Ballpark is fine. We're aiming for helpful, not perfect.
+            Set your budget — we'll handle the rest.
           </Text>
         </View>
+        <TouchableOpacity
+          onPress={() => router.back()}
+          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+          style={styles.closeBtn}
+        >
+          <Feather name="x" size={22} color={C.textSecondary} />
+        </TouchableOpacity>
       </View>
 
       <ScrollView
@@ -360,7 +367,14 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     alignItems: "center",
     justifyContent: "center",
-    marginTop: 4,
+    marginTop: 2,
+  },
+  closeBtn: {
+    width: 32,
+    height: 32,
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 2,
   },
   pageTitle: {
     fontSize: 22,

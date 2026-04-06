@@ -1,0 +1,226 @@
+Please refine the Sortii app to final polish level and introduce the smart, dynamic behaviour layer. Do not redesign the app. Keep the existing brand, logo, palette direction, rounded styling, and overall structure. This is a consistency, UX polish, and intelligence pass.
+
+PRIMARY GOAL  
+Make the app feel like one cohesive system and a smart weekly assistant, not just a planner.
+
+1. REMOVE THE UNUSED / CONFUSING TOP CHIP
+
+On the Weekly Planner screen, remove the “Standard” chip from the top row.
+
+Reason:
+- it is not clearly interactive
+- it adds clutter
+- the other chips imply tap behaviour, so this one feels broken/confusing
+
+Only keep the chips that have a clear job:
+- household size
+- budget level
+- weekly cost
+
+Make sure all remaining chips:
+- are tappable
+- look consistently interactive
+- include the same affordance style (for example a chevron or identical tap feedback)
+
+2. ALIGN THE MEALS + MONEY SETUP SCREENS
+
+These two setup/update screens need to feel like the same product and system.
+
+Make both screens consistent in:
+- font family
+- font size
+- font weight
+- spacing
+- alignment
+- colours
+- card styling
+- border radii
+- section spacing
+- divider treatment
+
+Header consistency:
+Both screens should use the same header structure:
+- back arrow on the left
+- title in the same alignment style
+- close icon on the right
+
+Title consistency:
+Choose one title pattern and apply it consistently across both update/setup screens.
+
+Use one of these patterns only:
+- “Let’s map your week”
+OR
+- “Make it yours”
+
+Do not mix both patterns across the two screens.
+
+Subheading consistency:
+Update the Meals/preferences screen so its subheading style and tone matches the Money/preferences screen.
+
+For the preferences-style screen, update the subheading text to:
+“Set your preferences — we’ll handle the rest.”
+
+Colour consistency:
+Standardise both screens so they feel distinctly “Sortii”.
+Use the same base system across both:
+- soft white / light neutral background
+- teal as the primary accent
+- muted greys for structure
+- consistent card fill and border colours
+
+Remove any off-tone background treatments that make one screen feel different from the other.
+
+Card/input consistency:
+Ensure both screens use the same:
+- input field styling
+- border thickness
+- card padding
+- spacing between headings and controls
+- divider spacing
+- button corner radius and button treatment where relevant
+
+3. IMPROVE THE ADJUST MODAL SUMMARY AREA
+
+Inside the Adjust modal, add a small label above the summary bar.
+
+Structure should become:
+
+Your current plan  
+4 people • Super Budget • A$113–A$133/week
+
+Requirements:
+- “Your current plan” should be smaller than the main heading
+- use medium weight
+- subtle grey tone
+- keep the summary row visually clean and premium
+
+4. ADD SMART SUGGESTIONS TO THE ADJUST EXPERIENCE
+
+Introduce a new Smart Suggestions section that makes the app feel intelligent and helpful.
+
+Preferred placement:
+- inside the Adjust modal
+- below “Your current plan”
+- above the Meals / Money / Start fresh option cards
+
+Smart Suggestions should use soft cards that match the current UI style.
+
+Each suggestion card should include:
+- a short helpful message
+- one clear CTA button
+
+Show a maximum of 1–2 suggestions at a time.
+
+Prioritise suggestions in this order:
+1. budget
+2. time
+3. effort
+
+Do not overload the user.
+
+Suggestion type 1: Budget suggestion
+Trigger:
+- weekly cost exceeds the intended budget threshold
+- or the user is spending more than needed
+
+Message:
+“You’re spending more than you need to”
+
+CTA:
+“Find cheaper swaps”
+
+Behaviour:
+- open swap suggestions
+OR
+- apply cost-saving swap recommendations
+
+Suggestion type 2: Time suggestion
+Trigger:
+- multiple meals in the current week have cook times above 30 minutes
+
+Message:
+“Busy week? Want quicker dinners?”
+
+CTA:
+“Switch to faster meals”
+
+Behaviour:
+- suggest or auto-apply quicker recipes
+
+Suggestion type 3: Effort suggestion
+Trigger:
+- no batch meals included
+OR
+- too many effort-heavy / more complex meals selected
+
+Message:
+“Want to make this week easier?”
+
+CTA:
+“Add a batch meal”
+
+Behaviour:
+- suggest or add a batch-style recipe option
+
+Design requirements for Smart Suggestions:
+- soft card style
+- subtle highlight treatment (light teal or soft neutral accent)
+- consistent with Sortii styling
+- helpful, not pushy
+- premium, not cluttered
+
+5. MAKE THE APP FEEL MORE DYNAMIC
+
+Adjust modal heading:
+- If user already has a plan, use:
+“What do you want to tweak?”
+- If user has no plan yet, use:
+“Let’s set up your week”
+
+Keep the subheading:
+“Pick one — we’ll handle the rest.”
+
+Optional planner microcopy enhancement:
+Rotate subtle helper lines under the planner progress bar. Keep them in Sortii tone.
+
+Examples:
+- “Dinner? Handled. Go do literally anything else.”
+- “Future you is already grateful.”
+- “One less thing to think about.”
+
+6. FINAL CONSISTENCY RULES
+
+Please ensure:
+- no dead or misleading UI elements remain
+- all interactive elements respond visually
+- both preference/update screens feel like one unified system
+- no mismatched fonts, weights, or colours
+- the overall feel is calm, smart, helpful, and distinctly Sortii
+
+Do not redesign layout or remove working functionality unless it conflicts with the requested fixes.
+
+7. OUTPUT REQUIRED AFTER IMPLEMENTATION
+
+After making the changes, please provide:
+
+1. A summary of what was updated
+2. Which components/screens were changed
+3. What smart suggestion logic was implemented
+4. Any assumptions made
+5. A short manual test checklist covering:
+- top chip row updated correctly
+- Meals and Money setup screens aligned
+- headings/subheadings matched
+- colours aligned across both setup screens
+- “Your current plan” added to Adjust modal
+- Smart Suggestions appearing correctly
+- Smart Suggestion CTAs working correctly
+- no broken navigation
+- consistent back/close behaviour
+
+This update should make the app feel:
+- cohesive
+- intelligent
+- effortless
+- premium
+- more addictive than merely functional

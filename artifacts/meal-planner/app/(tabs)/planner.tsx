@@ -56,9 +56,18 @@ const TOAST_AUTO_PLAN = [
 ];
 
 const MENTAL_LOAD_MSGS = [
-  "We've got this.",
+  "Dinner? Handled. Go do literally anything else.",
+  "Future you is already grateful.",
+  "One less thing to think about.",
+  "We've got this week sorted.",
   "Nothing left to decide.",
-  "Dinner's handled.",
+  "The hardest part is already done.",
+  "Your week is sorted. You're welcome.",
+  "Less deciding. More living.",
+  "5pm has never looked this easy.",
+  "All five nights, sorted.",
+  "You've got a plan. That's half the battle.",
+  "Groceries next. You've already won.",
 ];
 
 const TOAST_SAVE = [
@@ -525,7 +534,6 @@ export default function PlannerScreen() {
               icon="dollar-sign"
               onPress={() => router.push("/(tabs)/preferences")}
             />
-            <FilterChip label={healthLabel} icon="activity" />
             <FilterChip
               label={estimatedCostBand}
               icon="shopping-bag"

@@ -113,8 +113,8 @@ export default function AdjustHubScreen() {
     if (hasHighCostMeals && isLowBudgetPlan) {
       result.push({
         id: "budget",
-        icon: "alert-circle",
-        message: "Some meals are over budget. Want cheaper swaps?",
+        icon: "trending-down",
+        message: "You're spending more than you need to.",
         cta: "Find cheaper swaps",
         onPress: () => {
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -126,11 +126,11 @@ export default function AdjustHubScreen() {
     if (result.length < 2) {
       const avgCookTime =
         filledRecipes.reduce((sum, r) => sum + (r.cookTimeMinutes ?? 30), 0) / filledRecipes.length;
-      if (avgCookTime > 35) {
+      if (avgCookTime > 30) {
         result.push({
           id: "time",
           icon: "clock",
-          message: "Busy week? Your meals average over 35 mins each.",
+          message: "Busy week? Want quicker dinners?",
           cta: "Switch to faster meals",
           onPress: () => {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -146,7 +146,7 @@ export default function AdjustHubScreen() {
         result.push({
           id: "effort",
           icon: "zap",
-          message: "No batch meals this week — want to make cooking easier?",
+          message: "Want to make this week easier?",
           cta: "Add a batch meal",
           onPress: () => {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -212,6 +212,7 @@ export default function AdjustHubScreen() {
           Tweak your week — without starting over.
         </Text>
 
+        <Text style={[styles.planSummaryLabel, { color: C.textMuted }]}>Your current plan</Text>
         <View style={styles.planSummaryRow}>
           <Feather name="bar-chart-2" size={12} color={C.primary} />
           <Text style={[styles.planSummaryText, { color: C.textSecondary }]}>{planSummary}</Text>
@@ -326,6 +327,13 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontFamily: "Inter_400Regular",
     marginBottom: 10,
+  },
+  planSummaryLabel: {
+    fontSize: 11,
+    fontFamily: "Inter_600SemiBold",
+    letterSpacing: 0.4,
+    textTransform: "uppercase",
+    marginBottom: 5,
   },
   planSummaryRow: {
     flexDirection: "row",
