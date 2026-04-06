@@ -854,12 +854,12 @@ export default function PlannerScreen() {
           <Text style={[styles.confirmTitle, { color: C.text }]}>
             {pendingMealAction.type === "remove"
               ? "Remove this meal?"
-              : "Let's try something else."}
+              : "Not feeling this one?"}
           </Text>
           <Text style={[styles.confirmBody, { color: C.textSecondary }]}>
             {pendingMealAction.type === "remove"
               ? "This slot will be cleared."
-              : "We'll find a better fit."}
+              : "Browse a few alternatives — or close and keep it."}
           </Text>
           <View style={styles.confirmBtns}>
             <TouchableOpacity
