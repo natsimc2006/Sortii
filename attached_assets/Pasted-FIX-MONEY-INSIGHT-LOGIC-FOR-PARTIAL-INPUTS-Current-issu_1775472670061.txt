@@ -1,0 +1,129 @@
+FIX MONEY INSIGHT LOGIC FOR PARTIAL INPUTS
+
+⸻
+
+Current issue:
+The Money screen allows a user to enter only income and no expense fields, but the resulting messaging can still imply savings on takeaways or similar insights even though no takeaway/eating-out input was provided.
+
+This weakens trust.
+
+Please implement logic gating for money insights.
+
+⸻
+
+	5.	RULES FOR WHICH INSIGHTS CAN APPEAR
+
+⸻
+
+If the user has only partial money setup
+
+Example:
+	•	income only
+	•	or income + fixed costs
+	•	but no groceries
+	•	and no takeaway/eating out data
+
+Then show only:
+	•	neutral partial-summary messaging
+	•	prompts to complete setup
+	•	limited snapshot where appropriate
+
+Do NOT show:
+	•	takeaway savings claims
+	•	avoided takeaway spend claims
+	•	detailed savings comparisons that require missing inputs
+
+Use more appropriate messaging such as:
+	•	“Nice start — add a few more numbers to see the full picture.”
+	•	“Add groceries or eating out to unlock savings insights.”
+	•	“We can show what’s left once you add your regular weekly costs.”
+
+⸻
+
+	6.	REQUIRE DATA BEFORE SHOWING TAKEAWAY SAVINGS
+
+⸻
+
+Only show “saved vs takeaway” style insights if:
+	•	the user has entered eating out / takeaway input
+OR
+	•	you are explicitly using an estimated benchmark and label it clearly as an estimate
+
+If using benchmark logic, wording must be clear, for example:
+	•	“Based on typical takeaway replacement, this plan could save about $X.”
+
+Do not present this as a precise user-specific saving if the supporting input was never entered.
+
+⸻
+
+	7.	FIX SAVINGS CALCULATION WHEN USER PLANS FEWER THAN 7 MEALS
+
+⸻
+
+Current issue:
+If a user plans only 3 meals or 5 meals, the meal planner savings / grocery logic may still be behaving too much like a full-week plan.
+
+Please fix this.
+
+Savings and grocery allocation should scale based on the number of planned meals.
+
+⸻
+
+	8.	REQUIRED SAVINGS / GROCERY LOGIC
+
+⸻
+
+If the user plans fewer than 7 dinners:
+	•	do not calculate savings as though the app planned all 7 dinners
+	•	adjust dinner-related grocery allocation proportionally
+	•	adjust savings insight proportionally
+	•	ensure the app reflects only the meals actually planned
+
+Example principle:
+	•	if the weekly grocery dinner estimate is based on 7 dinners
+	•	and the user only plans 3 dinners
+	•	then apply only the appropriate proportion of dinner spend to this plan
+
+Use the same principle for:
+	•	grocery allocation
+	•	dinner spend estimates
+	•	meal-planner savings outputs
+	•	takeaway replacement estimates if shown
+
+⸻
+
+	9.	DISTINGUISH BETWEEN FULL-WEEK AND PARTIAL-WEEK LOGIC
+
+⸻
+
+Please clearly separate:
+
+Full-week dinner allocation
+
+Example:
+“About 65% of your grocery spend goes to dinners.”
+
+Planned coverage logic
+
+Example:
+“This week’s plan covers 3 of 7 dinners.”
+
+Use this distinction so savings and dinner-cost estimates feel believable and not overstated.
+
+⸻
+
+	10.	IMPROVE MONEY SORTED TRUST MESSAGING
+
+⸻
+
+Where insights are estimated, frame them clearly as approximate.
+
+Use wording like:
+	•	“about”
+	•	“estimated”
+	•	“based on your current setup”
+
+Avoid sounding overly precise when the data is partial.
+
+Goal:
+Make the money layer feel trustworthy, helpful, and realistic.

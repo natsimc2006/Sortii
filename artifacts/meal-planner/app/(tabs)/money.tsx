@@ -161,25 +161,42 @@ function WeeklySnapshotCard({
 
 function FoodFocusCard({
   estimatedDinnerSpend,
+  fullWeekDinnerEstimate,
   dinnerPlanCost,
   dinnerInsight,
   hasMealsSetup,
   numMeals,
   householdSize,
+  hasGroceries,
+  hasEatingOutData,
   fmt,
 }: {
   estimatedDinnerSpend: number;
+  fullWeekDinnerEstimate: number;
   dinnerPlanCost: number;
   dinnerInsight: string;
   hasMealsSetup: boolean;
   numMeals: number;
   householdSize: number;
+  hasGroceries: boolean;
+  hasEatingOutData: boolean;
   fmt: (n: number) => string;
 }) {
-  const takeawayCostPerMeal = householdSize * 13;
-  const takeawayTotal = numMeals * takeawayCostPerMeal;
-  const takeawaySaving = takeawayTotal - dinnerPlanCost;
-  const showSaving = hasMealsSetup && dinnerPlanCost > 0 && takeawaySaving > 2;
+  // Takeaway savings: benchmark $13/person/meal; only show when meals are planned
+  const TAKEAWAY_PER_PERSON_PER_MEAL = 13;
+  const benchmarkTotal = numMeals * householdSize * TAKEAWAY_PER_PERSON_PER_MEAL;
+
+  // If user entered eating-out data, use that (scaled to numMeals); otherwise use benchmark
+  const takeawayComparison = benchmarkTotal;
+  const takeawaySaving = takeawayComparison - dinnerPlanCost;
+
+  // Only show if meals planned, costs known, meaningful saving, AND groceries entered
+  const showSaving = hasMealsSetup && hasGroceries && dinnerPlanCost > 0 && numMeals > 0 && takeawaySaving > 2;
+
+  // Display label for estimated figure (proportional or full-week)
+  const estimateLabel = hasMealsSetup && numMeals > 0 && numMeals < 7
+    ? `~${numMeals} dinners covered`
+    : "Estimated dinners";
 
   return (
     <Card style={{ borderColor: C.primary }}>
@@ -187,41 +204,54 @@ function FoodFocusCard({
         <Text style={[styles.cardTitle, { color: C.text }]}>Where groceries are going</Text>
       </View>
 
-      <View style={styles.foodRow}>
-        <View style={styles.foodCell}>
-          <Text style={[styles.foodCellLabel, { color: C.textMuted }]}>Estimated dinners</Text>
-          <Text style={[styles.foodCellValue, { color: C.text }]}>{fmt(estimatedDinnerSpend)}</Text>
+      {!hasGroceries ? (
+        <View style={[styles.partialNudge, { backgroundColor: C.tealTint, borderColor: C.primary }]}>
+          <Feather name="info" size={14} color={C.primary} />
+          <Text style={[styles.partialNudgeText, { color: C.primaryDark }]}>
+            Add your weekly grocery spend to unlock dinner insights and savings comparisons.
+          </Text>
         </View>
-        {hasMealsSetup && dinnerPlanCost > 0 && (
-          <>
-            <View style={[styles.foodDivider, { backgroundColor: C.border }]} />
+      ) : (
+        <>
+          <View style={styles.foodRow}>
             <View style={styles.foodCell}>
-              <Text style={[styles.foodCellLabel, { color: C.textMuted }]}>Your dinner plan</Text>
-              <Text style={[styles.foodCellValue, { color: C.primary }]}>{fmt(dinnerPlanCost)}</Text>
+              <Text style={[styles.foodCellLabel, { color: C.textMuted }]}>{estimateLabel}</Text>
+              <Text style={[styles.foodCellValue, { color: C.text }]}>{fmt(estimatedDinnerSpend)}</Text>
             </View>
-          </>
-        )}
-      </View>
-
-      <Text style={[styles.foodInsight, { color: C.textSecondary }]}>{dinnerInsight}</Text>
-
-      {showSaving && (
-        <View style={[styles.takeawaySavingRow, { backgroundColor: C.plumTint ?? "#F5EEF8", borderColor: C.plum }]}>
-          <Feather name="award" size={14} color={C.plum} />
-          <View style={{ flex: 1 }}>
-            <Text style={[styles.takeawaySavingText, { color: C.plum }]}>
-              Your meal plan saves you ~{fmt(Math.round(takeawaySaving))} vs takeaways this week
-            </Text>
-            <Text style={[styles.takeawaySavingMontly, { color: C.plum }]}>
-              That's ~{fmt(Math.round(takeawaySaving * 4))}/month if you keep this up
-            </Text>
+            {hasMealsSetup && dinnerPlanCost > 0 && (
+              <>
+                <View style={[styles.foodDivider, { backgroundColor: C.border }]} />
+                <View style={styles.foodCell}>
+                  <Text style={[styles.foodCellLabel, { color: C.textMuted }]}>Your dinner plan</Text>
+                  <Text style={[styles.foodCellValue, { color: C.primary }]}>{fmt(dinnerPlanCost)}</Text>
+                </View>
+              </>
+            )}
           </View>
-        </View>
-      )}
 
-      <Text style={[styles.foodHelper, { color: C.textMuted }]}>
-        We estimate dinners from your weekly grocery spend — close enough, not spreadsheet-level.
-      </Text>
+          <Text style={[styles.foodInsight, { color: C.textSecondary }]}>{dinnerInsight}</Text>
+
+          {showSaving && (
+            <View style={[styles.takeawaySavingRow, { backgroundColor: C.plumTint ?? "#F5EEF8", borderColor: C.plum }]}>
+              <Feather name="award" size={14} color={C.plum} />
+              <View style={{ flex: 1 }}>
+                <Text style={[styles.takeawaySavingText, { color: C.plum }]}>
+                  {hasEatingOutData
+                    ? `Your meal plan saves you ~${fmt(Math.round(takeawaySaving))} vs eating out this week`
+                    : `Based on typical takeaway costs, this plan could save about ${fmt(Math.round(takeawaySaving))}`}
+                </Text>
+                <Text style={[styles.takeawaySavingMontly, { color: C.plum }]}>
+                  That's ~{fmt(Math.round(takeawaySaving * 4))}/month if you keep it up
+                </Text>
+              </View>
+            </View>
+          )}
+
+          <Text style={[styles.foodHelper, { color: C.textMuted }]}>
+            Estimated from your grocery spend — close enough, not spreadsheet-level.
+          </Text>
+        </>
+      )}
     </Card>
   );
 }
@@ -532,14 +562,38 @@ export default function MoneyScreen() {
             fmt={formatMoneyRound}
           />
 
+          {/* Partial setup nudge — income entered but no groceries yet */}
+          {result.isPartialSetup && (
+            <Card style={{ borderColor: C.border }}>
+              <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+                <Feather name="info" size={16} color={C.textSecondary} />
+                <Text style={[styles.cardTitle, { color: C.text, flex: 1 }]}>Nice start</Text>
+              </View>
+              <Text style={[styles.editHelper, { color: C.textSecondary }]}>
+                Add groceries or eating out to unlock savings insights and see the full picture.
+              </Text>
+              <TouchableOpacity
+                onPress={goToMoneySetup}
+                activeOpacity={0.82}
+                style={[styles.editBtn, { backgroundColor: C.primary }]}
+              >
+                <Feather name="plus" size={15} color="#fff" />
+                <Text style={styles.editBtnText}>Add more numbers</Text>
+              </TouchableOpacity>
+            </Card>
+          )}
+
           {money && (
             <FoodFocusCard
               estimatedDinnerSpend={result.estimatedDinnerSpend}
+              fullWeekDinnerEstimate={result.fullWeekDinnerEstimate}
               dinnerPlanCost={dinnerPlanCost}
               dinnerInsight={result.dinnerInsight}
               hasMealsSetup={hasMealsSetup}
               numMeals={filledMeals.length}
               householdSize={preferences.householdSize ?? 4}
+              hasGroceries={result.hasGroceries}
+              hasEatingOutData={result.hasEatingOutData}
               fmt={formatMoneyRound}
             />
           )}
@@ -702,6 +756,21 @@ const styles = StyleSheet.create({
     fontFamily: "Inter_400Regular",
     lineHeight: 18,
     fontStyle: "italic",
+  },
+  partialNudge: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: 8,
+    borderRadius: 10,
+    borderWidth: 1.5,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+  },
+  partialNudgeText: {
+    fontSize: 13,
+    fontFamily: "Inter_400Regular",
+    lineHeight: 18,
+    flex: 1,
   },
   suggestionsSection: {
     gap: 10,

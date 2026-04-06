@@ -199,16 +199,24 @@ export interface MoneyPageResult {
   remaining: number;
   suggestions: MoneySuggestion[];
   dinnerInsight: string;
+  // Proportional estimate — scaled to meals actually planned (not full-week)
   estimatedDinnerSpend: number;
+  // Full-week dinner allocation (65% of groceries, all 7 nights)
+  fullWeekDinnerEstimate: number;
+  plannedMealsCount: number;
+  // Gating flags for conditional UI
+  hasGroceries: boolean;
+  hasEatingOutData: boolean;
+  isPartialSetup: boolean;   // true when income/fixed costs entered but no groceries
 }
 
 function snapshotHeadlineFor(state: WeeklyState): string {
   switch (state) {
-    case 'over':  return 'Slight overspend — easy fix 👇';
-    case 'tight': return 'A little tight — easy fix though.';
+    case 'over':  return 'Slight overspend — a couple of easy fixes below.';
+    case 'tight': return 'A little tight this week — worth a look.';
     case 'ok':    return "Holding steady this week.";
     case 'good':  return "You're in a good spot this week.";
-    case 'great': return "You're in a great spot this week.";
+    case 'great': return "You're in a great spot — looking solid.";
   }
 }
 
@@ -216,7 +224,10 @@ export function buildMoneyPage(
   inputs: YourWeekInputs,
   dinnerPlanCost: number,
 ): MoneyPageResult {
-  const { weeklyMode, goal, hasMealsSetup, money } = inputs;
+  const { hasMealsSetup, money, meals } = inputs;
+
+  const dinnersPlanned = meals?.dinnersPlanned ?? 0;
+  const TOTAL_DINNERS_IN_WEEK = 7;
 
   if (!money) {
     return {
@@ -226,6 +237,11 @@ export function buildMoneyPage(
       suggestions: [],
       dinnerInsight: 'No dinners planned yet.',
       estimatedDinnerSpend: 0,
+      fullWeekDinnerEstimate: 0,
+      plannedMealsCount: dinnersPlanned,
+      hasGroceries: false,
+      hasEatingOutData: false,
+      isPartialSetup: false,
     };
   }
 
@@ -237,23 +253,44 @@ export function buildMoneyPage(
     otherWeeklySpend = 0,
   } = money;
 
+  const hasGroceries = groceriesWeekly > 0;
+  const hasEatingOutData = eatingOutWeekly > 0;
+  // Partial setup: user has income/fixed costs but hasn't entered grocery spend yet
+  const isPartialSetup = weeklyIncome > 0 && !hasGroceries;
+
   const weeklyState = computeWeeklyState(money);
   const remaining = weeklyIncome - fixedWeeklyCosts - groceriesWeekly - eatingOutWeekly - otherWeeklySpend;
 
   const isOver = weeklyState === 'over' || weeklyState === 'tight';
   const suggestions = isOver ? MONEY_SUGGESTIONS.slice(0, 3) : MONEY_SUGGESTIONS.slice(3, 5);
 
-  const estimatedDinnerSpend = Math.round(groceriesWeekly * 0.65);
+  // Full-week estimate: ~65% of groceries covers all 7 dinners
+  const fullWeekDinnerEstimate = Math.round(groceriesWeekly * 0.65);
 
+  // Proportional estimate: scaled to how many dinners are actually planned
+  const proportion = dinnersPlanned > 0 ? Math.min(dinnersPlanned / TOTAL_DINNERS_IN_WEEK, 1) : 1;
+  const estimatedDinnerSpend = hasGroceries
+    ? Math.round(fullWeekDinnerEstimate * proportion)
+    : 0;
+
+  // Dinner insight — proportional and coverage-aware
   let dinnerInsight: string;
-  if (!hasMealsSetup || dinnerPlanCost === 0) {
-    dinnerInsight = `We estimate dinners take about ${Math.round(65)}% of your grocery spend.`;
-  } else if (dinnerPlanCost < estimatedDinnerSpend) {
-    dinnerInsight = 'Your planned dinners come in under the grocery estimate. Nice.';
-  } else if (dinnerPlanCost > estimatedDinnerSpend * 1.15) {
-    dinnerInsight = 'Your dinner plan is a little over the estimate — a swap or two could help.';
+  if (!hasGroceries) {
+    dinnerInsight = 'Add your weekly grocery spend to see how your dinners track.';
+  } else if (!hasMealsSetup || dinnerPlanCost === 0) {
+    dinnerInsight = `About 65% of your grocery spend goes to dinners — roughly ${Math.round(fullWeekDinnerEstimate > 0 ? fullWeekDinnerEstimate : groceriesWeekly * 0.65)} for the week.`;
   } else {
-    dinnerInsight = 'Your planned dinners track close to the estimate. Looks good.';
+    const coverageNote = dinnersPlanned < TOTAL_DINNERS_IN_WEEK
+      ? `This plan covers ${dinnersPlanned} of ${TOTAL_DINNERS_IN_WEEK} dinners. `
+      : '';
+
+    if (dinnerPlanCost < estimatedDinnerSpend * 0.9) {
+      dinnerInsight = `${coverageNote}Your planned dinners come in under the estimate — nice work.`;
+    } else if (dinnerPlanCost > estimatedDinnerSpend * 1.2) {
+      dinnerInsight = `${coverageNote}Your dinner plan is a little over the estimate — a swap or two could help.`;
+    } else {
+      dinnerInsight = `${coverageNote}Your planned dinners track close to the estimate. Looks good.`;
+    }
   }
 
   return {
@@ -263,5 +300,10 @@ export function buildMoneyPage(
     suggestions,
     dinnerInsight,
     estimatedDinnerSpend,
+    fullWeekDinnerEstimate,
+    plannedMealsCount: dinnersPlanned,
+    hasGroceries,
+    hasEatingOutData,
+    isPartialSetup,
   };
 }
