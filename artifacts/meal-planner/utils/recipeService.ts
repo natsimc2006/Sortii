@@ -34,7 +34,11 @@ function normaliseUKRecipe(r: any): any {
     difficulty: 'easy',
     cookingStyle: 'mixed',
     healthTags: ['standard'],
-    budgetTags: costPerServe < 1.5 ? ['budget', 'standard'] : ['standard'],
+    budgetTags: costPerServe < 1.5
+      ? ['budget', 'standard']
+      : costPerServe < 2.5
+        ? ['standard']
+        : ['standard', 'premium'],
     leftoversFriendly: tags.includes('batch_cook'),
     mealType: r.mealType ?? 'dinner',
     estimatedCostBand: deriveCostBand(costPerServe),

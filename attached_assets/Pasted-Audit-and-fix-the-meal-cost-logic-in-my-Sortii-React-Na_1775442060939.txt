@@ -1,0 +1,81 @@
+Audit and fix the meal cost logic in my Sortii React Native / Expo app.
+
+Problem:
+The planner appears to be showing meal cost ranges that may no longer correctly reflect:
+- household size
+- meals per week
+- budget tier (Super Budget / Budget / Standard / Premium)
+- actual selected meals
+
+The recent Meals + Money changes may have broken the connection between:
+- meal generation
+- pricing engine
+- displayed weekly cost range
+
+Goals:
+1. Verify where the planner’s top-bar weekly meal cost range is coming from
+2. Ensure budget tier still meaningfully affects recipe selection and cost
+3. Ensure money setup does NOT override meal planner pricing
+4. Ensure the displayed weekly dinner cost/range is based on actual selected meals
+5. Restore clear price separation between Super Budget, Budget, Standard, and Premium
+
+Audit these exact areas:
+
+1. Find the source of the top-bar weekly cost range shown on the planner screen
+- Check whether it comes from:
+  - actual selected meal totals
+  - ingredient pricing engine
+  - mock/fallback values
+  - hardcoded average ranges
+- If it is not based on actual selected meals, fix it
+
+2. Check budget tier wiring
+Ensure the selected tier:
+- is passed into meal generation
+- affects recipe eligibility and/or recipe scoring
+- affects cost targeting
+- materially changes the resulting weekly dinner total
+
+3. Check for unintended overwrite from money setup
+Ensure fields like:
+- groceriesWeekly
+- fixedWeeklyCosts
+- money setup values
+do NOT replace or clamp the meal planner’s own dinner cost calculations
+
+Correct architecture:
+- meal planner calculates dinner cost independently
+- money layer reads dinner cost
+- money layer does not rewrite planner pricing
+
+4. Validate per-recipe and weekly totals
+For each generated meal plan:
+- calculate estimated recipe cost for each selected meal
+- sum those recipe costs into a weekly dinner total
+- derive the displayed weekly range from the actual selected meal costs
+Do not use generic fallback estimates if real recipe costs are available
+
+5. Add a simple debug comparison test in code
+Create a temporary test or console output that generates meal plans for the same setup using:
+- Super Budget
+- Budget
+- Standard
+- Premium
+
+For the same household size and meals per week, log the weekly dinner total for each.
+The totals should clearly step upward by tier.
+If not, strengthen the tier logic until the separation is clear.
+
+6. Preserve current UX
+Do not redesign the planner UI.
+Just fix the logic and wiring behind:
+- weekly cost range
+- tier influence
+- cost totals
+
+7. Final expected outcome
+After fixing:
+- Super Budget should produce the lowest weekly dinner total
+- Premium should produce the highest
+- planner top-bar cost range should reflect actual selected meals
+- money screens should read meal cost, not control it

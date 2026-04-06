@@ -375,6 +375,7 @@ export function filterRecipes(
     if (!dietTypeOk(r, diet)) return false;
     if (effectiveBudget === "super-budget" && r.estimatedCostBand !== "low") return false;
     if (effectiveBudget === "budget" && !r.budgetTags.includes("budget")) return false;
+    if (effectiveBudget === "premium" && r.estimatedCostBand === "low") return false;
     if (prefs.leftoversMode === "cook-once" && !r.leftoversFriendly) return false;
     if (!exclusionOk(r)) return false;
     if (!kidOk(r)) return false;
@@ -391,6 +392,7 @@ export function filterRecipes(
     if (!dietTypeOk(r, diet)) return false;
     if (effectiveBudget === "super-budget" && r.estimatedCostBand !== "low") return false;
     if (effectiveBudget === "budget" && !r.budgetTags.includes("budget")) return false;
+    if (effectiveBudget === "premium" && r.estimatedCostBand === "low") return false;
     if (prefs.leftoversMode === "cook-once" && !r.leftoversFriendly) return false;
     if (!exclusionOk(r)) return false;
     if (!kidOk(r)) return false;

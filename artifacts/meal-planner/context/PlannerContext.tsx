@@ -103,7 +103,6 @@ function calculateWeeklyCost(
     const recipe = recipes.find((r) => r.id === meal.recipeId);
     const costPerServe =
       recipe?.costPerServe ??
-      recipe?.costPerServeAUD ??
       fallbackCostByBand(recipe?.estimatedCostBand ?? "medium", currencySymbol);
     return sum + costPerServe * prefs.householdSize;
   }, 0);
@@ -225,13 +224,27 @@ export function PlannerProvider({ children }: { children: React.ReactNode }) {
     const scoreRecipe = (r: Recipe): number => {
       let score = 0;
 
-      // Budget match: 25 pts
+      // Budget match: up to 35 pts (widened gap for clear tier separation)
       const budget = p.budgetLevel;
-      if (budget === "super-budget" && r.estimatedCostBand === "low") score += 25;
-      else if (budget === "budget" && (r.estimatedCostBand === "low" || r.budgetTags.includes("budget"))) score += 25;
-      else if (budget === "standard" && r.budgetTags.includes("standard")) score += 25;
-      else if (budget === "premium" && r.budgetTags.includes("premium")) score += 25;
-      else score += 10;
+      if (budget === "super-budget") {
+        score += r.estimatedCostBand === "low" ? 35 : 0;
+      } else if (budget === "budget") {
+        if (r.estimatedCostBand === "low") score += 35;
+        else if (r.budgetTags.includes("budget")) score += 25;
+        else score += 5;
+      } else if (budget === "standard") {
+        if (r.estimatedCostBand === "medium") score += 30;
+        else if (r.budgetTags.includes("standard")) score += 20;
+        else if (r.estimatedCostBand === "low") score += 10;
+        else score += 5;
+      } else if (budget === "premium") {
+        if (r.estimatedCostBand === "high") score += 35;
+        else if (r.budgetTags.includes("premium")) score += 25;
+        else if (r.estimatedCostBand === "medium") score += 15;
+        else score += 0;
+      } else {
+        score += 10;
+      }
 
       // Cook time: 20 pts
       const effort = p.cookingEffort ?? "any";
