@@ -202,7 +202,7 @@ export default function OnboardingScreen() {
     if (!isContextLoaded) return;
     if (isInGeneratingFlow.current) return;
     if (isOnboarded) {
-      router.replace("/(tabs)/planner");
+      router.replace("/returning");
     }
   }, [isContextLoaded, isOnboarded]);
 
