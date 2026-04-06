@@ -10,6 +10,7 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
+  useWindowDimensions,
   View,
 } from "react-native";
 
@@ -336,6 +337,7 @@ export default function OnboardingScreen() {
 
   const paddingTop = Platform.OS === "web" ? 60 : insets.top;
   const paddingBottom = Platform.OS === "web" ? 40 : insets.bottom + 24;
+  const { height: windowHeight } = useWindowDimensions();
 
   const mealStep = step >= 3 && step <= 8 ? step - 2 : 0;
 
@@ -414,7 +416,7 @@ export default function OnboardingScreen() {
 
   if (step === 0) {
     return (
-      <View style={[styles.screen, { backgroundColor: C.background, paddingTop }]}>
+      <View style={[styles.screen, { backgroundColor: C.background, paddingTop, height: windowHeight }]}>
         <ScrollView
           contentContainerStyle={styles.welcomeContent}
           showsVerticalScrollIndicator={false}
