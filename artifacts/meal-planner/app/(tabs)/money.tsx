@@ -23,6 +23,9 @@ import {
   WeekGoal,
   WeeklyState,
 } from "@/utils/yourWeekEngine";
+import { getSwapsForRecipe } from "@/utils/getSwapsForRecipe";
+import { SWAP_RULES } from "@/constants/swapRules";
+import type { Recipe } from "@/constants/recipes";
 
 const C = Colors.light;
 
@@ -190,6 +193,63 @@ function FoodFocusCard({
 
       <Text style={[styles.foodHelper, { color: C.textMuted }]}>
         We estimate dinners from your weekly grocery spend — close enough, not spreadsheet-level.
+      </Text>
+    </Card>
+  );
+}
+
+// ─── SortiiSavingsCard ──────────────────────────────────────
+
+function SortiiSavingsCard({
+  swapSavings,
+  pantryEfficiency,
+  fmt,
+}: {
+  swapSavings: number;
+  pantryEfficiency: number;
+  fmt: (n: number) => string;
+}) {
+  const total = Math.round(swapSavings + pantryEfficiency);
+  if (total < 2) return null;
+
+  const roundedSwap = Math.round(swapSavings);
+  const roundedPantry = Math.round(pantryEfficiency);
+
+  return (
+    <Card style={{ borderColor: C.primary, backgroundColor: C.tealTint }}>
+      <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+        <View style={[styles.savingsIconBadge, { backgroundColor: C.primary }]}>
+          <Feather name="trending-down" size={14} color="#fff" />
+        </View>
+        <Text style={[styles.cardTitle, { color: C.primary, flex: 1 }]}>What Sortii saved you</Text>
+      </View>
+
+      <View style={styles.savingsAmountRow}>
+        <Text style={[styles.savingsAmountBig, { color: C.primary }]}>
+          ~{fmt(total)}
+        </Text>
+        <Text style={[styles.savingsAmountLabel, { color: C.textSecondary }]}>
+          estimated this week
+        </Text>
+      </View>
+
+      <View style={styles.savingsBreakdown}>
+        {roundedSwap > 0 && (
+          <View style={styles.savingsBreakdownRow}>
+            <Text style={[styles.savingsBreakdownLabel, { color: C.textSecondary }]}>Smarter ingredient choices</Text>
+            <Text style={[styles.savingsBreakdownValue, { color: C.primary }]}>{fmt(roundedSwap)}</Text>
+          </View>
+        )}
+        {roundedPantry > 0 && (
+          <View style={styles.savingsBreakdownRow}>
+            <Text style={[styles.savingsBreakdownLabel, { color: C.textSecondary }]}>Pantry-friendly meal selection</Text>
+            <Text style={[styles.savingsBreakdownValue, { color: C.primary }]}>{fmt(roundedPantry)}</Text>
+          </View>
+        )}
+      </View>
+
+      <Text style={[styles.savingsDisclaimer, { color: C.textMuted }]}>
+        Compared with a less-planned weekly mix. Estimated, not exact.
       </Text>
     </Card>
   );
@@ -367,6 +427,30 @@ export default function MoneyScreen() {
     return sum + cost * (preferences.householdSize ?? 4);
   }, 0);
 
+  // ─── Sortii savings calculation ────────────────────────────
+  // Swap savings: count matched swap rules across all planned meals
+  const swapSavings = (() => {
+    const ruleCount: Record<string, number> = {};
+    for (const entry of filledMeals) {
+      const recipe = getRecipeById(entry.recipeId!) as Recipe | null;
+      if (!recipe) continue;
+      const matched = getSwapsForRecipe(recipe.ingredients.map((i) => i.name));
+      for (const swap of matched) {
+        ruleCount[swap.id] = (ruleCount[swap.id] ?? 0) + 1;
+      }
+    }
+    return Object.entries(ruleCount).reduce((sum, [ruleId, count]) => {
+      const rule = SWAP_RULES.find((r) => r.id === ruleId);
+      return rule ? sum + rule.savingPerServeAUD * (preferences.householdSize ?? 4) * count : sum;
+    }, 0);
+  })();
+
+  // Pantry efficiency: batch/leftover-friendly recipes save ~$1.80/serve vs convenience alternatives
+  const pantryEfficiency = filledMeals.filter((e) => {
+    const r = getRecipeById(e.recipeId!) as Recipe | null;
+    return r && (r.batchCook || r.leftoversFriendly);
+  }).length * 1.8 * (preferences.householdSize ?? 4);
+
   const result = buildMoneyPage(
     {
       weeklyMode,
@@ -410,6 +494,14 @@ export default function MoneyScreen() {
               dinnerPlanCost={dinnerPlanCost}
               dinnerInsight={result.dinnerInsight}
               hasMealsSetup={hasMealsSetup}
+              fmt={formatMoneyRound}
+            />
+          )}
+
+          {hasMealsSetup && filledMeals.length > 0 && (
+            <SortiiSavingsCard
+              swapSavings={swapSavings}
+              pantryEfficiency={pantryEfficiency}
               fmt={formatMoneyRound}
             />
           )}
@@ -689,5 +781,50 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontFamily: "Inter_400Regular",
     textDecorationLine: "underline",
+  },
+  savingsIconBadge: {
+    width: 30,
+    height: 30,
+    borderRadius: 10,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  savingsAmountRow: {
+    flexDirection: "row",
+    alignItems: "baseline",
+    gap: 8,
+  },
+  savingsAmountBig: {
+    fontSize: 28,
+    fontFamily: "Manrope_700Bold",
+    lineHeight: 34,
+  },
+  savingsAmountLabel: {
+    fontSize: 13,
+    fontFamily: "Inter_400Regular",
+  },
+  savingsBreakdown: {
+    gap: 6,
+    paddingTop: 4,
+  },
+  savingsBreakdownRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  savingsBreakdownLabel: {
+    fontSize: 13,
+    fontFamily: "Inter_400Regular",
+    flex: 1,
+  },
+  savingsBreakdownValue: {
+    fontSize: 13,
+    fontFamily: "Inter_600SemiBold",
+  },
+  savingsDisclaimer: {
+    fontSize: 11,
+    fontFamily: "Inter_400Regular",
+    lineHeight: 16,
+    fontStyle: "italic",
   },
 });

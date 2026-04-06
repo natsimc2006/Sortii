@@ -1,0 +1,343 @@
+Please implement the next product-logic and Money Sorted improvements for Sortii. Keep the current Sortii brand, rounded styling, teal-led palette, soft premium feel, and calm tone. Do not redesign the app. This is a logic, hierarchy, and value-communication pass.
+
+PRIMARY GOAL
+Make the budget tiers feel genuinely different, reduce redundant planner actions, and make the Money Sorted page clearly show the value Sortii creates.
+
+⸻
+
+	1.	MAKE BUDGET TIERS GENERATE DIFFERENT WEEKS
+
+⸻
+
+Current issue:
+Super Budget, Budget, and Standard are returning very similar meals and costs. This makes the budget selector feel cosmetic and weak. Only Premium currently feels meaningfully different.
+
+Please update the meal-generation logic so each budget tier acts as a distinct meal-planning profile, not just a label.
+
+Budget tier behaviour
+
+Super Budget
+Meal profile:
+	•	lowest-cost meals
+	•	pantry-friendly meals
+	•	batch-friendly meals
+	•	simpler ingredient lists
+	•	more overlap in ingredients across the week
+	•	more practical family basics
+	•	fewer premium proteins
+	•	fewer speciality ingredients
+
+Generation priorities:
+	1.	lowest cost
+	2.	pantry overlap
+	3.	batch value
+	4.	simplicity
+	5.	variety
+
+Budget
+Meal profile:
+	•	still cost-conscious
+	•	practical, everyday meals
+	•	slightly more variety than Super Budget
+	•	moderate ingredient count
+	•	balanced low-cost proteins
+	•	simple prep
+
+Generation priorities:
+	1.	cost
+	2.	practicality
+	3.	prep ease
+	4.	balanced variety
+
+Standard
+Meal profile:
+	•	more balanced and varied
+	•	broader mix of meals
+	•	more freshness and flexibility
+	•	less repetition than Super Budget/Budget
+	•	still sensible, but not tightly cost-led
+
+Generation priorities:
+	1.	variety
+	2.	balanced cost
+	3.	freshness
+	4.	interest across the week
+
+Premium
+Keep Premium as the broadest and most flexible tier:
+	•	more indulgent meals
+	•	more premium proteins
+	•	more variety
+	•	less cost sensitivity
+	•	greater ingredient tolerance
+
+Generation priorities:
+	1.	variety
+	2.	indulgence
+	3.	premium ingredients
+	4.	lower cost sensitivity
+
+⸻
+
+	2.	ADD / USE RECIPE TAGS TO SUPPORT BUDGET DIFFERENTIATION
+
+⸻
+
+If not already in place, support recipe selection using tags or fields such as:
+	•	budget_tier_min
+	•	budget_tier_max
+	•	low_cost
+	•	moderate_cost
+	•	higher_cost
+	•	pantry_friendly
+	•	batch
+	•	repeat_friendly
+	•	premium_protein
+	•	family_basic
+	•	indulgent
+	•	quick
+	•	simple_ingredients
+
+Use these to make the generated week visibly and financially different by tier.
+
+⸻
+
+	3.	ENSURE COST DIFFERENTIATION BY TIER
+
+⸻
+
+Please make sure the weekly estimated cost changes meaningfully by tier.
+
+Expected pattern:
+	•	Super Budget = lowest estimate
+	•	Budget = low-mid estimate
+	•	Standard = mid estimate
+	•	Premium = highest estimate
+
+Do not let Super Budget / Budget / Standard all return almost identical cost ranges unless the actual selected week genuinely overlaps by chance.
+
+If needed, widen tier cost bands so the user can feel the difference.
+
+⸻
+
+	4.	MAKE BUDGET TIERS UNDERSTANDABLE TO THE USER
+
+⸻
+
+In the budget quick-edit selector, add short helper descriptions for each tier so users understand the payoff of each option.
+
+Use copy like:
+
+Super Budget
+“Lowest-cost meals, more pantry and batch wins”
+
+Budget
+“Everyday value with a bit more variety”
+
+Standard
+“Balanced meals with more flexibility”
+
+Premium
+“More variety, nicer ingredients, less compromise”
+
+Keep this subtle and easy to scan.
+
+⸻
+
+	5.	IMPROVE WHAT HAPPENS WHEN BUDGET CHANGES
+
+⸻
+
+When the user changes budget tier from the top planner chip:
+
+If the current plan still fits the new tier:
+	•	update the chip immediately
+	•	update the price estimate if needed
+	•	no rebuild prompt needed
+
+If the current plan no longer fits the new tier:
+	•	either auto-refresh the week
+OR
+	•	show a strong inline action bar
+
+If using an action bar, use copy like:
+
+Headline:
+“Your meals don’t match this budget yet”
+
+Supporting text:
+“Refresh this week to pull meals that better fit your selected budget.”
+
+CTA:
+“Refresh week”
+
+Do not use a weak tip-style message for this.
+
+⸻
+
+	6.	REVIEW THE ACTION ROW ABOVE THE BOTTOM NAV
+
+⸻
+
+Current row includes:
+	•	Fill Gaps
+	•	Save
+	•	Bin/Delete
+
+This row now feels somewhat redundant because similar actions exist elsewhere and it takes up valuable visual space.
+
+Please simplify this area.
+
+Preferred approach:
+	•	keep “Fill Gaps” as the visible primary shortcut
+	•	move “Save” and “Bin/Delete” into a secondary action menu, overflow menu, or the Adjust area
+
+Alternative acceptable approach:
+	•	replace the full row with a single “Plan actions” button that opens a compact action sheet including:
+	•	Fill gaps
+	•	Save week
+	•	Clear week
+
+Goal:
+	•	reduce clutter
+	•	reclaim vertical space
+	•	keep most useful action visible
+	•	maintain all functionality
+
+⸻
+
+	7.	IMPROVE MONEY SORTED PAGE WITH TARGETED SORTII ACCENTS
+
+⸻
+
+The Money Sorted page is tidy, but it can use a little more Sortii personality.
+
+Do NOT redesign the page or over-colour it.
+
+Add subtle Sortii accents in the right places only:
+	•	success/status pill
+	•	positive numbers like “A$300 left this week”
+	•	savings callouts
+	•	key insight cards
+	•	small header/icon accents if useful
+
+Keep the page mostly clean and neutral, but let Sortii show up in:
+	•	wins
+	•	savings
+	•	actions
+	•	positive feedback
+
+Goal:
+Make the page feel clearly part of Sortii without becoming loud or cluttered.
+
+⸻
+
+	8.	ADD A NEW “WHAT SORTII SAVED YOU” INSIGHT CARD
+
+⸻
+
+Please add a new card to the Money Sorted page that clearly communicates the value of the meal plan and swap logic.
+
+Preferred placement:
+	•	below “Where groceries are going”
+	•	above “Easy wins this week”
+
+Card title:
+“What Sortii saved you”
+
+Purpose:
+Show the estimated value created by meal planning, swaps, pantry use, or reduced spend logic.
+
+Suggested structure:
+	•	Meal swaps applied: A$18
+	•	Pantry-friendly choices: A$7
+	•	Estimated weekly savings: A$25
+
+Or a simplified version:
+	•	“You’ve saved about A$25 this week”
+
+Supporting line:
+“Compared with your original weekly meal mix.”
+
+If detailed breakdown is not yet available, start with a simplified version and structure the card so it can expand later.
+
+⸻
+
+	9.	CREATE A SIMPLE SAVINGS CALCULATION LAYER
+
+⸻
+
+Please add the underlying logic needed to estimate weekly savings.
+
+Start simple and do not over-engineer.
+
+Use a model such as:
+
+Estimated weekly savings =
+(original meal plan cost before swaps)
+minus
+(current optimised meal plan cost)
+
+If possible, optionally add:
+	•	pantry efficiency estimate
+	•	avoided takeaway estimate
+	•	swap savings estimate
+
+Even if the first version is simple, make the value feel believable and useful.
+
+Important:
+	•	do not pretend the number is exact if it is estimated
+	•	frame it as approximate where needed
+
+Use copy like:
+	•	“saved about A$25 this week”
+	•	“estimated weekly savings”
+	•	“about A$18 leaner than your original week”
+
+⸻
+
+	10.	KEEP “WHERE GROCERIES ARE GOING” AS A SEPARATE IDEA
+
+⸻
+
+Do not merge the grocery-share insight with the savings insight.
+
+These are separate ideas:
+	1.	how grocery money is allocated
+	2.	what Sortii helped save
+
+Keep them as separate cards/insights.
+
+⸻
+
+	11.	OUTPUT REQUIRED AFTER IMPLEMENTATION
+
+⸻
+
+After implementing, please provide:
+	1.	Summary of changes made
+	2.	What was changed in budget-tier generation logic
+	3.	What recipe tags/filters were added or updated
+	4.	How weekly cost differentiation now works
+	5.	What was changed in the planner action row above the bottom nav
+	6.	What targeted Sortii accents were added to the Money Sorted page
+	7.	How the “What Sortii saved you” card is calculated
+	8.	Any assumptions made
+	9.	A short manual test checklist covering:
+	•	Super Budget generates a meaningfully cheaper/more pantry-friendly week
+	•	Budget generates a slightly broader week than Super Budget
+	•	Standard generates more variety than Budget
+	•	Premium remains the most flexible/indulgent
+	•	weekly cost estimates differ by tier
+	•	changing tiers updates the planner clearly
+	•	planner action row is simplified and still functional
+	•	Money Sorted shows the new savings card
+	•	grocery allocation and savings remain separate ideas
+	•	page still feels clean and premium
+
+This pass should make the app feel:
+	•	smarter
+	•	more differentiated
+	•	more valuable
+	•	more trustworthy
+	•	more distinctly Sortii

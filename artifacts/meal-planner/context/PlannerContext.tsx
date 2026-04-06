@@ -224,24 +224,30 @@ export function PlannerProvider({ children }: { children: React.ReactNode }) {
     const scoreRecipe = (r: Recipe): number => {
       let score = 0;
 
-      // Budget match: up to 35 pts (widened gap for clear tier separation)
+      // Budget match: up to 40 pts — decisive tier separation
+      // Each tier strongly favours its cost band; other bands are heavily discounted.
       const budget = p.budgetLevel;
       if (budget === "super-budget") {
-        score += r.estimatedCostBand === "low" ? 35 : 0;
+        if (r.estimatedCostBand === "low") score += 40;
+        else if (r.estimatedCostBand === "medium") score += 4;
+        // high: 0 pts — never selected for super-budget
+        // Pantry/batch bonus: super-budget rewards flexibility & ingredient efficiency
+        if (r.batchCook || r.leftoversFriendly) score += 8;
       } else if (budget === "budget") {
         if (r.estimatedCostBand === "low") score += 35;
-        else if (r.budgetTags.includes("budget")) score += 25;
-        else score += 5;
+        else if (r.estimatedCostBand === "medium") score += 10;
+        // high: 0 pts — no high-cost meals for budget tier
+        if (r.budgetTags.includes("budget") && r.estimatedCostBand !== "high") score += 4;
       } else if (budget === "standard") {
-        if (r.estimatedCostBand === "medium") score += 30;
-        else if (r.budgetTags.includes("standard")) score += 20;
-        else if (r.estimatedCostBand === "low") score += 10;
-        else score += 5;
+        if (r.estimatedCostBand === "medium") score += 28;
+        else if (r.estimatedCostBand === "low") score += 18;
+        else if (r.estimatedCostBand === "high") score += 10;
+        if (r.budgetTags.includes("standard")) score += 4;
       } else if (budget === "premium") {
-        if (r.estimatedCostBand === "high") score += 35;
-        else if (r.budgetTags.includes("premium")) score += 25;
-        else if (r.estimatedCostBand === "medium") score += 15;
-        else score += 0;
+        if (r.estimatedCostBand === "high") score += 40;
+        else if (r.estimatedCostBand === "medium") score += 16;
+        // low: 0 pts — avoid low-cost meals for premium tier
+        if (r.budgetTags.includes("premium")) score += 4;
       } else {
         score += 10;
       }
