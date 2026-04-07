@@ -27,22 +27,31 @@ export function SwapTips({ ingredientNames }: Props) {
   const visible = swaps.slice(0, MAX_VISIBLE);
   const overflow = swaps.length - MAX_VISIBLE;
 
-  // Collapsed — just the pill
+  // Collapsed — pill with expand tap + inline X to dismiss
   if (!expanded) {
     return (
-      <TouchableOpacity
-        onPress={() => setExpanded(true)}
-        activeOpacity={0.75}
-        style={styles.pill}
-      >
-        <Text style={styles.pillEmoji}>💡</Text>
-        <Text style={styles.pillText}>
-          {swaps.length === 1
-            ? "1 swap waiting"
-            : `${swaps.length} swaps waiting`}
-        </Text>
-        <Feather name="chevron-down" size={12} color={PLUM} />
-      </TouchableOpacity>
+      <View style={styles.pillRow}>
+        <TouchableOpacity
+          onPress={() => setExpanded(true)}
+          activeOpacity={0.75}
+          style={styles.pill}
+        >
+          <Text style={styles.pillEmoji}>💡</Text>
+          <Text style={styles.pillText}>
+            {swaps.length === 1
+              ? "1 swap waiting"
+              : `${swaps.length} swaps waiting`}
+          </Text>
+          <Feather name="chevron-down" size={12} color={PLUM} />
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => setDismissed(true)}
+          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+          style={styles.pillDismiss}
+        >
+          <Feather name="x" size={13} color={PLUM} />
+        </TouchableOpacity>
+      </View>
     );
   }
 
@@ -129,6 +138,13 @@ function SwapRow({
 
 const styles = StyleSheet.create({
   // Collapsed pill
+  pillRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    marginTop: 6,
+    marginLeft: 2,
+  },
   pill: {
     flexDirection: "row",
     alignItems: "center",
@@ -140,8 +156,9 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     paddingHorizontal: 10,
     paddingVertical: 5,
-    marginTop: 6,
-    marginLeft: 2,
+  },
+  pillDismiss: {
+    padding: 4,
   },
   pillEmoji: { fontSize: 12 },
   pillText: {
