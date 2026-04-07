@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import Colors from "@/constants/Colors";
 import { Recipe } from "@/constants/recipes";
-import { useRecipeImage } from "@/hooks/useRecipeImage";
+import { toImageSource, useRecipeImage } from "@/hooks/useRecipeImage";
 
 interface RecipeCardProps {
   recipe: Recipe;
@@ -26,7 +26,7 @@ export function RecipeCard({
 }: RecipeCardProps) {
   const C = Colors.light;
   const [imgError, setImgError] = useState(false);
-  const imageUrl = useRecipeImage(recipe.id, recipe.name, recipe.imageUrl);
+  const imgSrc = useRecipeImage(recipe.id, recipe.name, recipe.imageUrl);
   const imgOpacity = useRef(new Animated.Value(0)).current;
 
   const handleImageLoad = () => {
@@ -44,7 +44,7 @@ export function RecipeCard({
         ? "layers"
         : "coffee";
 
-  const showImage = !!imageUrl && !imgError;
+  const showImage = imgSrc !== null && !imgError;
 
   return (
     <TouchableOpacity
@@ -61,7 +61,7 @@ export function RecipeCard({
         <View style={[styles.iconBox, { backgroundColor: C.chipBg }]}>
           {showImage ? (
             <Animated.Image
-              source={{ uri: imageUrl! }}
+              source={toImageSource(imgSrc)!}
               style={[styles.thumbnail, { opacity: imgOpacity }]}
               resizeMode="cover"
               onError={() => setImgError(true)}

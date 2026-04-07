@@ -13,7 +13,7 @@ import {
 import Colors from "@/constants/Colors";
 import { Recipe, getPrepStyleLabel } from "@/constants/recipes";
 import { getCurrentAustralianSeason, isRecipeSeasonal } from "@/utils/seasonUtils";
-import { useRecipeImage } from "@/hooks/useRecipeImage";
+import { toImageSource, useRecipeImage } from "@/hooks/useRecipeImage";
 
 const C = Colors.light;
 
@@ -64,7 +64,7 @@ export function MealSlotCard({
   kidFriendlyFilter = false,
 }: MealSlotCardProps) {
   const [imgError, setImgError] = useState(false);
-  const imageUrl = useRecipeImage(recipe?.id ?? "", recipe?.name ?? "", recipe?.imageUrl);
+  const imgSrc = useRecipeImage(recipe?.id ?? "", recipe?.name ?? "", recipe?.imageUrl);
   const imgOpacity = useRef(new Animated.Value(0)).current;
 
   const handleImageLoad = () => {
@@ -155,7 +155,7 @@ export function MealSlotCard({
   const placeholderBg = CUISINE_BG[cuisineKey] ?? "#F0F0F0";
   const placeholderEmoji = CUISINE_EMOJI[cuisineKey] ?? "🍽️";
 
-  const showImage = !!imageUrl && !imgError;
+  const showImage = imgSrc !== null && !imgError;
   const prepLabel = getPrepStyleLabel(recipe);
 
   return (
@@ -241,7 +241,7 @@ export function MealSlotCard({
         <View style={[styles.recipeIconBox, { backgroundColor: showImage ? ICON.recipe.bg : placeholderBg }]}>
           {showImage ? (
             <Animated.Image
-              source={{ uri: imageUrl! }}
+              source={toImageSource(imgSrc)!}
               style={[styles.recipeThumbnail, { opacity: imgOpacity }]}
               resizeMode="cover"
               onError={() => setImgError(true)}
