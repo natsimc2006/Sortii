@@ -350,8 +350,8 @@ export default function OnboardingScreen() {
   const paddingTop = Platform.OS === "web" ? 60 : insets.top;
   const paddingBottom = Platform.OS === "web" ? 40 : insets.bottom + 24;
   const { height: windowHeight, width: windowWidth } = useWindowDimensions();
-  // Logo: 72% of window width, capped at 340px — maintains aspect ratio (507:233 ≈ 2.176)
-  const logoWidth = Math.min(Math.round(windowWidth * 0.72), 340);
+  // Logo: 93.6% of window width, capped at 442px — maintains aspect ratio (507:233 ≈ 2.176)
+  const logoWidth = Math.min(Math.round(windowWidth * 0.936), 442);
   const logoHeight = Math.round(logoWidth / 2.176);
 
   const mealStep = step >= 3 && step <= 8 ? step - 2 : 0;
