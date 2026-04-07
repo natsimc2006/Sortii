@@ -41,7 +41,7 @@ const PLUM = "#5E3A4C";
 const PLUM_TINT = "#F3E8EE";
 const PLUM_BORDER = "rgba(94,58,76,0.20)";
 const HERO_BG = "#E6F3F0";
-const PAGE_BG = "#F7F3EB";
+const PAGE_BG = "#FFFFFF";
 const sortiiLogo = require("@/assets/images/sortii-logo-money.png");
 
 // ─── Status pill ────────────────────────────────────────────
@@ -245,7 +245,7 @@ function GroceriesSection({
 
   return (
     <View style={styles.groceriesSection}>
-      <Text style={styles.groceriesSectionTitle}>Existing Estimated Dinner Spend</Text>
+      <Text style={styles.groceriesSectionTitle}>Your usual estimated dinner spend</Text>
 
       <View style={styles.groceriesStatsRow}>
         <View style={styles.groceriesStat}>
