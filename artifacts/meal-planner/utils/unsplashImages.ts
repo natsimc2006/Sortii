@@ -26,6 +26,16 @@ const FOOD_WORDS = [
   "fresh", "ingredient", "chef", "plated",
 ];
 
+// ── Pinned images — curated, bypass all cache + Unsplash lookups ─────────────
+// Add a recipe name (lowercase) → URL here to lock a specific photo for a dish.
+// This takes priority over everything: session cache, AsyncStorage, and Unsplash.
+
+const PINNED_IMAGE_URLS: Record<string, string> = {
+  // Shepherd's Pie — TheMealDB "Lamb and Potato Pie" (British, professional food photo)
+  "shepherd's pie":  "https://www.themealdb.com/images/media/meals/sxrpws1511555907.jpg",
+  "shepherds pie":   "https://www.themealdb.com/images/media/meals/sxrpws1511555907.jpg",
+};
+
 // ── Curated query overrides for dishes that return poor results ───────────────
 
 const DISH_QUERY_OVERRIDES: Record<string, string> = {
@@ -193,6 +203,12 @@ export async function getRecipeImage(
   recipeName: string,
   existingUrl?: string
 ): Promise<string | null> {
+  // ── Check pinned images first — always wins, no cache or API calls ──────────
+  const nameLc = recipeName.toLowerCase().trim();
+  for (const [key, pinnedUrl] of Object.entries(PINNED_IMAGE_URLS)) {
+    if (nameLc.includes(key)) return pinnedUrl;
+  }
+
   const cacheKey = `${CACHE_PREFIX}${recipeId}`;
 
   if (SESSION_CACHE[cacheKey] !== undefined) {
