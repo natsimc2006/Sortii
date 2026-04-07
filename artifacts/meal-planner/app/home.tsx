@@ -81,7 +81,7 @@ export default function HomeScreen() {
     router.push(route as any);
   };
 
-  const PAGE_BG = "#F7F3EB";
+  const PAGE_BG = C.background;
 
   return (
     <View style={{ flex: 1, backgroundColor: PAGE_BG }}>
@@ -146,7 +146,7 @@ export default function HomeScreen() {
               style={[styles.stepCard, { backgroundColor: "#FFFFFF", borderColor: "#E8E8E8" }]}
             >
               <View style={[styles.stepCardAccent, { backgroundColor: step.stepColor }]} />
-              <View style={[styles.stepNum, { backgroundColor: C.primary }]}>
+              <View style={[styles.stepNum, { backgroundColor: step.stepColor }]}>
                 <Text style={styles.stepNumText}>{i + 1}</Text>
               </View>
               <View style={[styles.stepIconBox, { backgroundColor: step.stepColor }]}>

@@ -528,7 +528,7 @@ export function buildMoneyPage(
   if (!hasGroceries) {
     dinnerInsight = 'Add your weekly grocery spend to see how your dinners track.';
   } else if (!hasMealsSetup || dinnerPlanCost === 0) {
-    dinnerInsight = `About 65% of your grocery spend goes to dinners — roughly ${Math.round(fullWeekDinnerEstimate > 0 ? fullWeekDinnerEstimate : groceriesWeekly * 0.65)} for the week.`;
+    dinnerInsight = `About 65% of your grocery spend goes to dinners — roughly ${fmt(Math.round(fullWeekDinnerEstimate > 0 ? fullWeekDinnerEstimate : groceriesWeekly * 0.65))} for the week.`;
   } else {
     const coverageNote = dinnersPlanned < TOTAL_DINNERS_IN_WEEK
       ? `This plan covers ${dinnersPlanned} of ${TOTAL_DINNERS_IN_WEEK} dinners. `

@@ -245,11 +245,11 @@ function GroceriesSection({
 
   return (
     <View style={styles.groceriesSection}>
-      <Text style={styles.groceriesSectionTitle}>Where groceries are going</Text>
+      <Text style={styles.groceriesSectionTitle}>Estimated Dinner Spend</Text>
 
       <View style={styles.groceriesStatsRow}>
         <View style={styles.groceriesStat}>
-          <Text style={styles.groceriesStatLabel}>Estimated grocery spend</Text>
+          <Text style={styles.groceriesStatLabel}>Dinner estimate</Text>
           <Text style={styles.groceriesStatValue}>{fmt(estimatedDinnerSpend)}</Text>
         </View>
         {hasMealsSetup && dinnerPlanCost > 0 && (

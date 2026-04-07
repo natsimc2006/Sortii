@@ -437,7 +437,7 @@ export default function OnboardingScreen() {
   }
 
   if (step === 0) {
-    const PAGE_BG = "#F7F3EB";
+    const PAGE_BG = C.background;
     const LANDING_STEPS = [
       {
         icon: "sliders" as const,
@@ -555,7 +555,7 @@ export default function OnboardingScreen() {
                   width: 24,
                   height: 24,
                   borderRadius: 12,
-                  backgroundColor: C.primary,
+                  backgroundColor: s.color,
                   alignItems: "center",
                   justifyContent: "center",
                   alignSelf: "flex-start",
