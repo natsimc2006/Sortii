@@ -592,26 +592,6 @@ export default function PlannerScreen() {
               onPress={() => setActiveChip("cost")}
             />
           </View>
-          {isWeekFull && (
-            <View style={styles.smartActionRow}>
-              <TouchableOpacity
-                onPress={handleCheaperWeek}
-                style={[styles.smartActionChip, { backgroundColor: C.tealTint, borderColor: C.primary }]}
-                activeOpacity={0.75}
-              >
-                <Feather name="trending-down" size={12} color={C.primary} />
-                <Text style={[styles.smartActionChipText, { color: C.primary }]}>Cheaper week</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={handleQuickerWeek}
-                style={[styles.smartActionChip, { backgroundColor: "#FEF8E8", borderColor: C.gold }]}
-                activeOpacity={0.75}
-              >
-                <Feather name="zap" size={12} color={C.goldDark} />
-                <Text style={[styles.smartActionChipText, { color: C.goldDark }]}>Quicker week</Text>
-              </TouchableOpacity>
-            </View>
-          )}
           {preferences.kidFriendly && (
             <Text style={styles.kidFriendlyNote}>
               Showing kid-friendly meals only
