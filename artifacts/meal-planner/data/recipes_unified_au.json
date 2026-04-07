@@ -53745,5 +53745,215 @@
         "category": "dairy"
       }
     ]
+  },
+  {
+    "id": "r281",
+    "name": "Roast Pumpkin & Rice Salad",
+    "description": "Golden roasted pumpkin with a rice and barley blend, peas and hazelnuts in a Moroccan maple dressing",
+    "baseServings": 6,
+    "cookTimeMinutes": 50,
+    "difficulty": "easy",
+    "cookingStyle": "mixed",
+    "healthTags": [
+      "healthy"
+    ],
+    "budgetTags": [
+      "budget",
+      "standard"
+    ],
+    "leftoversFriendly": true,
+    "mealType": "dinner",
+    "estimatedCostBand": "low",
+    "ingredients": [
+      {
+        "name": "Butternut pumpkin",
+        "quantity": 800,
+        "unit": "g",
+        "category": "vegetables"
+      },
+      {
+        "name": "Rice and barley blend",
+        "quantity": 200,
+        "unit": "g",
+        "category": "grains"
+      },
+      {
+        "name": "Frozen peas",
+        "quantity": 75,
+        "unit": "g",
+        "category": "vegetables"
+      },
+      {
+        "name": "Sugar snap peas",
+        "quantity": 150,
+        "unit": "g",
+        "category": "vegetables"
+      },
+      {
+        "name": "Hazelnuts",
+        "quantity": 150,
+        "unit": "g",
+        "category": "pantry"
+      },
+      {
+        "name": "Moroccan seasoning",
+        "quantity": 3,
+        "unit": "tsp",
+        "category": "herbs"
+      },
+      {
+        "name": "White wine vinegar",
+        "quantity": 2,
+        "unit": "tbsp",
+        "category": "condiments"
+      },
+      {
+        "name": "Maple syrup",
+        "quantity": 2,
+        "unit": "tbsp",
+        "category": "condiments"
+      },
+      {
+        "name": "Olive oil",
+        "quantity": 80,
+        "unit": "ml",
+        "category": "condiments"
+      }
+    ],
+    "instructions": [
+      "Preheat oven to 220°C. Thinly slice pumpkin, arrange on a baking tray, drizzle with 1 tbs oil and season. Roast 20–25 minutes until golden and tender. Set aside to cool.",
+      "Place hazelnuts on a separate tray and bake for 8 minutes until golden. Cool then roughly chop.",
+      "Cook rice blend following packet directions. Transfer to a bowl to cool.",
+      "Cook sugar snap peas and frozen peas in boiling water for 2 minutes. Drain and rinse under cold water.",
+      "Whisk maple syrup, white wine vinegar, Moroccan seasoning and remaining oil together. Season with salt and pepper.",
+      "Combine pumpkin, hazelnuts, rice blend and peas. Stir through the dressing and serve."
+    ],
+    "proteinType": "none",
+    "cuisineType": "middle-eastern",
+    "seasonTags": [
+      "all"
+    ],
+    "imageUrl": "https://foodhub.scene7.com/is/image/woolworthsltdprod/dec14_roastpumpkinricesalad:Square-1300x1300",
+    "costPerServeAUD": 2.93,
+    "kidFriendly": false,
+    "kidFriendlyScore": 0,
+    "kidFriendlyReason": "",
+    "locale": [
+      "AU",
+      "UK"
+    ],
+    "costPerServeGBP": 1.55,
+    "ingredientsAU": [
+      {
+        "name": "Butternut pumpkin",
+        "quantity": 800,
+        "unit": "g",
+        "category": "vegetables"
+      },
+      {
+        "name": "Rice and barley blend",
+        "quantity": 200,
+        "unit": "g",
+        "category": "grains"
+      },
+      {
+        "name": "Frozen peas",
+        "quantity": 75,
+        "unit": "g",
+        "category": "vegetables"
+      },
+      {
+        "name": "Sugar snap peas",
+        "quantity": 150,
+        "unit": "g",
+        "category": "vegetables"
+      },
+      {
+        "name": "Hazelnuts",
+        "quantity": 150,
+        "unit": "g",
+        "category": "pantry"
+      },
+      {
+        "name": "Moroccan seasoning",
+        "quantity": 3,
+        "unit": "tsp",
+        "category": "herbs"
+      },
+      {
+        "name": "White wine vinegar",
+        "quantity": 2,
+        "unit": "tbsp",
+        "category": "condiments"
+      },
+      {
+        "name": "Maple syrup",
+        "quantity": 2,
+        "unit": "tbsp",
+        "category": "condiments"
+      },
+      {
+        "name": "Olive oil",
+        "quantity": 80,
+        "unit": "ml",
+        "category": "condiments"
+      }
+    ],
+    "ingredientsUK": [
+      {
+        "name": "Butternut squash",
+        "quantity": 800,
+        "unit": "g",
+        "category": "vegetables"
+      },
+      {
+        "name": "Rice and barley blend",
+        "quantity": 200,
+        "unit": "g",
+        "category": "grains"
+      },
+      {
+        "name": "Frozen peas",
+        "quantity": 75,
+        "unit": "g",
+        "category": "vegetables"
+      },
+      {
+        "name": "Sugar snap peas",
+        "quantity": 150,
+        "unit": "g",
+        "category": "vegetables"
+      },
+      {
+        "name": "Hazelnuts",
+        "quantity": 150,
+        "unit": "g",
+        "category": "pantry"
+      },
+      {
+        "name": "Moroccan seasoning",
+        "quantity": 3,
+        "unit": "tsp",
+        "category": "herbs"
+      },
+      {
+        "name": "White wine vinegar",
+        "quantity": 2,
+        "unit": "tbsp",
+        "category": "condiments"
+      },
+      {
+        "name": "Maple syrup",
+        "quantity": 2,
+        "unit": "tbsp",
+        "category": "condiments"
+      },
+      {
+        "name": "Olive oil",
+        "quantity": 80,
+        "unit": "ml",
+        "category": "condiments"
+      }
+    ]
   }
 ]
