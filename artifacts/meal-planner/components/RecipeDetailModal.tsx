@@ -193,6 +193,9 @@ export function RecipeDetailModal({ recipe, onClose }: RecipeDetailModalProps) {
     });
   };
 
+  const hasHero = heroImgSrc !== null && !heroImgError;
+  const topInset = Platform.OS === "web" ? 67 : insets.top + 16;
+
   return (
     <Modal
       visible={!!recipe}
@@ -201,155 +204,161 @@ export function RecipeDetailModal({ recipe, onClose }: RecipeDetailModalProps) {
       onRequestClose={onClose}
     >
       <View style={[styles.container, { backgroundColor: C.background }]}>
-        {heroImgSrc !== null && !heroImgError && (
-          <View style={styles.heroBanner}>
-            <Image
-              source={toImageSource(heroImgSrc)!}
-              style={styles.heroImage}
-              resizeMode="cover"
-              onError={() => setHeroImgError(true)}
-            />
-            <TouchableOpacity
-              onPress={onClose}
-              style={[styles.heroCloseBtn, { backgroundColor: "rgba(0,0,0,0.45)" }]}
-            >
-              <Feather name="x" size={20} color="#fff" />
-            </TouchableOpacity>
-          </View>
-        )}
-        <View
+        {/* Floating close button — always visible regardless of scroll position */}
+        <TouchableOpacity
+          onPress={onClose}
           style={[
-            styles.header,
+            styles.floatingCloseBtn,
             {
-              paddingTop: heroImgSrc !== null && !heroImgError ? 16 : (Platform.OS === "web" ? 67 : insets.top + 16),
-              borderBottomColor: C.cardBorder,
+              top: Platform.OS === "web" ? 16 : insets.top + 12,
+              backgroundColor: hasHero ? "rgba(0,0,0,0.45)" : C.chipBg,
             },
           ]}
         >
-          <View style={styles.headerRow}>
-            <Text style={[styles.title, { color: C.text }]} numberOfLines={2}>
-              {recipe.name}
-            </Text>
-            {!(heroImgSrc !== null && !heroImgError) && (
-              <TouchableOpacity
-                onPress={onClose}
-                style={[styles.closeBtn, { backgroundColor: C.chipBg }]}
-              >
-                <Feather name="x" size={20} color={C.text} />
-              </TouchableOpacity>
-            )}
-          </View>
+          <Feather name="x" size={20} color={hasHero ? "#fff" : C.text} />
+        </TouchableOpacity>
 
-          <Text style={[styles.desc, { color: C.textSecondary }]}>
-            {recipe.description}
-          </Text>
-
-          <View style={styles.metaRow}>
-            <MetaBadge icon="clock" label={`${recipe.cookTimeMinutes} min`} />
-            <MetaBadge icon="users" label={`Serves ${recipe.baseServings}`} />
-            <MetaBadge icon="bar-chart-2" label={recipe.difficulty} />
-            <MetaBadge icon="layers" label={recipe.cookingStyle} />
-            <MetaBadge icon="dollar-sign" label={`~$${costPerServe.toFixed(2)}/serve`} />
-            {recipe.leftoversFriendly && (
-              <MetaBadge icon="refresh-cw" label="Leftovers" />
-            )}
-          </View>
-        </View>
-
+        {/* Single scroll — hero image, title, meta, ingredients and steps all scroll together */}
         <ScrollView
           contentContainerStyle={[
-            styles.body,
+            styles.scrollContent,
             { paddingBottom: Platform.OS === "web" ? 60 : insets.bottom + 40 },
           ]}
           showsVerticalScrollIndicator={false}
         >
-          <View style={styles.sectionHeader}>
-            <Text style={[styles.sectionTitle, { color: C.text }]}>
-              Ingredients
+          {/* Hero image */}
+          {hasHero && (
+            <View style={styles.heroBanner}>
+              <Image
+                source={toImageSource(heroImgSrc)!}
+                style={styles.heroImage}
+                resizeMode="cover"
+                onError={() => setHeroImgError(true)}
+              />
+            </View>
+          )}
+
+          {/* Recipe header — title, description, meta badges */}
+          <View
+            style={[
+              styles.header,
+              {
+                paddingTop: hasHero ? 16 : topInset,
+                borderBottomColor: C.cardBorder,
+              },
+            ]}
+          >
+            <Text style={[styles.title, { color: C.text }]}>
+              {recipe.name}
             </Text>
-            <View style={[styles.servingPill, { backgroundColor: C.chipBg }]}>
-              <Feather name="users" size={12} color={C.primary} />
-              <Text style={[styles.servingPillText, { color: C.primary }]}>
-                {scaleFactor
-                  ? `Scaled for ${householdSize} people`
-                  : `${recipe.baseServings} servings`}
-              </Text>
+
+            <Text style={[styles.desc, { color: C.textSecondary }]}>
+              {recipe.description}
+            </Text>
+
+            <View style={styles.metaRow}>
+              <MetaBadge icon="clock" label={`${recipe.cookTimeMinutes} min`} />
+              <MetaBadge icon="users" label={`Serves ${recipe.baseServings}`} />
+              <MetaBadge icon="bar-chart-2" label={recipe.difficulty} />
+              <MetaBadge icon="layers" label={recipe.cookingStyle} />
+              <MetaBadge icon="dollar-sign" label={`~$${costPerServe.toFixed(2)}/serve`} />
+              {recipe.leftoversFriendly && (
+                <MetaBadge icon="refresh-cw" label="Leftovers" />
+              )}
             </View>
           </View>
 
-          {recipe.ingredients.map((ing, i) => {
-            const scaledQty = scaleFactor
-              ? scaleQuantity(ing.quantity, recipe.baseServings, householdSize)
-              : ing.quantity;
-            return (
-              <View
-                key={i}
-                style={[styles.ingRow, { borderBottomColor: C.cardBorder }]}
-              >
-                <View style={[styles.ingDot, { backgroundColor: C.primary }]} />
-                <Text style={[styles.ingName, { color: C.text }]}>
-                  {ing.name}
-                  {ing.optional ? (
-                    <Text style={{ color: C.textMuted }}> (optional)</Text>
-                  ) : null}
-                </Text>
-                <Text style={[styles.ingQty, { color: C.primary }]}>
-                  {formatQty(scaledQty)} {ing.unit}
+          {/* Ingredients */}
+          <View style={styles.body}>
+            <View style={styles.sectionHeader}>
+              <Text style={[styles.sectionTitle, { color: C.text }]}>
+                Ingredients
+              </Text>
+              <View style={[styles.servingPill, { backgroundColor: C.chipBg }]}>
+                <Feather name="users" size={12} color={C.primary} />
+                <Text style={[styles.servingPillText, { color: C.primary }]}>
+                  {scaleFactor
+                    ? `Scaled for ${householdSize} people`
+                    : `${recipe.baseServings} servings`}
                 </Text>
               </View>
-            );
-          })}
+            </View>
 
-          <View style={styles.stepsHeader}>
-            <Text style={[styles.sectionTitle, { color: C.text }]}>
-              Step-by-step method
-            </Text>
-            <Text style={[styles.stepsHint, { color: C.textMuted }]}>
-              Tap a step for detail
-            </Text>
-          </View>
-
-          {recipe.instructions.map((step, i) => {
-            const detail = getStepDetail(step);
-            const isExpanded = expandedSteps.has(i);
-            return (
-              <TouchableOpacity
-                key={i}
-                activeOpacity={detail ? 0.7 : 1}
-                onPress={() => detail && toggleStep(i)}
-                style={[
-                  styles.stepCard,
-                  {
-                    backgroundColor: isExpanded ? C.primary + "0D" : C.card,
-                    borderColor: isExpanded ? C.primary + "40" : C.cardBorder,
-                  },
-                ]}
-              >
-                <View style={[styles.stepNum, { backgroundColor: isExpanded ? C.primary : C.primary }]}>
-                  <Text style={styles.stepNumText}>{i + 1}</Text>
+            {recipe.ingredients.map((ing, i) => {
+              const scaledQty = scaleFactor
+                ? scaleQuantity(ing.quantity, recipe.baseServings, householdSize)
+                : ing.quantity;
+              return (
+                <View
+                  key={i}
+                  style={[styles.ingRow, { borderBottomColor: C.cardBorder }]}
+                >
+                  <View style={[styles.ingDot, { backgroundColor: C.primary }]} />
+                  <Text style={[styles.ingName, { color: C.text }]}>
+                    {ing.name}
+                    {ing.optional ? (
+                      <Text style={{ color: C.textMuted }}> (optional)</Text>
+                    ) : null}
+                  </Text>
+                  <Text style={[styles.ingQty, { color: C.primary }]}>
+                    {formatQty(scaledQty)} {ing.unit}
+                  </Text>
                 </View>
-                <View style={styles.stepBody}>
-                  <Text style={[styles.stepText, { color: C.text }]}>{step}</Text>
-                  {isExpanded && detail && (
-                    <View style={[styles.stepDetail, { borderTopColor: C.primary + "30" }]}>
-                      <Feather name="info" size={13} color={C.primary} style={{ marginTop: 1 }} />
-                      <Text style={[styles.stepDetailText, { color: C.textSecondary }]}>
-                        {detail}
-                      </Text>
-                    </View>
+              );
+            })}
+
+            {/* Steps */}
+            <View style={styles.stepsHeader}>
+              <Text style={[styles.sectionTitle, { color: C.text }]}>
+                Step-by-step method
+              </Text>
+              <Text style={[styles.stepsHint, { color: C.textMuted }]}>
+                Tap a step for detail
+              </Text>
+            </View>
+
+            {recipe.instructions.map((step, i) => {
+              const detail = getStepDetail(step);
+              const isExpanded = expandedSteps.has(i);
+              return (
+                <TouchableOpacity
+                  key={i}
+                  activeOpacity={detail ? 0.7 : 1}
+                  onPress={() => detail && toggleStep(i)}
+                  style={[
+                    styles.stepCard,
+                    {
+                      backgroundColor: isExpanded ? C.primary + "0D" : C.card,
+                      borderColor: isExpanded ? C.primary + "40" : C.cardBorder,
+                    },
+                  ]}
+                >
+                  <View style={[styles.stepNum, { backgroundColor: C.primary }]}>
+                    <Text style={styles.stepNumText}>{i + 1}</Text>
+                  </View>
+                  <View style={styles.stepBody}>
+                    <Text style={[styles.stepText, { color: C.text }]}>{step}</Text>
+                    {isExpanded && detail && (
+                      <View style={[styles.stepDetail, { borderTopColor: C.primary + "30" }]}>
+                        <Feather name="info" size={13} color={C.primary} style={{ marginTop: 1 }} />
+                        <Text style={[styles.stepDetailText, { color: C.textSecondary }]}>
+                          {detail}
+                        </Text>
+                      </View>
+                    )}
+                  </View>
+                  {detail && (
+                    <Feather
+                      name={isExpanded ? "chevron-up" : "chevron-down"}
+                      size={16}
+                      color={isExpanded ? C.primary : C.textMuted}
+                      style={styles.stepChevron}
+                    />
                   )}
-                </View>
-                {detail && (
-                  <Feather
-                    name={isExpanded ? "chevron-up" : "chevron-down"}
-                    size={16}
-                    color={isExpanded ? C.primary : C.textMuted}
-                    style={styles.stepChevron}
-                  />
-                )}
-              </TouchableOpacity>
-            );
-          })}
+                </TouchableOpacity>
+              );
+            })}
+          </View>
         </ScrollView>
       </View>
     </Modal>
@@ -360,25 +369,27 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  heroBanner: {
-    width: "100%",
-    height: 220,
-    position: "relative",
-    overflow: "hidden",
-  },
-  heroImage: {
-    width: "100%",
-    height: "100%",
-  },
-  heroCloseBtn: {
+  floatingCloseBtn: {
     position: "absolute",
-    top: 12,
     right: 16,
     width: 36,
     height: 36,
     borderRadius: 18,
     alignItems: "center",
     justifyContent: "center",
+    zIndex: 10,
+  },
+  scrollContent: {
+    flexGrow: 1,
+  },
+  heroBanner: {
+    width: "100%",
+    height: 240,
+    overflow: "hidden",
+  },
+  heroImage: {
+    width: "100%",
+    height: "100%",
   },
   header: {
     paddingHorizontal: 20,
@@ -386,24 +397,10 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     gap: 8,
   },
-  headerRow: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    gap: 10,
-  },
   title: {
-    flex: 1,
     fontSize: 22,
     fontFamily: "Inter_700Bold",
     lineHeight: 28,
-  },
-  closeBtn: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    alignItems: "center",
-    justifyContent: "center",
-    flexShrink: 0,
   },
   desc: {
     fontSize: 14,
