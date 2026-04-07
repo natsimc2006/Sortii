@@ -104,12 +104,16 @@ export default function ShoppingScreen() {
 
   // ─── Voice input ─────────────────────────────────────────────────────────
   const [isListening, setIsListening] = useState(false);
-  const [voiceText, setVoiceText] = useState("");
+  const [voiceInterim, setVoiceInterim] = useState(""); // live preview of current phrase
+  const [voiceSessionCount, setVoiceSessionCount] = useState(0); // items added this session
+  const [voiceLastAdded, setVoiceLastAdded] = useState<string | null>(null); // flash confirmation
   const [voiceSupported, setVoiceSupported] = useState<boolean | null>(null);
   const [permDeniedBanner, setPermDeniedBanner] = useState(false);
   const pulseAnim = useRef(new Animated.Value(1)).current;
   const pulseLoopRef = useRef<Animated.CompositeAnimation | null>(null);
   const webRecognitionRef = useRef<any>(null);
+  const nativeLoopingRef = useRef(false);
+  const lastAddedTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     if (Platform.OS === "web") {
@@ -129,6 +133,7 @@ export default function ShoppingScreen() {
       if (Platform.OS !== "web") {
         try {
           const Voice = require("@react-native-voice/voice").default;
+          nativeLoopingRef.current = false;
           Voice.destroy().then(() => Voice.removeAllListeners());
         } catch {}
       } else if (webRecognitionRef.current) {
@@ -140,8 +145,8 @@ export default function ShoppingScreen() {
   const startPulse = () => {
     pulseLoopRef.current = Animated.loop(
       Animated.sequence([
-        Animated.timing(pulseAnim, { toValue: 0.35, duration: 400, useNativeDriver: true }),
-        Animated.timing(pulseAnim, { toValue: 1, duration: 400, useNativeDriver: true }),
+        Animated.timing(pulseAnim, { toValue: 0.3, duration: 500, useNativeDriver: true }),
+        Animated.timing(pulseAnim, { toValue: 1, duration: 500, useNativeDriver: true }),
       ])
     );
     pulseLoopRef.current.start();
@@ -152,27 +157,39 @@ export default function ShoppingScreen() {
     Animated.timing(pulseAnim, { toValue: 1, duration: 150, useNativeDriver: true }).start();
   };
 
-  const parseAndAddItems = (transcript: string) => {
-    const parts = transcript
+  // Adds one parsed phrase. Called each time a final result comes in.
+  const addPhraseItems = (phrase: string, isSessionReset = false) => {
+    const parts = phrase
       .split(/,| and | & /i)
       .map((s) => s.trim())
       .filter(Boolean)
       .map((s) => s.charAt(0).toUpperCase() + s.slice(1));
 
-    console.log("[Voice] Raw transcript:", transcript);
-    console.log("[Voice] Parsed items:", parts);
-
     if (parts.length === 0) return;
+
     const ts = Date.now();
     const newExtras: Extra[] = parts.map((name, i) => ({ id: `${ts}-${i}`, name }));
     setExtras((prev) => [...prev, ...newExtras]);
-    setExtraInput("");
-    setVoiceText("");
-    showToast(`Added ${parts.length} ${parts.length === 1 ? "item" : "items"}.`);
+    setVoiceInterim("");
+
+    // Update session counter
+    setVoiceSessionCount((n) => isSessionReset ? parts.length : n + parts.length);
+
+    // Flash the last-added label briefly
+    const label = parts.length === 1 ? parts[0] : `${parts.length} items`;
+    setVoiceLastAdded(label);
+    if (lastAddedTimerRef.current) clearTimeout(lastAddedTimerRef.current);
+    lastAddedTimerRef.current = setTimeout(() => setVoiceLastAdded(null), 1800);
+
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
   };
 
   const startListening = async () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    setVoiceSessionCount(0);
+    setVoiceInterim("");
+    setVoiceLastAdded(null);
+
     if (Platform.OS === "web") {
       const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
       if (!SR) return;
@@ -184,63 +201,86 @@ export default function ShoppingScreen() {
       }
       const recognition = new SR();
       recognition.lang = "en-AU";
-      recognition.continuous = false;
+      recognition.continuous = true;   // keep mic open across pauses
       recognition.interimResults = true;
+
       recognition.onresult = (e: any) => {
-        const transcript = Array.from(e.results)
-          .map((r: any) => r[0].transcript)
-          .join("");
-        setVoiceText(transcript);
-        if (e.results[e.results.length - 1].isFinal) {
-          parseAndAddItems(transcript);
+        // Show live interim for the current phrase
+        const latest = e.results[e.results.length - 1];
+        if (!latest.isFinal) {
+          setVoiceInterim(latest[0].transcript);
+          return;
+        }
+        // A natural pause — treat this phrase as a completed item
+        const phrase = latest[0].transcript.trim();
+        if (phrase) {
+          setVoiceInterim("");
+          addPhraseItems(phrase);
+        }
+      };
+
+      recognition.onerror = (e: any) => {
+        if (e.error === "not-allowed") setPermDeniedBanner(true);
+        // "no-speech" is benign — just keep going
+        if (e.error !== "no-speech") {
           setIsListening(false);
+          setVoiceInterim("");
           stopPulse();
         }
       };
-      recognition.onerror = (e: any) => {
-        console.log("[Voice] Web error:", e.error);
-        if (e.error === "not-allowed") setPermDeniedBanner(true);
-        setIsListening(false);
-        setVoiceText("");
-        stopPulse();
-      };
+
       recognition.onend = () => {
-        setIsListening(false);
-        stopPulse();
+        // Continuous mode can end if browser cuts it — restart if still listening
+        if (webRecognitionRef.current) {
+          try { recognition.start(); } catch {}
+        }
       };
+
       webRecognitionRef.current = recognition;
       recognition.start();
       setIsListening(true);
       startPulse();
+
     } else {
       try {
         const Voice = require("@react-native-voice/voice").default;
-        Voice.onSpeechResults = (e: any) => {
-          const transcript = e.value?.[0] ?? "";
-          setVoiceText(transcript);
-          parseAndAddItems(transcript);
-          setIsListening(false);
-          stopPulse();
+        nativeLoopingRef.current = true;
+
+        const handleResult = async (e: any) => {
+          const phrase = e.value?.[0] ?? "";
+          if (phrase.trim()) addPhraseItems(phrase);
+          setVoiceInterim("");
+          // Restart immediately if still in loop
+          if (nativeLoopingRef.current) {
+            try { await Voice.start("en-AU"); } catch {}
+          }
         };
-        Voice.onSpeechError = (e: any) => {
-          console.log("[Voice] Native error:", e);
-          setIsListening(false);
-          setVoiceText("");
-          stopPulse();
+
+        Voice.onSpeechResults = handleResult;
+        Voice.onSpeechPartialResults = (e: any) => {
+          setVoiceInterim(e.value?.[0] ?? "");
         };
+        Voice.onSpeechError = async (e: any) => {
+          // "no speech" is fine — just restart
+          if (nativeLoopingRef.current) {
+            try { await Voice.start("en-AU"); } catch {}
+          }
+        };
+
         await Voice.start("en-AU");
         setIsListening(true);
         startPulse();
       } catch (e) {
-        console.log("[Voice] Failed to start:", e);
         setVoiceSupported(false);
       }
     }
   };
 
   const stopListening = async () => {
+    nativeLoopingRef.current = false;
     if (Platform.OS === "web") {
       if (webRecognitionRef.current) {
+        webRecognitionRef.current.onend = null; // prevent auto-restart
         webRecognitionRef.current.stop();
         webRecognitionRef.current = null;
       }
@@ -251,8 +291,12 @@ export default function ShoppingScreen() {
       } catch {}
     }
     setIsListening(false);
-    setVoiceText("");
+    setVoiceInterim("");
     stopPulse();
+    if (voiceSessionCount > 0) {
+      showToast(`${voiceSessionCount} item${voiceSessionCount !== 1 ? "s" : ""} added.`);
+    }
+    setVoiceSessionCount(0);
   };
 
   // ─── Compute shopping items ─────────────────────────────────────────────
@@ -592,43 +636,74 @@ export default function ShoppingScreen() {
           </View>
         )}
 
-        <View style={[styles.addRow, { backgroundColor: C.background, borderColor: C.cardBorder, marginBottom: 10 }]}>
-          <TextInput
-            value={isListening ? voiceText : extraInput}
-            onChangeText={isListening ? undefined : setExtraInput}
-            onSubmitEditing={isListening ? undefined : addExtra}
-            placeholder={isListening ? "Listening..." : "Item name"}
-            placeholderTextColor={isListening ? C.primary : C.textMuted}
-            returnKeyType="done"
-            editable={!isListening}
-            style={[
-              styles.addInput,
-              { color: isListening ? C.textSecondary : C.text, fontStyle: isListening ? "italic" : "normal" },
-            ]}
-          />
-          {voiceSupported && (
+        {/* ── Voice listening panel — shown when mic is active ── */}
+        {isListening ? (
+          <View style={[styles.voicePanel, { backgroundColor: C.tealTint, borderColor: C.primary }]}>
+            {/* Live interim transcript */}
+            <View style={styles.voicePanelTop}>
+              <Animated.View style={[styles.voiceLiveDot, { backgroundColor: C.primary, opacity: pulseAnim }]} />
+              <Text
+                style={[styles.voiceInterimText, { color: voiceInterim ? C.text : C.textMuted }]}
+                numberOfLines={2}
+              >
+                {voiceInterim || "Listening…"}
+              </Text>
+            </View>
+
+            {/* Last added flash */}
+            {voiceLastAdded && (
+              <View style={[styles.voiceAddedBadge, { backgroundColor: C.primary }]}>
+                <Feather name="check" size={11} color="#fff" />
+                <Text style={styles.voiceAddedText}>Added: {voiceLastAdded}</Text>
+              </View>
+            )}
+
+            {/* Counter + stop button */}
+            <View style={styles.voicePanelBottom}>
+              <Text style={[styles.voiceCountText, { color: C.primary }]}>
+                {voiceSessionCount > 0
+                  ? `${voiceSessionCount} item${voiceSessionCount !== 1 ? "s" : ""} added`
+                  : "Say an item — pause — say the next"}
+              </Text>
+              <TouchableOpacity
+                onPress={stopListening}
+                activeOpacity={0.8}
+                style={[styles.voiceStopBtn, { backgroundColor: C.primary }]}
+              >
+                <Feather name="mic-off" size={13} color="#fff" />
+                <Text style={styles.voiceStopText}>Done</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        ) : (
+          /* ── Normal text + mic row ── */
+          <View style={[styles.addRow, { backgroundColor: C.background, borderColor: C.cardBorder, marginBottom: 10 }]}>
+            <TextInput
+              value={extraInput}
+              onChangeText={setExtraInput}
+              onSubmitEditing={addExtra}
+              placeholder="Item name"
+              placeholderTextColor={C.textMuted}
+              returnKeyType="done"
+              style={[styles.addInput, { color: C.text }]}
+            />
+            {voiceSupported && (
+              <TouchableOpacity
+                onPress={startListening}
+                style={[styles.micBtn, { backgroundColor: "transparent", borderWidth: 1.5, borderColor: C.primary }]}
+                activeOpacity={0.75}
+              >
+                <Feather name="mic" size={15} color={C.primary} />
+              </TouchableOpacity>
+            )}
             <TouchableOpacity
-              onPress={isListening ? stopListening : startListening}
-              style={[
-                styles.micBtn,
-                isListening
-                  ? { backgroundColor: C.primary }
-                  : { backgroundColor: "transparent", borderWidth: 1.5, borderColor: C.primary },
-              ]}
-              activeOpacity={0.75}
+              onPress={addExtra}
+              style={[styles.addBtn, { backgroundColor: C.primary, opacity: extraInput.trim() ? 1 : 0.4 }]}
             >
-              <Animated.View style={{ opacity: isListening ? pulseAnim : 1 }}>
-                <Feather name="mic" size={15} color={isListening ? "#fff" : C.primary} />
-              </Animated.View>
+              <Text style={styles.addBtnText}>+ Add</Text>
             </TouchableOpacity>
-          )}
-          <TouchableOpacity
-            onPress={addExtra}
-            style={[styles.addBtn, { backgroundColor: C.primary, opacity: extraInput.trim() && !isListening ? 1 : 0.4 }]}
-          >
-            <Text style={styles.addBtnText}>+ Add</Text>
-          </TouchableOpacity>
-        </View>
+          </View>
+        )}
 
         <TouchableOpacity
           style={[styles.shareBtn, { backgroundColor: C.gold }]}
@@ -1018,4 +1093,70 @@ const styles = StyleSheet.create({
   emptySub: { fontSize: 14, fontFamily: "Inter_400Regular", textAlign: "center", lineHeight: 22 },
   emptyBtn: { marginTop: 8, paddingHorizontal: 28, paddingVertical: 13, borderRadius: 14 },
   emptyBtnText: { fontSize: 15, fontFamily: "Inter_700Bold", color: "#fff" },
+
+  // ── Voice panel ────────────────────────────────────────────
+  voicePanel: {
+    borderRadius: 14,
+    borderWidth: 1.5,
+    padding: 14,
+    marginBottom: 10,
+    gap: 10,
+  },
+  voicePanelTop: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+  },
+  voiceLiveDot: {
+    width: 9,
+    height: 9,
+    borderRadius: 5,
+    flexShrink: 0,
+  },
+  voiceInterimText: {
+    flex: 1,
+    fontSize: 15,
+    fontFamily: "Inter_400Regular",
+    lineHeight: 22,
+    fontStyle: "italic",
+  },
+  voiceAddedBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+    alignSelf: "flex-start",
+    gap: 5,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 20,
+  },
+  voiceAddedText: {
+    fontSize: 12,
+    fontFamily: "Inter_600SemiBold",
+    color: "#fff",
+  },
+  voicePanelBottom: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 10,
+  },
+  voiceCountText: {
+    flex: 1,
+    fontSize: 12,
+    fontFamily: "Inter_500Medium",
+    lineHeight: 17,
+  },
+  voiceStopBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 5,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 20,
+  },
+  voiceStopText: {
+    fontSize: 13,
+    fontFamily: "Inter_600SemiBold",
+    color: "#fff",
+  },
 });
