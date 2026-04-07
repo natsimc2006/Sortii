@@ -82,7 +82,7 @@ export default function MoneySetupScreen() {
   const { autoGeneratePlan } = usePlanner();
   const insets = useSafeAreaInsets();
   const { currencySymbol, locale } = useLocale();
-  const { money: savedMoney, lifestyleSpend: savedLifestyle, setMoney, setLifestyleSpend, setGoal: setContextGoal, updateWeekKey, isLoaded } = useUserWeek();
+  const { money: savedMoney, lifestyleSpend: savedLifestyle, saveMoneySetup, isLoaded } = useUserWeek();
 
   const [weeklyIncome, setWeeklyIncome] = useState("");
   const [fixedCosts, setFixedCosts] = useState("");
@@ -131,20 +131,21 @@ export default function MoneySetupScreen() {
   const handleSave = async () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     setSaving(true);
-    setMoney({
-      weeklyIncome: income,
-      fixedWeeklyCosts: fixed,
-      groceriesWeekly: grocery,
-      eatingOutWeekly: eating,
-      otherWeeklySpend: lifestyleTotal > 0 ? lifestyleTotal : undefined,
-    });
-    setLifestyleSpend({
-      streaming: streamingVal,
-      coffee: coffeeVal,
-      entertainment: entertainmentVal,
-    });
-    setContextGoal(selectedGoal);
-    updateWeekKey();
+    saveMoneySetup(
+      {
+        weeklyIncome: income,
+        fixedWeeklyCosts: fixed,
+        groceriesWeekly: grocery,
+        eatingOutWeekly: eating,
+        otherWeeklySpend: lifestyleTotal > 0 ? lifestyleTotal : undefined,
+      },
+      {
+        streaming: streamingVal,
+        coffee: coffeeVal,
+        entertainment: entertainmentVal,
+      },
+      selectedGoal,
+    );
     setTimeout(() => {
       const returnTo = isFreshFlow ? "fresh" : "money";
       router.replace(`/goal-setup?returnTo=${returnTo}`);

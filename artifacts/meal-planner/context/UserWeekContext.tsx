@@ -42,6 +42,7 @@ interface UserWeekContextType {
   addWeeklyContribution: (amount: number) => void;
   updateWeekKey: () => void;
   resetUserWeek: () => void;
+  saveMoneySetup: (money: MoneyInput, lifestyle: LifestyleSpendData, goal: WeekGoal) => void;
 }
 
 const UserWeekContext = createContext<UserWeekContextType>({
@@ -64,6 +65,7 @@ const UserWeekContext = createContext<UserWeekContextType>({
   addWeeklyContribution: () => {},
   updateWeekKey: () => {},
   resetUserWeek: () => {},
+  saveMoneySetup: () => {},
 });
 
 export function UserWeekProvider({ children }: { children: React.ReactNode }) {
@@ -173,6 +175,36 @@ export function UserWeekProvider({ children }: { children: React.ReactNode }) {
     updateOnboardingState({ lastPlannedWeekKey: weekKey, lastUpdatedAt: now });
   };
 
+  /**
+   * Batches all money-setup writes into ONE AsyncStorage call, avoiding the
+   * race condition where four separate `updateOnboardingState` calls each do
+   * read-then-write and clobber each other.
+   */
+  const saveMoneySetup = (m: MoneyInput, lifestyle: LifestyleSpendData, g: WeekGoal) => {
+    const weekKey = getCurrentWeekKey();
+    const now = new Date().toISOString();
+    setMoneyState(m);
+    setHasMoneySetupState(true);
+    setLifestyleSpendState(lifestyle);
+    setGoalState(g);
+    setLastPlannedWeekKey(weekKey);
+    setLastUpdatedAt(now);
+    updateOnboardingState({
+      hasMoneySetup: true,
+      moneySetup: {
+        weeklyIncome: m.weeklyIncome,
+        fixedWeeklyCosts: m.fixedWeeklyCosts,
+        groceries: m.groceriesWeekly,
+        eatingOut: m.eatingOutWeekly ?? 0,
+        otherWeeklySpend: m.otherWeeklySpend,
+      },
+      lifestyleSpend: lifestyle,
+      goal: g,
+      lastPlannedWeekKey: weekKey,
+      lastUpdatedAt: now,
+    });
+  };
+
   const resetUserWeek = () => {
     setWeeklyModeState(null);
     setGoalState('none');
@@ -208,6 +240,7 @@ export function UserWeekProvider({ children }: { children: React.ReactNode }) {
         addWeeklyContribution,
         updateWeekKey,
         resetUserWeek,
+        saveMoneySetup,
       }}
     >
       {children}
