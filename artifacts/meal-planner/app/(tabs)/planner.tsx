@@ -31,7 +31,7 @@ import { PantryTips } from "@/components/PantryTips";
 import { getSwapsForRecipe, getWeeklyPantryTips } from "@/utils/getSwapsForRecipe";
 import { SWAP_RULES } from "@/constants/swapRules";
 
-const sortiiLogo = require("@/assets/images/sortii-logo-orange.png");
+const sortiiLogo = require("@/assets/images/sortii-logo-v2-planner.png");
 
 function pickRandom<T>(arr: T[]): T {
   return arr[Math.floor(Math.random() * arr.length)];
