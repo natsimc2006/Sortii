@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import {
   WeeklyMode,
+  SavingsGoal,
   clearOnboardingState,
   getOnboardingState,
   updateOnboardingState,
@@ -11,6 +12,7 @@ import { getCurrentWeekKey } from '@/utils/weekKey';
 
 export type { WeekGoal };
 export type { LifestyleSpendData as LifestyleSpend };
+export type { SavingsGoal };
 
 export interface MoneyInput {
   weeklyIncome: number;
@@ -27,6 +29,7 @@ interface UserWeekContextType {
   hasMoneySetup: boolean;
   money: MoneyInput | null;
   lifestyleSpend: LifestyleSpendData | null;
+  savingsGoal: SavingsGoal | null;
   lastPlannedWeekKey: string | null;
   lastUpdatedAt: string | null;
   isLoaded: boolean;
@@ -35,6 +38,8 @@ interface UserWeekContextType {
   setHasMealsSetup: (v: boolean) => void;
   setMoney: (money: MoneyInput) => void;
   setLifestyleSpend: (v: LifestyleSpendData) => void;
+  setSavingsGoal: (g: SavingsGoal | null) => void;
+  addWeeklyContribution: (amount: number) => void;
   updateWeekKey: () => void;
   resetUserWeek: () => void;
 }
@@ -46,6 +51,7 @@ const UserWeekContext = createContext<UserWeekContextType>({
   hasMoneySetup: false,
   money: null,
   lifestyleSpend: null,
+  savingsGoal: null,
   lastPlannedWeekKey: null,
   lastUpdatedAt: null,
   isLoaded: false,
@@ -54,6 +60,8 @@ const UserWeekContext = createContext<UserWeekContextType>({
   setHasMealsSetup: () => {},
   setMoney: () => {},
   setLifestyleSpend: () => {},
+  setSavingsGoal: () => {},
+  addWeeklyContribution: () => {},
   updateWeekKey: () => {},
   resetUserWeek: () => {},
 });
@@ -65,6 +73,7 @@ export function UserWeekProvider({ children }: { children: React.ReactNode }) {
   const [hasMoneySetup, setHasMoneySetupState] = useState(false);
   const [money, setMoneyState] = useState<MoneyInput | null>(null);
   const [lifestyleSpend, setLifestyleSpendState] = useState<LifestyleSpendData | null>(null);
+  const [savingsGoal, setSavingsGoalState] = useState<SavingsGoal | null>(null);
   const [lastPlannedWeekKey, setLastPlannedWeekKey] = useState<string | null>(null);
   const [lastUpdatedAt, setLastUpdatedAt] = useState<string | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
@@ -74,6 +83,7 @@ export function UserWeekProvider({ children }: { children: React.ReactNode }) {
       if (state.weeklyMode) setWeeklyModeState(state.weeklyMode);
       setHasMealsSetupState(state.hasMealsSetup);
       if (state.goal) setGoalState(state.goal as WeekGoal);
+      if (state.savingsGoal) setSavingsGoalState(state.savingsGoal);
 
       if (state.moneySetup) {
         const m = state.moneySetup;
@@ -136,6 +146,25 @@ export function UserWeekProvider({ children }: { children: React.ReactNode }) {
     updateOnboardingState({ lifestyleSpend: v });
   };
 
+  const setSavingsGoal = (g: SavingsGoal | null) => {
+    setSavingsGoalState(g);
+    updateOnboardingState({ savingsGoal: g });
+  };
+
+  const addWeeklyContribution = (amount: number) => {
+    if (amount <= 0) return;
+    setSavingsGoalState((prev) => {
+      if (!prev) return prev;
+      const next: SavingsGoal = {
+        ...prev,
+        currentSaved: Math.min(prev.targetAmount, prev.currentSaved + amount),
+        weeklyContributions: [...prev.weeklyContributions, amount],
+      };
+      updateOnboardingState({ savingsGoal: next });
+      return next;
+    });
+  };
+
   const updateWeekKey = () => {
     const weekKey = getCurrentWeekKey();
     const now = new Date().toISOString();
@@ -151,6 +180,7 @@ export function UserWeekProvider({ children }: { children: React.ReactNode }) {
     setHasMoneySetupState(false);
     setMoneyState(null);
     setLifestyleSpendState(null);
+    setSavingsGoalState(null);
     setLastPlannedWeekKey(null);
     setLastUpdatedAt(null);
     clearOnboardingState();
@@ -165,6 +195,7 @@ export function UserWeekProvider({ children }: { children: React.ReactNode }) {
         hasMoneySetup,
         money,
         lifestyleSpend,
+        savingsGoal,
         lastPlannedWeekKey,
         lastUpdatedAt,
         isLoaded,
@@ -173,6 +204,8 @@ export function UserWeekProvider({ children }: { children: React.ReactNode }) {
         setHasMealsSetup,
         setMoney,
         setLifestyleSpend,
+        setSavingsGoal,
+        addWeeklyContribution,
         updateWeekKey,
         resetUserWeek,
       }}

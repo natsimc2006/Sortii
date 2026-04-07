@@ -17,6 +17,14 @@ export interface LifestyleSpendData {
   entertainment: number;
 }
 
+export interface SavingsGoal {
+  name: string;
+  targetAmount: number;
+  currentSaved: number;
+  weeklyContributions: number[];
+  emoji: string;
+}
+
 export interface OnboardingState {
   scope: OnboardingScope | null;
   weeklyMode: WeeklyMode | null;
@@ -25,6 +33,7 @@ export interface OnboardingState {
   moneySetup: MoneySetupData | null;
   lifestyleSpend: LifestyleSpendData | null;
   goal: string | null;
+  savingsGoal: SavingsGoal | null;
   lastPlannedWeekKey: string | null;
   lastUpdatedAt: string | null;
 }
@@ -39,6 +48,7 @@ const DEFAULT_STATE: OnboardingState = {
   moneySetup: null,
   lifestyleSpend: null,
   goal: null,
+  savingsGoal: null,
   lastPlannedWeekKey: null,
   lastUpdatedAt: null,
 };
