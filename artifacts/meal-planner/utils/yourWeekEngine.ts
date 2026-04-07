@@ -304,7 +304,8 @@ function buildDynamicSuggestions(
   if (eatingOutWeekly > 0) {
     candidatesOverTight.push({
       id: 'swap_takeaway',
-      label: "Skip one takeaway. Dinner's already sorted — you're literally 90% there.",
+      label: "Skip one takeaway this week.",
+      reason: "Dinner's already sorted — you're literally 90% there.",
       impactAmount: 25,
       category: 'money',
     });
@@ -370,16 +371,52 @@ function buildDynamicSuggestions(
   // freezer_check (static)
   candidatesOkPlus.push({
     id: 'freezer_check',
-    label: "Quick freezer check before you shop.",
-    reason: "You probably have more than you think.",
+    label: "Do a freezer audit before you shop.",
+    reason: "There's definitely something in there.",
     impactAmount: 10,
     category: 'money',
   });
 
   // ── always-last nudges ────────────────────────────────────
 
-  // monthly_projection_nudge
-  if (isOkOrBetter && hasMealsSetup && weeklySortiiSaving > 0) {
+  // goal_almost_there — fires when goal is under 3 weeks away (urgent motivating moment)
+  // Checked first so we can suppress monthly_projection_nudge when it fires
+  let goalAlmostThereFired = false;
+  if (goal !== 'none' && isOkOrBetter && weeklySortiiSaving > 0) {
+    const target = GOAL_TARGETS[goal];
+    const goalLabel = GOAL_LABELS[goal];
+    const goalEmoji = GOAL_EMOJIS[goal];
+    if (target && goalLabel && goalEmoji) {
+      const weeksLeft = Math.ceil(target / weeklySortiiSaving);
+      if (weeksLeft >= 1 && weeksLeft <= 3) {
+        goalAlmostThereFired = true;
+        let label: string;
+        let reason: string;
+        if (weeksLeft === 1) {
+          label = `One more week and ${goalLabel} is yours.`;
+          reason = "This is the one. Make it count.";
+        } else if (weeksLeft === 2) {
+          label = `Two weeks away from ${goalLabel}. Don't stop now.`;
+          reason = "You've done the hard part. Keep dinners sorted and you're there.";
+        } else {
+          label = `${goalLabel} is closer than it looks.`;
+          reason = "Three more weeks like this one and you're done.";
+        }
+        alwaysLast.unshift({
+          id: 'goal_almost_there',
+          label,
+          reason,
+          impactAmount: 0,
+          category: 'combined',
+          isGoalProjection: true,
+          goalEmoji,
+        });
+      }
+    }
+  }
+
+  // monthly_projection_nudge — suppressed when goal_almost_there fires
+  if (!goalAlmostThereFired && isOkOrBetter && hasMealsSetup && weeklySortiiSaving > 0) {
     const monthlyProjection = Math.round(weeklySortiiSaving * 4);
     if (monthlyProjection > 0) {
       alwaysLast.push({
@@ -389,26 +426,6 @@ function buildDynamicSuggestions(
         category: 'combined',
         isMonthlyNudge: true,
       });
-    }
-  }
-
-  // goal_almost_there — fires when goal is under 3 weeks away (urgent motivating moment)
-  if (goal !== 'none' && isOkOrBetter && weeklySortiiSaving > 0) {
-    const target = GOAL_TARGETS[goal];
-    const goalLabel = GOAL_LABELS[goal];
-    const goalEmoji = GOAL_EMOJIS[goal];
-    if (target && goalLabel && goalEmoji) {
-      const weeksLeft = Math.ceil(target / weeklySortiiSaving);
-      if (weeksLeft >= 1 && weeksLeft <= 3) {
-        alwaysLast.unshift({
-          id: 'goal_almost_there',
-          label: `${goalEmoji} You're ${weeksLeft} week${weeksLeft === 1 ? '' : 's'} away from your ${goalLabel}. Don't stop now.`,
-          impactAmount: 0,
-          category: 'combined',
-          isGoalProjection: true,
-          goalEmoji,
-        });
-      }
     }
   }
 

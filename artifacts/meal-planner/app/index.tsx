@@ -437,58 +437,243 @@ export default function OnboardingScreen() {
   }
 
   if (step === 0) {
+    const PAGE_BG = "#F7F3EB";
+    const LANDING_STEPS = [
+      {
+        icon: "sliders" as const,
+        title: "Tell us about your week",
+        desc: "Who you're feeding and what you want to spend. Takes 60 seconds.",
+        color: C.gold,
+        borderColor: C.gold,
+      },
+      {
+        icon: "calendar" as const,
+        title: "Plan your week",
+        desc: "Let Sortii fill the week, or pick a few yourself. Either way, dinner is handled.",
+        color: C.primary,
+        borderColor: C.primary,
+      },
+      {
+        icon: "shopping-cart" as const,
+        title: "Your list, ready to shop",
+        desc: "Your list builds itself. Categorised, consolidated, and ready to share.",
+        color: "#5E3A4C",
+        borderColor: "#5E3A4C",
+      },
+    ];
+    const LANDING_FEATURES: [string, string][] = [
+      ["240+ recipes. Always something new.", "book-open"],
+      ["Every budget. Real prices.", "dollar-sign"],
+      ["Feeds 1 to 10. Scales automatically.", "users"],
+      ["Cook once. Eat twice. Less waste.", "refresh-cw"],
+    ];
     return (
-      <View style={[styles.screen, { backgroundColor: C.background, paddingTop, height: windowHeight }]}>
+      <View style={{ flex: 1, backgroundColor: PAGE_BG }}>
         <ScrollView
           style={{ flex: 1 }}
-          contentContainerStyle={[
-            styles.welcomeContent,
-            Platform.OS === 'web' && { paddingBottom: 130 },
-          ]}
+          contentContainerStyle={{
+            paddingHorizontal: 24,
+            paddingTop: paddingTop + 8,
+            paddingBottom: 200,
+            gap: 24,
+          }}
           showsVerticalScrollIndicator={false}
-          keyboardShouldPersistTaps="handled"
         >
-          <Image source={sortiiLogo} style={[styles.logo, { width: logoWidth, height: logoHeight }]} resizeMode="contain" />
-          <Text style={[styles.welcomeHeadline, { color: C.text }]}>
-            No more "what's for dinner"{"\n"}Or "what can we afford this week?"
-          </Text>
-          <Text style={[styles.welcomeSub, { color: C.textSecondary }]}>
-            Sortii plans your week in 60 seconds — meals, budget, shopping list. Done.
-          </Text>
-          <Text style={[styles.welcomeSupport, { color: "#6B4A5E" }]}>
-            Less stress. Fewer takeaways. More money left.
-          </Text>
+          {/* Hero */}
+          <View style={{ alignItems: "center", gap: 10 }}>
+            <Image
+              source={sortiiLogo}
+              style={{ width: logoWidth, height: logoHeight }}
+              resizeMode="contain"
+            />
+            <Text style={{
+              fontSize: 28,
+              fontFamily: "Manrope_600SemiBold",
+              textAlign: "center",
+              lineHeight: 36,
+              letterSpacing: -0.3,
+              color: C.text,
+            }}>
+              {"No more\n\u201Cwhat\u2019s for dinner\u201D"}
+            </Text>
+            <Text style={{
+              fontSize: 15,
+              fontFamily: "Inter_400Regular",
+              textAlign: "center",
+              lineHeight: 22,
+              color: C.textSecondary,
+              maxWidth: 300,
+            }}>
+              Sortii plans your week in 60 seconds{"\n"}— meals, budget, shopping list. Sorted.
+            </Text>
+            <Text style={{
+              fontSize: 15,
+              fontFamily: "Inter_500Medium",
+              fontStyle: "italic",
+              textAlign: "center",
+              color: C.primary,
+              lineHeight: 22,
+            }}>
+              Less stress. Fewer takeaways. More evenings back.
+            </Text>
+            <View style={{ width: 36, height: 3, borderRadius: 2, backgroundColor: C.primary, marginTop: 2 }} />
+          </View>
+
+          {/* How it works */}
+          <View style={{ gap: 10 }}>
+            <View style={{ flexDirection: "row", alignItems: "center", gap: 6, marginBottom: 2 }}>
+              <View style={{ width: 7, height: 7, borderRadius: 99, backgroundColor: C.primary }} />
+              <Text style={{
+                fontSize: 11,
+                fontFamily: "Inter_600SemiBold",
+                color: C.primary,
+                letterSpacing: 1.2,
+              }}>
+                HOW IT WORKS
+              </Text>
+            </View>
+            {LANDING_STEPS.map((s, i) => (
+              <View
+                key={i}
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  backgroundColor: "#FFFFFF",
+                  borderRadius: 14,
+                  borderWidth: 1,
+                  borderColor: "#E8E8E8",
+                  borderLeftWidth: 4,
+                  borderLeftColor: s.borderColor,
+                  paddingVertical: 14,
+                  paddingRight: 14,
+                  paddingLeft: 16,
+                  gap: 14,
+                  overflow: "hidden",
+                }}
+              >
+                <View style={{
+                  width: 24,
+                  height: 24,
+                  borderRadius: 12,
+                  backgroundColor: C.primary,
+                  alignItems: "center",
+                  justifyContent: "center",
+                  alignSelf: "flex-start",
+                  marginTop: 2,
+                }}>
+                  <Text style={{ color: "#fff", fontSize: 11, fontFamily: "Inter_700Bold" }}>{i + 1}</Text>
+                </View>
+                <View style={{
+                  width: 44,
+                  height: 44,
+                  borderRadius: 12,
+                  backgroundColor: s.color,
+                  alignItems: "center",
+                  justifyContent: "center",
+                  alignSelf: "flex-start",
+                }}>
+                  <Feather name={s.icon} size={22} color="#FFFFFF" />
+                </View>
+                <View style={{ flex: 1, gap: 3 }}>
+                  <Text style={{ fontSize: 15, fontFamily: "Inter_600SemiBold", color: C.text }}>{s.title}</Text>
+                  <Text style={{ fontSize: 13, fontFamily: "Inter_400Regular", color: C.textSecondary, lineHeight: 18 }}>{s.desc}</Text>
+                </View>
+              </View>
+            ))}
+          </View>
+
+          {/* What's included */}
+          <View style={{
+            backgroundColor: "#FFFFFF",
+            borderRadius: 14,
+            borderWidth: 1.5,
+            borderColor: C.primary,
+            paddingHorizontal: 16,
+            paddingTop: 14,
+            paddingBottom: 6,
+          }}>
+            <Text style={{
+              fontSize: 11,
+              fontFamily: "Inter_600SemiBold",
+              color: C.primary,
+              letterSpacing: 1.2,
+              marginBottom: 10,
+            }}>
+              WHAT'S INCLUDED
+            </Text>
+            {LANDING_FEATURES.map(([label, icon], idx) => (
+              <View key={label}>
+                <View style={{ flexDirection: "row", alignItems: "center", gap: 12, paddingVertical: 10 }}>
+                  <View style={{
+                    width: 32,
+                    height: 32,
+                    borderRadius: 8,
+                    backgroundColor: C.tealTint,
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}>
+                    <Feather name={icon as any} size={16} color={C.primary} />
+                  </View>
+                  <Text style={{ flex: 1, fontSize: 14, fontFamily: "Inter_500Medium", color: C.text }}>{label}</Text>
+                </View>
+                {idx < LANDING_FEATURES.length - 1 && (
+                  <View style={{ height: 1, backgroundColor: "#F0F0F0" }} />
+                )}
+              </View>
+            ))}
+          </View>
         </ScrollView>
+
+        {/* Sticky CTA */}
         <View
           style={[
-            styles.welcomeActions,
-            { paddingBottom: paddingBottom + 16 },
-            Platform.OS === 'web' && {
-              position: 'fixed' as any,
+            {
+              paddingHorizontal: 20,
+              paddingTop: 12,
+              paddingBottom: paddingBottom + 16,
+              backgroundColor: PAGE_BG,
+              borderTopWidth: 1,
+              borderTopColor: "rgba(0,0,0,0.06)",
+            },
+            Platform.OS === "web" && {
+              position: "fixed" as any,
               bottom: 0,
               left: 0,
               right: 0,
-              backgroundColor: C.background,
-              paddingHorizontal: 24,
-              paddingTop: 12,
-              zIndex: 10,
             },
           ]}
         >
-          <TouchableOpacity
-            onPress={() => {
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-              goNext();
-            }}
-            activeOpacity={0.85}
-            style={[styles.primaryCta, { backgroundColor: C.gold }]}
-          >
-            <Text style={styles.primaryCtaText}>Get started</Text>
-            <Feather name="arrow-right" size={20} color="#fff" />
-          </TouchableOpacity>
-          <Text style={[styles.welcomeHelper, { color: C.textMuted }]}>
-            Takes about a minute. Promise.
-          </Text>
+          <View style={{
+            backgroundColor: "#FFFFFF",
+            borderRadius: 16,
+            padding: 14,
+            gap: 10,
+            shadowColor: "#000",
+            shadowOpacity: 0.06,
+            shadowOffset: { width: 0, height: -2 },
+            shadowRadius: 8,
+            elevation: 3,
+          }}>
+            <TouchableOpacity
+              onPress={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                goNext();
+              }}
+              activeOpacity={0.85}
+              style={[styles.primaryCta, { backgroundColor: C.gold }]}
+            >
+              <Text style={styles.primaryCtaText}>Get started</Text>
+              <Feather name="arrow-right" size={20} color="#fff" />
+            </TouchableOpacity>
+            <Text style={{
+              fontSize: 12,
+              fontFamily: "Inter_400Regular",
+              textAlign: "center",
+              color: C.textMuted,
+            }}>
+              No account required · All data stays on your device
+            </Text>
+          </View>
         </View>
       </View>
     );

@@ -24,16 +24,19 @@ const STEPS = [
     icon: "sliders",
     title: "Tell us about your week",
     desc: "Who you're feeding and what you want to spend. Takes 60 seconds.",
+    stepColor: "#F0AC2E",   // amber
   },
   {
     icon: "calendar",
     title: "Plan your week",
     desc: "Let Sortii fill the week, or pick a few yourself. Either way, dinner is handled.",
+    stepColor: "#25857F",   // teal
   },
   {
     icon: "shopping-cart",
     title: "Your list, ready to shop",
     desc: "Your list builds itself. Categorised, consolidated, and ready to share.",
+    stepColor: "#5E3A4C",   // mauve
   },
 ];
 
@@ -78,10 +81,12 @@ export default function HomeScreen() {
     router.push(route as any);
   };
 
+  const PAGE_BG = "#F7F3EB";
+
   return (
-    <View style={{ flex: 1, backgroundColor: C.background }}>
+    <View style={{ flex: 1, backgroundColor: PAGE_BG }}>
       <ScrollView
-        style={{ backgroundColor: C.background }}
+        style={{ backgroundColor: PAGE_BG }}
         contentContainerStyle={[
           styles.container,
           {
@@ -138,13 +143,13 @@ export default function HomeScreen() {
           {STEPS.map((step, i) => (
             <View
               key={i}
-              style={[styles.stepCard, { backgroundColor: "#FFFFFF", borderColor: C.cardBorder }]}
+              style={[styles.stepCard, { backgroundColor: "#FFFFFF", borderColor: "#E8E8E8" }]}
             >
-              <View style={[styles.stepCardAccent, { backgroundColor: C.primary }]} />
+              <View style={[styles.stepCardAccent, { backgroundColor: step.stepColor }]} />
               <View style={[styles.stepNum, { backgroundColor: C.primary }]}>
                 <Text style={styles.stepNumText}>{i + 1}</Text>
               </View>
-              <View style={[styles.stepIconBox, { backgroundColor: C.gold }]}>
+              <View style={[styles.stepIconBox, { backgroundColor: step.stepColor }]}>
                 <Feather name={step.icon as any} size={22} color="#FFFFFF" />
               </View>
               <View style={styles.stepText}>
@@ -156,26 +161,42 @@ export default function HomeScreen() {
         </View>
 
         {/* What's included */}
-        <View style={[styles.featuresCard, { backgroundColor: "#FFFFFF", borderColor: C.cardBorder }]}>
+        <View style={[styles.featuresCard, { backgroundColor: "#FFFFFF", borderColor: C.primary }]}>
           <Text style={[styles.featuresCardHeading, { color: C.primary }]}>WHAT'S INCLUDED</Text>
           {FEATURES.map(([label, icon], idx) => (
             <View key={label}>
               <View style={styles.featureRow}>
-                <Feather name={icon as any} size={16} color={C.primary} />
+                <View style={{
+                  width: 32,
+                  height: 32,
+                  borderRadius: 8,
+                  backgroundColor: C.tealTint,
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}>
+                  <Feather name={icon as any} size={16} color={C.primary} />
+                </View>
                 <Text style={[styles.featureLabel, { color: C.text }]}>{label}</Text>
               </View>
               {idx < FEATURES.length - 1 && (
-                <View style={[styles.featureDivider, { backgroundColor: C.cardBorder }]} />
+                <View style={[styles.featureDivider, { backgroundColor: "#F0F0F0" }]} />
               )}
             </View>
           ))}
         </View>
 
-        {/* Actions */}
-        <View style={styles.actions}>
-          <Text style={styles.plumAccent}>
-            The convenience of a meal kit. At supermarket prices.
-          </Text>
+        {/* Actions — wrapped in soft card */}
+        <View style={{
+          backgroundColor: "#FFFFFF",
+          borderRadius: 16,
+          padding: 16,
+          gap: 10,
+          shadowColor: "#000",
+          shadowOpacity: 0.05,
+          shadowOffset: { width: 0, height: 2 },
+          shadowRadius: 8,
+          elevation: 2,
+        }}>
           <PressableScale
             onPress={() => handleNav("/(tabs)/planner")}
             style={[styles.primaryBtn, { backgroundColor: C.gold }]}
@@ -183,11 +204,10 @@ export default function HomeScreen() {
             <Text style={styles.primaryBtnText}>Go to my plan</Text>
             <Feather name="arrow-right" size={20} color="#fff" style={{ marginLeft: 8 }} />
           </PressableScale>
+          <Text style={[styles.note, { color: C.textMuted }]}>
+            No account required · All data stays on your device
+          </Text>
         </View>
-
-        <Text style={[styles.note, { color: C.textMuted }]}>
-          No account required · All data stays on your device
-        </Text>
       </ScrollView>
 
       {/* ── Floating nav panel ─────────────────────────────── */}
@@ -289,7 +309,7 @@ const styles = StyleSheet.create({
     fontStyle: "italic",
     textAlign: "center",
     lineHeight: 24,
-    color: "#6B4A5E",
+    color: "#25857F",
     zIndex: 1,
   },
   accentBar: {

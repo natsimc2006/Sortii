@@ -11,7 +11,7 @@ export function getSavingsGoalCopy(goal: SavingsGoal, weeklyDinnerSaving: number
       weeklyDinnerSaving > 0 ? Math.ceil(remaining / weeklyDinnerSaving) : null;
     return weeksToGoal && weeksToGoal >= 1 && weeksToGoal <= 104
       ? `Goal set. Keep this up and you'll hit it in ~${weeksToGoal} weeks.`
-      : `Goal set. Every week at home gets you closer.`;
+      : `Goal set. Every dinner at home is doing something.`;
   }
 
   // Derived averages
@@ -33,13 +33,13 @@ export function getSavingsGoalCopy(goal: SavingsGoal, weeklyDinnerSaving: number
 
   // 3. Milestone hits — check for 75%, 50%, 25%
   if (percentSaved >= 0.75 && percentSaved < 0.95) {
-    return `Three-quarters of the way to ${name}. Nearly there.`;
+    return `Three-quarters of the way to ${name}. You're basically already there.`;
   }
   if (percentSaved >= 0.5 && percentSaved < 0.75) {
-    return `Halfway to ${name}. Dinner at home is working.`;
+    return `Halfway to ${name}. This is exactly how it's supposed to work.`;
   }
   if (percentSaved >= 0.25 && percentSaved < 0.5) {
-    return `One quarter down for ${name}. Keep it up.`;
+    return `One quarter down on ${name}. It's starting to stack up.`;
   }
 
   // 4. Ahead of schedule — actual pace better than average projected
@@ -49,20 +49,20 @@ export function getSavingsGoalCopy(goal: SavingsGoal, weeklyDinnerSaving: number
     weeksToGoalAtCurrent < weeksToGoalAtAvg - 1
   ) {
     const ahead = weeksToGoalAtAvg - weeksToGoalAtCurrent;
-    return `You're ${ahead} week${ahead === 1 ? '' : 's'} ahead of target. Nice.`;
+    return `You're ${ahead} week${ahead === 1 ? '' : 's'} ahead of schedule. Dinner at home is quietly doing the work.`;
   }
 
-  // 5. Slow/tight week — this week meaningfully below average
+  // 5. Slow/tight week — this week meaningfully below average (requires 3+ weeks history)
   if (
     weeklyDinnerSaving < avgContribution * 0.7 &&
-    weeklyContributions.length >= 2
+    weeklyContributions.length >= 3
   ) {
-    return `Tight week — ${name} holds steady. Back on track next week.`;
+    return `Tight week — ${name} isn't going anywhere. Reset next week.`;
   }
 
   // 6. Default — on track
   if (weeksToGoalAtCurrent !== null && weeksToGoalAtCurrent >= 1 && weeksToGoalAtCurrent <= 104) {
-    return `You're on track for ${name}. ~${weeksToGoalAtCurrent} weeks away.`;
+    return `You're on track for ${name}. About ${weeksToGoalAtCurrent} weeks away.`;
   }
 
   return `Every week at home builds your ${name} fund.`;
