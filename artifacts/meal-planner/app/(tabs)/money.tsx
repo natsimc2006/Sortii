@@ -292,8 +292,8 @@ function QuickWinsSection({ suggestions, fmt }: { suggestions: MoneySuggestion[]
         style={styles.quickWinsHeader}
         activeOpacity={0.7}
       >
-        <Text style={styles.quickWinsTitle}>💡 A few quick wins</Text>
-        <Feather name={open ? "chevron-up" : "chevron-down"} size={17} color={PLUM} />
+        <Text style={styles.quickWinsTitle}>💡 Tap for some quick wins this week</Text>
+        <Feather name={open ? "chevron-up" : "chevron-down"} size={17} color="#8A6200" />
       </TouchableOpacity>
 
       {open && (
@@ -637,6 +637,8 @@ const styles = StyleSheet.create({
   heroCard: {
     borderRadius: 20,
     backgroundColor: HERO_BG,
+    borderWidth: 1.5,
+    borderColor: "rgba(42,143,136,0.28)",
     padding: 20,
     gap: 6,
     ...Platform.select({
@@ -656,8 +658,8 @@ const styles = StyleSheet.create({
     color: TEAL, textTransform: "uppercase", letterSpacing: 0.8,
   },
   heroBigNumber: {
-    fontSize: 44, fontFamily: "Manrope_700Bold",
-    color: TEAL, lineHeight: 50,
+    fontSize: 34, fontFamily: "Manrope_700Bold",
+    color: TEAL, lineHeight: 42,
   },
   heroLabel: {
     fontSize: 14, fontFamily: "Inter_400Regular",
@@ -757,8 +759,8 @@ const styles = StyleSheet.create({
 
   // 4. Quick wins
   quickWinsWrap: {
-    borderRadius: 16, backgroundColor: PLUM_TINT,
-    borderWidth: 1.5, borderColor: PLUM_BORDER, overflow: "hidden",
+    borderRadius: 16, backgroundColor: "#FEF3D8",
+    borderWidth: 1.5, borderColor: "rgba(210,154,34,0.30)", overflow: "hidden",
   },
   quickWinsHeader: {
     flexDirection: "row", alignItems: "center",
@@ -766,7 +768,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 18, paddingVertical: 14,
   },
   quickWinsTitle: {
-    fontSize: 15, fontFamily: "Inter_600SemiBold", color: PLUM,
+    fontSize: 15, fontFamily: "Inter_600SemiBold", color: "#8A6200",
   },
   quickWinsBody: {
     paddingHorizontal: 18, paddingBottom: 16, gap: 12,
@@ -775,7 +777,7 @@ const styles = StyleSheet.create({
     flexDirection: "row", alignItems: "flex-start", gap: 8,
   },
   quickWinsArrow: {
-    fontSize: 13, color: PLUM, marginTop: 2, fontFamily: "Inter_600SemiBold",
+    fontSize: 13, color: "#8A6200", marginTop: 2, fontFamily: "Inter_600SemiBold",
   },
   quickWinsContent: { flex: 1, gap: 2 },
   quickWinsLabel: {
@@ -786,7 +788,7 @@ const styles = StyleSheet.create({
     color: C.textMuted, lineHeight: 17, fontStyle: "italic",
   },
   quickWinsImpact: {
-    fontSize: 13, fontFamily: "Inter_700Bold", color: PLUM,
+    fontSize: 13, fontFamily: "Inter_700Bold", color: "#8A6200",
   },
 
   // 5. Savings goal card

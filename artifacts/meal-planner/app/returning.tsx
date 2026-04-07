@@ -51,6 +51,7 @@ export default function ReturningScreen() {
 
   const handleSameAsLastWeek = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    updateWeekKey();
     router.replace("/(tabs)/planner");
   };
 

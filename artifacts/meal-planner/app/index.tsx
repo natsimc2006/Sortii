@@ -179,6 +179,8 @@ export default function OnboardingScreen() {
     setWeeklyMode: setContextWeeklyMode,
     setHasMealsSetup: setContextHasMealsSetup,
     updateWeekKey,
+    isLoaded: isWeekLoaded,
+    lastUpdatedAt,
   } = useUserWeek();
   const insets = useSafeAreaInsets();
   const [step, setStep] = useState<OnboardingStep>(0);
@@ -199,12 +201,20 @@ export default function OnboardingScreen() {
   const isInGeneratingFlow = useRef(false);
 
   useEffect(() => {
-    if (!isContextLoaded) return;
+    if (!isContextLoaded || !isWeekLoaded) return;
     if (isInGeneratingFlow.current) return;
     if (isOnboarded) {
+      // Only show returning screen if 7+ days have passed since last plan
+      if (lastUpdatedAt) {
+        const daysSince = (Date.now() - new Date(lastUpdatedAt).getTime()) / (1000 * 60 * 60 * 24);
+        if (daysSince < 7) {
+          router.replace("/(tabs)/planner");
+          return;
+        }
+      }
       router.replace("/returning");
     }
-  }, [isContextLoaded, isOnboarded]);
+  }, [isContextLoaded, isWeekLoaded, isOnboarded]);
 
   useEffect(() => {
     if (step !== 11) return;
