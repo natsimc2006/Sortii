@@ -42,7 +42,7 @@ const PLUM_TINT = "#F3E8EE";
 const PLUM_BORDER = "rgba(94,58,76,0.20)";
 const HERO_BG = "#E6F3F0";
 const PAGE_BG = "#FFFFFF";
-const sortiiLogo = require("@/assets/images/sortii-logo-money.png");
+const sortiiLogo = require("@/assets/images/sortii-logo-v2-money.png");
 
 // ─── Status pill ────────────────────────────────────────────
 

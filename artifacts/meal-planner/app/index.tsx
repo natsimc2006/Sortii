@@ -32,7 +32,7 @@ import {
 } from "@/utils/onboardingState";
 
 const C = Colors.light;
-const sortiiLogo = require("@/assets/images/sortii-logo-yourweek.png");
+const sortiiLogo = require("@/assets/images/sortii-logo-v2-landing.png");
 
 const ROTATING_MESSAGES = [
   "Sorting your week…",
