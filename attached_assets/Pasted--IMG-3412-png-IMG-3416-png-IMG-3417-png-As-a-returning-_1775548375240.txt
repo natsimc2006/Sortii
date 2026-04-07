@@ -1,0 +1,287 @@
+
+IMG_3412.png
+IMG_3416.png
+IMG_3417.png
+As a returning visitor I get the screen image attached - this though arrives each time I return not just at the start of a new week - can we brainstorm how to tweak it so it make sense whether returning the next day or the next week? 
+
+When selecting same filters as last week it pulls the meal filter though but not the existing money filters .
+
+Attached is the new money screen now. 
+Is the ‘this week’ grocery savings a bit domineering? Could it also benefit from a thin teal boarder? 
+
+I also feel like the field win tips should be a different colour to the saving goal to selected them.
+Should the quick win wording me more clear that expanding this shows the tips ‘take a look at some possible quick win’ type directive?
+
+Show more
+2:24 PM
+
+Catalogued five UI refinement requests for meal planner app
+Catalogued five UI refinement requests for meal planner app
+Great feedback across the board — here's a brainstorm on each:
+
+1. The "New week" screen appearing every visit The fix is context-aware gating. Options:
+
+Store a lastPlanGeneratedDate and only show the screen if it's been 7+ days, OR if it's a new calendar week (Mon trigger)
+If returning mid-week, skip straight to the planner with a subtle banner: "Week in progress — 4 dinners to go" with a small "Regenerate plan" link tucked in
+The screen could also adapt its copy: "Mid-week check-in" vs "New week, same you" depending on timing
+2. Money filters not carrying over with "Same meals" This feels like a session/state scoping bug — meal prefs and money prefs are probably being saved to different stores or the "copy last week" function only clones the meal object. Worth checking what gets written to state on save and ensuring money settings are included in the same snapshot.
+
+3. "This week" savings card — too dominant? Yes — a thin teal border (1–2px, maybe slightly muted/soft teal rather than full brand teal) would frame it as a module rather than a hero element. Could also reduce the ~$87 font size slightly so it reads as informative rather than celebratory.
+
+4. Quick wins vs saving goal — colour differentiation Suggestion:
+
+Saving goal card: keep the soft lavender/blush you have
+Quick wins tips: switch to a warm cream or very light amber — still soft, but clearly a different category
+This creates a visual language: lavender = goals/progress, amber = tips/actions
+5. "A few quick wins" — make it more directive Options:
+
+"💡 Tap for quick wins this week"
+"See your quick wins →"
+"A few easy saves — take a look ↓"
+The chevron helps but the label currently reads like a heading rather than an invitation. A small "tap to expand" sub-label in muted text underneath could also work without changing the main label.
+Want me to mock any of these up as UI copy/layout notes you can take back into Replit?
+
+Can you help me with a single prompt to give Replit for:
+- Store a lastPlanGeneratedDate and only show the screen if it’s been 7+ days,
+- Fix the money filters/ data to save it 
+- change the this week card as suggested 
+- quick wins change the amber to match the amber on other elements 
+- change the saved to ‘Tap for some quick wins this week’
+
+2:35 PM
+
+Consolidated multiple feature requests into unified Replit implementation
+Consolidated multiple feature requests into unified Replit implementation
+Here's a single, clean prompt you can drop straight into Replit:
+
+Please make the following updates to the Sortii meal planner app:
+
+1. Returning visitor screen logic Store a lastPlanGeneratedDate in local storage when a plan is generated. Only show the "New week. Same you." screen if 7 or more days have passed since that date. If the user returns before 7 days, skip this screen entirely and go straight to the planner.
+
+2. Money filters persistence When the user selects "Same meals as last week," ensure money/budget settings and filters are included in the copied state — not just meal preferences. Check that the money settings are being written to the same saved snapshot as meal preferences and that both are restored together on load.
+
+3. "This week" savings card styling Add a thin teal border (1–2px, soft/muted teal) around the "This week" savings card. Slightly reduce the size of the ~$87 figure so the card reads as informative rather than dominant.
+
+4. Quick wins section — colour Change the background colour of the quick wins tips section to a soft warm amber that matches the existing amber already used elsewhere in the app (e.g. the "ii" in the Sortii logo). The saving goal card should keep its current lavender/blush so the two sections are visually distinct.
+
+5. Quick wins label Change the "A few quick wins" label to: "Tap for some quick wins this week" — keeping the 💡 emoji and the existing chevron/expand behaviour.
+
+Want me to add anything about the copy on the mid-week return state too?
+
+When the web app version of the app is viewed (not the iOS version!), on my phone it looks great and just like the iOS - ik my husbands phone as he has phone setting zoomed in for better/bighet text, the app is then over powered by sticky too and bottom bars and for example he only sees a small meal list section - is this just something that’s going to occur due to the zoom settings - it is there any tech change in the app rules that can help with those types of individual/personal settings?
+
+2:39 PM
+
+Identified responsive design challenges with zoomed text settings
+Identified responsive design challenges with zoomed text settings
+This is a real and solvable problem — it's not just "that's how it is." Here's the breakdown:
+
+Why it's happening When someone increases system font size or zoom, the sticky header and footer bars scale up with it but the middle content area doesn't get any extra room — so it gets squeezed into whatever's left, which can be tiny.
+
+What can actually be fixed in the app
+
+Use dvh instead of vh for height calculations 100dvh (dynamic viewport height) is more mobile-aware and accounts for browser chrome, address bars etc — more reliable than vh on mobile browsers
+Cap the sticky bars with max-height Set a max-height on the top and bottom nav bars so they can't grow beyond a certain size even if text scales up — e.g. max-height: 60px with overflow: hidden
+Use flex: 1; overflow-y: auto on the middle content area This tells the content section to take whatever space remains after the bars, rather than a fixed pixel height — so it always fills the gap regardless of bar size
+font-size in rem not px throughout If any elements use fixed px sizing, they won't respect the user's system zoom. rem units scale with user settings more gracefully
+Add a viewport meta tag check Ensure the app has <meta name="viewport" content="width=device-width, initial-scale=1"> — without user-scalable=no, which would block zoom entirely but is also bad accessibility practice
+The honest caveat Extreme system zoom will always create some tension with fixed navigation — but the flex/dvh approach should make it significantly better for most zoom levels your husband would realistically use.
+
+Want me to write this up as a Replit prompt too?
+
+Yes please
+
+2:44 PM
+
+Recognized straightforward request
+Recognized straightforward request
+Here you go:
+
+Please make the following updates to improve how the Sortii web app handles zoomed/large text settings on mobile devices:
+
+1. Replace vh with dvh Anywhere the app uses 100vh for height calculations, replace with 100dvh (dynamic viewport height) so the layout responds correctly to mobile browser chrome and address bars.
+
+2. Cap sticky header and footer bar height Add max-height: 60px and overflow: hidden to both the sticky top and bottom navigation bars so they cannot grow beyond a fixed size when a user has system font size or zoom increased.
+
+3. Fix the middle content area to fill remaining space The main content area between the top and bottom bars should use flex: 1 and overflow-y: auto so it always fills whatever space remains regardless of how large the bars are. It should never be squeezed to a small fixed height.
+
+4. Audit font sizes — use rem not px Check all font-size declarations across the app. Any that use fixed px values should be converted to rem so they scale gracefully with the user's system text size settings.
+
+5. Check viewport meta tag Ensure the HTML includes <meta name="viewport" content="width=device-width, initial-scale=1">. Do not include user-scalable=no or maximum-scale=1 as these block user zoom and are bad for accessibility.
+
+The goal is that a user with their phone zoom or text size increased should still see a usable layout with the full content area visible between the navigation bars.
+
+Short and unambiguous enough that Replit shouldn't need clarification on any of it. Want me to combine this with the earlier prompts into one master update?
+
+
+Weekly Meal Planner Simulate on Web Preview on your phone Test on a mobile device to experience touch gestures and native features. 1 Download Expo Go A free app that lets you run your project instantly. iOS Android 2 Scan the QR code Use your camera to scan the code and launch
+
+pasted
+
+Replit has provided me the below overview of rules and dynamic messaging built into the money section at the moment - can you please help me audit to check the logic of these, and also to see if there are some missing opportunities to sprinkle the 'sortii  cheeky voice in there (thinking the subscription pause / skip a coffee style ideas)?
+
+5:48 PM
+
+Prepared systematic audit of messaging logic and brand voice opportunities
+Prepared systematic audit of messaging logic and brand voice opportunities
+Great material to work with. Here's a full audit across logic and voice:
+
+1. Snapshot Headline
+Logic: Solid — five states is good coverage. Voice gaps: These are functional but flat. Opportunities:
+
+Current	Suggested
+"Holding steady this week."	"Holding steady. Not bad at all."
+"You're in a good spot this week."	"You're in a good spot. Dinner's doing the work."
+"You're in a great spot — looking solid."	"You're smashing it. Dinner at home is paying off."
+"Slight overspend — a couple of easy fixes below."	"Slightly over — nothing a leftover night won't fix."
+"A little tight this week — worth a look."	"A little tight. Tap the quick wins below."
+2. Dinner/Groceries Insight Line
+Logic issue: The "nice work" and "looks good" lines feel almost identical in tone — if the plan tracks close and comes under, a user might see either randomly. Worth tightening the thresholds so they feel meaningfully different.
+
+Voice gaps:
+
+Current	Suggested
+"Your planned dinners come in under the estimate — nice work."	"Dinners are under budget. That's the plan working."
+"Your dinner plan is a little over the estimate — a swap or two could help."	"Dinner spend is nudging over. One swap could sort it."
+"Your planned dinners track close to the estimate. Looks good."	"Dinners are tracking well. Nothing to worry about here."
+"No dinners planned yet."	"No dinners locked in yet — that's where the savings start."
+3. Quick Wins — Logic Audit
+Potential issues:
+
+swap_takeaway fires always even if the user has no takeaway spend entered — could feel irrelevant or presumptuous
+fridge_raid and leftover_night can both appear in the same week — they're essentially the same behavioural nudge, consider making them mutually exclusive
+grocery_trim only fires when groceries > $200 AND over/tight — a user who is "ok" but spending $250 might never see it
+batch_meal (no batch in plan) and leftover_night (batch in plan) are good logical opposites — that's clean
+The savings figure on monthly_projection_nudge has no label — "~£X/month" could mean nothing without context of what X is based on
+Missing opportunities:
+
+No tip for users with eating out spend but no meals set up — "You've got $X on eating out and no dinners planned. That's where Sortii earns its keep."
+No tip that fires when the goal is getting close (e.g. under 3 weeks away) — a motivating "you're almost there" moment mid-week
+No seasonal or contextual nudge (weekend coming up, school holidays etc) — probably v2 territory but worth noting
+Voice gaps — the ones that need the most love:
+
+Current	Suggested
+"Skip one takeaway this week." / "We've already planned dinner — you're 90% there."	"Skip one takeaway. Dinner's already sorted — you're literally 90% there."
+"One night: open the fridge, see what happens." / "We call it a win."	"One night: open the fridge, wing it. Sortii calls that a win."
+"Quick freezer check before you shop." / "You probably have more than you think."	"Do a freezer audit before you shop. There's definitely something in there."
+"You've got £X on streaming this week. Pause one." / "When did you last actually watch it?"	"You've got $X on streaming. Pause one. When did you last actually watch it?" ✓ this one's already good
+"You've got £X going to coffee this week. Skip one run."	"That's roughly N coffees this week. One less still counts." ✓ also good
+4. Savings Goal Copy — Logic Audit
+Logic issue: The "slow week" trigger (this week < 70% of average) could fire in week 2 with very little data — worth requiring 3+ weeks of history before showing it.
+
+Missing state: No copy for when someone updates their goal midway — the progress bar resets but the copy doesn't acknowledge the change. Could add: "Goal updated. Fresh start — let's go."
+
+Voice gaps:
+
+Current	Suggested
+"Goal set. Every week at home gets you closer."	"Goal set. Every dinner at home is doing something."
+"Three-quarters of the way to [name]. Nearly there."	"Three-quarters of the way to [name]. You're basically already there."
+"Halfway to [name]. Dinner at home is working."	"Halfway to [name]. This is exactly how it's supposed to work."
+"One quarter down for [name]. Keep it up."	"One quarter down on [name]. It's starting to stack up."
+"You're N weeks ahead of target. Nice."	"You're N weeks ahead of schedule. Dinner at home is quietly doing the work."
+"Tight week — [name] holds steady. Back on track next week."	"Tight week — [name] isn't going anywhere. Reset next week."
+Summary of What to Take Back to Replit
+Three types of changes here:
+
+Logic fixes — swap_takeaway condition, fridge_raid/leftover_night mutual exclusion, slow week requiring 3+ weeks data, grocery_trim threshold
+Missing triggers — eating out with no plan, goal almost reached
+Copy rewrites — mostly the flatter lines that could carry more of the Sortii voice
+Want me to package the copy rewrites and logic fixes into a single Replit prompt?
+
+yes please
+
+5:50 PM
+
+Synthesized audit findings into unified Replit prompt
+Synthesized audit findings into unified Replit prompt
+Here you go:
+
+Please make the following updates to the dynamic copy and logic rules in the Money section of the Sortii app. Changes are across utils/yourWeekEngine.ts, utils/savingsGoalCopy.ts, and money.tsx.
+
+1. Snapshot headline copy updates In the snapshotHeadlineFor() function, replace the copy for each state as follows:
+
+over → "Slightly over — nothing a leftover night won't fix."
+tight → "A little tight. Tap the quick wins below."
+ok → "Holding steady. Not bad at all."
+good → "You're in a good spot. Dinner's doing the work."
+great → "You're smashing it. Dinner at home is paying off."
+2. Dinner/groceries insight line copy updates In buildMoneyPage(), replace the insight line copy as follows:
+
+Plan under estimate → "Dinners are under budget. That's the plan working."
+Plan over estimate by 20%+ → "Dinner spend is nudging over. One swap could sort it."
+Plan tracking close → "Dinners are tracking well. Nothing to worry about here."
+No dinners planned → "No dinners locked in yet — that's where the savings start."
+3. Quick wins — logic fixes
+
+swap_takeaway — add a condition so this only fires if the user has takeaway/eating out spend entered. Do not show it if no eating out spend exists.
+fridge_raid and leftover_night — make these mutually exclusive. If a batch meal exists in the plan, show leftover_night. If not, show fridge_raid. Never show both in the same week.
+grocery_trim — remove the requirement that the week must be "over" or "tight". Fire this any time groceries exceed $200, regardless of weekly budget state.
+monthly_projection_nudge — ensure the copy includes context for the figure shown, e.g. "You're tracking well. Keep this up and you'll save ~$X/month on dinners alone."
+4. Quick wins — two new trigger conditions
+
+Add the following new suggestions to buildDynamicSuggestions():
+
+eating_out_no_plan — fires when eating out spend > $0 but no meals are set up. Label: "You've got $X on eating out and no dinners planned. That's where Sortii earns its keep." Reason: "Set up your week and watch that number move." Save: ~$30
+goal_almost_there — fires when savings goal progress is within 3 weeks of the target. Label: "You're almost there — [name] is within reach." Reason: "Keep this week's dinners sorted and you'll cross the line." Save: — (no figure, motivational only)
+5. Quick wins — copy updates Update the following existing quick win labels and reasons:
+
+swap_takeaway → Label: "Skip one takeaway this week." Reason: "Dinner's already sorted — you're literally 90% there."
+fridge_raid → Label: "One night: open the fridge, wing it." Reason: "Sortii calls that a win."
+freezer_check → Label: "Do a freezer audit before you shop." Reason: "There's definitely something in there."
+eating_out_swap → Label: "Swap one meal out for a planned dinner." Reason: "Your plan's already there — use it." (no change, already good)
+pause_subscription and skip_coffee — no change, voice is already strong on these
+6. Savings goal copy updates In utils/savingsGoalCopy.ts, replace copy as follows:
+
+First week, no calculable timeline → "Goal set. Every dinner at home is doing something."
+75–95% saved → "Three-quarters of the way to [name]. You're basically already there."
+50–75% saved → "Halfway to [name]. This is exactly how it's supposed to work."
+25–50% saved → "One quarter down on [name]. It's starting to stack up."
+Ahead of schedule → "You're N weeks ahead of schedule. Dinner at home is quietly doing the work."
+Slow week → "Tight week — [name] isn't going anywhere. Reset next week."
+Default on track, timeline calculable → "You're on track for [name]. About N weeks away."
+Default, no timeline → "Every week at home builds your [name] fund."
+7. Savings goal — logic fixes
+
+The "slow week" trigger (this week < 70% of average) should require a minimum of 3 weeks of contribution history before it can fire. Do not show it in weeks 1 or 2.
+Add a new state for when the goal amount or name is updated mid-progress. When a goal is edited and saved, show: "Goal updated. Fresh start — let's go." This should appear once, then revert to the standard progress copy.
+That should cover everything cleanly. Want me to also draft the copy for the goal_almost_there progression states in case Replit asks for more detail on that one?
+
+yes please
+
+5:52 PM
+
+Prepared detailed copy for progression states
+Prepared detailed copy for progression states
+Here are the progression states for goal_almost_there, ready to hand to Replit:
+
+goal_almost_there — full progression copy
+
+This trigger fires when the savings goal is within 3 weeks of the target. Break it into three micro-states based on weeks remaining, so the copy tightens as the user gets closer:
+
+~3 weeks away
+
+Label: "[Name] is closer than it looks."
+Reason: "Three more weeks like this one and you're done."
+~2 weeks away
+
+Label: "Two weeks away from [name]. Don't stop now."
+Reason: "You've done the hard part. Keep dinners sorted and you're there."
+~1 week away
+
+Label: "One more week and [name] is yours."
+Reason: "This is the one. Make it count."
+Goal reached (week it tips over) This should replace the goal card entirely for that week with a one-time celebration state:
+
+Label: "[Name] — sorted. ✈️" (or relevant emoji based on goal name e.g. 🏠 for deposit, 💍 for wedding)
+Subtext: "Dinner at home did that. Set a new goal when you're ready."
+CTA: "Set a new goal →"
+Emoji logic suggestion for the celebration state So Replit can automate this:
+
+Goal name contains	Emoji
+bali / trip / holiday / travel / flights	✈️
+house / deposit / home	🏠
+wedding / married	💍
+car	🚗
+baby / nursery	🍼
+anything else	🎉
+Additional note for Replit The goal_almost_there card should not show at the same time as monthly_projection_nudge — if the goal is within 3 weeks, suppress the projection nudge and show goal_almost_there only. They are covering the same emotional territory and showing both would dilute the moment.

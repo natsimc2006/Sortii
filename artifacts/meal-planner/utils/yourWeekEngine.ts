@@ -179,11 +179,11 @@ export interface MoneyPageResult {
 
 function snapshotHeadlineFor(state: WeeklyState): string {
   switch (state) {
-    case 'over':  return 'Slight overspend — a couple of easy fixes below.';
-    case 'tight': return 'A little tight this week — worth a look.';
-    case 'ok':    return "Holding steady this week.";
-    case 'good':  return "You're in a good spot this week.";
-    case 'great': return "You're in a great spot — looking solid.";
+    case 'over':  return "Slightly over — nothing a leftover night won't fix.";
+    case 'tight': return 'A little tight. Tap the quick wins below.';
+    case 'ok':    return "Holding steady. Not bad at all.";
+    case 'good':  return "You're in a good spot. Dinner's doing the work.";
+    case 'great': return "You're smashing it. Dinner at home is paying off.";
   }
 }
 
@@ -289,25 +289,28 @@ function buildDynamicSuggestions(
     });
   }
 
-  // swap_takeaway (static)
-  candidatesOverTight.push({
-    id: 'swap_takeaway',
-    label: "Skip one takeaway this week.",
-    reason: "We've already planned dinner — you're 90% there.",
-    impactAmount: 25,
-    category: 'money',
-  });
+  // eating_out_nomeal — eating out spend logged but no dinners planned
+  if (eatingOutWeekly > 0 && !hasMealsSetup) {
+    candidatesOverTight.push({
+      id: 'eating_out_nomeal',
+      label: `You've got ${fmt(eatingOutWeekly)} on eating out and no dinners planned. That's where Sortii earns its keep.`,
+      reason: "Lock in a few dinners and watch that number shrink.",
+      impactAmount: Math.round(eatingOutWeekly * 0.3),
+      category: 'combined',
+    });
+  }
 
-  // fridge_raid (static)
-  candidatesOverTight.push({
-    id: 'fridge_raid',
-    label: "One night: open the fridge, see what happens.",
-    reason: "We call it a win.",
-    impactAmount: 20,
-    category: 'money',
-  });
+  // swap_takeaway — only show if user has eating-out spend (not totally out of nowhere)
+  if (eatingOutWeekly > 0) {
+    candidatesOverTight.push({
+      id: 'swap_takeaway',
+      label: "Skip one takeaway. Dinner's already sorted — you're literally 90% there.",
+      impactAmount: 25,
+      category: 'money',
+    });
+  }
 
-  // leftover_night / batch_meal
+  // leftover_night / batch_meal — mutually exclusive with fridge_raid
   if (hasMealsSetup && hasBatchMeal) {
     candidatesOverTight.push({
       id: 'leftover_night',
@@ -324,11 +327,25 @@ function buildDynamicSuggestions(
       impactAmount: 15,
       category: 'meals',
     });
+    // fridge_raid only when there's no leftover_night nudge already (same behavioural intent)
+    candidatesOverTight.push({
+      id: 'fridge_raid',
+      label: "One night: open the fridge, wing it. Sortii calls that a win.",
+      impactAmount: 20,
+      category: 'money',
+    });
   }
 
-  // grocery_trim
-  if (groceriesWeekly > 200 && isOverOrTight) {
+  // grocery_trim — fires for any state when groceries are on the higher side
+  if (groceriesWeekly > 200) {
     candidatesOverTight.push({
+      id: 'grocery_trim',
+      label: "Your grocery spend is on the higher side. One swap could help.",
+      reason: "Try one own-brand swap on something you buy every week.",
+      impactAmount: 18,
+      category: 'money',
+    });
+    candidatesOkPlus.push({
       id: 'grocery_trim',
       label: "Your grocery spend is on the higher side. One swap could help.",
       reason: "Try one own-brand swap on something you buy every week.",
@@ -367,11 +384,31 @@ function buildDynamicSuggestions(
     if (monthlyProjection > 0) {
       alwaysLast.push({
         id: 'monthly_projection_nudge',
-        label: `You're tracking well. Keep this up and you save ~${fmt(monthlyProjection)}/month.`,
+        label: `You're tracking well. Keep this up and that's ~${fmt(monthlyProjection)}/month saved on dinners.`,
         impactAmount: 0,
         category: 'combined',
         isMonthlyNudge: true,
       });
+    }
+  }
+
+  // goal_almost_there — fires when goal is under 3 weeks away (urgent motivating moment)
+  if (goal !== 'none' && isOkOrBetter && weeklySortiiSaving > 0) {
+    const target = GOAL_TARGETS[goal];
+    const goalLabel = GOAL_LABELS[goal];
+    const goalEmoji = GOAL_EMOJIS[goal];
+    if (target && goalLabel && goalEmoji) {
+      const weeksLeft = Math.ceil(target / weeklySortiiSaving);
+      if (weeksLeft >= 1 && weeksLeft <= 3) {
+        alwaysLast.unshift({
+          id: 'goal_almost_there',
+          label: `${goalEmoji} You're ${weeksLeft} week${weeksLeft === 1 ? '' : 's'} away from your ${goalLabel}. Don't stop now.`,
+          impactAmount: 0,
+          category: 'combined',
+          isGoalProjection: true,
+          goalEmoji,
+        });
+      }
     }
   }
 
@@ -481,11 +518,11 @@ export function buildMoneyPage(
       : '';
 
     if (dinnerPlanCost < estimatedDinnerSpend * 0.9) {
-      dinnerInsight = `${coverageNote}Your planned dinners come in under the estimate — nice work.`;
+      dinnerInsight = `${coverageNote}Dinners are under budget. That's the plan working.`;
     } else if (dinnerPlanCost > estimatedDinnerSpend * 1.2) {
-      dinnerInsight = `${coverageNote}Your dinner plan is a little over the estimate — a swap or two could help.`;
+      dinnerInsight = `${coverageNote}Dinner spend is nudging over. One swap could sort it.`;
     } else {
-      dinnerInsight = `${coverageNote}Your planned dinners track close to the estimate. Looks good.`;
+      dinnerInsight = `${coverageNote}Dinners are tracking well. Nothing to worry about here.`;
     }
   }
 
