@@ -624,24 +624,20 @@ export default function OnboardingScreen() {
           </View>
         </ScrollView>
 
-        {/* Sticky CTA */}
+        {/* Sticky CTA — absolutely pinned to bottom on all platforms */}
         <View
-          style={[
-            {
-              paddingHorizontal: 20,
-              paddingTop: 12,
-              paddingBottom: paddingBottom + 16,
-              backgroundColor: PAGE_BG,
-              borderTopWidth: 1,
-              borderTopColor: "rgba(0,0,0,0.06)",
-            },
-            Platform.OS === "web" && {
-              position: "fixed" as any,
-              bottom: 0,
-              left: 0,
-              right: 0,
-            },
-          ]}
+          style={{
+            position: "absolute",
+            bottom: 0,
+            left: 0,
+            right: 0,
+            paddingHorizontal: 20,
+            paddingTop: 12,
+            paddingBottom: paddingBottom + 16,
+            backgroundColor: C.background,
+            borderTopWidth: 1,
+            borderTopColor: "rgba(0,0,0,0.06)",
+          }}
         >
           <View style={{
             backgroundColor: "#FFFFFF",
