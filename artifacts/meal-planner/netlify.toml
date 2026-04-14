@@ -1,5 +1,6 @@
 [build]
-  command = "npx expo export --platform web"
+  base = "artifacts/meal-planner"
+  command = "npm run build:web"
   publish = "dist"
 
 [[redirects]]
