@@ -25,6 +25,8 @@
       "package": "com.sortiidinnersorted.app"
     },
     "web": {
+      "output": "static",
+      "bundler": "metro",
       "favicon": "./assets/images/favicon.png",
       "name": "Sortii – Dinner. Sorted.",
       "shortName": "Sortii",
