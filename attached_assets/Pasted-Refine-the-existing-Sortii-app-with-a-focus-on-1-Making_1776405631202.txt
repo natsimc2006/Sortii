@@ -1,0 +1,225 @@
+Refine the existing Sortii app with a focus on:
+1) Making Home the clear, consistent entry point
+2) Simplifying and improving the “Help me sort this” experience
+3) Tightening tone and reducing UI/mental noise
+
+IMPORTANT:
+This is a refinement pass, not a rebuild.
+Do NOT redesign the app or change the core structure.
+Preserve the current visual style, spacing, and component system.
+
+---
+
+1. FIX APP ENTRY BEHAVIOUR (CRITICAL)
+
+Current issue:
+App reopens on last active tab (e.g. Meals).
+
+Required behaviour:
+- App must ALWAYS open on Home
+- Ignore previously active tab on launch
+
+Implementation guidance:
+- Disable navigation state persistence OR
+- Force initial route to Home on app mount
+- Ensure tab navigation still works normally within a session
+
+Goal:
+Home becomes the emotional entry point every time the app opens.
+
+---
+
+2. HOME SCREEN — REFINEMENT
+
+Keep the current structure, but improve clarity and tone.
+
+A. Weekly summary (top line)
+
+Keep style, refine tone slightly.
+
+Good examples:
+- “You’re in reasonable shape. Nothing’s on fire.”
+- “A fairly steady week. No surprises lurking.”
+
+Avoid:
+- overly long sentences
+- anything motivational or preachy
+
+---
+
+B. Rebalance content hierarchy
+
+Ensure these feel like equal life areas:
+- Tonight’s dinner
+- Family
+- Money
+
+Do NOT visually prioritise meals too heavily.
+
+---
+
+C. Money card tone improvement
+
+Replace:
+“See how your week looks financially.”
+
+With something more human:
+
+Examples:
+- “Curious how this week looks financially?”
+- “Want a quick look at the money side?”
+- “There’s some breathing room here if you want it.”
+
+Keep tone:
+light, optional, non-pressured
+
+---
+
+D. Week at a glance
+
+Keep current UI.
+
+Prepare for future support of mixed signals:
+(meals, family, appointments, bills)
+
+No major redesign required yet.
+
+---
+
+3. “HELP ME SORT THIS” — SIMPLIFY (VERY IMPORTANT)
+
+This feature must reduce overwhelm, not summarise the week.
+
+Current issue:
+Too many completed items → feels like a checklist.
+
+---
+
+A. Reduce content
+
+Show:
+- MAX 1–2 items only
+
+Example:
+
+Header:
+“Alright. Let’s keep this simple.”
+
+Then:
+
+Option 1:
+“Tonight’s dinner is sorted.”
+
+Optional second:
+“Tomorrow’s looking fine.”
+
+Then:
+
+Final line:
+“That’ll do.”
+
+---
+
+B. Remove instructional UI
+
+Remove:
+- “Tap one to acknowledge it”
+- any system-style instructions
+
+Replace with:
+- no instruction OR
+- soft line like “You’re good.”
+
+---
+
+C. Interaction behaviour
+
+- Tapping an item can lightly acknowledge it
+- No heavy navigation
+- No expanding into full screens
+- Keep everything contained
+
+---
+
+D. Emotional goal
+
+User should feel:
+“I don’t need to do everything right now.”
+
+NOT:
+“Here’s everything that’s done / not done”
+
+---
+
+4. MEALS PAGE — MICROCOPY TWEAK
+
+Refine header:
+
+Current:
+“7 dinners planned. Dinner’s cooperating this week.”
+
+Update to:
+“7 dinners sorted. Dinner’s behaving itself.”
+
+Keep tone:
+dry, observational, light
+
+---
+
+5. FAMILY MODULE — VISUAL CLEANUP
+
+Reduce visual clutter slightly.
+
+- Keep “Kids & activities” expanded
+- Collapse:
+  - pickups & dropoffs
+  - weekend plans
+  - family notes
+
+Goal:
+Less scanning, more clarity
+
+---
+
+6. GENERAL TONE GUARDRAILS
+
+Across the app, ensure:
+
+DO:
+- keep tone warm and slightly wry
+- use observational language
+- keep things short and natural
+
+DO NOT:
+- use productivity language
+- use motivational phrases
+- use instructions unless necessary
+- over-explain
+
+---
+
+7. OVERALL UX GOAL
+
+After refinement, the app should feel like:
+
+- a calm weekly snapshot
+- not a planner demanding attention
+- not a checklist system
+- not something that creates pressure
+
+The Home screen should make the user think:
+
+“Okay. That’s manageable.”
+
+And the “Help me sort this” flow should feel like:
+
+“I only need to do one small thing. Or nothing.”
+
+---
+
+IMPORTANT FINAL RULE
+
+If a change adds complexity, remove it.
+
+Sortii should always trend toward:
+less noise, fewer decisions, softer interactions.

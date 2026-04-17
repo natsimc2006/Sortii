@@ -17,7 +17,7 @@ import { usePlanner } from "@/context/PlannerContext";
 import { useUserWeek } from "@/context/UserWeekContext";
 import { useLocale } from "@/context/LocaleContext";
 import allRecipesRaw from "@/data/recipes_unified_au.json";
-import { buildHelpActions, HelpAction } from "@/utils/decisionEngine";
+import { buildHelpItems, HelpItem } from "@/utils/decisionEngine";
 import { computeNudge, recordAppOpen, Nudge } from "@/utils/nudgeEngine";
 
 const allRecipes = allRecipesRaw as { id: string; name: string }[];
@@ -25,7 +25,6 @@ const allRecipes = allRecipesRaw as { id: string; name: string }[];
 const TEAL      = "#2A8F88";
 const TEAL_TINT = "#E6F3F0";
 const GOLD      = "#D29A22";
-const GOLD_TINT = "#F6E6BA";
 const PLUM      = "#5E3A4C";
 const BG        = "#F7F3EB";
 const CARD_BG   = "#FFFFFF";
@@ -53,22 +52,22 @@ function getGreeting() {
 const SUMMARIES: Record<string, string[]> = {
   empty: [
     "The week's wide open. Nothing dramatic yet.",
-    "Not much happening yet. Could go either way.",
-    "A blank slate. Plenty of time.",
+    "A blank slate. Could go either way.",
+    "Not much on yet. Plenty of time.",
   ],
   light: [
     "A light week, by the look of it.",
-    "A couple of things taking shape. Nothing unmanageable.",
     "A quiet one. We'll take it.",
+    "A couple of things taking shape. Nothing unmanageable.",
   ],
   steady: [
-    "A fairly steady week. Dinner's cooperating.",
-    "A couple of moving parts, but all quite manageable.",
+    "A fairly steady week. No surprises lurking.",
     "You've got a bit on, but nothing dramatic.",
+    "A couple of moving parts. All quite manageable.",
   ],
   sorted: [
-    "A fairly sorted week. Not much to worry about.",
     "You're in reasonable shape. Nothing's on fire.",
+    "A fairly sorted week. Not much to worry about.",
     "A solid week. Organised without being smug about it.",
   ],
 };
@@ -82,13 +81,7 @@ function getWeeklySummary(filled: number): string {
 }
 
 // ── Smart nudge banner ────────────────────────────────────────────
-function NudgeBanner({
-  nudge,
-  onDismiss,
-}: {
-  nudge: Nudge;
-  onDismiss: () => void;
-}) {
+function NudgeBanner({ nudge, onDismiss }: { nudge: Nudge; onDismiss: () => void }) {
   return (
     <TouchableOpacity
       style={[styles.nudgeBanner, { borderLeftColor: nudge.color }]}
@@ -110,92 +103,73 @@ function NudgeBanner({
 }
 
 // ── "Help me sort this" overlay ───────────────────────────────────
+// Intentionally simple: 1–2 status statements, always-on dismiss.
 function HelpOverlay({
   visible,
-  actions,
+  items,
   onDismiss,
 }: {
   visible: boolean;
-  actions: HelpAction[];
+  items: HelpItem[];
   onDismiss: () => void;
 }) {
-  // Reset done-state each time the overlay opens (component re-mounts on visible toggle)
-  const [done, setDone] = useState<Record<string, boolean>>(() => {
-    const initial: Record<string, boolean> = {};
-    actions.forEach((a) => { if (a.startDone) initial[a.id] = true; });
-    return initial;
-  });
-
-  const preDoneCount = actions.filter((a) => a.startDone).length;
-  const tappedCount  = Object.values(done).filter(Boolean).length - preDoneCount;
-  const allDone      = actions.every((a) => done[a.id]);
-  const readyToDismiss = tappedCount >= 1 || allDone;
-
-  function handleTap(id: string) {
-    setDone((prev) => ({ ...prev, [id]: true }));
-  }
+  const [tapped, setTapped] = useState<Set<string>>(new Set());
 
   if (!visible) return null;
+
+  function handleTap(id: string) {
+    setTapped((prev) => new Set([...prev, id]));
+  }
 
   return (
     <Pressable style={styles.helpBackdrop} onPress={onDismiss}>
       <Pressable style={styles.helpCard} onPress={(e) => e.stopPropagation()}>
         <Text style={styles.helpTitle}>Alright. Let's keep this simple.</Text>
 
-        <View style={styles.helpActions}>
-          {actions.map((action) => {
-            const isDone = !!done[action.id];
+        <View style={styles.helpItems}>
+          {items.map((item) => {
+            const wasTapped = tapped.has(item.id);
+            const color = item.positive ? TEAL : GOLD;
+            const iconName = item.positive
+              ? (wasTapped ? "check-circle" : "check")
+              : (wasTapped ? "check" : "circle");
+
             return (
               <TouchableOpacity
-                key={action.id}
-                style={[styles.helpAction, isDone && styles.helpActionDone]}
-                onPress={() => handleTap(action.id)}
-                activeOpacity={isDone ? 1 : 0.72}
+                key={item.id}
+                style={[
+                  styles.helpItem,
+                  { borderLeftColor: color + "50" },
+                  wasTapped && styles.helpItemTapped,
+                ]}
+                onPress={() => handleTap(item.id)}
+                activeOpacity={wasTapped ? 1 : 0.7}
               >
-                <View
+                <Feather
+                  name={iconName as any}
+                  size={15}
+                  color={wasTapped ? TEAL : color}
+                />
+                <Text
                   style={[
-                    styles.helpActionIcon,
-                    { backgroundColor: isDone ? TEAL + "18" : action.color + "15" },
+                    styles.helpItemText,
+                    wasTapped && styles.helpItemTextTapped,
                   ]}
                 >
-                  <Feather
-                    name={(isDone ? "check" : action.icon) as any}
-                    size={15}
-                    color={isDone ? TEAL : action.color}
-                  />
-                </View>
-                <View style={styles.helpActionText}>
-                  <Text
-                    style={[
-                      styles.helpActionLabel,
-                      isDone && styles.helpActionLabelDone,
-                    ]}
-                  >
-                    {action.text}
-                  </Text>
-                  <Text style={styles.helpActionSub}>{action.sub}</Text>
-                </View>
+                  {item.text}
+                </Text>
               </TouchableOpacity>
             );
           })}
         </View>
 
+        {/* Always tappable — no gating */}
         <TouchableOpacity
-          style={[
-            styles.helpDismiss,
-            readyToDismiss ? styles.helpDismissReady : styles.helpDismissWaiting,
-          ]}
-          onPress={readyToDismiss ? onDismiss : undefined}
-          activeOpacity={readyToDismiss ? 0.78 : 1}
+          style={styles.helpDismiss}
+          onPress={onDismiss}
+          activeOpacity={0.8}
         >
-          <Text
-            style={[
-              styles.helpDismissText,
-              readyToDismiss ? styles.helpDismissTextReady : styles.helpDismissTextWaiting,
-            ]}
-          >
-            {readyToDismiss ? "That'll do." : "Tap one to acknowledge it."}
-          </Text>
+          <Text style={styles.helpDismissText}>That'll do.</Text>
         </TouchableOpacity>
       </Pressable>
     </Pressable>
@@ -209,19 +183,15 @@ export default function HomeTab() {
   const { money, hasMoneySetup } = useUserWeek();
   const { currencySymbol } = useLocale();
 
-  const [helpVisible, setHelpVisible]   = useState(false);
-  const [nudge, setNudge]               = useState<Nudge | null>(null);
+  const [helpVisible, setHelpVisible]       = useState(false);
+  const [nudge, setNudge]                   = useState<Nudge | null>(null);
   const [kidsActivities, setKidsActivities] = useState<{ id: string; name: string }[]>([]);
 
-  // Build help actions from decision engine (fresh on each open)
-  const todayName = getTodayName();
-  const todayIdx  = DAYS.indexOf(todayName);
-  const tomorrowName = DAYS[(todayIdx + 1) % 7];
+  const todayName    = getTodayName();
+  const todayIdx     = DAYS.indexOf(todayName);
+  const plannedCount = currentPlan.filter((e) => e.slot === "dinner" && e.recipeId).length;
 
-  const filledDinners = currentPlan.filter((e) => e.slot === "dinner" && e.recipeId);
-  const plannedCount  = filledDinners.length;
-
-  const tonightEntry  = currentPlan.find((e) => e.day === todayName  && e.slot === "dinner");
+  const tonightEntry  = currentPlan.find((e) => e.day === todayName && e.slot === "dinner");
   const tonightRecipe = tonightEntry?.recipeId
     ? allRecipes.find((r) => r.id === tonightEntry.recipeId) ?? null
     : null;
@@ -236,24 +206,19 @@ export default function HomeTab() {
   const greeting = useMemo(() => getGreeting(), []);
   const summary  = useMemo(() => getWeeklySummary(plannedCount), [plannedCount]);
 
-  // Decision engine actions (recomputed when data or overlay opens)
-  const helpActions = useMemo(
-    () => buildHelpActions(currentPlan, allRecipes, kidsActivities),
+  const helpItems = useMemo(
+    () => buildHelpItems(currentPlan, allRecipes, kidsActivities),
     [currentPlan, kidsActivities, helpVisible]
   );
 
-  // On mount: load kids activities, compute nudge, record visit
   useEffect(() => {
     (async () => {
-      // Load family activities
       const raw = await AsyncStorage.getItem(KIDS_KEY);
       if (raw) setKidsActivities(JSON.parse(raw));
 
-      // Compute nudge (reads last_opened before we update it)
       const computed = await computeNudge(currentPlan, allRecipes);
       if (computed) setNudge(computed);
 
-      // Record this visit
       await recordAppOpen();
     })();
   }, []);
@@ -296,7 +261,10 @@ export default function HomeTab() {
           <TouchableOpacity
             onPress={() => router.push("/(tabs)/meals")}
             activeOpacity={0.8}
-            style={[styles.card, tonightRecipe ? styles.cardTeal : styles.cardGold]}
+            style={[
+              styles.card,
+              tonightRecipe ? styles.cardTeal : styles.cardNeutral,
+            ]}
           >
             <View style={styles.cardRow}>
               <View style={{ flex: 1 }}>
@@ -306,11 +274,11 @@ export default function HomeTab() {
                 <Text style={styles.cardTitle}>
                   {tonightRecipe ? tonightRecipe.name : "Nothing planned yet."}
                 </Text>
-                <Text style={[styles.cardSub, { color: tonightRecipe ? TEAL : GOLD }]}>
+                <Text style={[styles.cardSub, { color: tonightRecipe ? TEAL : TEXT_MUTED }]}>
                   {tonightRecipe ? "Sorted. ✓" : "Tap to sort tonight →"}
                 </Text>
               </View>
-              <View style={[styles.cardChevron, { backgroundColor: (tonightRecipe ? TEAL : GOLD) + "18" }]}>
+              <View style={[styles.cardChevron, { backgroundColor: (tonightRecipe ? TEAL : GOLD) + "12" }]}>
                 <Feather name="chevron-right" size={16} color={tonightRecipe ? TEAL : GOLD} />
               </View>
             </View>
@@ -331,9 +299,7 @@ export default function HomeTab() {
                       {kidsActivities[0].name}
                       {kidsActivities.length > 1 ? ` + ${kidsActivities.length - 1} more` : ""}
                     </Text>
-                    <Text style={[styles.cardSub, { color: TEXT_MUTED }]}>
-                      On the list. ✓
-                    </Text>
+                    <Text style={[styles.cardSub, { color: TEXT_MUTED }]}>On the list. ✓</Text>
                   </>
                 ) : (
                   <>
@@ -361,7 +327,7 @@ export default function HomeTab() {
                 <View style={{ flex: 1 }}>
                   <Text style={[styles.cardLabel, { color: GOLD }]}>MONEY</Text>
                   <Text style={styles.cardTitle}>
-                    You've got {currencySymbol}{weeklyBreathingRoom} breathing room this week.
+                    {currencySymbol}{weeklyBreathingRoom} breathing room this week.
                   </Text>
                   <Text style={[styles.cardSub, { color: TEXT_MUTED }]}>
                     After meals and fixed costs.
@@ -381,7 +347,9 @@ export default function HomeTab() {
               <View style={styles.cardRow}>
                 <View style={{ flex: 1 }}>
                   <Text style={[styles.cardLabel, { color: GOLD }]}>MONEY</Text>
-                  <Text style={styles.cardTitle}>See how your week looks financially.</Text>
+                  <Text style={styles.cardTitle}>
+                    Curious how this week looks financially?
+                  </Text>
                   <Text style={[styles.cardSub, { color: TEAL }]}>Set it up →</Text>
                 </View>
                 <View style={[styles.cardChevron, { backgroundColor: GOLD + "12" }]}>
@@ -409,20 +377,16 @@ export default function HomeTab() {
                     key={day}
                     style={[
                       styles.dayPill,
-                      isToday
-                        ? styles.dayPillToday
-                        : hasMeal
-                        ? styles.dayPillMeal
+                      isToday ? styles.dayPillToday
+                        : hasMeal ? styles.dayPillMeal
                         : styles.dayPillEmpty,
                     ]}
                   >
                     <Text
                       style={[
                         styles.dayPillText,
-                        isToday
-                          ? { color: "#fff" }
-                          : hasMeal
-                          ? { color: TEXT }
+                        isToday ? { color: "#fff" }
+                          : hasMeal ? { color: TEXT }
                           : { color: "#bbb" },
                       ]}
                     >
@@ -430,12 +394,7 @@ export default function HomeTab() {
                     </Text>
                     <View style={styles.dayDots}>
                       {hasMeal && (
-                        <View
-                          style={[
-                            styles.dot,
-                            { backgroundColor: isToday ? "#fff" : TEAL },
-                          ]}
-                        />
+                        <View style={[styles.dot, { backgroundColor: isToday ? "#fff" : TEAL }]} />
                       )}
                     </View>
                   </View>
@@ -461,10 +420,10 @@ export default function HomeTab() {
           <View style={{ paddingBottom: 32 }} />
         </ScrollView>
 
-        {/* Help me sort this — rendered above scroll, fills screen */}
+        {/* Help me sort this — rendered above scroll */}
         <HelpOverlay
           visible={helpVisible}
-          actions={helpActions}
+          items={helpItems}
           onDismiss={() => setHelpVisible(false)}
         />
       </View>
@@ -548,19 +507,13 @@ const styles = StyleSheet.create({
     lineHeight: 17,
   },
 
-  // Cards
+  // Cards — all equal visual weight by default
   card: { borderRadius: 14, borderWidth: 1, padding: 15 },
   cardTeal: {
     backgroundColor: TEAL_TINT,
     borderColor: TEAL + "50",
     borderLeftWidth: 3,
     borderLeftColor: TEAL,
-  },
-  cardGold: {
-    backgroundColor: GOLD_TINT,
-    borderColor: GOLD + "50",
-    borderLeftWidth: 3,
-    borderLeftColor: GOLD,
   },
   cardNeutral: { backgroundColor: CARD_BG, borderColor: BORDER },
   cardRow: { flexDirection: "row", alignItems: "center", gap: 10 },
@@ -633,10 +586,10 @@ const styles = StyleSheet.create({
   },
   soonText: { fontSize: 10, fontFamily: "Inter_500Medium", color: "#aaa" },
 
-  // Help overlay
+  // Help overlay — deliberately minimal
   helpBackdrop: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(30, 28, 24, 0.62)",
+    backgroundColor: "rgba(30, 28, 24, 0.58)",
     justifyContent: "center",
     alignItems: "center",
     paddingHorizontal: 24,
@@ -645,14 +598,14 @@ const styles = StyleSheet.create({
   helpCard: {
     backgroundColor: "#FEFCF8",
     borderRadius: 22,
-    padding: 24,
+    padding: 26,
     width: "100%",
     ...Platform.select({
-      web: { boxShadow: "0px 12px 40px rgba(0,0,0,0.22)" },
+      web: { boxShadow: "0px 12px 40px rgba(0,0,0,0.18)" },
       default: {
         shadowColor: "#000",
         shadowOffset: { width: 0, height: 10 },
-        shadowOpacity: 0.2,
+        shadowOpacity: 0.18,
         shadowRadius: 28,
         elevation: 24,
       },
@@ -662,60 +615,48 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontFamily: "Inter_600SemiBold",
     color: TEXT,
-    marginBottom: 18,
+    marginBottom: 20,
     lineHeight: 26,
   },
-  helpActions: { gap: 8, marginBottom: 20 },
-  helpAction: {
+
+  // Items: plain statement rows
+  helpItems: { gap: 10, marginBottom: 24 },
+  helpItem: {
     flexDirection: "row",
-    alignItems: "flex-start",
-    gap: 12,
-    backgroundColor: "#F7F3EB",
-    borderRadius: 12,
-    padding: 13,
-    borderWidth: 1,
-    borderColor: "transparent",
-  },
-  helpActionDone: {
-    backgroundColor: TEAL_TINT,
-    borderColor: TEAL + "30",
-  },
-  helpActionIcon: {
-    width: 34,
-    height: 34,
-    borderRadius: 10,
     alignItems: "center",
-    justifyContent: "center",
-    flexShrink: 0,
-    marginTop: 1,
+    gap: 12,
+    paddingVertical: 12,
+    paddingHorizontal: 14,
+    borderRadius: 12,
+    borderLeftWidth: 3,
+    backgroundColor: "#F7F3EB",
   },
-  helpActionText: { flex: 1, gap: 3 },
-  helpActionLabel: {
-    fontSize: 14,
+  helpItemTapped: {
+    backgroundColor: TEAL_TINT,
+    borderLeftColor: TEAL + "50",
+  },
+  helpItemText: {
+    fontSize: 15,
     fontFamily: "Inter_500Medium",
     color: TEXT,
-    lineHeight: 20,
+    flex: 1,
+    lineHeight: 21,
   },
-  helpActionLabelDone: {
+  helpItemTextTapped: {
     color: TEAL,
-    textDecorationLine: "line-through",
-    opacity: 0.6,
+    opacity: 0.75,
   },
-  helpActionSub: {
-    fontSize: 12,
-    fontFamily: "Inter_400Regular",
-    color: TEXT_MUTED,
-    lineHeight: 17,
-    fontStyle: "italic",
-  },
+
+  // Always-on dismiss
   helpDismiss: {
+    backgroundColor: TEAL,
     borderRadius: 14,
     paddingVertical: 14,
     alignItems: "center",
   },
-  helpDismissReady:   { backgroundColor: TEAL },
-  helpDismissWaiting: { backgroundColor: "#EDEBE7" },
-  helpDismissText:    { fontSize: 15, fontFamily: "Inter_600SemiBold" },
-  helpDismissTextReady:   { color: "#fff" },
-  helpDismissTextWaiting: { color: "#bbb" },
+  helpDismissText: {
+    fontSize: 15,
+    fontFamily: "Inter_600SemiBold",
+    color: "#fff",
+  },
 });

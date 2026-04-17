@@ -101,7 +101,7 @@ export default function MealsScreen() {
     if (plannedCount === 0) return "Nothing planned yet. The week's wide open.";
     if (plannedCount <= 2) return `${plannedCount} dinner${plannedCount > 1 ? "s" : ""} sorted. A start.`;
     if (plannedCount <= 5) return `${plannedCount} dinners sorted. A decent week taking shape.`;
-    return `${plannedCount} dinners planned. Dinner's cooperating this week.`;
+    return `${plannedCount} dinners sorted. Dinner's behaving itself.`;
   }
 
   const handleNav = (route: string) => {

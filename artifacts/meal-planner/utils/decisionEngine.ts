@@ -1,21 +1,18 @@
 /**
  * Sortii Decision Engine
- * Selects 2–3 contextual, calm actions for "Help me sort this" mode.
+ * Produces 1–2 calm status items for "Help me sort this" mode.
  *
- * Priority order:
- *  1. Today (tonight's dinner)
- *  2. Next 48h (tomorrow, family activities)
- *  3. Gaps (first empty day after tomorrow)
- *  4. General affirmation
+ * Priority:
+ *  1. Tonight's dinner (always shown)
+ *  2. Tomorrow's dinner — or a family note — or quiet reassurance
+ *
+ * Items are statements, not tasks. Tone is observational, never urgent.
  */
 
-export interface HelpAction {
+export interface HelpItem {
   id: string;
-  icon: string;
   text: string;
-  sub: string;
-  color: string;
-  startDone: boolean;
+  positive: boolean; // true = reassuring, false = gentle heads-up
 }
 
 interface PlanEntry {
@@ -38,10 +35,6 @@ const DAYS = [
   "Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday",
 ];
 
-const TEAL = "#2A8F88";
-const GOLD = "#D29A22";
-const PLUM = "#5E3A4C";
-
 function getTodayIdx(): number {
   const d = new Date().getDay();
   return d === 0 ? 6 : d - 1;
@@ -59,112 +52,61 @@ function getDinnerFor(
   return recipes.find((r) => r.id === entry.recipeId) ?? null;
 }
 
-export function buildHelpActions(
+export function buildHelpItems(
   currentPlan: PlanEntry[],
   allRecipes: Recipe[],
   kidsActivities: Activity[]
-): HelpAction[] {
-  const actions: HelpAction[] = [];
-  const todayIdx = getTodayIdx();
-  const todayName = DAYS[todayIdx];
+): HelpItem[] {
+  const items: HelpItem[] = [];
+  const todayIdx    = getTodayIdx();
+  const todayName   = DAYS[todayIdx];
   const tomorrowName = DAYS[(todayIdx + 1) % 7];
 
-  // ── Priority 1: Tonight ──────────────────────────────────────
+  // ── Item 1: Tonight ──────────────────────────────────────────
   const tonightRecipe = getDinnerFor(todayName, currentPlan, allRecipes);
-  if (tonightRecipe) {
-    actions.push({
-      id: "tonight",
-      icon: "moon",
-      text: `Tonight: ${tonightRecipe.name}`,
-      sub: "Already sorted. Nothing to do here.",
-      color: TEAL,
-      startDone: true,
-    });
-  } else {
-    actions.push({
-      id: "tonight",
-      icon: "moon",
-      text: "Glance at tonight's dinner",
-      sub: "Just a quick look. No commitment needed.",
-      color: GOLD,
-      startDone: false,
-    });
-  }
+  items.push({
+    id: "tonight",
+    text: tonightRecipe
+      ? `Tonight's dinner is sorted.`
+      : "Tonight's dinner isn't sorted yet.",
+    positive: !!tonightRecipe,
+  });
 
-  if (actions.length >= 3) return actions.slice(0, 3);
-
-  // ── Priority 2: Tomorrow ─────────────────────────────────────
+  // ── Item 2: Tomorrow, family note, or quiet reassurance ──────
   const tomorrowRecipe = getDinnerFor(tomorrowName, currentPlan, allRecipes);
+
   if (tomorrowRecipe) {
-    actions.push({
+    items.push({
       id: "tomorrow",
-      icon: "calendar",
-      text: `Tomorrow: ${tomorrowRecipe.name}`,
-      sub: "One less thing to think about.",
-      color: TEAL,
-      startDone: true,
+      text: "Tomorrow's looking fine.",
+      positive: true,
+    });
+  } else if (kidsActivities.length > 0) {
+    items.push({
+      id: "family",
+      text: `${kidsActivities[0].name} is on the list.`,
+      positive: true,
     });
   } else {
-    // Is there a family activity to surface instead?
-    if (kidsActivities.length > 0) {
-      actions.push({
-        id: "family_check",
-        icon: "star",
-        text: `${kidsActivities[0].name} is on the list`,
-        sub: "Already noted. Nothing else needed.",
-        color: GOLD,
-        startDone: true,
+    // Only add a second item if there's something worth saying
+    const anyMealsPlanned = currentPlan.some(
+      (e) => e.slot === "dinner" && e.recipeId
+    );
+    if (anyMealsPlanned && !tonightRecipe) {
+      items.push({
+        id: "general",
+        text: "No rush on anything else right now.",
+        positive: true,
       });
-    } else {
-      actions.push({
-        id: "tomorrow_gap",
-        icon: "calendar",
-        text: "Tomorrow's dinner isn't sorted",
-        sub: "Add something quick if that helps.",
-        color: GOLD,
-        startDone: false,
+    } else if (!anyMealsPlanned) {
+      items.push({
+        id: "general",
+        text: "One thing at a time is enough.",
+        positive: true,
       });
     }
+    // If tonight is sorted and nothing else notable — just show the one item
   }
 
-  if (actions.length >= 3) return actions.slice(0, 3);
-
-  // ── Priority 3: Gaps later in week / Family / Affirmation ────
-  const remainingDays = DAYS.slice(todayIdx + 2);
-  const firstGap = remainingDays.find(
-    (day) => !getDinnerFor(day, currentPlan, allRecipes)
-  );
-
-  if (kidsActivities.length > 1) {
-    // Multiple kids activities — surface as a reassurance
-    actions.push({
-      id: "family_count",
-      icon: "star",
-      text: `${kidsActivities.length} things on for the kids this week`,
-      sub: "All noted. You've got it covered.",
-      color: GOLD,
-      startDone: true,
-    });
-  } else if (firstGap) {
-    actions.push({
-      id: "week_gap",
-      icon: "plus-circle",
-      text: `${firstGap}'s dinner isn't sorted yet`,
-      sub: "Add one. That's enough for now.",
-      color: GOLD,
-      startDone: false,
-    });
-  } else {
-    // Week is in good shape — affirmation
-    actions.push({
-      id: "affirm",
-      icon: "heart",
-      text: "One thing at a time is enough.",
-      sub: "That's not a pep talk. It's just true.",
-      color: PLUM,
-      startDone: false,
-    });
-  }
-
-  return actions.slice(0, 3);
+  return items.slice(0, 2);
 }

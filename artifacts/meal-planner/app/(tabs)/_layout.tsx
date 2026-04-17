@@ -198,6 +198,7 @@ export default function TabLayout() {
   return (
     <View style={{ flex: 1 }}>
       <Tabs
+        initialRouteName="home"
         screenOptions={{
           tabBarActiveTintColor: C.primary,
           tabBarInactiveTintColor: "#909090",
