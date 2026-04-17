@@ -1,7 +1,10 @@
 import { Feather, Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useRef, useState } from "react";
 import {
+  Animated,
+  Platform,
+  Pressable,
   ScrollView,
   StyleSheet,
   Text,
@@ -44,22 +47,119 @@ function getGreeting() {
   return "Good evening.";
 }
 
+const SUMMARIES_EMPTY = [
+  "The week's wide open. Nothing dramatic yet.",
+  "Not much happening yet. Could go either way.",
+  "A blank slate. Plenty of time.",
+];
+const SUMMARIES_LIGHT = [
+  "A light week, by the look of it.",
+  "A couple of things taking shape. Nothing unmanageable.",
+  "A quiet one. We'll take it.",
+];
+const SUMMARIES_STEADY = [
+  "A fairly steady week. Dinner's cooperating.",
+  "A couple of moving parts, but all quite manageable.",
+  "You've got a bit on, but nothing dramatic.",
+];
+const SUMMARIES_SORTED = [
+  "A fairly sorted week. Not much to worry about.",
+  "You're in reasonable shape. Dinner's cooperating and nothing's on fire.",
+  "A solid week. Organised without being smug about it.",
+];
+
 function getWeeklySummary(filled: number): string {
-  if (filled === 0) return "The week's wide open. Could go either way.";
-  if (filled <= 2) return `${filled} dinners sorted. A gentle start.`;
-  if (filled === 3) return "You're sorted for dinner till mid-week. We love a small win.";
-  if (filled <= 5) return "A fairly steady week. Dinner's at least behaving itself.";
-  if (filled === 6) return "Almost fully sorted. One more and you're done.";
-  return "Week sorted for dinner. That's the spirit.";
+  const pick = (arr: string[]) => arr[Math.floor(Math.random() * arr.length)];
+  if (filled === 0) return pick(SUMMARIES_EMPTY);
+  if (filled <= 2) return pick(SUMMARIES_LIGHT);
+  if (filled <= 5) return pick(SUMMARIES_STEADY);
+  return pick(SUMMARIES_SORTED);
 }
 
-function getResetLines(): string[] {
-  return [
-    "Just one thing: what's for dinner tonight?",
-    "Let's keep this light.",
-    "A couple of small things. That's enough.",
-    "One step at a time is perfectly fine.",
+// ── Sort this out overlay ──────────────────────────────────────
+function SortItOutOverlay({
+  visible,
+  tonightRecipe,
+  onDismiss,
+  onCheckDinner,
+  onAddActivity,
+  onViewPlan,
+}: {
+  visible: boolean;
+  tonightRecipe: { name: string } | null;
+  onDismiss: () => void;
+  onCheckDinner: () => void;
+  onAddActivity: () => void;
+  onViewPlan: () => void;
+}) {
+  if (!visible) return null;
+
+  const actions = [
+    {
+      icon: "moon",
+      label: tonightRecipe ? `Tonight: ${tonightRecipe.name}` : "Check tonight's dinner",
+      color: tonightRecipe ? TEAL : GOLD,
+      done: !!tonightRecipe,
+      onPress: onCheckDinner,
+    },
+    {
+      icon: "star",
+      label: "Add one family activity",
+      color: GOLD,
+      done: false,
+      onPress: onAddActivity,
+    },
+    {
+      icon: "calendar",
+      label: "Look at this week's plan",
+      color: TEAL,
+      done: false,
+      onPress: onViewPlan,
+    },
   ];
+
+  return (
+    <Pressable style={styles.sortOverlay} onPress={onDismiss}>
+      <Pressable style={styles.sortCard} onPress={(e) => e.stopPropagation()}>
+        <Text style={styles.sortTitle}>Alright. Let's keep this simple.</Text>
+
+        <View style={styles.sortActions}>
+          {actions.map(({ icon, label, color, done, onPress }) => (
+            <TouchableOpacity
+              key={label}
+              style={styles.sortAction}
+              onPress={onPress}
+              activeOpacity={0.75}
+            >
+              <View
+                style={[
+                  styles.sortActionIcon,
+                  { backgroundColor: color + "18" },
+                ]}
+              >
+                <Feather name={icon as any} size={15} color={done ? TEAL : color} />
+              </View>
+              <Text
+                style={[
+                  styles.sortActionLabel,
+                  done && { color: TEAL, textDecorationLine: "line-through", opacity: 0.6 },
+                ]}
+              >
+                {label}
+              </Text>
+              {!done && (
+                <Feather name="chevron-right" size={14} color="#ccc" />
+              )}
+            </TouchableOpacity>
+          ))}
+        </View>
+
+        <TouchableOpacity style={styles.sortDone} onPress={onDismiss} activeOpacity={0.75}>
+          <Text style={styles.sortDoneText}>That'll do.</Text>
+        </TouchableOpacity>
+      </Pressable>
+    </Pressable>
+  );
 }
 
 export default function HomeTab() {
@@ -68,10 +168,9 @@ export default function HomeTab() {
   const { money, hasMoneySetup } = useUserWeek();
   const { currencySymbol } = useLocale();
 
-  const [resetMode, setResetMode] = useState(false);
+  const [sortItOutVisible, setSortItOutVisible] = useState(false);
 
   const todayName = getTodayName();
-
   const filledDinners = currentPlan.filter((e) => e.slot === "dinner" && e.recipeId);
   const plannedCount = filledDinners.length;
 
@@ -92,230 +191,232 @@ export default function HomeTab() {
 
   const greeting = useMemo(() => getGreeting(), []);
   const summary = useMemo(() => getWeeklySummary(plannedCount), [plannedCount]);
-  const resetLine = useMemo(
-    () => getResetLines()[Math.floor(Math.random() * getResetLines().length)],
-    []
-  );
 
-  // ── Reset mode: show only 1-3 high-priority actions ──────────
-  if (resetMode) {
-    return (
-      <SafeAreaView style={styles.safe}>
+  return (
+    <SafeAreaView style={styles.safe}>
+      <View style={{ flex: 1 }}>
         <ScrollView
           style={styles.scroll}
           contentContainerStyle={styles.container}
           showsVerticalScrollIndicator={false}
         >
-          <View style={styles.header}>
-            <Text style={styles.wordmark}>
-              sorti<Text style={styles.wordmarkGold}>ii</Text>.
-            </Text>
-            <Text style={styles.voiceLine}>{resetLine}</Text>
-          </View>
-
-          <View style={[styles.card, { backgroundColor: TEAL_TINT, borderColor: TEAL, borderLeftWidth: 3, borderLeftColor: TEAL }]}>
-            <Text style={styles.cardLabelTeal}>RESET MODE</Text>
-            <Text style={[styles.mealName, { fontSize: 15, lineHeight: 22 }]}>
-              We've simplified everything. Just a few gentle things to focus on.
-            </Text>
-          </View>
-
-          {!tonightRecipe && (
+          {/* A — Header */}
+          <View style={styles.headerRow}>
+            <View style={styles.headerLeft}>
+              <Text style={styles.wordmark}>
+                sorti<Text style={styles.wordmarkGold}>ii</Text>.
+              </Text>
+              <Text style={styles.greeting}>{greeting}</Text>
+            </View>
             <TouchableOpacity
-              onPress={() => router.push("/(tabs)/meals")}
-              activeOpacity={0.78}
-              style={[styles.card, styles.cardGold]}
+              style={styles.sortItOutBtn}
+              onPress={() => setSortItOutVisible(true)}
+              activeOpacity={0.75}
             >
-              <Text style={styles.cardLabelGold}>ONE THING</Text>
-              <Text style={styles.mealName}>Sort dinner for tonight.</Text>
-              <Text style={styles.sortTonightLink}>Go to Meals →</Text>
+              <Feather name="zap" size={13} color={TEAL} />
+              <Text style={styles.sortItOutText}>Sort this out</Text>
+            </TouchableOpacity>
+          </View>
+
+          {/* Weekly summary */}
+          <Text style={styles.summary}>{summary}</Text>
+
+          {/* B — Tonight's dinner (equal weight card) */}
+          <TouchableOpacity
+            onPress={() => router.push("/(tabs)/meals")}
+            activeOpacity={0.8}
+            style={[styles.card, tonightRecipe ? styles.cardTeal : styles.cardGold]}
+          >
+            <View style={styles.cardRow}>
+              <View>
+                <Text
+                  style={[
+                    styles.cardLabel,
+                    { color: tonightRecipe ? TEAL : GOLD },
+                  ]}
+                >
+                  TONIGHT'S DINNER
+                </Text>
+                <Text style={styles.cardTitle}>
+                  {tonightRecipe ? tonightRecipe.name : "Nothing planned yet."}
+                </Text>
+                <Text
+                  style={[
+                    styles.cardSub,
+                    { color: tonightRecipe ? TEAL : GOLD },
+                  ]}
+                >
+                  {tonightRecipe ? "Sorted. ✓" : "Tap to sort tonight →"}
+                </Text>
+              </View>
+              <View
+                style={[
+                  styles.cardChevronWrap,
+                  {
+                    backgroundColor: tonightRecipe
+                      ? TEAL + "18"
+                      : GOLD + "18",
+                  },
+                ]}
+              >
+                <Feather
+                  name="chevron-right"
+                  size={16}
+                  color={tonightRecipe ? TEAL : GOLD}
+                />
+              </View>
+            </View>
+          </TouchableOpacity>
+
+          {/* C — Family (equal weight) */}
+          <TouchableOpacity
+            onPress={() => router.push("/(tabs)/family")}
+            activeOpacity={0.8}
+            style={[styles.card, styles.cardNeutral]}
+          >
+            <View style={styles.cardRow}>
+              <View style={{ flex: 1 }}>
+                <Text style={[styles.cardLabel, { color: PLUM }]}>FAMILY</Text>
+                <Text style={styles.cardTitle}>Nothing on here yet.</Text>
+                <Text style={[styles.cardSub, { fontStyle: "italic", color: TEXT_MUTED }]}>
+                  A rare and peaceful sight.
+                </Text>
+              </View>
+              <View style={[styles.cardChevronWrap, { backgroundColor: PLUM + "12" }]}>
+                <Feather name="chevron-right" size={16} color={PLUM} />
+              </View>
+            </View>
+          </TouchableOpacity>
+
+          {/* D — Money (equal weight) */}
+          {hasMoneySetup && weeklyBreathingRoom > 0 ? (
+            <TouchableOpacity
+              onPress={() => router.push("/(tabs)/money")}
+              activeOpacity={0.8}
+              style={[styles.card, styles.cardNeutral]}
+            >
+              <View style={styles.cardRow}>
+                <View style={{ flex: 1 }}>
+                  <Text style={[styles.cardLabel, { color: GOLD }]}>MONEY</Text>
+                  <Text style={styles.cardTitle}>
+                    You've got {currencySymbol}{weeklyBreathingRoom} breathing room this week.
+                  </Text>
+                  <Text style={[styles.cardSub, { color: TEXT_MUTED }]}>
+                    After meals and fixed costs.
+                  </Text>
+                </View>
+                <View style={[styles.cardChevronWrap, { backgroundColor: GOLD + "12" }]}>
+                  <Feather name="chevron-right" size={16} color={GOLD} />
+                </View>
+              </View>
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity
+              onPress={() => router.push("/(tabs)/more")}
+              activeOpacity={0.8}
+              style={[styles.card, styles.cardNeutral]}
+            >
+              <View style={styles.cardRow}>
+                <View style={{ flex: 1 }}>
+                  <Text style={[styles.cardLabel, { color: GOLD }]}>MONEY</Text>
+                  <Text style={styles.cardTitle}>
+                    See how your week looks financially.
+                  </Text>
+                  <Text style={[styles.cardSub, { color: TEAL }]}>
+                    Set it up →
+                  </Text>
+                </View>
+                <View style={[styles.cardChevronWrap, { backgroundColor: GOLD + "12" }]}>
+                  <Feather name="chevron-right" size={16} color={GOLD} />
+                </View>
+              </View>
             </TouchableOpacity>
           )}
 
-          {tonightRecipe && (
-            <View style={[styles.card, styles.cardTeal]}>
-              <Text style={styles.cardLabelTeal}>TONIGHT</Text>
-              <Text style={styles.mealName}>{tonightRecipe.name}</Text>
-              <Text style={styles.sortedLine}>Dinner sorted. ✓</Text>
-            </View>
-          )}
+          {/* E — Week at a glance (mixed-signal ready) */}
+          <View style={styles.weekSection}>
+            <Text style={styles.sectionLabel}>WEEK AT A GLANCE</Text>
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.weekStrip}
+            >
+              {DAYS.map((day, i) => {
+                const isToday = day === todayName;
+                const hasMeal = currentPlan.some(
+                  (e) => e.day === day && e.slot === "dinner" && e.recipeId
+                );
+                return (
+                  <View
+                    key={day}
+                    style={[
+                      styles.dayPill,
+                      isToday
+                        ? styles.dayPillToday
+                        : hasMeal
+                        ? styles.dayPillMeal
+                        : styles.dayPillEmpty,
+                    ]}
+                  >
+                    <Text
+                      style={[
+                        styles.dayPillText,
+                        isToday
+                          ? { color: "#fff" }
+                          : hasMeal
+                          ? { color: TEXT }
+                          : { color: "#bbb" },
+                      ]}
+                    >
+                      {DAY_ABBR[i]}
+                    </Text>
+                    <View style={styles.dayDots}>
+                      {hasMeal && (
+                        <View style={[styles.dot, { backgroundColor: isToday ? "#fff" : TEAL }]} />
+                      )}
+                    </View>
+                  </View>
+                );
+              })}
+            </ScrollView>
+          </View>
 
-          <TouchableOpacity
-            onPress={() => setResetMode(false)}
-            style={styles.resetExitBtn}
-            activeOpacity={0.7}
-          >
-            <Feather name="arrow-left" size={14} color={TEXT_MUTED} />
-            <Text style={styles.resetExitText}>Back to full view</Text>
-          </TouchableOpacity>
+          {/* F — Placeholder row */}
+          <View style={styles.placeholderRow}>
+            <View style={[styles.placeholderCard, { borderColor: TEAL + "30" }]}>
+              <Feather name="calendar" size={15} color={TEAL} />
+              <Text style={[styles.placeholderLabel, { color: TEAL }]}>Appointments</Text>
+              <View style={styles.soonPill}><Text style={styles.soonText}>Soon</Text></View>
+            </View>
+            <View style={[styles.placeholderCard, { borderColor: "#4A7B5E30" }]}>
+              <Feather name="file-text" size={15} color="#4A7B5E" />
+              <Text style={[styles.placeholderLabel, { color: "#4A7B5E" }]}>Bills</Text>
+              <View style={styles.soonPill}><Text style={styles.soonText}>Soon</Text></View>
+            </View>
+          </View>
 
           <View style={{ paddingBottom: 32 }} />
         </ScrollView>
-      </SafeAreaView>
-    );
-  }
 
-  // ── Normal mode ───────────────────────────────────────────────
-  return (
-    <SafeAreaView style={styles.safe}>
-      <ScrollView
-        style={styles.scroll}
-        contentContainerStyle={styles.container}
-        showsVerticalScrollIndicator={false}
-      >
-        {/* A — Header */}
-        <View style={styles.headerRow}>
-          <View style={styles.header}>
-            <Text style={styles.wordmark}>
-              sorti<Text style={styles.wordmarkGold}>ii</Text>.
-            </Text>
-            <Text style={styles.voiceLine}>{greeting} {summary}</Text>
-          </View>
-          <TouchableOpacity
-            style={styles.resetBtn}
-            onPress={() => setResetMode(true)}
-            activeOpacity={0.75}
-          >
-            <Feather name="wind" size={14} color={TEAL} />
-            <Text style={styles.resetBtnText}>Breathe</Text>
-          </TouchableOpacity>
-        </View>
-
-        {/* B — Tonight's dinner */}
-        {tonightRecipe ? (
-          <TouchableOpacity
-            onPress={() => router.push("/(tabs)/meals")}
-            activeOpacity={0.8}
-            style={[styles.card, styles.cardTeal]}
-          >
-            <Text style={styles.cardLabelTeal}>TONIGHT'S DINNER</Text>
-            <Text style={styles.mealName}>{tonightRecipe.name}</Text>
-            <Text style={styles.sortedLine}>Sorted. ✓</Text>
-          </TouchableOpacity>
-        ) : (
-          <TouchableOpacity
-            onPress={() => router.push("/(tabs)/meals")}
-            activeOpacity={0.8}
-            style={[styles.card, styles.cardGold]}
-          >
-            <Text style={styles.cardLabelGold}>TONIGHT</Text>
-            <Text style={styles.mealName}>Nothing planned yet.</Text>
-            <Text style={styles.sortTonightLink}>Sort tonight →</Text>
-          </TouchableOpacity>
-        )}
-
-        {/* C — Week at a glance */}
-        <View style={styles.weekSection}>
-          <Text style={styles.sectionLabel}>WEEK AT A GLANCE</Text>
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.weekStrip}
-          >
-            {DAYS.map((day, i) => {
-              const isToday = day === todayName;
-              const hasMeal = currentPlan.some(
-                (e) => e.day === day && e.slot === "dinner" && e.recipeId
-              );
-              return (
-                <View
-                  key={day}
-                  style={[
-                    styles.dayPill,
-                    isToday
-                      ? styles.dayPillToday
-                      : hasMeal
-                      ? styles.dayPillMeal
-                      : styles.dayPillEmpty,
-                  ]}
-                >
-                  <Text
-                    style={[
-                      styles.dayPillText,
-                      isToday
-                        ? { color: "#fff" }
-                        : hasMeal
-                        ? { color: "#2B2B2B" }
-                        : { color: "#aaa" },
-                    ]}
-                  >
-                    {DAY_ABBR[i]}
-                  </Text>
-                  <Text style={styles.dayPillEmoji}>
-                    {hasMeal ? "🍽" : "·"}
-                  </Text>
-                </View>
-              );
-            })}
-          </ScrollView>
-        </View>
-
-        {/* D — Money snapshot */}
-        {hasMoneySetup && weeklyBreathingRoom > 0 ? (
-          <TouchableOpacity
-            onPress={() => router.push("/(tabs)/money")}
-            activeOpacity={0.8}
-            style={[styles.card, styles.cardMoney]}
-          >
-            <Text style={styles.cardLabelGold}>BREATHING ROOM THIS WEEK</Text>
-            <Text style={styles.breathingAmount}>
-              {currencySymbol}{weeklyBreathingRoom}
-            </Text>
-            <Text style={styles.breathingSub}>after meals and fixed costs.</Text>
-          </TouchableOpacity>
-        ) : (
-          <TouchableOpacity
-            onPress={() => router.push("/(tabs)/money")}
-            activeOpacity={0.75}
-            style={[styles.card, styles.cardPlum]}
-          >
-            <Text style={styles.cardLabelPlum}>MONEY</Text>
-            <Text style={styles.mealName}>
-              See how your week looks financially.
-            </Text>
-            <Text style={styles.sortTonightLink} onPress={() => router.push("/(tabs)/more")}>
-              Set it up →
-            </Text>
-          </TouchableOpacity>
-        )}
-
-        {/* E — Family placeholder */}
-        <TouchableOpacity
-          onPress={() => router.push("/(tabs)/family")}
-          activeOpacity={0.8}
-          style={[styles.card, styles.cardNeutral]}
-        >
-          <View style={styles.cardRow}>
-            <Ionicons name="people-outline" size={18} color={PLUM} />
-            <View style={{ flex: 1 }}>
-              <Text style={styles.cardLabelPlum}>FAMILY</Text>
-              <Text style={[styles.mealName, { fontSize: 15 }]}>
-                Nothing on here yet.{" "}
-                <Text style={{ fontStyle: "italic", fontFamily: "Inter_400Regular" }}>
-                  A rare and peaceful sight.
-                </Text>
-              </Text>
-            </View>
-            <Feather name="chevron-right" size={16} color="#ccc" />
-          </View>
-        </TouchableOpacity>
-
-        {/* F — Appointments + Bills: Coming soon row */}
-        <View style={styles.placeholderRow}>
-          <View style={[styles.placeholderCard, { borderColor: TEAL + "40" }]}>
-            <Feather name="calendar" size={16} color={TEAL} />
-            <Text style={[styles.placeholderLabel, { color: TEAL }]}>Appointments</Text>
-            <Text style={styles.placeholderSoon}>Soon</Text>
-          </View>
-          <View style={[styles.placeholderCard, { borderColor: "#4A7B5E40" }]}>
-            <Feather name="file-text" size={16} color="#4A7B5E" />
-            <Text style={[styles.placeholderLabel, { color: "#4A7B5E" }]}>Bills</Text>
-            <Text style={styles.placeholderSoon}>Soon</Text>
-          </View>
-        </View>
-
-        <View style={{ paddingBottom: 32 }} />
-      </ScrollView>
+        {/* Sort it out overlay — above scroll, within safe area */}
+        <SortItOutOverlay
+          visible={sortItOutVisible}
+          tonightRecipe={tonightRecipe}
+          onDismiss={() => setSortItOutVisible(false)}
+          onCheckDinner={() => {
+            setSortItOutVisible(false);
+            router.push("/(tabs)/meals");
+          }}
+          onAddActivity={() => {
+            setSortItOutVisible(false);
+            router.push("/(tabs)/family");
+          }}
+          onViewPlan={() => {
+            setSortItOutVisible(false);
+            router.push("/(tabs)/planner");
+          }}
+        />
+      </View>
     </SafeAreaView>
   );
 }
@@ -323,204 +424,225 @@ export default function HomeTab() {
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: BG },
   scroll: { flex: 1 },
-  container: { paddingHorizontal: 20, paddingTop: 16, gap: 14 },
+  container: { paddingHorizontal: 20, paddingTop: 16, gap: 12 },
 
   headerRow: {
     flexDirection: "row",
     alignItems: "flex-start",
     justifyContent: "space-between",
     gap: 12,
-    marginBottom: 4,
   },
-  header: { flex: 1, gap: 4 },
+  headerLeft: { flex: 1, gap: 2 },
   wordmark: {
-    fontSize: 28,
+    fontSize: 26,
     fontFamily: "PlayfairDisplay_700Bold",
     color: TEXT,
   },
   wordmarkGold: { color: GOLD },
-  voiceLine: {
+  greeting: {
     fontSize: 13,
+    fontFamily: "Inter_400Regular",
+    color: TEXT_MUTED,
+  },
+  summary: {
+    fontSize: 14,
     fontFamily: "Inter_400Regular",
     fontStyle: "italic",
     color: TEAL,
-    marginTop: 4,
-    lineHeight: 19,
+    lineHeight: 20,
+    marginTop: -2,
+    marginBottom: 4,
   },
 
-  resetBtn: {
+  sortItOutBtn: {
     flexDirection: "row",
     alignItems: "center",
     gap: 5,
     backgroundColor: TEAL_TINT,
     borderRadius: 20,
-    paddingHorizontal: 12,
+    paddingHorizontal: 11,
     paddingVertical: 7,
     borderWidth: 1,
     borderColor: TEAL + "30",
-    marginTop: 4,
+    marginTop: 2,
+    flexShrink: 0,
   },
-  resetBtnText: {
+  sortItOutText: {
     fontSize: 12,
     fontFamily: "Inter_600SemiBold",
     color: TEAL,
   },
 
-  resetExitBtn: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-    alignSelf: "flex-start",
-    padding: 4,
-    marginTop: 4,
+  card: {
+    borderRadius: 14,
+    borderWidth: 1,
+    padding: 15,
   },
-  resetExitText: {
-    fontSize: 13,
-    fontFamily: "Inter_400Regular",
-    color: TEXT_MUTED,
-  },
-
-  card: { borderRadius: 14, padding: 16, gap: 6 },
   cardTeal: {
     backgroundColor: TEAL_TINT,
-    borderWidth: 1,
-    borderColor: TEAL + "60",
+    borderColor: TEAL + "50",
     borderLeftWidth: 3,
     borderLeftColor: TEAL,
   },
   cardGold: {
     backgroundColor: GOLD_TINT,
-    borderWidth: 1,
-    borderColor: GOLD + "60",
+    borderColor: GOLD + "50",
     borderLeftWidth: 3,
     borderLeftColor: GOLD,
-  },
-  cardMoney: {
-    backgroundColor: CARD_BG,
-    borderWidth: 1,
-    borderColor: BORDER,
-    borderLeftWidth: 3,
-    borderLeftColor: GOLD,
-  },
-  cardPlum: {
-    backgroundColor: PLUM_TINT,
-    borderWidth: 1,
-    borderColor: PLUM + "40",
-    borderLeftWidth: 3,
-    borderLeftColor: PLUM,
   },
   cardNeutral: {
     backgroundColor: CARD_BG,
-    borderWidth: 1,
     borderColor: BORDER,
-    borderLeftWidth: 3,
-    borderLeftColor: PLUM + "80",
   },
   cardRow: {
     flexDirection: "row",
     alignItems: "center",
     gap: 10,
   },
-
-  cardLabelTeal: {
+  cardLabel: {
     fontSize: 10,
     fontFamily: "Inter_600SemiBold",
     letterSpacing: 0.8,
     textTransform: "uppercase",
-    color: TEAL,
+    marginBottom: 3,
   },
-  cardLabelGold: {
-    fontSize: 10,
-    fontFamily: "Inter_600SemiBold",
-    letterSpacing: 0.8,
-    textTransform: "uppercase",
-    color: GOLD,
-  },
-  cardLabelPlum: {
-    fontSize: 10,
-    fontFamily: "Inter_600SemiBold",
-    letterSpacing: 0.8,
-    textTransform: "uppercase",
-    color: PLUM,
-  },
-
-  mealName: {
-    fontSize: 18,
+  cardTitle: {
+    fontSize: 16,
     fontFamily: "Inter_600SemiBold",
     color: TEXT,
-    lineHeight: 24,
+    lineHeight: 22,
+    flex: 1,
+    flexWrap: "wrap",
   },
-  sortedLine: {
-    fontSize: 13,
+  cardSub: {
+    fontSize: 12,
     fontFamily: "Inter_400Regular",
-    fontStyle: "italic",
-    color: TEAL,
+    marginTop: 3,
   },
-  sortTonightLink: {
-    fontSize: 13,
-    fontFamily: "Inter_600SemiBold",
-    color: TEAL,
-    marginTop: 2,
+  cardChevronWrap: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    alignItems: "center",
+    justifyContent: "center",
+    flexShrink: 0,
   },
 
-  breathingAmount: {
-    fontSize: 28,
-    fontFamily: "Inter_700Bold",
-    color: TEAL,
-  },
-  breathingSub: {
-    fontSize: 13,
-    fontFamily: "Inter_400Regular",
-    color: TEXT_MUTED,
-  },
-
-  weekSection: { gap: 8 },
+  weekSection: { gap: 8, marginTop: 4 },
   sectionLabel: {
     fontSize: 10,
     fontFamily: "Inter_600SemiBold",
     letterSpacing: 1.2,
     textTransform: "uppercase",
-    color: TEAL,
+    color: TEXT_MUTED,
   },
-  weekStrip: { gap: 8, paddingBottom: 2 },
+  weekStrip: { gap: 6, paddingBottom: 2 },
   dayPill: {
-    borderRadius: 20,
-    paddingHorizontal: 12,
+    borderRadius: 18,
+    paddingHorizontal: 10,
     paddingVertical: 8,
     alignItems: "center",
-    gap: 2,
+    gap: 4,
     borderWidth: 1,
+    minWidth: 44,
   },
   dayPillToday: { backgroundColor: TEAL, borderColor: TEAL },
   dayPillMeal: { backgroundColor: CARD_BG, borderColor: BORDER },
   dayPillEmpty: { backgroundColor: BG, borderColor: BORDER },
-  dayPillText: { fontSize: 12, fontFamily: "Inter_600SemiBold" },
-  dayPillEmoji: { fontSize: 12 },
+  dayPillText: { fontSize: 11, fontFamily: "Inter_600SemiBold" },
+  dayDots: { flexDirection: "row", gap: 3, height: 6, alignItems: "center" },
+  dot: { width: 5, height: 5, borderRadius: 3 },
 
-  placeholderRow: {
-    flexDirection: "row",
-    gap: 12,
-  },
+  placeholderRow: { flexDirection: "row", gap: 10 },
   placeholderCard: {
     flex: 1,
     backgroundColor: CARD_BG,
     borderRadius: 12,
     borderWidth: 1,
-    padding: 14,
+    padding: 13,
+    gap: 5,
     alignItems: "flex-start",
-    gap: 6,
   },
   placeholderLabel: {
     fontSize: 13,
     fontFamily: "Inter_600SemiBold",
   },
-  placeholderSoon: {
-    fontSize: 10,
-    fontFamily: "Inter_500Medium",
-    color: "#aaa",
+  soonPill: {
     backgroundColor: "#F0F0F0",
     borderRadius: 8,
     paddingHorizontal: 7,
     paddingVertical: 2,
+  },
+  soonText: {
+    fontSize: 10,
+    fontFamily: "Inter_500Medium",
+    color: "#aaa",
+  },
+
+  // Sort it out overlay
+  sortOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 24,
+    zIndex: 100,
+  },
+  sortCard: {
+    backgroundColor: CARD_BG,
+    borderRadius: 20,
+    padding: 24,
+    width: "100%",
+    gap: 0,
+    ...Platform.select({
+      web: { boxShadow: "0px 8px 32px rgba(0,0,0,0.18)" },
+      default: {
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 8 },
+        shadowOpacity: 0.18,
+        shadowRadius: 24,
+        elevation: 20,
+      },
+    }),
+  },
+  sortTitle: {
+    fontSize: 17,
+    fontFamily: "Inter_600SemiBold",
+    color: TEXT,
+    marginBottom: 16,
+    lineHeight: 24,
+  },
+  sortActions: { gap: 2, marginBottom: 20 },
+  sortAction: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: "#F5F5F5",
+  },
+  sortActionIcon: {
+    width: 34,
+    height: 34,
+    borderRadius: 10,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  sortActionLabel: {
+    flex: 1,
+    fontSize: 14,
+    fontFamily: "Inter_500Medium",
+    color: TEXT,
+  },
+  sortDone: {
+    backgroundColor: "#F7F3EB",
+    borderRadius: 12,
+    paddingVertical: 13,
+    alignItems: "center",
+  },
+  sortDoneText: {
+    fontSize: 15,
+    fontFamily: "Inter_600SemiBold",
+    color: TEXT_MUTED,
   },
 });

@@ -1,0 +1,249 @@
+Refine and improve the current Sortii app to strengthen the Home dashboard, unify the product feel, and ensure the experience remains calm, supportive, and slightly wry.
+
+IMPORTANT CONTEXT
+This app has already been refactored from a meal planner into a broader Sortii app with:
+- Home (dashboard)
+- Meals (module)
+- Family (module)
+- Add (quick add)
+- More (supporting modules)
+
+The current structure is correct.
+Do NOT redesign from scratch.
+This is a refinement and tightening pass.
+
+The goal now is:
+- make Home feel like a true “your week” view (not meal-dominant)
+- strengthen emotional usability
+- keep the warm, slightly cheeky Sortii voice consistent
+- improve clarity without adding complexity
+
+CORE PRODUCT FEEL
+Sortii should feel like:
+- calm
+- lightly humorous
+- quietly competent
+- never overwhelming
+- never preachy
+- never overly “wellness”
+
+Think:
+“helpful friend who’s seen it all before and isn’t fussed”
+
+---
+
+HOME SCREEN — REBALANCE (MOST IMPORTANT)
+
+The Home screen is currently slightly too meal-dominant.
+
+Refine it to a **hybrid weekly overview (option C)**:
+
+STRUCTURE:
+
+1. Header
+- Keep Sortii logo
+- Keep time-based greeting
+
+2. Add a short weekly summary line FIRST
+Examples:
+- “A fairly steady week. Dinner’s sorted, and not much chaos elsewhere.”
+- “A couple of moving parts, but all quite manageable.”
+- “You’ve got a bit on, but nothing dramatic.”
+
+This should feel like a quick emotional read of the week.
+
+3. Mixed “This week” signals (equal weight)
+
+Show 3–4 cards with equal importance:
+
+- Tonight’s dinner
+- Family (next activity OR empty state)
+- Breathing room (money)
+- Optional future: appointments/bills placeholder
+
+These should feel like:
+👉 different parts of life sitting together calmly
+
+IMPORTANT:
+Do NOT visually prioritise meals above everything else.
+
+---
+
+WEEK AT A GLANCE — UPGRADE
+
+Currently uses only meal icons.
+
+Refine so it can support mixed signals:
+
+- Meals → plate icon
+- Family → star or similar
+- Future: appointments → calendar dot
+- Future: bills → small coin or marker
+
+Even if only meals are active now, structure the system to support multiple types.
+
+---
+
+BREATHING ROOM CARD — COPY TWEAK
+
+Upgrade from neutral stat to emotional reassurance.
+
+Instead of:
+“Breathing room this week”
+
+Use:
+- “You’ve got $250 breathing room this week.”
+- or
+- “This week’s got $250 breathing room.”
+
+Keep tone:
+calm, reassuring, slightly human
+
+---
+
+FAMILY MODULE — REFINEMENT
+
+Remove or reduce “module in progress” banner.
+
+Let the module feel:
+early but intentional
+
+Keep sections:
+- Kids & activities (make this the FIRST usable working section)
+- Pickups & dropoffs
+- Weekend plans
+- Family notes
+
+Make **Kids & activities fully usable now**:
+- allow adding activities
+- basic display
+- simple structure
+
+Keep other sections scaffolded.
+
+Empty states should remain warm:
+- “Nothing on yet. Enjoy the quiet.”
+- “All clear here. Nobody needs to be anywhere.”
+
+---
+
+ADD FLOW — COPY TIGHTEN
+
+Change sheet title to:
+
+“What’s come up?”
+
+Keep sub:
+“Quick. No admin, no fuss.”
+
+Keep options simple:
+- Add meal
+- Add family activity
+- Add appointment (coming soon)
+- Add bill (coming soon)
+- Add note (coming soon)
+
+---
+
+RESET BUTTON — FINALISE
+
+Replace “Breathe” with:
+
+👉 “Sort this out”
+
+This button should:
+- feel practical, not fluffy
+- connect to brand
+- signal help, not pressure
+
+---
+
+RESET MODE — LIGHT IMPLEMENTATION
+
+When “Sort this out” is tapped:
+
+1. Dim background slightly
+2. Show one centered card
+
+Copy example:
+“Alright. Let’s keep this simple.”
+
+Then show 2–3 tiny actions:
+- Check tonight’s dinner
+- Add one activity
+- Look at this week’s plan
+
+Then show:
+“That’ll do.”
+
+Do NOT overbuild this yet.
+Keep it simple and emotionally supportive.
+
+---
+
+MORE SCREEN — SMALL REORDER
+
+Group upcoming modules more intentionally:
+
+Section: “Coming soon”
+- Appointments
+- Bills
+
+Then:
+- Reminders
+
+Keep tone light:
+“Everything else, in one calm place.”
+
+---
+
+VOICE & MICROCOPY — LOCK THIS IN
+
+Tone should be:
+- warm
+- slightly cheeky
+- observational
+- not try-hard
+- not joke-heavy
+
+Good examples:
+- “Dinner’s cooperating this week.”
+- “A rare and peaceful sight.”
+- “Nothing dramatic. We like that.”
+
+Avoid:
+- motivational language
+- productivity jargon
+- overly cute phrasing
+
+---
+
+IMPORTANT GUARDRAILS
+
+Do NOT:
+- add more features
+- add more cards to Home
+- make Home busier
+- introduce alerts or warning-heavy UI
+- turn this into a task manager
+
+DO:
+- simplify
+- rebalance
+- improve clarity
+- improve emotional usability
+
+---
+
+FINAL SUCCESS STATE
+
+After this refinement, the app should feel like:
+
+- a calm weekly overview, not a meal app with extras
+- meals, family, and money sitting together naturally
+- something a user would open even when slightly overwhelmed
+- something that feels quietly helpful, not demanding
+
+The Home screen should make the user think:
+
+👉 “Okay. That’s manageable.”

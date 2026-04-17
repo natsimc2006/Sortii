@@ -85,7 +85,7 @@ function QuickAddSheet({
         onPress={(e) => e.stopPropagation()}
       >
         <View style={styles.sheetHandle} />
-        <Text style={styles.sheetTitle}>Add to your week</Text>
+        <Text style={styles.sheetTitle}>What's come up?</Text>
         <Text style={styles.sheetSub}>Quick. No admin, no fuss.</Text>
 
         <View style={styles.sheetOptions}>

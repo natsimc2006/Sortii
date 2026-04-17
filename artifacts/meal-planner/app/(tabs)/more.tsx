@@ -71,6 +71,11 @@ export default function MoreScreen() {
           badge: "Soon",
           onPress: () => {},
         },
+      ],
+    },
+    {
+      title: "Also on the way",
+      items: [
         {
           icon: "bell",
           color: "#E07B3A",
