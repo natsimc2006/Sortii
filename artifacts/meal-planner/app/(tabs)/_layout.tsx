@@ -2,7 +2,7 @@ import { Feather, Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { BlurView } from "expo-blur";
 import { Tabs, useRouter } from "expo-router";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Platform,
   Pressable,
@@ -13,6 +13,21 @@ import {
   useColorScheme,
 } from "react-native";
 import Colors from "@/constants/Colors";
+
+/**
+ * Expo Router: declare 'home' as the canonical initial tab.
+ * This is evaluated at module load time by the file-system router.
+ */
+export const unstable_settings = {
+  initialRouteName: "home",
+};
+
+/**
+ * Module-level flag — false on every fresh page load (web) or app launch (native).
+ * Ensures the Home redirect fires once per session, regardless of which URL or
+ * persisted route the navigator tries to restore.
+ */
+let _sessionInitialized = false;
 
 const TEAL = "#2A8F88";
 const GOLD = "#D29A22";
@@ -191,6 +206,27 @@ function AddTabButton({
 export default function TabLayout() {
   const [quickAddVisible, setQuickAddVisible] = useState(false);
   const colorScheme = useColorScheme();
+  const router = useRouter();
+
+  /**
+   * On every fresh app open / page reload, redirect to Home.
+   *
+   * Why this works:
+   * - Web: the JS module re-evaluates on each page load, so _sessionInitialized
+   *   is always false at startup — even if the browser URL points to /meals.
+   * - Native: the module evaluates once per app launch, so the redirect fires
+   *   on launch and the flag prevents it from firing again during the session.
+   *
+   * router.replace (not navigate) rewrites history so the user can't
+   * "back" into the non-home route that was restored.
+   */
+  useEffect(() => {
+    if (!_sessionInitialized) {
+      _sessionInitialized = true;
+      router.replace("/(tabs)/home");
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const isDark = colorScheme === "dark";
   const isIOS = Platform.OS === "ios";
   const C = Colors.light;

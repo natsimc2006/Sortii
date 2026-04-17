@@ -1,0 +1,60 @@
+Fix the app so it ALWAYS opens on the Home tab/screen on app launch and app reopen.
+
+Current problem:
+Even though Home exists as the first tab, the app still lands on Meals when reopening.
+This suggests navigation state or route persistence is still restoring the previous tab/screen.
+
+I need this fixed at the navigation/root level, not just visually.
+
+REQUIRED BEHAVIOUR
+- On every fresh app open, default to Home
+- On every app reopen, default to Home
+- Do NOT restore the last active tab from a previous session
+- Do NOT persist the previously open route across reload/reopen
+- Home must be the consistent entry point into Sortii
+
+IMPORTANT
+This is not about changing the selected tab icon only.
+This is about the actual initial route / navigation state on launch.
+
+PLEASE CHECK FOR ALL OF THESE POSSIBLE CAUSES AND FIX THEM:
+1. Tab navigator or router restoring the last active tab
+2. Persisted navigation state in local storage / async storage / session storage
+3. Expo Router or React Navigation using previous route state
+4. Any initial route still pointing to Meals / planner screen
+5. Any logic redirecting to Meals after startup
+6. Any cached navigation stack from hot reload / preview environment
+
+IMPLEMENTATION GOAL
+At the root navigation level:
+- set Home as the true initial route
+- clear or ignore any saved navigation state on launch
+- prevent prior session tab restoration
+- make Home the first mounted visible screen
+
+IF USING REACT NAVIGATION
+- ensure initialRouteName is set to Home on the root tab navigator
+- disable persisted navigation state restore
+- clear any saved navigation state from AsyncStorage/local storage/session storage
+- do not hydrate the navigator from previously saved state
+
+IF USING EXPO ROUTER
+- ensure the default route/index resolves to Home
+- remove any redirect to Meals/planner
+- make the Home route the actual landing route
+- prevent previous tab restoration on reopen if possible in current setup
+
+TEST REQUIRED
+After fixing:
+1. open app
+2. tap Meals
+3. close/reopen app or refresh preview
+4. app should return to Home, not Meals
+
+IMPORTANT UX REASON
+Sortii is now structured so Home is the emotional front door.
+Meals is a module.
+The user must always land on Home first.
+
+Do not make any visual redesigns in this pass.
+Only fix launch/navigation behaviour so Home is the true entry screen.
