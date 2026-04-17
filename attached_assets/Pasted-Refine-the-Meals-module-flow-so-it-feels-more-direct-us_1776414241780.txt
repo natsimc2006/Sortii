@@ -1,0 +1,134 @@
+Refine the Meals module flow so it feels more direct, useful, and natural inside the wider Sortii app.
+
+IMPORTANT CONTEXT
+The current Meals tab opens to a summary-style Meals page with:
+- tonight’s dinner card
+- quick action tiles
+- progress bar
+
+Then the user has to tap again to get to the actual weekly meal plan view.
+
+This is adding an unnecessary layer.
+
+GOAL
+When a user taps the Meals tab, they should land directly on the actual weekly meal plan screen first.
+
+The Meals module should feel like a practical working area, not a summary page in front of the real content.
+
+CORE CHANGE
+Change the Meals tab default landing screen from the current summary/hub page to the actual weekly meal planner view.
+
+This weekly meal planner view should become the main Meals home screen.
+
+WHY
+If a user taps Meals, the most likely thing they want is:
+- see this week’s meals
+- swap a meal
+- check tonight’s dinner
+- access shopping
+- adjust budget/preferences
+
+So the first screen should support that immediately.
+
+NEW MEALS FLOW
+When user taps Meals:
+- open directly to the weekly meal plan view
+- show the day-by-day meals immediately
+- preserve the strongest existing planner functionality
+
+At the TOP of the Meals screen, keep a slim, useful header area with:
+1. Page title: Meals
+2. One short summary line such as:
+   - “7 dinners sorted. Dinner’s behaving itself.”
+3. Optional small tonight’s dinner card or compact tonight highlight
+4. A compact quick-action row for:
+   - Shopping list
+   - Meal budget
+   - Browse recipes
+   - Preferences
+
+Then immediately below that, show the weekly meal plan.
+
+IMPORTANT
+Do NOT make the user tap “Plan the week” to reach the main planner.
+The planner should already be the default screen.
+
+REMOVE CURRENT MEALS SUMMARY PAGE AS THE FIRST SCREEN
+The current summary page with large tiles should no longer be the default Meals landing page.
+
+You can either:
+- remove it entirely
+OR
+- repurpose parts of it into the top section of the weekly meal planner screen
+
+Preferred approach:
+Embed the useful parts into the main weekly planner screen so the flow is flatter and faster.
+
+LOGO / HEADER SPACE CHANGE
+Remove the large current Sortii logo lockup from the Meals screen.
+
+Reason:
+It is taking up space that should be used for more useful navigation and working content.
+
+Instead:
+- use a cleaner, more compact header
+- prioritise the page title and quick actions
+- keep the broader Sortii branding in the app shell/Home, not repeated heavily here
+
+This Meals screen should feel more like:
+- a useful working screen
+- less like a landing page
+
+KEEP / PRESERVE
+Please preserve the strongest parts of the existing weekly meal planner screen:
+- day-by-day meal cards
+- swap suggestions
+- pantry tips
+- meal details
+- useful meal interactions
+- supportive Sortii tone
+
+Do NOT simplify away the good planner functionality.
+
+TOP OF MEALS SCREEN — RECOMMENDED STRUCTURE
+Use a tighter structure like this:
+
+- Header row:
+  - “Meals”
+  - optional small bookmark/home/tools icon if needed
+
+- Short summary line:
+  - “7 dinners sorted. Dinner’s behaving itself.”
+
+- Compact quick links / chips / buttons:
+  - Shopping
+  - Budget
+  - Recipes
+  - Preferences
+
+- Then weekly planner content immediately below
+
+Tone should stay:
+- warm
+- practical
+- lightly wry
+- not cluttered
+
+DO NOT
+- keep a large hero logo at the top of Meals
+- force an extra screen before the planner
+- make the module feel slower or more layered
+- add more UI clutter
+
+DO
+- flatten the flow
+- make Meals feel action-ready
+- use the available screen space for useful controls and planner content
+- keep the visual style calm and premium
+
+SUCCESS STATE
+After this update:
+- tapping Meals should feel immediate and useful
+- user should see the weekly meal plan right away
+- the top of the screen should be tighter, cleaner, and more functional
+- the Meals module should feel like the practical working space within Sortii
