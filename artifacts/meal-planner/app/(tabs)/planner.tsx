@@ -567,13 +567,6 @@ export default function PlannerScreen() {
               >
                 <Feather name="bookmark" size={15} color={C.textSecondary} />
               </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => router.push("/home")}
-                style={[styles.filterIconBtn, { backgroundColor: C.chipBg, borderWidth: 1.5, borderColor: C.border }]}
-                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-              >
-                <Feather name="home" size={15} color={C.textSecondary} />
-              </TouchableOpacity>
             </View>
           </View>
           <View style={styles.filterChips}>

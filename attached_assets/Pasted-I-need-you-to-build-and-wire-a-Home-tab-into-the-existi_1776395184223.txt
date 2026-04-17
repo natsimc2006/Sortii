@@ -1,0 +1,156 @@
+I need you to build and wire a Home tab into the existing Sortii 
+Expo/React Native app. This is a focused task — do not modify any 
+existing screens, data logic, or AsyncStorage keys. Only add what 
+is described below.
+
+BRAND COLOURS (never alter these):
+- Background: #F7F3EB
+- Text: #2B2B2B
+- Teal (primary action): #2A8F88
+- Teal tint: #E6F3F0
+- Gold (CTA): #D29A22
+- Gold tint: #F6E6BA
+- Plum (smart features): #5E3A4C
+- Plum tint: #F3E8EE
+- Border: #E6E1D7
+- White: #FFFFFF
+
+────────────────────────────────────────
+TASK 1 — ADD HOME AS TAB 1
+────────────────────────────────────────
+Find the bottom tab navigator file (likely app/(tabs)/_layout.tsx 
+or navigation/TabNavigator.tsx or similar).
+
+Add a new tab at position 1 (first tab, before Planner):
+- Name: "Home"
+- Icon: house icon from @expo/vector-icons (Ionicons, 
+  name="home-outline", active name="home")
+- Icon colour active: #2A8F88
+- Routes to: the existing home.tsx file
+
+The existing tabs shift right:
+Planner · Recipes · Adjust · Shopping · Money
+become:
+Home · Planner · Recipes · Adjust · Shopping · Money
+
+If 6 tabs is too many for the tab bar, hide the Recipes tab from 
+the tab bar (keep the screen accessible from the Planner screen's 
+existing Recipes button — do not delete it). The tab bar should 
+show: Home · Planner · Adjust · Shopping · Money.
+
+Remove the floating house icon button from the top-right corner 
+of PlannerScreen and MoneyScreen now that Home is a proper tab.
+
+────────────────────────────────────────
+TASK 2 — BUILD HOME SCREEN (home.tsx)
+────────────────────────────────────────
+Replace the contents of home.tsx with the Sortii Calm Dashboard.
+Use ScrollView, SafeAreaView, and StyleSheet.
+
+The screen has these sections in order:
+
+A) HEADER
+- Small Sortii wordmark text: "sortii." in Playfair Display or 
+  serif font, charcoal #2B2B2B, "ii" in gold #D29A22
+- Below it: one rotating Sortii voice line (pick randomly from 
+  this array each render):
+  [
+    "A steady week ahead.",
+    "Thursday's doing the most, but we'll allow it.",
+    "Nothing dramatic today. We love that for you.",
+    "Future you is already grateful.",
+    "One less thing to think about."
+  ]
+  Style: font size 14, color #2A8F88, italic, margin-top 4
+
+B) TODAY'S DINNER CARD
+Read from AsyncStorage using the same key the Planner screen uses 
+to store the weekly meal plan. Find today's meal by matching 
+today's day of the week (Monday/Tuesday etc) to the plan object.
+
+Condition logic:
+- IF today's meal exists in the plan:
+  Show a teal-tinted card (#E6F3F0, border #2A8F88, border-left 
+  width 3, border-radius 12, padding 16).
+  Label: "TONIGHT'S DINNER" — font 10px, uppercase, 
+  letter-spacing 0.12, color #2A8F88
+  Meal name: font 18, font-weight 600, color #2B2B2B
+  Below: "Sorted." in teal #2A8F88, font 13, italic
+  
+- IF no meal is planned for today:
+  Show same card style but gold tint (#F6E6BA, border #D29A22).
+  Label: "TONIGHT"
+  Text: "Nothing planned yet."
+  Below: a teal text button "Sort tonight →" that navigates to 
+  the Planner tab
+
+C) WEEK AT A GLANCE STRIP
+A horizontal ScrollView showing 7 day pills.
+Each pill = day abbreviation (Mon/Tue/Wed etc) + small plate 
+emoji if a meal exists for that day, or a faint dot if not.
+
+- Today's pill: background #2A8F88, text white, border-radius 20,
+  padding 8px 12px
+- Other days with meal: background white, border #E6E1D7, 
+  text #2B2B2B
+- Empty days: background #F7F3EB, border #E6E1D7, text #aaa
+
+Read meal data from the same AsyncStorage key as above.
+
+D) MONEY SNAPSHOT CARD (conditional)
+Read from AsyncStorage using the same key the Money screen uses 
+to store weeklyBreathingRoom (or equivalent — check the Money 
+screen for the exact key name).
+
+Condition logic:
+- IF money data exists AND weeklyBreathingRoom > 0:
+  Show a white card (border #E6E1D7, border-radius 12, padding 16,
+  border-left 3px solid #D29A22).
+  Label: "THIS WEEK'S BREATHING ROOM" — 10px, uppercase, 
+  letter-spacing 0.12, color #D29A22
+  Amount: "$[weeklyBreathingRoom]" — font 28, font-weight 700, 
+  color #2A8F88
+  Below: "after meals and fixed costs." — font 13, color #888
+
+- IF money is not set up yet:
+  Show a plum-tinted card (#F3E8EE, border-left #5E3A4C).
+  Label: "MONEY"
+  Text: "See how your week looks financially."
+  Tappable — navigates to the Money tab.
+
+E) BOTTOM SPACER
+paddingBottom: 32
+
+────────────────────────────────────────
+TASK 3 — FIX GO_BACK NAVIGATION ERROR
+────────────────────────────────────────
+There is a "The action 'GO_BACK' was not handled" error visible 
+in the Money setup flow screens (budget input, savings goal).
+
+Find where navigation.goBack() is called in the Money setup 
+screens. The likely cause is that these screens are being pushed 
+onto a stack that has no previous route to go back to.
+
+Fix: wrap the goBack() call in a safety check:
+  if (navigation.canGoBack()) {
+    navigation.goBack();
+  } else {
+    navigation.navigate('Home'); // or the tab name for Home
+  }
+
+Apply this fix wherever navigation.goBack() is called in the 
+Money setup flow files.
+
+────────────────────────────────────────
+SAFETY RULES
+────────────────────────────────────────
+- Do not modify recipes.json or any recipe data files
+- Do not change any existing AsyncStorage keys or data schemas
+- Do not alter PlannerScreen, ShoppingScreen, RecipesScreen, 
+  or AdjustScreen logic
+- Do not change any existing brand colours on existing screens
+- If you cannot find the exact AsyncStorage key for meal plan 
+  or money data, console.log the available keys and stop — 
+  do not guess or create new storage logic
+- Test that the existing Planner tab still works after the 
+  tab bar change

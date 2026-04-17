@@ -82,8 +82,10 @@ export default function GoalSetupScreen() {
     setTimeout(() => {
       if (returnTo) {
         navigate();
-      } else {
+      } else if (router.canGoBack()) {
         router.back();
+      } else {
+        router.navigate("/(tabs)/home");
       }
     }, 300);
   };
@@ -92,8 +94,10 @@ export default function GoalSetupScreen() {
     Haptics.selectionAsync();
     if (returnTo) {
       navigate();
-    } else {
+    } else if (router.canGoBack()) {
       router.back();
+    } else {
+      router.navigate("/(tabs)/home");
     }
   };
 
@@ -102,8 +106,10 @@ export default function GoalSetupScreen() {
     setSavingsGoal(null);
     if (returnTo) {
       navigate();
-    } else {
+    } else if (router.canGoBack()) {
       router.back();
+    } else {
+      router.navigate("/(tabs)/home");
     }
   };
 
@@ -115,7 +121,7 @@ export default function GoalSetupScreen() {
       {/* Header */}
       <View style={[styles.header, { paddingTop }]}>
         <TouchableOpacity
-          onPress={() => router.back()}
+          onPress={() => router.canGoBack() ? router.back() : router.navigate("/(tabs)/home")}
           style={styles.backBtn}
           hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
         >

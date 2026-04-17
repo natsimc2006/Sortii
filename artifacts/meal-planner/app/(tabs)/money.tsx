@@ -504,13 +504,6 @@ export default function MoneyScreen() {
       <View style={styles.pageHeader}>
         <View style={styles.moneyHeaderRow}>
           <Image source={sortiiLogo} style={styles.moneyPageLogo} resizeMode="contain" />
-          <TouchableOpacity
-            onPress={() => router.push("/home")}
-            style={styles.homeBtn}
-            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-          >
-            <Feather name="home" size={15} color={C.textSecondary} />
-          </TouchableOpacity>
         </View>
         <Text style={styles.pageSubtitle}>
           A quick look at your week, with a few easy wins if you want them.

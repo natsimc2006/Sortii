@@ -1,4 +1,4 @@
-import { Feather } from "@expo/vector-icons";
+import { Feather, Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { BlurView } from "expo-blur";
 import { Tabs, useRouter } from "expo-router";
@@ -85,6 +85,15 @@ export default function TabLayout() {
       }}
     >
       <Tabs.Screen
+        name="home"
+        options={{
+          title: "Home",
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons name={focused ? "home" : "home-outline"} size={22} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
         name="planner"
         options={{
           title: "Planner",
@@ -97,9 +106,7 @@ export default function TabLayout() {
         name="recipes"
         options={{
           title: "Recipes",
-          tabBarIcon: ({ color }) => (
-            <Feather name="book-open" size={22} color={color} />
-          ),
+          href: null,
         }}
       />
       <Tabs.Screen

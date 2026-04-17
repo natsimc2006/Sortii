@@ -188,7 +188,7 @@ export default function MoneySetupScreen() {
         ]}
       >
         <TouchableOpacity
-          onPress={() => router.back()}
+          onPress={() => router.canGoBack() ? router.back() : router.navigate("/(tabs)/home")}
           style={[styles.backBtn, { backgroundColor: C.chipBg }]}
           hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
         >
@@ -201,7 +201,7 @@ export default function MoneySetupScreen() {
           </Text>
         </View>
         <TouchableOpacity
-          onPress={() => router.back()}
+          onPress={() => router.canGoBack() ? router.back() : router.navigate("/(tabs)/home")}
           hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
           style={styles.closeBtn}
         >
