@@ -1,0 +1,292 @@
+
+
+Use the CURRENT Sortii meal planner app as the base project and refactor it into the new unified Sortii app.
+
+IMPORTANT CONTEXT
+The current meal planner app is the strongest existing Sortii product expression.
+Keep and reuse as much as practical from the current app’s:
+- brand feel
+- tone of voice
+- color palette
+- card styling
+- button styling
+- planner flow
+- shopping list flow
+- meal logic
+- warm, lightly witty copy style
+
+Do NOT start over visually.
+Do NOT rebuild a totally different brand direction.
+Do NOT make this look like a generic dashboard SaaS app.
+
+However, the app now needs to evolve from:
+“meal planner app”
+into:
+“Sortii, a calm life dashboard, with meals as the first and strongest module.”
+
+CORE PRODUCT SHIFT
+Refactor the current meal planner so it becomes the foundation of a broader Sortii app.
+
+This means:
+- the app should no longer open straight into the meal planner as the main identity
+- the app should now open to a new Home dashboard
+- Meals should become one module/page within the app
+- Family should become the next module/page
+- Appointments and Bills can exist as lightweight placeholders or early modules for now
+- everything should feel like one product, not several stitched-together tools
+
+GOAL
+Build the next version of Sortii by using the current meal planner codebase, but changing the app shell, navigation, and information hierarchy.
+
+The user should feel:
+- this is still the same Sortii brand
+- but now it has grown into a bigger calm weekly support app
+
+DO NOT BREAK THE CURRENT MEAL PLANNER
+Preserve existing meal planner functionality as much as possible.
+The meal planner should become the Meals module, not be removed or heavily damaged.
+
+REFACTOR PRIORITY
+1. Create a new app shell
+2. Add a new Home dashboard as the default landing page
+3. Move the current meal planner into a dedicated Meals module
+4. Create a Family module page placeholder or initial version
+5. Add a central Add action
+6. Add a More area for future modules like Appointments, Bills, Settings
+7. Keep visual consistency with the existing app
+
+NEW APP STRUCTURE
+Refactor navigation to:
+
+- Home
+- Meals
+- Family
+- Add
+- More
+
+This should replace the current meal-specific bottom nav as the primary app structure.
+
+Inside Meals, preserve access to:
+- Planner
+- Recipes
+- Shopping
+- Meal budget / savings insights
+
+These can be sub-tabs, segmented controls, top tabs, or clean internal navigation within the Meals section.
+
+IMPORTANT
+Do NOT keep the current meal planner as the homepage.
+The new homepage must be Home / Dashboard.
+
+HOME DASHBOARD REQUIREMENTS
+Build a new Sortii Home dashboard as the opening screen of the app.
+
+This dashboard should feel calm, light, and emotionally safe.
+
+It should show:
+1. A short greeting / weekly summary
+2. Today
+3. Coming up soon
+4. A subtle weekly overview
+5. A Reset button or gentle “overwhelmed?” entry point
+
+For now, the dashboard can use live Meals data first, and support placeholder Family / Appointments / Bills content until those modules are integrated.
+
+DASHBOARD CONTENT PRIORITY
+Initially surface:
+- tonight’s meal
+- meals planned this week
+- any meal gaps after a certain day
+- any useful meal-related quick wins
+- placeholder family summary area
+- placeholder appointments summary area
+- placeholder bills summary area
+
+The Home screen should make it feel like Sortii has become bigger than meals, even if Meals is still the most complete module.
+
+DASHBOARD COPY STYLE
+Use warm, calm, lightly wry microcopy.
+
+Examples:
+- “A fairly steady week. Dinner’s at least behaving itself.”
+- “A couple of moving parts this week, but all survivable.”
+- “You’re sorted for dinner till Wednesday. We love a small win.”
+- “A lighter week, by the look of it.”
+
+Do not use productivity jargon.
+Do not use harsh warnings.
+
+FAMILY MODULE
+Create a Family module page inside the same app shell.
+
+This can begin as:
+- a lightweight module scaffold
+- or an early migration target from the existing Family Juggler app
+
+Family module should be designed for:
+- kids’ activities
+- pickups
+- weekend plans
+- prep notes
+- family logistics
+
+For now, build the Family module so it fits the same design system and navigation as the meal app.
+
+If full migration is not yet possible, create:
+- the Family module page
+- the data structure hooks
+- the component layout scaffolding
+- placeholder empty states that feel calm and intentional
+
+Example empty state:
+“Nothing added here yet. A rare and peaceful sight.”
+
+ADD BUTTON / QUICK ADD
+The middle Add action should become a true cross-app quick add, not just a meal-planner adjustment button.
+
+When user taps Add, show options like:
+- Add meal
+- Add family activity
+- Add appointment
+- Add bill
+- Add note
+
+Keep this fast and lightweight.
+Do not make it feel like admin.
+
+MORE SECTION
+Create a More section or screen containing:
+- Appointments
+- Bills
+- Settings
+
+Appointments and Bills can begin as light module placeholders if needed.
+The goal is to establish the architecture now, even if those modules are built out later.
+
+MEALS MODULE REQUIREMENTS
+Preserve the existing strong meal planner experience.
+This is one of the best parts of the app and should remain high quality.
+
+Keep and reuse where possible:
+- weekly planner flow
+- recipe cards
+- swap actions
+- shopping list
+- budget-related meal insights
+- supportive copy like “Week sorted. You’re done here.”
+
+However, refactor meal-specific branding so it sits under the broader Sortii brand.
+
+IMPORTANT BRAND CHANGE
+Reduce over-reliance on multiple separate sub-brand lockups like:
+- Your Dinner... Sorted
+- Your Money... Sorted
+
+Move toward a clearer master brand structure:
+- Sortii
+- Your week, sorted
+- Home / Meals / Family / More
+
+Module pages can still have supportive subheadings, but the app should now feel like one brand, not separate mini brands.
+
+DESIGN DIRECTION
+Preserve the existing Sortii visual world:
+- warm white / soft neutral background
+- teal / forest / mustard / soft plum accents
+- rounded cards
+- soft borders
+- mobile-first spacing
+- clear hierarchy
+- friendly premium feel
+
+Do not flatten it into something generic.
+Do not make it too clinical or too corporate.
+
+IMPORTANT UX RULE
+The broader app must still feel emotionally safe for users who avoid life admin when overwhelmed.
+
+That means:
+- Home should never dump too much at once
+- show only the most relevant few items by default
+- use progressive reveal
+- use supportive containment language
+- avoid pressure-heavy empty states
+
+RESET MODE
+Add a small Reset or Overwhelmed entry point on Home.
+
+It does not need to be fully advanced yet, but should support a simple calming state.
+
+For V1, Reset Mode can:
+- simplify the interface
+- show 1 to 3 small actions
+- use gentle supportive copy
+
+Examples:
+- “Let’s keep this light.”
+- “Just a couple of small things.”
+- “That’s enough for now.”
+
+MIGRATION STRATEGY
+Treat the current meal planner as the base foundation.
+Do NOT attempt to preserve the current meal-only app structure exactly.
+
+Instead:
+- keep the existing Meals functionality
+- rebuild the app shell around it
+- promote Home to the top level
+- prepare Family as the next full module to migrate in
+
+If useful, create a temporary architecture where:
+- Meals = fully live
+- Family = scaffolded and partly live
+- Appointments = placeholder
+- Bills = placeholder
+- Home = live and fed mainly by Meals at first
+
+TECHNICAL REQUIREMENTS
+Refactor code cleanly so the app can grow.
+
+Create or improve:
+- shared layout shell
+- shared nav
+- shared theme tokens
+- shared card/button/input styling
+- modular data structures
+- dashboard aggregation layer
+- hooks or adapters so future Family/Appointments/Bills data can feed the Home screen
+
+Do not build isolated mini apps within the app.
+It must feel like a single coherent app.
+
+Make sure:
+- back button behaviour works
+- nav state is consistent
+- modal/screen transitions feel stable
+- the app feels intentional, not fragile
+
+BUILD ORDER
+Please implement in this order:
+1. New shared app shell
+2. New bottom navigation
+3. New Home dashboard as default landing page
+4. Refactor current meal planner into Meals module
+5. Add Family module page scaffold
+6. Convert Add button into cross-app Quick Add
+7. Add More section
+8. Fix navigation / back handling issues
+9. Polish copy and visual consistency
+
+SUCCESS CRITERIA
+The result should feel like:
+- the same Sortii brand, matured
+- still warm and recognisable
+- no loss of the strong meal planner personality
+- now clearly a broader life dashboard product
+- ready to absorb Family next without feeling bolted on
+
+FINAL PRODUCT FEEL
+The app should now say:
+“Sortii helps with your week”
+not just
+“Sortii helps with dinner”
