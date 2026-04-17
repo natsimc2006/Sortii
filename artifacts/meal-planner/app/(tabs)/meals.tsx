@@ -567,7 +567,7 @@ export default function MealsScreen() {
         marginBottom: TAB_BAR_HEIGHT + insets.bottom,
       }}
     >
-      {/* ── Slim header ─────────────────────────────────────────────────── */}
+      {/* ── Sticky header: title + status + tools ───────────────────────── */}
       <View
         style={[
           styles.topBar,
@@ -578,96 +578,49 @@ export default function MealsScreen() {
           },
         ]}
       >
-        <View style={styles.topBarContent}>
-          {/* Title row */}
-          <View style={styles.titleRow}>
-            <Text style={[styles.pageTitle, { color: C.text }]}>Meals</Text>
-            <TouchableOpacity
-              onPress={handleSave}
-              style={[
-                styles.iconBtn,
-                { backgroundColor: C.chipBg, borderWidth: 1.5, borderColor: C.border },
-              ]}
-              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-            >
-              <Feather name="bookmark" size={15} color={C.textSecondary} />
-            </TouchableOpacity>
-          </View>
-
-          {/* Status summary line */}
-          <Text style={[styles.statusLine, { color: C.textMuted }]}>
-            {getMealStatusLine()}
-          </Text>
-
-          {/* Quick-action chips */}
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            style={styles.quickChipScroll}
-            contentContainerStyle={styles.quickChipRow}
+        {/* Title row */}
+        <View style={styles.titleRow}>
+          <Text style={[styles.pageTitle, { color: C.text }]}>Meals</Text>
+          <TouchableOpacity
+            onPress={handleSave}
+            style={[
+              styles.iconBtn,
+              { backgroundColor: C.chipBg, borderWidth: 1.5, borderColor: C.border },
+            ]}
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
           >
-            {QUICK_ACTIONS.map((action) => (
-              <TouchableOpacity
-                key={action.route}
-                style={[styles.quickChip, { backgroundColor: C.chipBg, borderColor: C.border }]}
-                onPress={() => handleQuickNav(action.route)}
-                activeOpacity={0.75}
-                hitSlop={{ top: 4, bottom: 4 }}
-              >
-                <Feather name={action.icon as any} size={11} color={TEAL} />
-                <Text style={[styles.quickChipText, { color: C.text }]}>{action.label}</Text>
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
-
-          {/* Context filter chips (household, budget, cost) */}
-          <View style={styles.filterChips}>
-            <FilterChip
-              label={`${preferences.householdSize} ${preferences.householdSize === 1 ? "person" : "people"}`}
-              icon="users"
-              onPress={() => setActiveChip("household")}
-            />
-            <FilterChip
-              label={budgeLabel}
-              icon="dollar-sign"
-              onPress={() => setActiveChip("budget")}
-            />
-            <FilterChip
-              label={estimatedCostBand}
-              icon="shopping-bag"
-              onPress={() => setActiveChip("cost")}
-            />
-          </View>
-
-          {preferences.kidFriendly && (
-            <Text style={[styles.kidFriendlyNote, { color: C.textSecondary }]}>
-              Showing kid-friendly meals only
-            </Text>
-          )}
-          {filledCount >= 3 && !isWeekFull && (
-            <Animated.Text style={[styles.headerReassurance, { opacity: mountOpacity }]}>
-              {headerReassuranceMsg}
-            </Animated.Text>
-          )}
-          {weeklySwapSaving >= 2 && !swapBannerDismissed && (
-            <View style={styles.swapBanner}>
-              <Text style={[styles.swapBannerText, { flex: 1 }]}>
-                💡 Apply all swaps → save up to {currencySymbol}{weeklySwapSaving} this week
-              </Text>
-              <TouchableOpacity
-                onPress={() => setSwapBannerDismissed(true)}
-                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-                style={{ padding: 2, marginLeft: 8 }}
-              >
-                <Feather name="x" size={14} color="#3D1F2F" />
-              </TouchableOpacity>
-            </View>
-          )}
-          <PantryTips key={planKey} tips={weeklyPantryTips} />
+            <Feather name="bookmark" size={15} color={C.textSecondary} />
+          </TouchableOpacity>
         </View>
+
+        {/* Status summary line */}
+        <Text style={[styles.statusLine, { color: C.textMuted }]}>
+          {getMealStatusLine()}
+        </Text>
+
+        {/* Tools row — prominent, horizontally scrollable */}
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={styles.toolsScroll}
+          contentContainerStyle={styles.toolsRow}
+        >
+          {QUICK_ACTIONS.map((action) => (
+            <TouchableOpacity
+              key={action.route}
+              style={[styles.toolBtn, { backgroundColor: C.tealTint, borderColor: TEAL + "30" }]}
+              onPress={() => handleQuickNav(action.route)}
+              activeOpacity={0.72}
+              hitSlop={{ top: 4, bottom: 4 }}
+            >
+              <Feather name={action.icon as any} size={12} color={TEAL} />
+              <Text style={[styles.toolBtnText, { color: C.primaryDark }]}>{action.label}</Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
       </View>
 
-      {/* Budget mismatch banner */}
+      {/* Budget mismatch banner — shown just below sticky header */}
       {planBudgetMismatch && (
         <View
           style={[
@@ -709,6 +662,55 @@ export default function MealsScreen() {
         style={{ flex: 1 }}
         contentContainerStyle={styles.content}
       >
+        {/* "Your plan" settings — lighter chips, scroll away with content */}
+        <View style={styles.planSettingsSection}>
+          <Text style={[styles.planSettingsLabel, { color: C.textMuted }]}>YOUR PLAN</Text>
+          <View style={styles.planSettingsChipRow}>
+            <PlanChip
+              label={`${preferences.householdSize} ${preferences.householdSize === 1 ? "person" : "people"}`}
+              icon="users"
+              onPress={() => setActiveChip("household")}
+            />
+            <PlanChip
+              label={budgeLabel}
+              icon="dollar-sign"
+              onPress={() => setActiveChip("budget")}
+            />
+            <PlanChip
+              label={estimatedCostBand}
+              icon="shopping-bag"
+              onPress={() => setActiveChip("cost")}
+            />
+          </View>
+          {preferences.kidFriendly && (
+            <Text style={[styles.kidFriendlyNote, { color: C.textSecondary }]}>
+              Showing kid-friendly meals only
+            </Text>
+          )}
+          {filledCount >= 3 && !isWeekFull && (
+            <Animated.Text style={[styles.headerReassurance, { opacity: mountOpacity }]}>
+              {headerReassuranceMsg}
+            </Animated.Text>
+          )}
+        </View>
+
+        {/* Swap saving banner */}
+        {weeklySwapSaving >= 2 && !swapBannerDismissed && (
+          <View style={styles.swapBanner}>
+            <Text style={[styles.swapBannerText, { flex: 1 }]}>
+              💡 Apply all swaps → save up to {currencySymbol}{weeklySwapSaving} this week
+            </Text>
+            <TouchableOpacity
+              onPress={() => setSwapBannerDismissed(true)}
+              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+              style={{ padding: 2, marginLeft: 8 }}
+            >
+              <Feather name="x" size={14} color="#3D1F2F" />
+            </TouchableOpacity>
+          </View>
+        )}
+        <PantryTips key={planKey} tips={weeklyPantryTips} />
+
         <View style={[styles.progressBar, { backgroundColor: C.chipBg }]}>
           <View
             style={[
@@ -1224,52 +1226,43 @@ export default function MealsScreen() {
   );
 }
 
-// ── Filter chip (small tappable context pill) ─────────────────────────────────
-function FilterChip({
+// ── Plan chip — quiet metadata chip for "Your plan" settings row ─────────────
+function PlanChip({
   label,
   icon,
   onPress,
 }: {
   label: string;
   icon: string;
-  onPress?: () => void;
+  onPress: () => void;
 }) {
   const C = Colors.light;
-  if (onPress) {
-    return (
-      <TouchableOpacity
-        style={[styles.filterChip, { backgroundColor: C.chipBg }]}
-        onPress={onPress}
-        activeOpacity={0.75}
-        hitSlop={{ top: 4, bottom: 4, left: 4, right: 4 }}
-      >
-        <Feather name={icon as any} size={10} color={C.primary} />
-        <Text style={[styles.filterChipText, { color: C.chipText }]}>{label}</Text>
-        <Feather name="chevron-right" size={9} color={C.primary} style={{ marginLeft: 1 }} />
-      </TouchableOpacity>
-    );
-  }
   return (
-    <View style={[styles.filterChip, { backgroundColor: C.chipBg }]}>
-      <Feather name={icon as any} size={10} color={C.primary} />
-      <Text style={[styles.filterChipText, { color: C.chipText }]}>{label}</Text>
-    </View>
+    <TouchableOpacity
+      style={[styles.planChip, { borderColor: C.cardBorder }]}
+      onPress={onPress}
+      activeOpacity={0.7}
+      hitSlop={{ top: 6, bottom: 6, left: 4, right: 4 }}
+    >
+      <Feather name={icon as any} size={10} color={C.textMuted} />
+      <Text style={[styles.planChipText, { color: C.textSecondary }]}>{label}</Text>
+      <Feather name="chevron-down" size={9} color={C.textMuted} style={{ marginLeft: 1 }} />
+    </TouchableOpacity>
   );
 }
 
 const styles = StyleSheet.create({
-  // ── Header ──────────────────────────────────────────────────────────────
+  // ── Sticky header ────────────────────────────────────────────────────────
   topBar: {
     paddingHorizontal: 20,
-    paddingBottom: 14,
+    paddingBottom: 12,
     borderBottomWidth: 1,
+    gap: 4,
   },
-  topBarContent: { gap: 6 },
   titleRow: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginBottom: 2,
   },
   pageTitle: {
     fontSize: 24,
@@ -1290,63 +1283,79 @@ const styles = StyleSheet.create({
     fontFamily: "Inter_400Regular",
     fontStyle: "italic",
     lineHeight: 18,
+    marginBottom: 2,
   },
 
-  // ── Quick-action chips ───────────────────────────────────────────────────
-  quickChipScroll: { marginLeft: -2 },
-  quickChipRow: {
+  // ── Tools row (prominent navigation / action buttons) ────────────────────
+  toolsScroll: { marginLeft: -2 },
+  toolsRow: {
     flexDirection: "row",
     gap: 7,
-    paddingRight: 4,
+    paddingRight: 6,
     paddingVertical: 2,
   },
-  quickChip: {
+  toolBtn: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 5,
-    paddingHorizontal: 11,
-    paddingVertical: 7,
+    gap: 6,
+    paddingHorizontal: 13,
+    paddingVertical: 8,
     borderRadius: 20,
     borderWidth: 1,
   },
-  quickChipText: {
-    fontSize: 12,
+  toolBtnText: {
+    fontSize: 13,
     fontFamily: "Inter_600SemiBold",
-    lineHeight: 16,
+    lineHeight: 17,
   },
 
-  // ── Filter chips (context: household, budget, cost) ──────────────────────
-  filterChips: {
+  // ── "Your plan" settings section (scrolls away) ──────────────────────────
+  planSettingsSection: {
+    gap: 6,
+    marginBottom: 4,
+    paddingBottom: 14,
+    borderBottomWidth: 1,
+    borderBottomColor: "#EDE9E1",
+  },
+  planSettingsLabel: {
+    fontSize: 10,
+    fontFamily: "Inter_500Medium",
+    letterSpacing: 0.8,
+    textTransform: "uppercase",
+    marginBottom: 2,
+  },
+  planSettingsChipRow: {
     flexDirection: "row",
     flexWrap: "wrap",
     gap: 6,
   },
-  filterChip: {
+  planChip: {
     flexDirection: "row",
     alignItems: "center",
     gap: 4,
     paddingHorizontal: 8,
     paddingVertical: 4,
-    borderRadius: 20,
+    borderRadius: 16,
     borderWidth: 1,
-    borderColor: "#D8D8D8",
+    backgroundColor: "transparent",
   },
-  filterChipText: {
+  planChipText: {
     fontSize: 11,
-    fontFamily: "Inter_500Medium",
+    fontFamily: "Inter_400Regular",
   },
 
   kidFriendlyNote: {
     fontSize: 11,
     fontFamily: "Inter_500Medium",
     fontStyle: "italic",
-    marginTop: 2,
+    marginTop: 1,
   },
   headerReassurance: {
     fontSize: 12,
-    fontFamily: "Inter_500Medium",
+    fontFamily: "Inter_400Regular",
     fontStyle: "italic",
     color: "#6B4A5E",
+    marginTop: 1,
   },
   swapBanner: {
     flexDirection: "row",
@@ -1355,7 +1364,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     paddingHorizontal: 12,
     paddingVertical: 8,
-    marginTop: 4,
+    marginBottom: 6,
     borderWidth: 1.5,
     borderColor: "#C49AB6",
   },

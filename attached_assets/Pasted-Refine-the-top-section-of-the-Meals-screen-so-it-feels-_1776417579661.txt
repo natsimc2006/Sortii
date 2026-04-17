@@ -1,0 +1,152 @@
+Refine the top section of the Meals screen so it feels more organised, clearer to scan, and easier to use.
+
+IMPORTANT CONTEXT
+The current Meals screen flow is now correct:
+- Meals opens directly to the weekly plan
+- This is the right structure
+
+The remaining problem is visual hierarchy at the top of the Meals screen.
+
+Current issue:
+There are two rows of grey pill/chip controls that look too similar.
+
+Row 1:
+- Shopping
+- Budget
+- Recipes
+- Preferences
+
+Row 2:
+- 4 people
+- Standard
+- $153–$179
+
+Because both rows look visually similar, they compete with each other and create confusion.
+The user cannot instantly tell which row is:
+- navigation / tools
+vs
+- current plan settings / quick adjustments
+
+GOAL
+Create a cleaner, clearer hierarchy so the top of Meals feels like a tidy workbench:
+- first row = action tools
+- second row = current plan settings
+- easier to scan
+- easier to understand
+- visually calmer
+
+DESIRED STRUCTURE
+
+1. Header
+Keep:
+- “Meals”
+- supportive summary line like:
+  “7 dinners sorted. Dinner’s behaving itself.”
+
+2. ACTION TOOLS ROW
+This row should contain:
+- Shopping
+- Budget
+- Recipes
+- Preferences
+
+This row should feel like:
+- module navigation / tools
+- clearly tappable
+- slightly more prominent than the settings row
+- cleaner and more intentional than simple chips
+
+IMPLEMENTATION GUIDANCE:
+- make these feel like a tools bar or quick action row
+- keep icon + label
+- allow horizontal scrolling if needed on smaller screens
+- can be sticky when scrolling, if it feels smooth and not visually heavy
+
+IMPORTANT:
+If sticky is implemented, ONLY make this tools row sticky.
+Do NOT make the settings row sticky.
+
+3. SETTINGS / CURRENT PLAN ROW
+This row should contain:
+- 4 people
+- Standard
+- $153–$179
+
+This row should feel different from the tools row.
+
+It should communicate:
+“These are the current settings for this meal plan”
+
+Make this row visually lighter and less dominant than the tools row.
+
+IMPLEMENTATION OPTIONS:
+- smaller chips
+- lighter border
+- lighter text treatment
+- less visual weight overall
+
+Also add a tiny label above this row:
+“Your plan”
+
+This label should be subtle and helpful, not loud.
+
+4. CONTENT BELOW
+Keep the rest of the Meals page structure:
+- swap banner
+- pantry tips
+- weekly meal cards
+
+No major redesign needed below the top section.
+
+VISUAL HIERARCHY RULES
+The user should instantly understand:
+
+Top row = things I can do
+Second row = current setup / current plan
+
+These two rows must no longer feel visually identical.
+
+SPACING RULES
+- Keep the title + summary close together
+- Keep the action tools row visually grouped with the header
+- Add slightly more space before “Your plan”
+- Keep settings row visually quieter
+- Then continue into swaps / pantry tips / meal plan
+
+TONE / FEEL
+The screen should feel:
+- calm
+- tidy
+- practical
+- premium
+- lightly human
+
+Do NOT:
+- add more clutter
+- add heavy dividers
+- make it look like a filter panel
+- make everything the same weight
+
+Do:
+- create clear separation of purpose
+- improve scanability
+- preserve the existing Sortii style
+
+OPTIONAL STICKY BEHAVIOUR
+If implemented well:
+- make ONLY the first action tools row sticky while scrolling
+- it should remain accessible as the user moves through the week plan
+- keep it visually light and not bulky
+- avoid sticky behaviour if it makes the UI feel crowded or jumpy
+
+SUCCESS STATE
+After this change, the top of Meals should feel like:
+- a clear working area
+- not a stack of similar chips
+- easy to understand at a glance
+
+The user should intuitively read it as:
+1. Here’s my Meals space
+2. Here are the main things I can do
+3. Here’s my current plan setup
+4. Now I can work through the week
