@@ -1,8 +1,7 @@
-import { Feather, Ionicons } from "@expo/vector-icons";
+import { Feather } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import React, { useMemo, useRef, useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
-  Animated,
   Platform,
   Pressable,
   ScrollView,
@@ -25,15 +24,14 @@ const TEAL_TINT = "#E6F3F0";
 const GOLD = "#D29A22";
 const GOLD_TINT = "#F6E6BA";
 const PLUM = "#5E3A4C";
-const PLUM_TINT = "#F3E8EE";
 const BG = "#F7F3EB";
 const CARD_BG = "#FFFFFF";
 const BORDER = "#E6E1D7";
 const TEXT = "#2B2B2B";
 const TEXT_MUTED = "#888888";
 
-const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
-const DAY_ABBR = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+const DAYS = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
+const DAY_ABBR = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
 
 function getTodayName() {
   const d = new Date().getDay();
@@ -64,7 +62,7 @@ const SUMMARIES_STEADY = [
 ];
 const SUMMARIES_SORTED = [
   "A fairly sorted week. Not much to worry about.",
-  "You're in reasonable shape. Dinner's cooperating and nothing's on fire.",
+  "You're in reasonable shape. Nothing's on fire.",
   "A solid week. Organised without being smug about it.",
 ];
 
@@ -76,107 +74,226 @@ function getWeeklySummary(filled: number): string {
   return pick(SUMMARIES_SORTED);
 }
 
-// ── Sort this out overlay ──────────────────────────────────────
-function SortItOutOverlay({
+// ── "Help me sort this" overlay ────────────────────────────────
+interface SimpleAction {
+  id: string;
+  icon: string;
+  text: string;
+  sub: string;
+  color: string;
+  startDone: boolean;
+}
+
+function buildActions(
+  tonightRecipe: { name: string } | null,
+  plannedCount: number,
+  tomorrowName: string,
+  tomorrowRecipe: { name: string } | null
+): SimpleAction[] {
+  const actions: SimpleAction[] = [];
+
+  // 1 — Tonight
+  if (tonightRecipe) {
+    actions.push({
+      id: "tonight",
+      icon: "moon",
+      text: `Tonight: ${tonightRecipe.name}`,
+      sub: "Already sorted. Nothing to do here.",
+      color: TEAL,
+      startDone: true,
+    });
+  } else {
+    actions.push({
+      id: "tonight",
+      icon: "moon",
+      text: "Glance at tonight's dinner",
+      sub: "Just acknowledge it. That's all.",
+      color: GOLD,
+      startDone: false,
+    });
+  }
+
+  // 2 — Week or tomorrow
+  if (plannedCount >= 3) {
+    actions.push({
+      id: "week",
+      icon: "calendar",
+      text: `${plannedCount} dinners already planned`,
+      sub: "Further along than it feels.",
+      color: TEAL,
+      startDone: true,
+    });
+  } else if (tomorrowRecipe) {
+    actions.push({
+      id: "tomorrow",
+      icon: "calendar",
+      text: `Tomorrow: ${tomorrowRecipe.name}`,
+      sub: "One less thing to think about.",
+      color: TEAL,
+      startDone: true,
+    });
+  } else {
+    actions.push({
+      id: "week",
+      icon: "calendar",
+      text: "Add one meal for later this week",
+      sub: "Just one. That's enough for now.",
+      color: GOLD,
+      startDone: false,
+    });
+  }
+
+  // 3 — Affirmation (always last)
+  actions.push({
+    id: "affirm",
+    icon: "heart",
+    text: "One thing at a time is enough.",
+    sub: "That's not an opinion. It's just true.",
+    color: PLUM,
+    startDone: false,
+  });
+
+  return actions;
+}
+
+function HelpOverlay({
   visible,
   tonightRecipe,
+  plannedCount,
+  tomorrowName,
+  tomorrowRecipe,
   onDismiss,
-  onCheckDinner,
-  onAddActivity,
-  onViewPlan,
 }: {
   visible: boolean;
   tonightRecipe: { name: string } | null;
+  plannedCount: number;
+  tomorrowName: string;
+  tomorrowRecipe: { name: string } | null;
   onDismiss: () => void;
-  onCheckDinner: () => void;
-  onAddActivity: () => void;
-  onViewPlan: () => void;
 }) {
+  const actions = useMemo(
+    () => buildActions(tonightRecipe, plannedCount, tomorrowName, tomorrowRecipe),
+    [visible]
+  );
+
+  const [done, setDone] = useState<Record<string, boolean>>(() => {
+    const initial: Record<string, boolean> = {};
+    actions.forEach((a) => { if (a.startDone) initial[a.id] = true; });
+    return initial;
+  });
+
+  const tapCount = Object.values(done).filter(Boolean).length - actions.filter((a) => a.startDone).length;
+  const readyToDismiss = tapCount >= 1 || actions.every((a) => done[a.id]);
+
+  function handleAction(id: string) {
+    setDone((prev) => ({ ...prev, [id]: true }));
+  }
+
   if (!visible) return null;
 
-  const actions = [
-    {
-      icon: "moon",
-      label: tonightRecipe ? `Tonight: ${tonightRecipe.name}` : "Check tonight's dinner",
-      color: tonightRecipe ? TEAL : GOLD,
-      done: !!tonightRecipe,
-      onPress: onCheckDinner,
-    },
-    {
-      icon: "star",
-      label: "Add one family activity",
-      color: GOLD,
-      done: false,
-      onPress: onAddActivity,
-    },
-    {
-      icon: "calendar",
-      label: "Look at this week's plan",
-      color: TEAL,
-      done: false,
-      onPress: onViewPlan,
-    },
-  ];
-
   return (
-    <Pressable style={styles.sortOverlay} onPress={onDismiss}>
-      <Pressable style={styles.sortCard} onPress={(e) => e.stopPropagation()}>
-        <Text style={styles.sortTitle}>Alright. Let's keep this simple.</Text>
+    <Pressable style={styles.helpBackdrop} onPress={onDismiss}>
+      <Pressable style={styles.helpCard} onPress={(e) => e.stopPropagation()}>
+        {/* Header */}
+        <Text style={styles.helpTitle}>Alright. Let's keep this simple.</Text>
 
-        <View style={styles.sortActions}>
-          {actions.map(({ icon, label, color, done, onPress }) => (
-            <TouchableOpacity
-              key={label}
-              style={styles.sortAction}
-              onPress={onPress}
-              activeOpacity={0.75}
-            >
-              <View
+        {/* Actions */}
+        <View style={styles.helpActions}>
+          {actions.map((action) => {
+            const isDone = !!done[action.id];
+            return (
+              <TouchableOpacity
+                key={action.id}
                 style={[
-                  styles.sortActionIcon,
-                  { backgroundColor: color + "18" },
+                  styles.helpAction,
+                  isDone && styles.helpActionDone,
                 ]}
+                onPress={() => handleAction(action.id)}
+                activeOpacity={isDone ? 1 : 0.72}
               >
-                <Feather name={icon as any} size={15} color={done ? TEAL : color} />
-              </View>
-              <Text
-                style={[
-                  styles.sortActionLabel,
-                  done && { color: TEAL, textDecorationLine: "line-through", opacity: 0.6 },
-                ]}
-              >
-                {label}
-              </Text>
-              {!done && (
-                <Feather name="chevron-right" size={14} color="#ccc" />
-              )}
-            </TouchableOpacity>
-          ))}
+                <View
+                  style={[
+                    styles.helpActionIcon,
+                    {
+                      backgroundColor: isDone
+                        ? TEAL + "18"
+                        : action.color + "15",
+                    },
+                  ]}
+                >
+                  <Feather
+                    name={isDone ? "check" : (action.icon as any)}
+                    size={15}
+                    color={isDone ? TEAL : action.color}
+                  />
+                </View>
+                <View style={styles.helpActionText}>
+                  <Text
+                    style={[
+                      styles.helpActionLabel,
+                      isDone && styles.helpActionLabelDone,
+                    ]}
+                  >
+                    {action.text}
+                  </Text>
+                  <Text style={styles.helpActionSub}>{action.sub}</Text>
+                </View>
+              </TouchableOpacity>
+            );
+          })}
         </View>
 
-        <TouchableOpacity style={styles.sortDone} onPress={onDismiss} activeOpacity={0.75}>
-          <Text style={styles.sortDoneText}>That'll do.</Text>
+        {/* That'll do */}
+        <TouchableOpacity
+          style={[
+            styles.helpDismiss,
+            readyToDismiss
+              ? styles.helpDismissReady
+              : styles.helpDismissWaiting,
+          ]}
+          onPress={readyToDismiss ? onDismiss : undefined}
+          activeOpacity={readyToDismiss ? 0.78 : 1}
+        >
+          <Text
+            style={[
+              styles.helpDismissText,
+              readyToDismiss
+                ? styles.helpDismissTextReady
+                : styles.helpDismissTextWaiting,
+            ]}
+          >
+            {readyToDismiss ? "That'll do." : "Tap one to acknowledge it."}
+          </Text>
         </TouchableOpacity>
       </Pressable>
     </Pressable>
   );
 }
 
+// ── Main screen ────────────────────────────────────────────────
 export default function HomeTab() {
   const router = useRouter();
   const { currentPlan } = usePlanner();
   const { money, hasMoneySetup } = useUserWeek();
   const { currencySymbol } = useLocale();
 
-  const [sortItOutVisible, setSortItOutVisible] = useState(false);
+  const [helpVisible, setHelpVisible] = useState(false);
 
   const todayName = getTodayName();
+  const todayIdx = DAYS.indexOf(todayName);
+  const tomorrowName = DAYS[(todayIdx + 1) % 7] ?? DAYS[0];
+
   const filledDinners = currentPlan.filter((e) => e.slot === "dinner" && e.recipeId);
   const plannedCount = filledDinners.length;
 
   const tonightEntry = currentPlan.find((e) => e.day === todayName && e.slot === "dinner");
   const tonightRecipe = tonightEntry?.recipeId
     ? allRecipes.find((r) => r.id === tonightEntry.recipeId) ?? null
+    : null;
+
+  const tomorrowEntry = currentPlan.find((e) => e.day === tomorrowName && e.slot === "dinner");
+  const tomorrowRecipe = tomorrowEntry?.recipeId
+    ? allRecipes.find((r) => r.id === tomorrowEntry.recipeId) ?? null
     : null;
 
   const weeklyBreathingRoom = money
@@ -209,66 +326,43 @@ export default function HomeTab() {
               <Text style={styles.greeting}>{greeting}</Text>
             </View>
             <TouchableOpacity
-              style={styles.sortItOutBtn}
-              onPress={() => setSortItOutVisible(true)}
+              style={styles.helpBtn}
+              onPress={() => setHelpVisible(true)}
               activeOpacity={0.75}
             >
               <Feather name="zap" size={13} color={TEAL} />
-              <Text style={styles.sortItOutText}>Sort this out</Text>
+              <Text style={styles.helpBtnText}>Help me sort this</Text>
             </TouchableOpacity>
           </View>
 
           {/* Weekly summary */}
           <Text style={styles.summary}>{summary}</Text>
 
-          {/* B — Tonight's dinner (equal weight card) */}
+          {/* B — Tonight's dinner */}
           <TouchableOpacity
             onPress={() => router.push("/(tabs)/meals")}
             activeOpacity={0.8}
             style={[styles.card, tonightRecipe ? styles.cardTeal : styles.cardGold]}
           >
             <View style={styles.cardRow}>
-              <View>
-                <Text
-                  style={[
-                    styles.cardLabel,
-                    { color: tonightRecipe ? TEAL : GOLD },
-                  ]}
-                >
+              <View style={{ flex: 1 }}>
+                <Text style={[styles.cardLabel, { color: tonightRecipe ? TEAL : GOLD }]}>
                   TONIGHT'S DINNER
                 </Text>
                 <Text style={styles.cardTitle}>
                   {tonightRecipe ? tonightRecipe.name : "Nothing planned yet."}
                 </Text>
-                <Text
-                  style={[
-                    styles.cardSub,
-                    { color: tonightRecipe ? TEAL : GOLD },
-                  ]}
-                >
+                <Text style={[styles.cardSub, { color: tonightRecipe ? TEAL : GOLD }]}>
                   {tonightRecipe ? "Sorted. ✓" : "Tap to sort tonight →"}
                 </Text>
               </View>
-              <View
-                style={[
-                  styles.cardChevronWrap,
-                  {
-                    backgroundColor: tonightRecipe
-                      ? TEAL + "18"
-                      : GOLD + "18",
-                  },
-                ]}
-              >
-                <Feather
-                  name="chevron-right"
-                  size={16}
-                  color={tonightRecipe ? TEAL : GOLD}
-                />
+              <View style={[styles.cardChevron, { backgroundColor: (tonightRecipe ? TEAL : GOLD) + "18" }]}>
+                <Feather name="chevron-right" size={16} color={tonightRecipe ? TEAL : GOLD} />
               </View>
             </View>
           </TouchableOpacity>
 
-          {/* C — Family (equal weight) */}
+          {/* C — Family */}
           <TouchableOpacity
             onPress={() => router.push("/(tabs)/family")}
             activeOpacity={0.8}
@@ -282,13 +376,13 @@ export default function HomeTab() {
                   A rare and peaceful sight.
                 </Text>
               </View>
-              <View style={[styles.cardChevronWrap, { backgroundColor: PLUM + "12" }]}>
+              <View style={[styles.cardChevron, { backgroundColor: PLUM + "12" }]}>
                 <Feather name="chevron-right" size={16} color={PLUM} />
               </View>
             </View>
           </TouchableOpacity>
 
-          {/* D — Money (equal weight) */}
+          {/* D — Money */}
           {hasMoneySetup && weeklyBreathingRoom > 0 ? (
             <TouchableOpacity
               onPress={() => router.push("/(tabs)/money")}
@@ -305,7 +399,7 @@ export default function HomeTab() {
                     After meals and fixed costs.
                   </Text>
                 </View>
-                <View style={[styles.cardChevronWrap, { backgroundColor: GOLD + "12" }]}>
+                <View style={[styles.cardChevron, { backgroundColor: GOLD + "12" }]}>
                   <Feather name="chevron-right" size={16} color={GOLD} />
                 </View>
               </View>
@@ -319,21 +413,17 @@ export default function HomeTab() {
               <View style={styles.cardRow}>
                 <View style={{ flex: 1 }}>
                   <Text style={[styles.cardLabel, { color: GOLD }]}>MONEY</Text>
-                  <Text style={styles.cardTitle}>
-                    See how your week looks financially.
-                  </Text>
-                  <Text style={[styles.cardSub, { color: TEAL }]}>
-                    Set it up →
-                  </Text>
+                  <Text style={styles.cardTitle}>See how your week looks financially.</Text>
+                  <Text style={[styles.cardSub, { color: TEAL }]}>Set it up →</Text>
                 </View>
-                <View style={[styles.cardChevronWrap, { backgroundColor: GOLD + "12" }]}>
+                <View style={[styles.cardChevron, { backgroundColor: GOLD + "12" }]}>
                   <Feather name="chevron-right" size={16} color={GOLD} />
                 </View>
               </View>
             </TouchableOpacity>
           )}
 
-          {/* E — Week at a glance (mixed-signal ready) */}
+          {/* E — Week at a glance */}
           <View style={styles.weekSection}>
             <Text style={styles.sectionLabel}>WEEK AT A GLANCE</Text>
             <ScrollView
@@ -361,11 +451,7 @@ export default function HomeTab() {
                     <Text
                       style={[
                         styles.dayPillText,
-                        isToday
-                          ? { color: "#fff" }
-                          : hasMeal
-                          ? { color: TEXT }
-                          : { color: "#bbb" },
+                        isToday ? { color: "#fff" } : hasMeal ? { color: TEXT } : { color: "#bbb" },
                       ]}
                     >
                       {DAY_ABBR[i]}
@@ -381,7 +467,7 @@ export default function HomeTab() {
             </ScrollView>
           </View>
 
-          {/* F — Placeholder row */}
+          {/* F — Coming soon row */}
           <View style={styles.placeholderRow}>
             <View style={[styles.placeholderCard, { borderColor: TEAL + "30" }]}>
               <Feather name="calendar" size={15} color={TEAL} />
@@ -398,23 +484,14 @@ export default function HomeTab() {
           <View style={{ paddingBottom: 32 }} />
         </ScrollView>
 
-        {/* Sort it out overlay — above scroll, within safe area */}
-        <SortItOutOverlay
-          visible={sortItOutVisible}
+        {/* Help me sort this overlay */}
+        <HelpOverlay
+          visible={helpVisible}
           tonightRecipe={tonightRecipe}
-          onDismiss={() => setSortItOutVisible(false)}
-          onCheckDinner={() => {
-            setSortItOutVisible(false);
-            router.push("/(tabs)/meals");
-          }}
-          onAddActivity={() => {
-            setSortItOutVisible(false);
-            router.push("/(tabs)/family");
-          }}
-          onViewPlan={() => {
-            setSortItOutVisible(false);
-            router.push("/(tabs)/planner");
-          }}
+          plannedCount={plannedCount}
+          tomorrowName={tomorrowName}
+          tomorrowRecipe={tomorrowRecipe}
+          onDismiss={() => setHelpVisible(false)}
         />
       </View>
     </SafeAreaView>
@@ -433,17 +510,9 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   headerLeft: { flex: 1, gap: 2 },
-  wordmark: {
-    fontSize: 26,
-    fontFamily: "PlayfairDisplay_700Bold",
-    color: TEXT,
-  },
+  wordmark: { fontSize: 26, fontFamily: "PlayfairDisplay_700Bold", color: TEXT },
   wordmarkGold: { color: GOLD },
-  greeting: {
-    fontSize: 13,
-    fontFamily: "Inter_400Regular",
-    color: TEXT_MUTED,
-  },
+  greeting: { fontSize: 13, fontFamily: "Inter_400Regular", color: TEXT_MUTED },
   summary: {
     fontSize: 14,
     fontFamily: "Inter_400Regular",
@@ -454,7 +523,7 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
 
-  sortItOutBtn: {
+  helpBtn: {
     flexDirection: "row",
     alignItems: "center",
     gap: 5,
@@ -467,17 +536,9 @@ const styles = StyleSheet.create({
     marginTop: 2,
     flexShrink: 0,
   },
-  sortItOutText: {
-    fontSize: 12,
-    fontFamily: "Inter_600SemiBold",
-    color: TEAL,
-  },
+  helpBtnText: { fontSize: 12, fontFamily: "Inter_600SemiBold", color: TEAL },
 
-  card: {
-    borderRadius: 14,
-    borderWidth: 1,
-    padding: 15,
-  },
+  card: { borderRadius: 14, borderWidth: 1, padding: 15 },
   cardTeal: {
     backgroundColor: TEAL_TINT,
     borderColor: TEAL + "50",
@@ -490,15 +551,8 @@ const styles = StyleSheet.create({
     borderLeftWidth: 3,
     borderLeftColor: GOLD,
   },
-  cardNeutral: {
-    backgroundColor: CARD_BG,
-    borderColor: BORDER,
-  },
-  cardRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 10,
-  },
+  cardNeutral: { backgroundColor: CARD_BG, borderColor: BORDER },
+  cardRow: { flexDirection: "row", alignItems: "center", gap: 10 },
   cardLabel: {
     fontSize: 10,
     fontFamily: "Inter_600SemiBold",
@@ -511,15 +565,9 @@ const styles = StyleSheet.create({
     fontFamily: "Inter_600SemiBold",
     color: TEXT,
     lineHeight: 22,
-    flex: 1,
-    flexWrap: "wrap",
   },
-  cardSub: {
-    fontSize: 12,
-    fontFamily: "Inter_400Regular",
-    marginTop: 3,
-  },
-  cardChevronWrap: {
+  cardSub: { fontSize: 12, fontFamily: "Inter_400Regular", marginTop: 3 },
+  cardChevron: {
     width: 32,
     height: 32,
     borderRadius: 16,
@@ -563,86 +611,102 @@ const styles = StyleSheet.create({
     gap: 5,
     alignItems: "flex-start",
   },
-  placeholderLabel: {
-    fontSize: 13,
-    fontFamily: "Inter_600SemiBold",
-  },
+  placeholderLabel: { fontSize: 13, fontFamily: "Inter_600SemiBold" },
   soonPill: {
     backgroundColor: "#F0F0F0",
     borderRadius: 8,
     paddingHorizontal: 7,
     paddingVertical: 2,
   },
-  soonText: {
-    fontSize: 10,
-    fontFamily: "Inter_500Medium",
-    color: "#aaa",
-  },
+  soonText: { fontSize: 10, fontFamily: "Inter_500Medium", color: "#aaa" },
 
-  // Sort it out overlay
-  sortOverlay: {
+  // ── Help me sort this overlay ──
+  helpBackdrop: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(0,0,0,0.5)",
+    backgroundColor: "rgba(30, 28, 24, 0.62)",
     justifyContent: "center",
     alignItems: "center",
     paddingHorizontal: 24,
     zIndex: 100,
   },
-  sortCard: {
-    backgroundColor: CARD_BG,
-    borderRadius: 20,
+  helpCard: {
+    backgroundColor: "#FEFCF8",
+    borderRadius: 22,
     padding: 24,
     width: "100%",
-    gap: 0,
     ...Platform.select({
-      web: { boxShadow: "0px 8px 32px rgba(0,0,0,0.18)" },
+      web: { boxShadow: "0px 12px 40px rgba(0,0,0,0.22)" },
       default: {
         shadowColor: "#000",
-        shadowOffset: { width: 0, height: 8 },
-        shadowOpacity: 0.18,
-        shadowRadius: 24,
-        elevation: 20,
+        shadowOffset: { width: 0, height: 10 },
+        shadowOpacity: 0.2,
+        shadowRadius: 28,
+        elevation: 24,
       },
     }),
   },
-  sortTitle: {
-    fontSize: 17,
+  helpTitle: {
+    fontSize: 18,
     fontFamily: "Inter_600SemiBold",
     color: TEXT,
-    marginBottom: 16,
-    lineHeight: 24,
+    marginBottom: 18,
+    lineHeight: 26,
   },
-  sortActions: { gap: 2, marginBottom: 20 },
-  sortAction: {
+  helpActions: { gap: 6, marginBottom: 20 },
+  helpAction: {
     flexDirection: "row",
-    alignItems: "center",
+    alignItems: "flex-start",
     gap: 12,
-    paddingVertical: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: "#F5F5F5",
+    backgroundColor: "#F7F3EB",
+    borderRadius: 12,
+    padding: 13,
+    borderWidth: 1,
+    borderColor: "transparent",
   },
-  sortActionIcon: {
+  helpActionDone: {
+    backgroundColor: TEAL_TINT,
+    borderColor: TEAL + "30",
+  },
+  helpActionIcon: {
     width: 34,
     height: 34,
     borderRadius: 10,
     alignItems: "center",
     justifyContent: "center",
+    flexShrink: 0,
+    marginTop: 1,
   },
-  sortActionLabel: {
-    flex: 1,
+  helpActionText: { flex: 1, gap: 2 },
+  helpActionLabel: {
     fontSize: 14,
     fontFamily: "Inter_500Medium",
     color: TEXT,
+    lineHeight: 20,
   },
-  sortDone: {
-    backgroundColor: "#F7F3EB",
-    borderRadius: 12,
-    paddingVertical: 13,
+  helpActionLabelDone: {
+    color: TEAL,
+    textDecorationLine: "line-through",
+    opacity: 0.65,
+  },
+  helpActionSub: {
+    fontSize: 12,
+    fontFamily: "Inter_400Regular",
+    color: TEXT_MUTED,
+    lineHeight: 17,
+    fontStyle: "italic",
+  },
+
+  helpDismiss: {
+    borderRadius: 14,
+    paddingVertical: 14,
     alignItems: "center",
   },
-  sortDoneText: {
+  helpDismissReady: { backgroundColor: TEAL },
+  helpDismissWaiting: { backgroundColor: "#EDEBE7" },
+  helpDismissText: {
     fontSize: 15,
     fontFamily: "Inter_600SemiBold",
-    color: TEXT_MUTED,
   },
+  helpDismissTextReady: { color: "#fff" },
+  helpDismissTextWaiting: { color: "#bbb" },
 });
