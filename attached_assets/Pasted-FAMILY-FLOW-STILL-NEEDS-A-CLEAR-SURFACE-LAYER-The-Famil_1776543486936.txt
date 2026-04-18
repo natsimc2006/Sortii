@@ -1,0 +1,198 @@
+FAMILY FLOW STILL NEEDS A CLEAR SURFACE LAYER
+
+The Family engine appears to be getting stronger underneath, but the user-facing flow still does not clearly reveal the planner intelligence.
+
+The Family module still feels too much like a data-entry screen and not enough like Sortii is actively sorting the week.
+
+Goal
+
+Improve the Family module’s surface flow, CTA sequence, and payoff moments so the user can clearly move from:
+people → events → review → plan summary → useful insight
+
+This should make the Family logic feel obvious and helpful, not hidden in the background.
+
+⸻
+
+1. Strengthen the family-member setup flow
+
+On the Family screen, the user needs a clearer way to keep building the family roster.
+
+Please improve the “Family members” card so it more clearly supports:
+
+* adding multiple family members
+* distinguishing adults vs children
+* making it obvious the user can keep building the roster before or alongside adding events
+
+Required changes:
+
+* make Add person feel like a clear ongoing CTA, not a quiet text link
+* once one member exists, allow easy addition of another without the page feeling “done”
+* if only children exist and no adults/drivers exist yet, surface a helper note such as:
+    * “Add an adult or driver too, so Sortii can work out the running around.”
+
+⸻
+
+2. Make event creation part of a sequence, not a dead end
+
+After saving an event, the user should never feel like they have just entered data and been dropped back into the Family page.
+
+Please make the post-save sequence very explicit.
+
+Required behaviour:
+
+* after the first saved event, show:
+    * “Saved. One thing down.”
+    * “Want us to map the week?”
+    * CTA: Review week
+    * CTA: Add another event
+* after later events, show:
+    * “Saved. Plan updated.”
+    * “We’ve sorted the week around it.”
+    * CTA: Review full plan
+    * CTA: Add another event
+
+This post-save state should feel like the bridge into the engine.
+
+⸻
+
+3. Add a clear “review / planner payoff” area
+
+The Family module still needs a more obvious destination where the planning engine becomes visible.
+
+Please create a clear summary/review section or screen that surfaces the intelligence in plain English.
+
+This needs to show, when data exists:
+
+* how many events are on
+* who is covering what
+* whether travel / timing looks clean, tight, or problematic
+* whether there are clashes
+* whether the current setup works fine
+* one useful “worth knowing” insight
+
+The user should be able to reach this via a visible CTA:
+
+* Review week
+* Review full plan
+* See how it’s sorted
+
+Do not bury the planner outputs below forms or low-priority cards.
+
+⸻
+
+4. Make “all good” as visible as “problem detected”
+
+The engine should not only surface warnings.
+
+It also needs to surface reassuring outputs, such as:
+
+* “Saturday solves itself cleanly.”
+* “Two things on. Nothing that doesn’t fit.”
+* “Everything currently works.”
+* “One steady week. No real drama.”
+
+When no conflicts exist, still show a visible summary card or insight so the user can see that the engine has checked the week and found it manageable.
+
+⸻
+
+5. Improve event-entry ergonomics
+
+The Add Event screen still feels functional but slightly too raw.
+
+Please improve surface UX without changing the underlying logic:
+
+* make times feel more natural and user-friendly
+* ensure saving is obvious and easy
+* make recurrence feel clearly connected to the event
+* after save, route the user into the review flow rather than just back to a quiet state
+
+If possible, use more natural time handling than bare numeric input where practical.
+
+⸻
+
+6. Reorder Family screen so outputs lead once events exist
+
+Once events are present, the Family screen should prioritise:
+
+1. weekly summary
+2. worth knowing
+3. who’s covering what
+4. review full plan CTA
+5. add another event CTA
+6. events by day
+7. family member management lower down
+
+The forms and roster should support the planner, not dominate it.
+
+⸻
+
+7. Add a dedicated compact CTA block when engine outputs exist
+
+When Sortii has enough data to interpret the week, show a strong compact card such as:
+
+Option example:
+
+This week, sorted
+2 events. 1 driver. Saturday looks manageable.
+
+Buttons:
+
+* Review full plan
+* Share plan
+* Add another event
+
+This is the moment the planner should feel real.
+
+⸻
+
+8. Fix the “members only” state so it feels like progress, not waiting
+
+When members exist but no events exist, the page should feel like the user has completed step one.
+
+Suggested tone:
+
+* “Everyone’s here.”
+* “Now add what’s actually on.”
+* “Once you add a couple of things, we’ll map the week.”
+
+Include:
+
+* visible member chips
+* strong Add first event button
+* still-visible Add another person option
+* optional note if no adults/drivers exist
+
+⸻
+
+9. Desired feeling
+
+The Family module should feel like this progression:
+
+* I added the people
+* I added what’s on
+* Sortii checked the week
+* I can see who’s doing what
+* I can see whether it’s tight or fine
+* I can share the plan or fix something
+
+Right now it still feels too close to:
+
+* I added a person
+* I added an event
+* I’m back on the page
+
+Please close that gap.
+
+⸻
+
+10. Do not rebuild the engine again
+
+At this stage, focus on:
+
+* CTA flow
+* surface visibility
+* state progression
+* review/payoff screen
+* better exposure of already-built planner outputs
+
+Do not spend another pass mostly on hidden engine work unless something is truly disconnected.

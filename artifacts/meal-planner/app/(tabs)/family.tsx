@@ -306,41 +306,264 @@ function SavedBanner({
   );
 }
 
-// ── ReviewPlanCta ──────────────────────────────────────────────────────────────
-function ReviewPlanCta({
-  hasInsights,
+// ── WeekSortedCard — the planner payoff hero card ─────────────────────────────
+function WeekSortedCard({
+  result,
+  onReview,
   onShare,
   onAddAnother,
 }: {
-  hasInsights: boolean;
+  result: FamilyWeekResult;
+  onReview: () => void;
   onShare: () => void;
   onAddAnother: () => void;
 }) {
+  const { totalEvents, weekendCount, driverCount, busynessLevel } = result.weekSummary;
+
+  const statParts: string[] = [];
+  statParts.push(`${totalEvents} ${totalEvents === 1 ? "event" : "events"}`);
+  if (driverCount > 0) statParts.push(`${driverCount} ${driverCount === 1 ? "driver" : "drivers"}`);
+  if (weekendCount > 0) statParts.push(`${weekendCount} this weekend`);
+
+  const insight =
+    result.insights.length > 0
+      ? result.insights[0]!.message
+      : getLightInsight(result) ?? "Nothing clashing. Looks manageable.";
+
+  const hasIssue = result.insights.some(
+    (i) => i.type === "conflict" || i.type === "child_clash"
+  );
+
   return (
-    <View style={styles.reviewCtaCard}>
-      <View style={styles.reviewCtaIcon}>
-        <Feather name="check-circle" size={16} color={TEAL} />
-      </View>
-      <View style={{ flex: 1, gap: 2 }}>
-        <Text style={styles.reviewCtaTitle}>
-          {hasInsights ? "Plan has a few things to note." : "The week looks sorted."}
-        </Text>
-        <Text style={styles.reviewCtaSub}>
-          {hasInsights
-            ? "See the 'Worth knowing' cards above for details."
-            : "Nothing clashing. Share it when you're ready."}
+    <View style={[styles.weekSortedCard, hasIssue && styles.weekSortedCardWarn]}>
+      <View style={styles.weekSortedHeader}>
+        <View style={[styles.weekSortedTick, hasIssue && { backgroundColor: ORANGE }]}>
+          <Feather name={hasIssue ? "alert-triangle" : "check"} size={11} color="#fff" />
+        </View>
+        <Text style={styles.weekSortedTitle}>
+          {hasIssue ? "This week — a couple of things to sort." : "This week, sorted."}
         </Text>
       </View>
-      <View style={styles.reviewCtaActions}>
-        <TouchableOpacity style={styles.reviewCtaShareBtn} onPress={onShare} activeOpacity={0.85}>
-          <Feather name="send" size={13} color="#fff" />
-          <Text style={styles.reviewCtaShareBtnText}>Share plan</Text>
+      <Text style={styles.weekSortedStats}>{statParts.join("  ·  ")}</Text>
+      <Text style={styles.weekSortedInsight}>{insight}</Text>
+      <View style={styles.weekSortedActions}>
+        <TouchableOpacity style={styles.weekSortedReviewBtn} onPress={onReview} activeOpacity={0.85}>
+          <Feather name="list" size={13} color="#fff" />
+          <Text style={styles.weekSortedReviewBtnText}>Review full plan</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.reviewCtaAddBtn} onPress={onAddAnother} activeOpacity={0.8}>
-          <Feather name="plus" size={13} color={TEAL} />
-          <Text style={styles.reviewCtaAddBtnText}>Add more</Text>
+        <TouchableOpacity style={styles.weekSortedShareBtn} onPress={onShare} activeOpacity={0.85}>
+          <Feather name="send" size={13} color={TEAL} />
+          <Text style={styles.weekSortedShareBtnText}>Share</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.weekSortedAddBtn} onPress={onAddAnother} activeOpacity={0.8}>
+          <Feather name="plus" size={12} color={TEXT_MUTED} />
+          <Text style={styles.weekSortedAddBtnText}>Add more</Text>
         </TouchableOpacity>
       </View>
+    </View>
+  );
+}
+
+// ── PlanSummarySheet — the review destination ─────────────────────────────────
+function PlanSummarySheet({
+  visible,
+  result,
+  members,
+  onClose,
+  onShare,
+  onAddAnother,
+}: {
+  visible: boolean;
+  result: FamilyWeekResult | null;
+  members: FamilyMember[];
+  onClose: () => void;
+  onShare: () => void;
+  onAddAnother: () => void;
+}) {
+  const insets  = useSafeAreaInsets();
+  const slideY  = useRef(new Animated.Value(800)).current;
+  const overlayOp = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    if (visible) {
+      Animated.parallel([
+        Animated.spring(slideY, { toValue: 0, useNativeDriver: true, tension: 80, friction: 12 }),
+        Animated.timing(overlayOp, { toValue: 1, duration: 200, useNativeDriver: true }),
+      ]).start();
+    } else {
+      Animated.parallel([
+        Animated.timing(slideY, { toValue: 800, duration: 220, useNativeDriver: true }),
+        Animated.timing(overlayOp, { toValue: 0, duration: 180, useNativeDriver: true }),
+      ]).start();
+    }
+  }, [visible]);
+
+  if (!visible || !result) return null;
+
+  const { totalEvents, weekendCount, driverCount, busynessLevel } = result.weekSummary;
+  const { label: busynessLabel, color: busynessColor } = BUSYNESS_CONFIG[busynessLevel];
+  const lightInsight = getLightInsight(result);
+  const hasRealInsights = result.insights.length > 0;
+
+  return (
+    <View style={StyleSheet.absoluteFill} pointerEvents="box-none">
+      <Animated.View style={[StyleSheet.absoluteFill, { opacity: overlayOp }]}>
+        <Pressable style={styles.formOverlay} onPress={onClose} />
+      </Animated.View>
+
+      <Animated.View
+        style={[
+          styles.formSheet,
+          { transform: [{ translateY: slideY }], paddingBottom: insets.bottom + 16, maxHeight: "92%" },
+        ]}
+      >
+        <View style={styles.sheetHandle} />
+        <View style={styles.sheetTitleRow}>
+          <View>
+            <Text style={styles.sheetTitle}>Your plan this week</Text>
+            <Text style={styles.sheetSubTitle}>
+              {totalEvents === 0 ? "Nothing on yet." : `${totalEvents} ${totalEvents === 1 ? "event" : "events"} · ${busynessLabel.toLowerCase()}`}
+            </Text>
+          </View>
+          <TouchableOpacity onPress={onClose} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+            <Feather name="x" size={18} color={TEXT_MUTED} />
+          </TouchableOpacity>
+        </View>
+
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ gap: 16, paddingBottom: 16 }}
+        >
+          {/* Stats row */}
+          {totalEvents > 0 && (
+            <View style={styles.summaryStatsRow}>
+              <View style={styles.summaryStatBox}>
+                <Text style={styles.summaryStatNum}>{totalEvents}</Text>
+                <Text style={styles.summaryStatLabel}>{totalEvents === 1 ? "event" : "events"}</Text>
+              </View>
+              {weekendCount > 0 && (
+                <View style={styles.summaryStatBox}>
+                  <Text style={[styles.summaryStatNum, { color: GOLD }]}>{weekendCount}</Text>
+                  <Text style={styles.summaryStatLabel}>weekend</Text>
+                </View>
+              )}
+              {driverCount > 0 && (
+                <View style={styles.summaryStatBox}>
+                  <Text style={[styles.summaryStatNum, { color: TEAL }]}>{driverCount}</Text>
+                  <Text style={styles.summaryStatLabel}>{driverCount === 1 ? "driver" : "drivers"}</Text>
+                </View>
+              )}
+              <View style={[styles.busynessPill, { backgroundColor: busynessColor + "18", borderColor: busynessColor + "44" }]}>
+                <View style={[styles.busynessDot, { backgroundColor: busynessColor }]} />
+                <Text style={[styles.busynessText, { color: busynessColor }]}>{busynessLabel}</Text>
+              </View>
+            </View>
+          )}
+
+          {/* Worth knowing */}
+          <View style={styles.summaryInsightBlock}>
+            <Text style={styles.summaryBlockLabel}>WORTH KNOWING</Text>
+            {hasRealInsights ? (
+              result.insights.map((ins, i) => {
+                const iconMap: Record<string, string> = {
+                  conflict: "alert-triangle", child_clash: "alert-circle",
+                  tight: "clock", busy: "layers", solo: "user",
+                };
+                const colorMap: Record<string, string> = {
+                  conflict: "#C0392B", child_clash: "#C0392B",
+                  tight: ORANGE, busy: GOLD, solo: PLUM,
+                };
+                return (
+                  <View key={i} style={styles.summaryInsightRow}>
+                    <Feather name={(iconMap[ins.type] ?? "info") as any} size={13} color={colorMap[ins.type] ?? TEXT_MUTED} />
+                    <Text style={styles.summaryInsightText}>{ins.message}</Text>
+                  </View>
+                );
+              })
+            ) : (
+              <View style={styles.summaryInsightRow}>
+                <Feather name="check-circle" size={13} color={TEAL} />
+                <Text style={styles.summaryInsightText}>{lightInsight ?? "Everything currently fits."}</Text>
+              </View>
+            )}
+          </View>
+
+          {/* Who's covering what */}
+          {result.planSplit.size > 0 && (
+            <View style={styles.summaryBlock}>
+              <Text style={styles.summaryBlockLabel}>WHO'S COVERING WHAT</Text>
+              {Array.from(result.planSplit.entries()).map(([driverId, days]) => {
+                const driver = members.find((m) => m.id === driverId);
+                if (!driver) return null;
+                return (
+                  <View key={driverId} style={styles.summaryPlanRow}>
+                    <View style={[styles.planSplitDot, { backgroundColor: driver.color }]} />
+                    <Text style={styles.summaryPlanName}>{driver.name}</Text>
+                    <Text style={styles.summaryPlanDays}>{days.join(", ")}</Text>
+                  </View>
+                );
+              })}
+            </View>
+          )}
+
+          {/* Events by day — compact */}
+          {result.daysWithEvents.length > 0 && (
+            <View style={styles.summaryBlock}>
+              <Text style={styles.summaryBlockLabel}>THIS WEEK</Text>
+              {result.daysWithEvents.map((day) => (
+                <View key={day} style={styles.summaryDayBlock}>
+                  <Text style={[styles.summaryDayLabel, (day === "Saturday" || day === "Sunday") && { color: GOLD }]}>
+                    {day}
+                  </Text>
+                  {result.eventsByDay[day].map((ev) => {
+                    const driver = ev.driverId ? members.find((m) => m.id === ev.driverId) : null;
+                    const involved = ev.personIds.map((id) => members.find((m) => m.id === id)?.name).filter(Boolean);
+                    return (
+                      <View key={ev.id} style={styles.summaryEventRow}>
+                        <View style={styles.summaryEventTimePill}>
+                          <Text style={styles.summaryEventTime}>{formatTime(ev.time)}</Text>
+                        </View>
+                        <View style={{ flex: 1 }}>
+                          <Text style={styles.summaryEventTitle}>{ev.title}</Text>
+                          <Text style={styles.summaryEventMeta}>
+                            {[
+                              ev.location,
+                              driver ? `${driver.name} driving` : null,
+                              involved.length ? involved.join(", ") : null,
+                            ].filter(Boolean).join("  ·  ")}
+                          </Text>
+                        </View>
+                      </View>
+                    );
+                  })}
+                </View>
+              ))}
+            </View>
+          )}
+
+          {/* Unassigned note */}
+          {result.weekSummary.unassignedCount > 0 && (
+            <View style={styles.summaryUnassignedNote}>
+              <Feather name="alert-circle" size={13} color={TEXT_MUTED} />
+              <Text style={styles.summaryUnassignedText}>
+                {result.weekSummary.unassignedCount} {result.weekSummary.unassignedCount === 1 ? "event has" : "events have"} no driver assigned yet. Tap the event to edit.
+              </Text>
+            </View>
+          )}
+        </ScrollView>
+
+        {/* Actions */}
+        <View style={styles.summaryActions}>
+          <TouchableOpacity style={styles.summaryShareBtn} onPress={onShare} activeOpacity={0.85}>
+            <Feather name="send" size={14} color="#fff" />
+            <Text style={styles.summaryShareBtnText}>Share plan</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.summaryAddBtn} onPress={onAddAnother} activeOpacity={0.85}>
+            <Feather name="plus" size={14} color={TEAL} />
+            <Text style={styles.summaryAddBtnText}>Add another event</Text>
+          </TouchableOpacity>
+        </View>
+      </Animated.View>
     </View>
   );
 }
@@ -611,28 +834,47 @@ function AddEventSheet({
             </View>
 
             {/* Times */}
-            <View style={styles.formRow}>
-              <View style={[styles.formField, { flex: 1 }]}>
-                <Text style={styles.formLabel}>Start time</Text>
-                <TextInput
-                  style={styles.formInput}
-                  value={draft.time}
-                  onChangeText={(v) => setField("time", v)}
-                  placeholder="e.g. 3:30pm"
-                  placeholderTextColor="#bbb"
-                  autoCapitalize="none"
-                />
-              </View>
-              <View style={[styles.formField, { flex: 1 }]}>
-                <Text style={styles.formLabel}>End time (optional)</Text>
-                <TextInput
-                  style={styles.formInput}
-                  value={draft.endTime ?? ""}
-                  onChangeText={(v) => setField("endTime", v)}
-                  placeholder="e.g. 5pm"
-                  placeholderTextColor="#bbb"
-                  autoCapitalize="none"
-                />
+            <View style={styles.formField}>
+              <Text style={styles.formLabel}>What time?</Text>
+              {/* Quick-pick time chips */}
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 8 }}>
+                <View style={{ flexDirection: "row", gap: 6 }}>
+                  {["7am","8am","9am","10am","11am","12pm","1pm","2pm","3pm","3:30pm","4pm","4:30pm","5pm","6pm","7pm"].map((t) => {
+                    const isSelected = draft.time === t;
+                    return (
+                      <TouchableOpacity
+                        key={t}
+                        style={[styles.timePresetChip, isSelected && styles.timePresetChipSelected]}
+                        onPress={() => setField("time", t)}
+                        activeOpacity={0.75}
+                      >
+                        <Text style={[styles.timePresetText, isSelected && styles.timePresetTextSelected]}>{t}</Text>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </View>
+              </ScrollView>
+              <View style={styles.formRow}>
+                <View style={[styles.formField, { flex: 1 }]}>
+                  <TextInput
+                    style={styles.formInput}
+                    value={draft.time}
+                    onChangeText={(v) => setField("time", v)}
+                    placeholder="or type: 3:30pm"
+                    placeholderTextColor="#bbb"
+                    autoCapitalize="none"
+                  />
+                </View>
+                <View style={[styles.formField, { flex: 1 }]}>
+                  <TextInput
+                    style={styles.formInput}
+                    value={draft.endTime ?? ""}
+                    onChangeText={(v) => setField("endTime", v)}
+                    placeholder="ends: 5pm (optional)"
+                    placeholderTextColor="#bbb"
+                    autoCapitalize="none"
+                  />
+                </View>
               </View>
             </View>
 
@@ -795,12 +1037,36 @@ function ManagePeopleSection({
     Keyboard.dismiss();
   }
 
+  const hasAdults   = members.some((m) => m.role === "adult");
+  const hasChildren = members.some((m) => m.role === "child");
+  const needsAdultHint = hasChildren && !hasAdults;
+
   return (
     <View style={styles.peopleSection}>
       <View style={styles.peopleSectionHeader}>
         <Feather name="users" size={14} color={TEXT_MUTED} />
         <Text style={styles.peopleSectionTitle}>Family members</Text>
+        {members.length > 0 && !adding && (
+          <TouchableOpacity
+            style={styles.addPersonCtaInline}
+            onPress={() => setAdding(true)}
+            activeOpacity={0.75}
+          >
+            <Feather name="user-plus" size={12} color={TEAL} />
+            <Text style={styles.addPersonCtaInlineText}>Add another</Text>
+          </TouchableOpacity>
+        )}
       </View>
+
+      {/* No-adults hint */}
+      {needsAdultHint && !adding && (
+        <View style={styles.noAdultsHint}>
+          <Feather name="info" size={12} color={GOLD} />
+          <Text style={styles.noAdultsHintText}>
+            Add an adult or driver too, so Sortii can work out the running around.
+          </Text>
+        </View>
+      )}
 
       {members.length === 0 && !adding && (
         <Text style={styles.peopleSectionEmpty}>
@@ -852,7 +1118,7 @@ function ManagePeopleSection({
                 activeOpacity={0.75}
               >
                 <Text style={[styles.addPersonRoleText, role === r && { color: TEAL }]}>
-                  {r === "adult" ? "Adult" : "Child"}
+                  {r === "adult" ? "Adult / driver" : "Child"}
                 </Text>
               </TouchableOpacity>
             ))}
@@ -867,16 +1133,17 @@ function ManagePeopleSection({
             </TouchableOpacity>
           </View>
         </View>
-      ) : (
+      ) : members.length === 0 ? (
+        /* Large CTA when empty */
         <TouchableOpacity
-          style={styles.addPersonCta}
+          style={styles.addPersonCtaFull}
           onPress={() => setAdding(true)}
-          activeOpacity={0.75}
+          activeOpacity={0.8}
         >
-          <Feather name="user-plus" size={13} color={TEAL} />
-          <Text style={styles.addPersonCtaText}>Add person</Text>
+          <Feather name="user-plus" size={15} color="#fff" />
+          <Text style={styles.addPersonCtaFullText}>Add family member</Text>
         </TouchableOpacity>
-      )}
+      ) : null}
     </View>
   );
 }
@@ -896,8 +1163,9 @@ export default function FamilyScreen() {
     type: BannerType; title: string;
   } | null>(null);
 
-  const [showForm, setShowForm]       = useState(false);
-  const [editingEvent, setEditingEvent] = useState<FamilyEvent | null>(null);
+  const [showForm, setShowForm]           = useState(false);
+  const [editingEvent, setEditingEvent]   = useState<FamilyEvent | null>(null);
+  const [showPlanSummary, setShowPlanSummary] = useState(false);
 
   const load = useCallback(async () => {
     const s = await loadFamilyState();
@@ -918,11 +1186,15 @@ export default function FamilyScreen() {
   function openAddEvent()                   { setEditingEvent(null); setShowForm(true); }
   function openEditEvent(ev: FamilyEvent)   { setEditingEvent(ev);   setShowForm(true); }
 
+  function openPlanSummary() {
+    dismissBanner();
+    setShowPlanSummary(true);
+  }
+
   function showBanner(type: BannerType, title: string) {
     setSavedBanner({ type, title });
     if (bannerTimer.current) clearTimeout(bannerTimer.current);
     bannerTimer.current = setTimeout(() => setSavedBanner(null), 6000);
-    // Scroll to top so the banner and summary are visible
     setTimeout(() => scrollRef.current?.scrollTo({ y: 0, animated: true }), 80);
   }
 
@@ -1025,7 +1297,7 @@ export default function FamilyScreen() {
           <SavedBanner
             type={savedBanner.type}
             eventTitle={savedBanner.title}
-            onReview={() => { dismissBanner(); scrollRef.current?.scrollTo({ y: 0, animated: true }); }}
+            onReview={openPlanSummary}
             onAddAnother={() => { dismissBanner(); openAddEvent(); }}
             onDismiss={dismissBanner}
           />
@@ -1067,12 +1339,15 @@ export default function FamilyScreen() {
               ))}
             </View>
 
-            {/* 5. Review / share CTA */}
-            <ReviewPlanCta
-              hasInsights={hasInsights}
-              onShare={handleSharePlan}
-              onAddAnother={openAddEvent}
-            />
+            {/* 5. "This week, sorted" payoff card */}
+            {result && (
+              <WeekSortedCard
+                result={result}
+                onReview={openPlanSummary}
+                onShare={handleSharePlan}
+                onAddAnother={openAddEvent}
+              />
+            )}
           </>
         ) : hasMembers ? (
           /* ── Members exist, no events ── */
@@ -1143,6 +1418,18 @@ export default function FamilyScreen() {
           initialDraft={editingEvent}
           onClose={() => { setShowForm(false); setEditingEvent(null); }}
           onSave={handleSaveEvent}
+        />
+      )}
+
+      {/* ── Plan summary review sheet ── */}
+      {showPlanSummary && (
+        <PlanSummarySheet
+          visible={showPlanSummary}
+          result={result}
+          members={state.members}
+          onClose={() => setShowPlanSummary(false)}
+          onShare={handleSharePlan}
+          onAddAnother={() => { setShowPlanSummary(false); openAddEvent(); }}
         />
       )}
     </View>
@@ -1366,25 +1653,112 @@ const styles = StyleSheet.create({
   },
   lightInsightText: { flex: 1, fontSize: 13, fontFamily: "Inter_400Regular", color: TEXT, lineHeight: 18 },
 
-  // Review plan CTA
-  reviewCtaCard: {
-    backgroundColor: CARD_BG, borderRadius: 14, borderWidth: 1, borderColor: BORDER, padding: 14, gap: 10,
+  // WeekSortedCard
+  weekSortedCard: {
+    backgroundColor: TEAL_TINT, borderRadius: 16, borderWidth: 1, borderColor: TEAL + "30", padding: 16, gap: 10,
+    ...Platform.select({
+      web: { boxShadow: `0px 2px 16px ${TEAL}1A` },
+      default: { shadowColor: TEAL, shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 10, elevation: 3 },
+    }),
   },
-  reviewCtaIcon: { marginBottom: 2 },
-  reviewCtaTitle: { fontSize: 14, fontFamily: "Inter_600SemiBold", color: TEXT },
-  reviewCtaSub: { fontSize: 13, fontFamily: "Inter_400Regular", color: TEXT_MUTED, lineHeight: 18 },
-  reviewCtaActions: { flexDirection: "row", gap: 10, flexWrap: "wrap" },
-  reviewCtaShareBtn: {
+  weekSortedCardWarn: { backgroundColor: ORANGE + "12", borderColor: ORANGE + "40" },
+  weekSortedHeader: { flexDirection: "row", alignItems: "center", gap: 9 },
+  weekSortedTick: {
+    width: 22, height: 22, borderRadius: 11, backgroundColor: TEAL,
+    alignItems: "center", justifyContent: "center",
+  },
+  weekSortedTitle: { fontSize: 15, fontFamily: "Inter_700Bold", color: TEXT, flex: 1 },
+  weekSortedStats: { fontSize: 12, fontFamily: "Inter_500Medium", color: TEXT_MUTED, letterSpacing: 0.2 },
+  weekSortedInsight: { fontSize: 13, fontFamily: "Inter_400Regular", color: TEXT, lineHeight: 18, fontStyle: "italic" },
+  weekSortedActions: { flexDirection: "row", alignItems: "center", gap: 8, flexWrap: "wrap", marginTop: 2 },
+  weekSortedReviewBtn: {
     flexDirection: "row", alignItems: "center", gap: 6,
-    backgroundColor: TEAL, borderRadius: 20, paddingHorizontal: 16, paddingVertical: 9,
+    backgroundColor: TEAL, borderRadius: 20, paddingHorizontal: 14, paddingVertical: 9,
   },
-  reviewCtaShareBtnText: { fontSize: 13, fontFamily: "Inter_600SemiBold", color: "#fff" },
-  reviewCtaAddBtn: {
+  weekSortedReviewBtnText: { fontSize: 13, fontFamily: "Inter_600SemiBold", color: "#fff" },
+  weekSortedShareBtn: {
     flexDirection: "row", alignItems: "center", gap: 5,
-    backgroundColor: TEAL_TINT, borderRadius: 20, paddingHorizontal: 14, paddingVertical: 9,
+    backgroundColor: "#fff", borderRadius: 20, paddingHorizontal: 12, paddingVertical: 9,
+    borderWidth: 1, borderColor: TEAL + "44",
+  },
+  weekSortedShareBtnText: { fontSize: 13, fontFamily: "Inter_600SemiBold", color: TEAL },
+  weekSortedAddBtn: {
+    flexDirection: "row", alignItems: "center", gap: 4,
+    paddingHorizontal: 10, paddingVertical: 9,
+  },
+  weekSortedAddBtnText: { fontSize: 13, fontFamily: "Inter_400Regular", color: TEXT_MUTED },
+
+  // Plan summary sheet
+  sheetSubTitle: { fontSize: 12, fontFamily: "Inter_400Regular", color: TEXT_MUTED, marginTop: 2 },
+  summaryStatsRow: { flexDirection: "row", alignItems: "center", flexWrap: "wrap", gap: 16, paddingBottom: 4 },
+  summaryStatBox: { alignItems: "center", gap: 1 },
+  summaryStatNum: { fontSize: 22, fontFamily: "Inter_700Bold", color: TEXT },
+  summaryStatLabel: { fontSize: 11, fontFamily: "Inter_400Regular", color: TEXT_MUTED },
+  summaryInsightBlock: {
+    backgroundColor: CARD_BG, borderRadius: 12, borderWidth: 1, borderColor: BORDER,
+    borderLeftWidth: 3, borderLeftColor: ORANGE, padding: 12, gap: 8,
+  },
+  summaryBlock: {
+    backgroundColor: CARD_BG, borderRadius: 12, borderWidth: 1, borderColor: BORDER, padding: 12, gap: 8,
+  },
+  summaryBlockLabel: {
+    fontSize: 10, fontFamily: "Inter_600SemiBold", letterSpacing: 1.2,
+    textTransform: "uppercase", color: TEXT_MUTED, marginBottom: 2,
+  },
+  summaryInsightRow: { flexDirection: "row", alignItems: "flex-start", gap: 8 },
+  summaryInsightText: { flex: 1, fontSize: 13, fontFamily: "Inter_400Regular", color: TEXT, lineHeight: 18 },
+  summaryPlanRow: { flexDirection: "row", alignItems: "center", gap: 10 },
+  summaryPlanName: { fontSize: 13, fontFamily: "Inter_600SemiBold", color: TEXT, minWidth: 60 },
+  summaryPlanDays: { flex: 1, fontSize: 13, fontFamily: "Inter_400Regular", color: TEXT_MUTED },
+  summaryDayBlock: { gap: 6, marginBottom: 4 },
+  summaryDayLabel: { fontSize: 12, fontFamily: "Inter_700Bold", color: TEXT },
+  summaryEventRow: { flexDirection: "row", alignItems: "flex-start", gap: 8 },
+  summaryEventTimePill: { backgroundColor: TEAL_TINT, borderRadius: 6, paddingHorizontal: 7, paddingVertical: 3, alignSelf: "flex-start" },
+  summaryEventTime: { fontSize: 11, fontFamily: "Inter_700Bold", color: TEAL },
+  summaryEventTitle: { fontSize: 13, fontFamily: "Inter_600SemiBold", color: TEXT },
+  summaryEventMeta: { fontSize: 11, fontFamily: "Inter_400Regular", color: TEXT_MUTED, marginTop: 1 },
+  summaryUnassignedNote: { flexDirection: "row", alignItems: "flex-start", gap: 8 },
+  summaryUnassignedText: { flex: 1, fontSize: 12, fontFamily: "Inter_400Regular", color: TEXT_MUTED, lineHeight: 17 },
+  summaryActions: { flexDirection: "row", gap: 10, paddingTop: 12, flexWrap: "wrap" },
+  summaryShareBtn: {
+    flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 7,
+    backgroundColor: TEAL, borderRadius: 14, paddingVertical: 14,
+  },
+  summaryShareBtnText: { fontSize: 14, fontFamily: "Inter_600SemiBold", color: "#fff" },
+  summaryAddBtn: {
+    flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 7,
+    backgroundColor: TEAL_TINT, borderRadius: 14, paddingVertical: 14,
     borderWidth: 1, borderColor: TEAL + "30",
   },
-  reviewCtaAddBtnText: { fontSize: 13, fontFamily: "Inter_600SemiBold", color: TEAL },
+  summaryAddBtnText: { fontSize: 14, fontFamily: "Inter_600SemiBold", color: TEAL },
+
+  // Time preset chips
+  timePresetChip: {
+    paddingHorizontal: 12, paddingVertical: 7, borderRadius: 20,
+    borderWidth: 1, borderColor: BORDER, backgroundColor: BG,
+  },
+  timePresetChipSelected: { backgroundColor: TEAL, borderColor: TEAL },
+  timePresetText: { fontSize: 13, fontFamily: "Inter_500Medium", color: TEXT_MUTED },
+  timePresetTextSelected: { color: "#fff" },
+
+  // People section improvements
+  addPersonCtaInline: {
+    flexDirection: "row", alignItems: "center", gap: 5,
+    backgroundColor: TEAL_TINT, borderRadius: 20, paddingHorizontal: 10, paddingVertical: 5,
+    borderWidth: 1, borderColor: TEAL + "30",
+  },
+  addPersonCtaInlineText: { fontSize: 12, fontFamily: "Inter_600SemiBold", color: TEAL },
+  addPersonCtaFull: {
+    flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8,
+    backgroundColor: TEAL, borderRadius: 12, paddingVertical: 13, marginTop: 4,
+  },
+  addPersonCtaFullText: { fontSize: 14, fontFamily: "Inter_600SemiBold", color: "#fff" },
+  noAdultsHint: {
+    flexDirection: "row", alignItems: "flex-start", gap: 7,
+    backgroundColor: GOLD + "12", borderRadius: 10, borderWidth: 1, borderColor: GOLD + "30",
+    paddingHorizontal: 11, paddingVertical: 9,
+  },
+  noAdultsHintText: { flex: 1, fontSize: 12, fontFamily: "Inter_400Regular", color: TEXT, lineHeight: 17 },
 
   // Repeat note
   repeatNote: { flexDirection: "row", alignItems: "center", gap: 7, paddingVertical: 4 },
