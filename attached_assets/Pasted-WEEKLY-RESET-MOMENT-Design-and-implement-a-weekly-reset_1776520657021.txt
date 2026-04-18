@@ -1,0 +1,122 @@
+WEEKLY RESET MOMENT
+
+Design and implement a weekly reset experience for Sortii that appears at the end of the week and helps users reflect, feel progress, and begin the next week with less mental load.
+
+Goal
+
+Create a calm, lightly cheeky weekly recap that feels like a gentle exhale, not a performance report.
+
+⸻
+
+1. Add a weekly summary card or modal
+
+Title:
+“This week, quietly sorted”
+
+Display 2 to 4 recap lines based on real user activity across modules.
+
+Examples of recap lines:
+
+* “You freed up $X this week.”
+* “Dinner was handled X nights.”
+* “One takeaway never happened, which helped.”
+* “Saturday looked busy, but it stayed upright.”
+* “You kept on top of X appointments.”
+
+Use only lines that are relevant to that user’s week.
+
+⸻
+
+2. Data inputs
+
+Use available weekly signals such as:
+
+* freedUpThisWeek
+* mealsPlanned
+* swapsApplied
+* takeawayReduced
+* appointmentsHandled
+* busyDayDetected
+* pantrySavings
+* breathingRoom
+
+Generate recap content dynamically from these.
+
+⸻
+
+3. Tone rules
+
+Keep the tone:
+
+* calm
+* supportive
+* observational
+* slightly dry / human
+
+Do not use:
+
+* gamification language
+* performance scoring
+* goal-completion framing
+* guilt or productivity language
+
+⸻
+
+4. Timing
+
+Generate the recap at the end of the week.
+
+Preferred behaviour:
+
+* prepare on Sunday evening
+* show on next app open
+* keep visible until dismissed
+
+⸻
+
+5. Add one primary CTA only
+
+Examples:
+
+* Sort next week
+* Start next week lighter
+* Keep the calm going
+
+Only one CTA should appear.
+
+⸻
+
+6. Add continuity suggestions
+
+If user applied helpful actions this week, suggest carrying one forward into next week.
+
+Examples:
+
+* “Want to keep takeaway to one this week too?”
+* “Want another lower-cost dinner mix this week?”
+* “Keep that subscription paused for now?”
+
+These should feel optional and helpful.
+
+⸻
+
+7. Visual design
+
+Style the summary to feel soft and premium:
+
+* white or warm cream base
+* soft green / gold accents
+* large savings number if relevant
+* concise recap lines
+* no graphs or detailed tables
+
+This should feel like a calm weekly wrap-up, not a dashboard report.
+
+⸻
+
+8. Dismiss + persistence
+
+Allow the user to:
+
+* dismiss it
+* revisit it later from a “This week” or “Weekly wrap” section if easy to implement

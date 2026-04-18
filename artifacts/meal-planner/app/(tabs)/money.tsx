@@ -1,8 +1,9 @@
 import { Feather } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
+  Animated,
   ActivityIndicator,
   Image,
   Platform,
@@ -68,6 +69,96 @@ function confirmMsg(id: string, amount: number, fmt: (n: number) => string): str
     case "freezer_check":      return "Sorted. Free food you forgot about.";
     default:                   return `Done. A little extra breathing room.`;
   }
+}
+
+// ─── Stacked wins bar ────────────────────────────────────────
+
+function escalatingHeadline(count: number): string {
+  if (count === 1) return "Nice. Small win.";
+  if (count <= 2) return "That's already helping.";
+  return "You've quietly fixed a chunk of your week.";
+}
+
+function StackedWinsBar({
+  total,
+  count,
+  fmt,
+}: {
+  total: number;
+  count: number;
+  fmt: (n: number) => string;
+}) {
+  const scale = useRef(new Animated.Value(1)).current;
+  const prevTotal = useRef(0);
+
+  useEffect(() => {
+    if (total > 0 && total !== prevTotal.current) {
+      prevTotal.current = total;
+      Animated.sequence([
+        Animated.spring(scale, { toValue: 1.05, useNativeDriver: true, tension: 260, friction: 7 }),
+        Animated.spring(scale, { toValue: 1, useNativeDriver: true, tension: 200, friction: 10 }),
+      ]).start();
+    }
+  }, [total]);
+
+  if (total <= 0 || count === 0) return null;
+
+  return (
+    <View style={styles.winsBar}>
+      <Feather name="trending-up" size={14} color={TEAL} style={{ marginTop: 1 }} />
+      <View style={{ flex: 1, gap: 2 }}>
+        <Text style={styles.winsBarHeadline}>{escalatingHeadline(count)}</Text>
+        <Animated.Text style={[styles.winsBarAmount, { transform: [{ scale }] }]}>
+          +{fmt(total)} freed up this week
+        </Animated.Text>
+      </View>
+    </View>
+  );
+}
+
+// ─── Wins toast ───────────────────────────────────────────────
+
+function WinsToast({
+  message,
+  bottomInset,
+}: {
+  message: string | null;
+  bottomInset: number;
+}) {
+  const anim = useRef(new Animated.Value(0)).current;
+  const [displayMsg, setDisplayMsg] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (message) {
+      setDisplayMsg(message);
+      anim.setValue(0);
+      Animated.spring(anim, { toValue: 1, useNativeDriver: true, tension: 90, friction: 9 }).start();
+    } else {
+      Animated.timing(anim, { toValue: 0, duration: 220, useNativeDriver: true }).start(() => {
+        setDisplayMsg(null);
+      });
+    }
+  }, [message]);
+
+  if (!displayMsg) return null;
+
+  return (
+    <Animated.View
+      style={[
+        styles.winsToast,
+        { bottom: bottomInset + 16 },
+        {
+          opacity: anim,
+          transform: [
+            { translateY: anim.interpolate({ inputRange: [0, 1], outputRange: [10, 0] }) },
+          ],
+        },
+      ]}
+      pointerEvents="none"
+    >
+      <Text style={styles.winsToastText}>{displayMsg}</Text>
+    </Animated.View>
+  );
 }
 
 // ─── Status pill ────────────────────────────────────────────
@@ -322,12 +413,16 @@ function WinRow({
   isApplied,
   onApply,
   onUndo,
+  hasMealsSetup,
+  onViewMeals,
 }: {
   s: MoneySuggestion;
   fmt: (n: number) => string;
   isApplied: boolean;
   onApply: () => void;
   onUndo: () => void;
+  hasMealsSetup: boolean;
+  onViewMeals: () => void;
 }) {
   const isActionable = !s.isGoalProjection && !s.isMonthlyNudge && s.impactAmount > 0;
   const ctaLabel = WIN_CTA[s.id] ?? "Try this";
@@ -346,6 +441,14 @@ function WinRow({
         {isApplied ? (
           <>
             <Text style={styles.quickWinsConfirm}>{message}</Text>
+            {s.id === "skip_takeaway" && hasMealsSetup && (
+              <TouchableOpacity
+                onPress={onViewMeals}
+                hitSlop={{ top: 4, bottom: 4, left: 4, right: 4 }}
+              >
+                <Text style={styles.quickWinsMealLink}>Your dinners are already sorted →</Text>
+              </TouchableOpacity>
+            )}
             <TouchableOpacity
               onPress={() => {
                 Haptics.selectionAsync();
@@ -389,12 +492,16 @@ function QuickWinsSection({
   appliedWins,
   onApply,
   onUndo,
+  hasMealsSetup,
+  onViewMeals,
 }: {
   suggestions: MoneySuggestion[];
   fmt: (n: number) => string;
   appliedWins: Map<string, number>;
   onApply: (id: string, amount: number) => void;
   onUndo: (id: string) => void;
+  hasMealsSetup: boolean;
+  onViewMeals: () => void;
 }) {
   const [open, setOpen] = useState(false);
   const tips = suggestions.slice(0, 3);
@@ -434,6 +541,8 @@ function QuickWinsSection({
               isApplied={appliedWins.has(s.id)}
               onApply={() => onApply(s.id, s.impactAmount)}
               onUndo={() => onUndo(s.id)}
+              hasMealsSetup={hasMealsSetup}
+              onViewMeals={onViewMeals}
             />
           ))}
         </View>
@@ -541,9 +650,18 @@ export default function MoneyScreen() {
 
   // Applied quick wins (id → impactAmount)
   const [appliedWins, setAppliedWins] = useState<Map<string, number>>(new Map());
+  const [toastMsg, setToastMsg] = useState<string | null>(null);
+  const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const showToast = (msg: string) => {
+    if (toastTimer.current) clearTimeout(toastTimer.current);
+    setToastMsg(msg);
+    toastTimer.current = setTimeout(() => setToastMsg(null), 2600);
+  };
 
   const applyWin = (id: string, amount: number) => {
     setAppliedWins((prev) => new Map(prev).set(id, amount));
+    showToast(confirmMsg(id, amount, formatMoneyRound));
   };
 
   const undoWin = (id: string) => {
@@ -552,9 +670,16 @@ export default function MoneyScreen() {
       next.delete(id);
       return next;
     });
+    if (toastTimer.current) clearTimeout(toastTimer.current);
+    setToastMsg(null);
   };
 
   const appliedSavingsTotal = Array.from(appliedWins.values()).reduce((a, b) => a + b, 0);
+
+  const goToMeals = () => {
+    Haptics.selectionAsync();
+    router.push("/(tabs)/meals");
+  };
 
   const paddingTop = Platform.OS === "web" ? 24 : insets.top + 8;
   const paddingBottom = Platform.OS === "web" ? 60 : insets.bottom + 80;
@@ -637,8 +762,9 @@ export default function MoneyScreen() {
   );
 
   return (
+    <View style={{ flex: 1, backgroundColor: PAGE_BG }}>
     <ScrollView
-      style={{ backgroundColor: PAGE_BG }}
+      style={{ flex: 1 }}
       contentContainerStyle={[styles.container, { paddingTop, paddingBottom }]}
       showsVerticalScrollIndicator={false}
     >
@@ -661,6 +787,13 @@ export default function MoneyScreen() {
             swapSavings={swapSavings}
             pantryEfficiency={pantryEfficiency}
             weeklyState={result.weeklyState}
+            fmt={formatMoneyRound}
+          />
+
+          {/* Stacked wins bar */}
+          <StackedWinsBar
+            total={appliedSavingsTotal}
+            count={appliedWins.size}
             fmt={formatMoneyRound}
           />
 
@@ -697,6 +830,8 @@ export default function MoneyScreen() {
             appliedWins={appliedWins}
             onApply={applyWin}
             onUndo={undoWin}
+            hasMealsSetup={hasMealsSetup}
+            onViewMeals={goToMeals}
           />
 
           {/* 5. Savings goal card */}
@@ -731,6 +866,8 @@ export default function MoneyScreen() {
         </>
       )}
     </ScrollView>
+    <WinsToast message={toastMsg} bottomInset={paddingBottom} />
+    </View>
   );
 }
 
@@ -980,6 +1117,49 @@ const styles = StyleSheet.create({
   appliedWinsNote: {
     fontSize: 12, fontFamily: "Inter_500Medium", color: TEAL,
     fontStyle: "italic", marginTop: 2,
+  },
+  quickWinsMealLink: {
+    fontSize: 12, fontFamily: "Inter_500Medium", color: TEAL,
+    textDecorationLine: "underline", marginTop: 2,
+  },
+
+  // Stacked wins bar
+  winsBar: {
+    flexDirection: "row", alignItems: "flex-start", gap: 10,
+    backgroundColor: "#E6F3F0", borderRadius: 14,
+    borderWidth: 1.5, borderColor: "rgba(42,143,136,0.22)",
+    paddingHorizontal: 14, paddingVertical: 12,
+  },
+  winsBarHeadline: {
+    fontSize: 13, fontFamily: "Inter_500Medium",
+    color: "#1C6860", lineHeight: 18,
+  },
+  winsBarAmount: {
+    fontSize: 15, fontFamily: "Inter_700Bold", color: TEAL,
+  },
+
+  // Wins toast
+  winsToast: {
+    position: "absolute",
+    left: 24, right: 24,
+    backgroundColor: "#1A5C57",
+    borderRadius: 14,
+    paddingHorizontal: 18, paddingVertical: 12,
+    alignItems: "center",
+    ...Platform.select({
+      web: { boxShadow: "0px 6px 20px rgba(0,0,0,0.18)" },
+      default: {
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.18,
+        shadowRadius: 12,
+        elevation: 8,
+      },
+    }),
+  },
+  winsToastText: {
+    fontSize: 14, fontFamily: "Inter_500Medium", color: "#fff",
+    textAlign: "center",
   },
 
   // 5. Savings goal card

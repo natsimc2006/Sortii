@@ -1,0 +1,183 @@
+CARRY THIS INTO NEXT WEEK FLOW
+
+Build a lightweight “carry this into next week” setup flow for Sortii that appears after the weekly reset and helps users start the next week with less effort.
+
+Goal
+
+Make Sortii feel like it remembers what helped last week and offers to carry forward useful settings, habits, and choices into the new week.
+
+This should feel calm, smart, and low-effort. It should not feel like a form or a big setup flow.
+
+⸻
+
+1. Add a post-reset smart carry-forward section
+
+After the weekly wrap card, show a section titled:
+
+“Want to keep a couple of things from last week?”
+
+Under this, show 2 to 4 suggested carry-forward actions based on what the user actually did last week.
+
+⸻
+
+2. Suggested carry-forward items should be dynamic
+
+Only show suggestions that are relevant to the user’s previous week.
+
+Meal-related suggestions
+
+If meals were planned successfully:
+
+* “Keep a budget-friendly dinner mix”
+* “Use a similar meal style again”
+* “Plan 5 dinners again”
+* “Keep leftovers on”
+
+If the user reduced takeaway:
+
+* “Keep takeaway to one this week too”
+* “Let meals cover one usual takeaway night”
+
+If pantry / swaps saved money:
+
+* “Use the lower-cost swap mix again”
+* “Keep smarter swaps switched on”
+
+⸻
+
+Money-related suggestions
+
+If user applied one or more easy wins:
+
+* “Keep one quiet money win in play”
+* “Leave one subscription paused”
+* “Keep coffee spend a little tighter”
+* “Carry forward last week’s breathing room mindset”
+
+These should map to actual settings or assumptions where possible.
+
+⸻
+
+Family / planning suggestions
+
+If the family module exists or becomes active:
+
+* “Keep the busiest day flagged”
+* “Bring forward recurring activities”
+* “Start with last week’s structure”
+
+⸻
+
+3. Interaction design
+
+Each suggestion should have a simple toggle or chip-based action:
+
+* selected by default if confidence is high
+* unselected if lower confidence
+
+Examples:
+
+* Keep 5 dinners
+* Keep one takeaway-free night
+* Pause one subscription again
+* Reuse lower-cost swaps
+
+Do not make the user type anything unless necessary.
+
+⸻
+
+4. Add one primary CTA
+
+Use one simple button:
+
+“Start next week like this”
+
+Secondary text option:
+“Make a few changes first”
+
+⸻
+
+5. What happens on confirm
+
+When user taps the main CTA:
+
+* prefill next week’s meal setup
+* carry forward selected meal preferences
+* carry forward selected money assumptions or soft targets
+* bring forward selected planning structure if relevant
+
+This should not lock anything in permanently.
+It should simply prefill / prepare the next week.
+
+⸻
+
+6. Tone
+
+All copy should feel:
+
+* helpful
+* lightly cheeky
+* non-controlling
+* easy
+
+Examples:
+
+* “A couple of things seemed to help.”
+* “No need to reinvent the wheel.”
+* “Last week wasn’t a total disaster. Want to borrow the useful bits?”
+
+Avoid:
+
+* “goals”
+* “habits”
+* “discipline”
+* “optimise”
+
+⸻
+
+7. Visual behaviour
+
+Keep this flow lightweight:
+
+* card-based
+* 2 to 4 suggestions max
+* clear toggles or chips
+* one gold CTA
+
+Do not make this a long onboarding flow.
+It should feel like a 10-second head start.
+
+⸻
+
+8. Suggested logic / confidence rules
+
+Use confidence scoring when deciding what to surface.
+
+High confidence:
+
+* user applied action manually
+* user repeated the same behaviour across multiple days
+* a setting clearly reduced stress or cost
+
+Medium confidence:
+
+* likely helpful based on data, but not explicitly chosen
+
+Only preselect high-confidence suggestions.
+
+⸻
+
+9. Persistence
+
+Store the carry-forward choices for the new week only.
+Do not overwrite permanent preferences unless the user explicitly changes those elsewhere.
+
+⸻
+
+10. Desired feeling
+
+The user should feel:
+
+* “good, I don’t have to start from scratch”
+* “that was easier than expected”
+* “the app actually remembers what helped”
