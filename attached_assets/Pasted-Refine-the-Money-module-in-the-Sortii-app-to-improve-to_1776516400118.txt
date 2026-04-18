@@ -1,0 +1,190 @@
+Refine the Money module in the Sortii app to improve tone, clarity, and user experience.
+
+IMPORTANT
+Do not redesign the structure.
+This is a tone, UX, and microcopy polish pass.
+
+GOAL
+The Money module should feel:
+- calm
+- observational
+- slightly cheeky
+- not like a finance app
+- not like admin
+
+--------------------------------
+1. WEEKLY SNAPSHOT TONE
+--------------------------------
+
+Update top summary copy to feel like a small win, not a report.
+
+Replace phrases like:
+“$52 sorted by Sortii this week”
+
+With softer, more human phrasing such as:
+- “About $52 quietly sorted this week.”
+- “~$52 back in your pocket.”
+- “~$52 saved without trying too hard.”
+
+Keep it understated and positive.
+
+--------------------------------
+2. BREAKDOWN COPY
+--------------------------------
+
+Keep breakdown structure but soften tone:
+
+Examples:
+- “Smarter ingredient swaps — $30”
+- “Using what you already had — $22”
+
+Optional subtext:
+- “Nothing dramatic. Just less waste.”
+
+--------------------------------
+3. SECTION LABELS
+--------------------------------
+
+Replace overly formal labels like:
+“Weekly snapshot”
+
+With lighter options such as:
+- “What’s going on”
+- “The quick version”
+- “If you care for details”
+
+--------------------------------
+4. USUAL SPEND SECTION
+--------------------------------
+
+Refine tone to be observational, not analytical.
+
+Example:
+- “Most of your grocery spend goes to dinners — about $228.”
+- “Dinner does most of the damage — ~$228.”
+
+--------------------------------
+5. QUICK WINS BOX
+--------------------------------
+
+Rename and soften tone.
+
+Replace:
+“Tap for some quick wins this week”
+
+With:
+- “A few easy wins (if you want them)”
+- “Low effort, decent payoff”
+
+Update suggestions to feel human:
+
+Instead of:
+“Your grocery spend is on the higher side”
+
+Use:
+- “Grocery spend’s creeping up a bit.”
+- “You’re not overspending… but you’re not not either.”
+
+Instead of:
+“Do a freezer audit”
+
+Use:
+- “There’s almost definitely something in the freezer.”
+- “Freezer check before you shop = free food you forgot about.”
+
+Keep savings amounts visible.
+
+--------------------------------
+6. SAVINGS GOAL BEHAVIOUR
+--------------------------------
+
+Make savings goals fully optional.
+
+Fix logic:
+- If user skips goal setup, do NOT show forced goal screen
+- Continue flow normally
+
+Update savings goal card:
+
+Title options:
+- “Saving for something?”
+- “Got something in mind?”
+
+Subtext:
+- “We’ll keep an eye on it quietly.”
+- “No pressure.”
+
+CTA:
+- “Set a goal”
+- “Add one (optional)”
+
+Secondary:
+- “Not right now”
+
+Style:
+- lighter visual weight (e.g. dashed border or softer card)
+
+--------------------------------
+7. CTA BUTTON TONE
+--------------------------------
+
+Replace “Update my numbers” with:
+- “Adjust my week”
+- or “Tweak my numbers”
+
+Make it feel less like admin.
+
+--------------------------------
+8. EMPTY STATES
+--------------------------------
+
+Replace:
+“No money setup yet”
+
+With:
+- “No numbers yet.”
+- “We’re guessing nothing. Fair enough.”
+
+--------------------------------
+9. FORM SCREEN TONE
+--------------------------------
+
+Update setup screen copy:
+
+Instead of:
+“Set your budget — we’ll handle the rest”
+
+Use:
+- “Give us rough numbers. We’ll do the thinking.”
+- “Doesn’t need to be perfect.”
+
+--------------------------------
+10. SUCCESS / CONFIRMATION
+--------------------------------
+
+Use short, dry confirmations:
+- “That’ll do.”
+- “Good enough.”
+- “We’ll work with that.”
+
+--------------------------------
+11. CONSISTENCY
+--------------------------------
+
+Ensure all Money pages:
+- use white background
+- match Home and Meals styling
+- feel like one unified product
+
+--------------------------------
+FINAL RESULT
+--------------------------------
+
+The Money module should feel:
+- helpful, not heavy
+- human, not financial
+- lightly witty, not jokey
+- optional, not forced
+
+It should feel like:
+“a quiet nudge from someone who gets it”

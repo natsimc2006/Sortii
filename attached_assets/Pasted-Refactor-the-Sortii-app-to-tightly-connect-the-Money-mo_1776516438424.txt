@@ -1,0 +1,189 @@
+Refactor the Sortii app to tightly connect the Money module with the Meals planner so users can see the real impact of their decisions.
+
+IMPORTANT  
+Do not redesign the UI structure drastically.  
+This is about connection, feedback, and subtle intelligence across existing screens.
+
+GOAL  
+Users should feel:
+- “this decision changed my week”
+- not “this is a separate feature”
+
+--------------------------------
+1. CONNECT MEAL ACTIONS → MONEY IMPACT
+--------------------------------
+
+For every meal interaction:
+- swap meal
+- apply pantry tip
+- replace ingredient
+- choose cheaper option
+
+Add a lightweight money feedback system.
+
+Display subtle inline feedback:
+
+Examples:
+- “+$4 breathing room”
+- “Saved $6 this week”
+- “Cheaper swap → +$3”
+
+Placement:
+- small text under meal card
+- or temporary toast after action
+
+Do NOT interrupt flow.
+
+--------------------------------
+2. RUNNING WEEKLY IMPACT
+--------------------------------
+
+Track a rolling total of savings across the week.
+
+Update dynamically when:
+- swaps applied
+- meals changed
+- pantry tips used
+
+Surface this in 2 places:
+
+A. Meals page (top)
+- “$28 saved so far”
+- “You’ve quietly saved ~$28 this week”
+
+B. Money page
+- already exists → just ensure it reflects real interactions
+
+--------------------------------
+3. MEALS HEADER ENHANCEMENT
+--------------------------------
+
+Enhance Meals header with live financial feedback.
+
+Add a small secondary line:
+
+Examples:
+- “7 dinners sorted. ~$28 better off.”
+- “Dinner’s behaving. ~$22 saved.”
+
+Keep tone subtle and non-salesy.
+
+--------------------------------
+4. SWAPS → REAL CONSEQUENCES
+--------------------------------
+
+When user taps:
+“Review swaps → save $30”
+
+Ensure:
+- applying swaps actually updates:
+  - meal plan
+  - AND underlying cost estimate
+  - AND shopping list (if possible)
+
+If full automation is complex:
+- update estimated totals first
+- flag shopping list sync as “next improvement”
+
+--------------------------------
+5. SHOPPING LIST CONNECTION (IMPORTANT)
+--------------------------------
+
+When swaps are applied:
+- reflect ingredient changes in shopping list
+
+If not fully supported:
+- show message:
+  “We’ve adjusted your plan. Shopping list catching up.”
+
+Long-term goal:
+- shopping list reflects final chosen meals only
+
+--------------------------------
+6. MONEY PAGE: EXPLAIN WHERE SAVINGS CAME FROM
+--------------------------------
+
+Improve clarity:
+
+Instead of generic breakdown, show:
+
+- “Ingredient swaps — $18”
+- “Using what you already had — $10”
+- “Skipping extra meals — $6”
+
+Optional microcopy:
+- “Nothing fancy. Just small decisions adding up.”
+
+--------------------------------
+7. “BREATHING ROOM” LINK BACK TO MEALS
+--------------------------------
+
+On Money page:
+
+Under:
+“Weekly breathing room”
+
+Add subtle line:
+
+- “Meals planning is doing most of the work here.”
+
+Optional tap:
+→ opens Meals page
+
+--------------------------------
+8. DECISION LOOP (CORE PRODUCT BEHAVIOUR)
+--------------------------------
+
+Create a loop:
+
+User action → visible impact → reinforcement
+
+Examples:
+- swaps → +$ → visible immediately
+- pantry tip → +$ → reflected in weekly total
+
+Avoid:
+- delayed updates
+- hidden calculations
+
+--------------------------------
+9. TONE RULES (VERY IMPORTANT)
+--------------------------------
+
+All feedback must feel:
+
+- observational
+- slightly dry
+- not congratulatory
+- not gamified
+
+GOOD:
+- “That freed up ~$6”
+- “Small win — ~$4 back”
+- “Adds up to ~$18 this week”
+
+BAD:
+- “Great job!”
+- “You saved money!”
+- “Amazing!”
+
+--------------------------------
+10. PERFORMANCE & STATE
+--------------------------------
+
+Ensure:
+- savings state persists across screens
+- updates instantly
+- does not require reload
+
+--------------------------------
+FINAL RESULT
+--------------------------------
+
+Meals and Money should feel like one system.
+
+Users should feel:
+- “Sortii is quietly improving my week”
+- not “I’m tracking things manually”
+
+The product should reward decisions without making a big deal about it.

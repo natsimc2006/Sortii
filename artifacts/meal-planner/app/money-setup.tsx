@@ -207,7 +207,7 @@ export default function MoneySetupScreen() {
         <View style={{ flex: 1, marginHorizontal: 12 }}>
           <Text style={[styles.pageTitle, { color: C.text }]}>Make it yours.</Text>
           <Text style={[styles.pageHelper, { color: C.textSecondary }]}>
-            Set your budget — we'll handle the rest.
+            Give us rough numbers. We'll do the thinking.
           </Text>
         </View>
         <TouchableOpacity

@@ -89,25 +89,25 @@ function HeroCard({
 
       {/* Big number */}
       <Text style={styles.heroBigNumber}>~{fmt(total > 0 ? total : 0)}</Text>
-      <Text style={styles.heroLabel}>sorted by Sortii this week</Text>
+      <Text style={styles.heroLabel}>quietly sorted this week.</Text>
 
       {total > 0 && (
         <>
           <View style={styles.heroDivider} />
           {roundedSwap > 0 && (
             <View style={styles.heroLineItem}>
-              <Text style={styles.heroLineLabel}>Smarter ingredient choices</Text>
+              <Text style={styles.heroLineLabel}>Smarter ingredient swaps</Text>
               <Text style={styles.heroLineValue}>{fmt(roundedSwap)}</Text>
             </View>
           )}
           {roundedPantry > 0 && (
             <View style={styles.heroLineItem}>
-              <Text style={styles.heroLineLabel}>Pantry-friendly meal selection</Text>
+              <Text style={styles.heroLineLabel}>Using what you already had</Text>
               <Text style={styles.heroLineValue}>{fmt(roundedPantry)}</Text>
             </View>
           )}
           <Text style={styles.heroDisclaimer}>
-            Compared with a less-planned week — estimated, not exact.
+            Nothing dramatic. Just less waste. Estimated, not exact.
           </Text>
         </>
       )}
@@ -162,7 +162,7 @@ function WeeklySnapshotSection({
         style={styles.collapseHeader}
         activeOpacity={0.7}
       >
-        <Text style={styles.collapseTitle}>Weekly snapshot</Text>
+        <Text style={styles.collapseTitle}>The quick version</Text>
         <Feather name={open ? "chevron-up" : "chevron-down"} size={18} color={C.textMuted} />
       </TouchableOpacity>
 
@@ -197,6 +197,11 @@ function WeeklySnapshotSection({
               {isNeg ? `–${fmt(Math.abs(remaining))} over` : fmt(remaining)}
             </Text>
           </View>
+          {!isNeg && hasMealsSetup && (
+            <Text style={styles.mealsCreditNote}>
+              Meals planning is doing most of the work here.
+            </Text>
+          )}
         </View>
       )}
     </View>
@@ -245,7 +250,7 @@ function GroceriesSection({
 
   return (
     <View style={styles.groceriesSection}>
-      <Text style={styles.groceriesSectionTitle}>Your usual estimated dinner spend</Text>
+      <Text style={styles.groceriesSectionTitle}>Dinner does most of the damage</Text>
 
       <View style={styles.groceriesStatsRow}>
         <View style={styles.groceriesStat}>
@@ -291,7 +296,7 @@ function QuickWinsSection({ suggestions, fmt }: { suggestions: MoneySuggestion[]
         style={styles.quickWinsHeader}
         activeOpacity={0.7}
       >
-        <Text style={styles.quickWinsTitle}>💡 Tap for some quick wins this week</Text>
+        <Text style={styles.quickWinsTitle}>A few easy wins (if you want them)</Text>
         <Feather name={open ? "chevron-up" : "chevron-down"} size={17} color="#8A6200" />
       </TouchableOpacity>
 
@@ -383,9 +388,9 @@ function MoneyEmptyState({ onSetup, onBack }: { onSetup: () => void; onBack: () 
   return (
     <View style={styles.emptyState}>
       <Feather name="dollar-sign" size={40} color={C.border} />
-      <Text style={styles.emptyHeadline}>No money setup yet</Text>
+      <Text style={styles.emptyHeadline}>No numbers yet.</Text>
       <Text style={styles.emptySub}>
-        Add your weekly numbers to see how your week is tracking.
+        Give us rough numbers and we'll do the thinking for you.
       </Text>
       <TouchableOpacity
         onPress={onSetup}
@@ -560,22 +565,23 @@ export default function MoneyScreen() {
             />
           ) : (
             <TouchableOpacity onPress={goToGoalSetup} style={styles.addGoalNudge} activeOpacity={0.8}>
-              <Text style={styles.addGoalNudgeText}>+ Set a savings goal</Text>
-              <Text style={styles.addGoalNudgeSub}>We'll track your progress week by week.</Text>
+              <Text style={styles.addGoalNudgeTitle}>Saving for something?</Text>
+              <Text style={styles.addGoalNudgeSub}>We'll keep an eye on it quietly.</Text>
+              <Text style={styles.addGoalNudgeCta}>Set a goal (optional)</Text>
             </TouchableOpacity>
           )}
 
           {/* 6. Update CTA */}
           <View style={styles.updateCtaWrap}>
             <Text style={styles.updateCtaLabel}>
-              Groceries, income, or fixed costs — easy.
+              Numbers changed? Easy.
             </Text>
             <TouchableOpacity
               onPress={goToMoneySetup}
               activeOpacity={0.85}
               style={styles.updateCtaBtn}
             >
-              <Text style={styles.updateCtaBtnText}>Update my numbers</Text>
+              <Text style={styles.updateCtaBtnText}>Tweak my numbers</Text>
             </TouchableOpacity>
           </View>
         </>
@@ -834,11 +840,19 @@ const styles = StyleSheet.create({
     borderStyle: "dashed", paddingVertical: 18, paddingHorizontal: 20,
     alignItems: "center", gap: 4,
   },
-  addGoalNudgeText: {
+  addGoalNudgeTitle: {
     fontSize: 14, fontFamily: "Inter_600SemiBold", color: PLUM,
   },
   addGoalNudgeSub: {
     fontSize: 12, fontFamily: "Inter_400Regular", color: C.textMuted,
+  },
+  addGoalNudgeCta: {
+    fontSize: 13, fontFamily: "Inter_500Medium", color: TEAL,
+    textDecorationLine: "underline", marginTop: 4,
+  },
+  mealsCreditNote: {
+    fontSize: 12, fontFamily: "Inter_400Regular", fontStyle: "italic",
+    color: C.textMuted, marginTop: 6, lineHeight: 17,
   },
 
   // 6. Update CTA

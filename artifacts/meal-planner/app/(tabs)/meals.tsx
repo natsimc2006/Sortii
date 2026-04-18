@@ -596,6 +596,11 @@ export default function MealsScreen() {
         <Text style={[styles.statusLine, { color: C.textMuted }]}>
           {getMealStatusLine()}
         </Text>
+        {weeklySwapSaving >= 4 && (
+          <Text style={[styles.moneyFeedbackLine, { color: TEAL }]}>
+            ~{currencySymbol}{weeklySwapSaving} in smarter swaps this week.
+          </Text>
+        )}
 
         {/* Tools row — prominent, horizontally scrollable */}
         <ScrollView
@@ -1255,6 +1260,12 @@ const styles = StyleSheet.create({
     fontFamily: "Inter_400Regular",
     fontStyle: "italic",
     lineHeight: 18,
+    marginBottom: 2,
+  },
+  moneyFeedbackLine: {
+    fontSize: 12,
+    fontFamily: "Inter_500Medium",
+    lineHeight: 17,
     marginBottom: 2,
   },
 
