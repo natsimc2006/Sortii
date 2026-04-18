@@ -22,7 +22,6 @@ import {
   FamilyInsight,
   FamilyWeekResult,
   WeekSummaryData,
-  buildPlanSplit,
   computeFamilyWeek,
   formatTime,
   parseTime,
@@ -220,6 +219,128 @@ function InsightsSection({ insights }: { insights: FamilyInsight[] }) {
           <Text style={styles.insightText}>{ins.message}</Text>
         </View>
       ))}
+    </View>
+  );
+}
+
+// ── Light insight (always-on "worth knowing" for quiet weeks) ─────────────────
+function getLightInsight(result: FamilyWeekResult): string | null {
+  if (result.weekSummary.totalEvents === 0) return null;
+  if (result.insights.length > 0) return null; // real insights take precedence
+  const { totalEvents, weekendCount, busynessLevel } = result.weekSummary;
+  if (totalEvents === 1) return "One event only. Nothing to worry about.";
+  if (weekendCount >= 2 && busynessLevel === "quiet") return "Weekend looks busy. Nothing clashing though.";
+  if (weekendCount === 1 && busynessLevel === "quiet") return "One thing this weekend. Should sort itself.";
+  if (busynessLevel === "quiet") return "Two things on. Nothing that doesn't fit.";
+  if (busynessLevel === "steady" && weekendCount === 0) return "Everything fits neatly this week.";
+  if (busynessLevel === "steady") return "A steady week with nothing clashing.";
+  if (busynessLevel === "busy") return "A full week — but it's all in one place now.";
+  return "Everything currently fits.";
+}
+
+// ── SavedBanner ────────────────────────────────────────────────────────────────
+type BannerType = "first" | "subsequent" | "edited";
+
+function SavedBanner({
+  type,
+  eventTitle,
+  onReview,
+  onAddAnother,
+  onDismiss,
+}: {
+  type: BannerType;
+  eventTitle: string;
+  onReview: () => void;
+  onAddAnother: () => void;
+  onDismiss: () => void;
+}) {
+  const opacity = useRef(new Animated.Value(0)).current;
+  const translateY = useRef(new Animated.Value(-8)).current;
+
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(opacity,     { toValue: 1, duration: 250, useNativeDriver: true }),
+      Animated.spring(translateY,  { toValue: 0, tension: 90, friction: 14, useNativeDriver: true }),
+    ]).start();
+  }, []);
+
+  const headline =
+    type === "first"      ? "Saved. One thing down."
+    : type === "edited"   ? "Updated."
+    : "Saved. Plan updated.";
+
+  const reviewLabel =
+    type === "first" ? "Review week" : "Review full plan";
+
+  const subline =
+    type === "first"
+      ? "Want us to map the week?"
+      : type === "edited"
+      ? "The plan reflects your change."
+      : "We've sorted the week around it.";
+
+  return (
+    <Animated.View style={[styles.savedBanner, { opacity, transform: [{ translateY }] }]}>
+      <View style={styles.savedBannerLeft}>
+        <View style={styles.savedBannerDot} />
+        <View style={{ flex: 1 }}>
+          <Text style={styles.savedBannerHeadline}>{headline}</Text>
+          <Text style={styles.savedBannerSub}>{subline}</Text>
+        </View>
+      </View>
+      <View style={styles.savedBannerActions}>
+        {type !== "edited" && (
+          <TouchableOpacity style={styles.bannerReviewBtn} onPress={onReview} activeOpacity={0.85}>
+            <Text style={styles.bannerReviewBtnText}>{reviewLabel}</Text>
+          </TouchableOpacity>
+        )}
+        <TouchableOpacity style={styles.bannerAddBtn} onPress={onAddAnother} activeOpacity={0.85}>
+          <Feather name="plus" size={13} color={TEAL} />
+          <Text style={styles.bannerAddBtnText}>Add another</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={onDismiss} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+          <Feather name="x" size={14} color={TEXT_MUTED} />
+        </TouchableOpacity>
+      </View>
+    </Animated.View>
+  );
+}
+
+// ── ReviewPlanCta ──────────────────────────────────────────────────────────────
+function ReviewPlanCta({
+  hasInsights,
+  onShare,
+  onAddAnother,
+}: {
+  hasInsights: boolean;
+  onShare: () => void;
+  onAddAnother: () => void;
+}) {
+  return (
+    <View style={styles.reviewCtaCard}>
+      <View style={styles.reviewCtaIcon}>
+        <Feather name="check-circle" size={16} color={TEAL} />
+      </View>
+      <View style={{ flex: 1, gap: 2 }}>
+        <Text style={styles.reviewCtaTitle}>
+          {hasInsights ? "Plan has a few things to note." : "The week looks sorted."}
+        </Text>
+        <Text style={styles.reviewCtaSub}>
+          {hasInsights
+            ? "See the 'Worth knowing' cards above for details."
+            : "Nothing clashing. Share it when you're ready."}
+        </Text>
+      </View>
+      <View style={styles.reviewCtaActions}>
+        <TouchableOpacity style={styles.reviewCtaShareBtn} onPress={onShare} activeOpacity={0.85}>
+          <Feather name="send" size={13} color="#fff" />
+          <Text style={styles.reviewCtaShareBtnText}>Share plan</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.reviewCtaAddBtn} onPress={onAddAnother} activeOpacity={0.8}>
+          <Feather name="plus" size={13} color={TEAL} />
+          <Text style={styles.reviewCtaAddBtnText}>Add more</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
@@ -762,15 +883,20 @@ function ManagePeopleSection({
 
 // ── Main screen ────────────────────────────────────────────────────────────────
 export default function FamilyScreen() {
-  const insets       = useSafeAreaInsets();
-  const paddingTop   = insets.top + 8;
+  const insets        = useSafeAreaInsets();
+  const paddingTop    = insets.top + 8;
   const paddingBottom = insets.bottom + 88;
+  const scrollRef     = useRef<ScrollView>(null);
+  const bannerTimer   = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const [state, setState]   = useState<FamilyState>({ members: [], events: [] });
   const [result, setResult] = useState<FamilyWeekResult | null>(null);
   const [loading, setLoading] = useState(true);
+  const [savedBanner, setSavedBanner] = useState<{
+    type: BannerType; title: string;
+  } | null>(null);
 
-  const [showForm, setShowForm]     = useState(false);
+  const [showForm, setShowForm]       = useState(false);
   const [editingEvent, setEditingEvent] = useState<FamilyEvent | null>(null);
 
   const load = useCallback(async () => {
@@ -781,6 +907,7 @@ export default function FamilyScreen() {
   }, []);
 
   useEffect(() => { load(); }, [load]);
+  useEffect(() => () => { if (bannerTimer.current) clearTimeout(bannerTimer.current); }, []);
 
   async function persistState(next: FamilyState) {
     setState(next);
@@ -788,10 +915,25 @@ export default function FamilyScreen() {
     await saveFamilyState(next);
   }
 
-  function openAddEvent()          { setEditingEvent(null); setShowForm(true); }
-  function openEditEvent(ev: FamilyEvent) { setEditingEvent(ev); setShowForm(true); }
+  function openAddEvent()                   { setEditingEvent(null); setShowForm(true); }
+  function openEditEvent(ev: FamilyEvent)   { setEditingEvent(ev);   setShowForm(true); }
+
+  function showBanner(type: BannerType, title: string) {
+    setSavedBanner({ type, title });
+    if (bannerTimer.current) clearTimeout(bannerTimer.current);
+    bannerTimer.current = setTimeout(() => setSavedBanner(null), 6000);
+    // Scroll to top so the banner and summary are visible
+    setTimeout(() => scrollRef.current?.scrollTo({ y: 0, animated: true }), 80);
+  }
+
+  function dismissBanner() {
+    if (bannerTimer.current) clearTimeout(bannerTimer.current);
+    setSavedBanner(null);
+  }
 
   async function handleSaveEvent(draft: Omit<FamilyEvent, "id">) {
+    const wasEditing  = !!editingEvent;
+    const prevCount   = state.events.length;
     const next: FamilyState = editingEvent
       ? {
           ...state,
@@ -803,6 +945,9 @@ export default function FamilyScreen() {
     setShowForm(false);
     setEditingEvent(null);
     await persistState(next);
+    const bannerType: BannerType =
+      wasEditing ? "edited" : prevCount === 0 ? "first" : "subsequent";
+    showBanner(bannerType, draft.title);
   }
 
   async function handleDeleteEvent(id: string) {
@@ -843,16 +988,19 @@ export default function FamilyScreen() {
 
   if (loading) return <View style={{ flex: 1, backgroundColor: BG }} />;
 
-  const hasEvents  = state.events.length > 0;
-  const hasMembers = state.members.length > 0;
-  const insights   = result?.insights ?? [];
-  const weekSummary = result?.weekSummary;
-  const planSplit  = result?.planSplit ?? new Map();
+  const hasEvents      = state.events.length > 0;
+  const hasMembers     = state.members.length > 0;
+  const insights       = result?.insights ?? [];
+  const weekSummary    = result?.weekSummary;
+  const planSplit      = result?.planSplit ?? new Map();
   const daysWithEvents = result?.daysWithEvents ?? [];
+  const lightInsight   = result ? getLightInsight(result) : null;
+  const hasInsights    = insights.length > 0;
 
   return (
     <View style={{ flex: 1, backgroundColor: BG }}>
       <ScrollView
+        ref={scrollRef}
         style={{ flex: 1 }}
         contentContainerStyle={[styles.container, { paddingTop, paddingBottom }]}
         showsVerticalScrollIndicator={false}
@@ -863,44 +1011,71 @@ export default function FamilyScreen() {
           <View style={{ flex: 1 }}>
             <Text style={styles.pageTitle}>Family</Text>
             <Text style={styles.pageSub}>
-              {result?.dashboardLine ?? "The moving parts of your week, in one place."}
+              {hasEvents
+                ? (result?.dashboardLine ?? "The moving parts of your week.")
+                : hasMembers
+                ? "Once you add a couple of things, we'll map the week."
+                : "Your family's week, in one place."}
             </Text>
           </View>
-          {hasEvents && (
-            <TouchableOpacity
-              style={styles.sharePlanBtn}
-              onPress={handleSharePlan}
-              activeOpacity={0.8}
-            >
-              <Feather name="send" size={13} color={TEAL} />
-              <Text style={styles.sharePlanBtnText}>Share plan</Text>
-            </TouchableOpacity>
-          )}
         </View>
 
-        {/* ── Week summary stats ── */}
-        {weekSummary && <WeekSummaryCard summary={weekSummary} />}
+        {/* ── Post-save confirmation banner ── */}
+        {savedBanner && (
+          <SavedBanner
+            type={savedBanner.type}
+            eventTitle={savedBanner.title}
+            onReview={() => { dismissBanner(); scrollRef.current?.scrollTo({ y: 0, animated: true }); }}
+            onAddAnother={() => { dismissBanner(); openAddEvent(); }}
+            onDismiss={dismissBanner}
+          />
+        )}
 
-        {/* ── Worth knowing (insights) ── */}
-        {insights.length > 0 && <InsightsSection insights={insights} />}
-
-        {/* ── Events or empty states ── */}
+        {/* ══ PLANNER OUTPUTS — lead when events exist ══ */}
         {hasEvents ? (
-          <View style={styles.weekSection}>
-            <Text style={styles.sectionLabel}>THIS WEEK</Text>
-            {daysWithEvents.map((day) => (
-              <DaySection
-                key={day}
-                day={day}
-                events={result?.eventsByDay[day] ?? []}
-                members={state.members}
-                onEditEvent={openEditEvent}
-                onDeleteEvent={handleDeleteEvent}
-              />
-            ))}
-          </View>
+          <>
+            {/* 1. Week summary stats */}
+            {weekSummary && <WeekSummaryCard summary={weekSummary} />}
+
+            {/* 2. Worth knowing — always shows something */}
+            {hasInsights ? (
+              <InsightsSection insights={insights} />
+            ) : lightInsight ? (
+              <View style={styles.lightInsightCard}>
+                <Feather name="zap" size={13} color={TEAL} />
+                <Text style={styles.lightInsightText}>{lightInsight}</Text>
+              </View>
+            ) : null}
+
+            {/* 3. Who's covering what — up here, not buried */}
+            {planSplit.size > 0 && (
+              <PlanSplitSection planSplit={planSplit} members={state.members} />
+            )}
+
+            {/* 4. This week — day-by-day events */}
+            <View style={styles.weekSection}>
+              <Text style={styles.sectionLabel}>THIS WEEK</Text>
+              {daysWithEvents.map((day) => (
+                <DaySection
+                  key={day}
+                  day={day}
+                  events={result?.eventsByDay[day] ?? []}
+                  members={state.members}
+                  onEditEvent={openEditEvent}
+                  onDeleteEvent={handleDeleteEvent}
+                />
+              ))}
+            </View>
+
+            {/* 5. Review / share CTA */}
+            <ReviewPlanCta
+              hasInsights={hasInsights}
+              onShare={handleSharePlan}
+              onAddAnother={openAddEvent}
+            />
+          </>
         ) : hasMembers ? (
-          // Has people but nothing planned yet
+          /* ── Members exist, no events ── */
           <View style={styles.membersReadyState}>
             <View style={styles.membersReadyChips}>
               {state.members.map((m) => (
@@ -910,6 +1085,7 @@ export default function FamilyScreen() {
             <Text style={styles.membersReadyTitle}>Everyone's here.</Text>
             <Text style={styles.membersReadySub}>
               Add events as they come up — pickups, activities, anything that needs coordinating.
+              Once you do, we'll map the week for you.
             </Text>
             <TouchableOpacity
               style={styles.membersReadyCta}
@@ -921,22 +1097,17 @@ export default function FamilyScreen() {
             </TouchableOpacity>
           </View>
         ) : (
-          // Truly empty
+          /* ── Truly empty ── */
           <View style={styles.emptyState}>
             <Feather name="calendar" size={34} color="#D6D2C8" />
             <Text style={styles.emptyTitle}>Nothing on this week.</Text>
             <Text style={styles.emptySub}>
-              A rare and peaceful sight. Add people first, then events as they come up.
+              Add family members, then events as they come up. Sortii will sort the week.
             </Text>
           </View>
         )}
 
-        {/* ── Plan split — who covers what ── */}
-        {planSplit.size > 0 && (
-          <PlanSplitSection planSplit={planSplit} members={state.members} />
-        )}
-
-        {/* ── Family members ── */}
+        {/* ── Family members (always at bottom when events exist) ── */}
         <ManagePeopleSection
           members={state.members}
           onAdd={handleAddMember}
@@ -1160,6 +1331,60 @@ const styles = StyleSheet.create({
   addPersonConfirmText: { fontSize: 13, fontFamily: "Inter_600SemiBold", color: "#fff" },
   addPersonCta: { flexDirection: "row", alignItems: "center", gap: 7 },
   addPersonCtaText: { fontSize: 13, fontFamily: "Inter_600SemiBold", color: TEAL },
+
+  // Saved banner
+  savedBanner: {
+    backgroundColor: CARD_BG, borderRadius: 14, borderWidth: 1,
+    borderColor: TEAL + "40", borderLeftWidth: 3, borderLeftColor: TEAL,
+    padding: 14, gap: 10,
+    ...Platform.select({
+      web: { boxShadow: `0px 2px 12px ${TEAL}22` },
+      default: { shadowColor: TEAL, shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.14, shadowRadius: 8, elevation: 3 },
+    }),
+  },
+  savedBannerLeft: { flexDirection: "row", alignItems: "flex-start", gap: 10 },
+  savedBannerDot: { width: 9, height: 9, borderRadius: 5, backgroundColor: TEAL, marginTop: 4, flexShrink: 0 },
+  savedBannerHeadline: { fontSize: 14, fontFamily: "Inter_700Bold", color: TEXT },
+  savedBannerSub: { fontSize: 12, fontFamily: "Inter_400Regular", color: TEXT_MUTED, marginTop: 1 },
+  savedBannerActions: { flexDirection: "row", alignItems: "center", gap: 8, flexWrap: "wrap" },
+  bannerReviewBtn: {
+    backgroundColor: TEAL, borderRadius: 20, paddingHorizontal: 14, paddingVertical: 7,
+  },
+  bannerReviewBtnText: { fontSize: 12, fontFamily: "Inter_600SemiBold", color: "#fff" },
+  bannerAddBtn: {
+    flexDirection: "row", alignItems: "center", gap: 5,
+    backgroundColor: TEAL_TINT, borderRadius: 20, paddingHorizontal: 12, paddingVertical: 7,
+    borderWidth: 1, borderColor: TEAL + "30",
+  },
+  bannerAddBtnText: { fontSize: 12, fontFamily: "Inter_600SemiBold", color: TEAL },
+
+  // Light insight (quiet week)
+  lightInsightCard: {
+    flexDirection: "row", alignItems: "flex-start", gap: 9,
+    backgroundColor: TEAL_TINT, borderRadius: 12, borderWidth: 1, borderColor: TEAL + "30",
+    paddingHorizontal: 14, paddingVertical: 11,
+  },
+  lightInsightText: { flex: 1, fontSize: 13, fontFamily: "Inter_400Regular", color: TEXT, lineHeight: 18 },
+
+  // Review plan CTA
+  reviewCtaCard: {
+    backgroundColor: CARD_BG, borderRadius: 14, borderWidth: 1, borderColor: BORDER, padding: 14, gap: 10,
+  },
+  reviewCtaIcon: { marginBottom: 2 },
+  reviewCtaTitle: { fontSize: 14, fontFamily: "Inter_600SemiBold", color: TEXT },
+  reviewCtaSub: { fontSize: 13, fontFamily: "Inter_400Regular", color: TEXT_MUTED, lineHeight: 18 },
+  reviewCtaActions: { flexDirection: "row", gap: 10, flexWrap: "wrap" },
+  reviewCtaShareBtn: {
+    flexDirection: "row", alignItems: "center", gap: 6,
+    backgroundColor: TEAL, borderRadius: 20, paddingHorizontal: 16, paddingVertical: 9,
+  },
+  reviewCtaShareBtnText: { fontSize: 13, fontFamily: "Inter_600SemiBold", color: "#fff" },
+  reviewCtaAddBtn: {
+    flexDirection: "row", alignItems: "center", gap: 5,
+    backgroundColor: TEAL_TINT, borderRadius: 20, paddingHorizontal: 14, paddingVertical: 9,
+    borderWidth: 1, borderColor: TEAL + "30",
+  },
+  reviewCtaAddBtnText: { fontSize: 13, fontFamily: "Inter_600SemiBold", color: TEAL },
 
   // Repeat note
   repeatNote: { flexDirection: "row", alignItems: "center", gap: 7, paddingVertical: 4 },

@@ -1,0 +1,213 @@
+MAKE THE FAMILY ENGINE FEEL VISIBLE IN THE UI
+
+The Family module may now have more engine outputs wired up, but on the surface it still does not feel like the planner/logic is actively helping the user.
+
+The issue now is not just engine availability. It is that the Family UI and CTA flow are not making the planner outputs visible enough.
+
+Goal
+
+Make the Family module feel like Sortii is actually interpreting and sorting the week, not just storing people and events.
+
+⸻
+
+1. Add a clear “review the week” bridge into planner mode
+
+Right now, after a user adds members or events, the app does not clearly move them into the planning outputs.
+
+Please add a clear CTA progression:
+
+If members exist but no events
+
+Show:
+
+* member chips
+* supportive line:
+    “Once you add a couple of things, we’ll map the week.”
+* primary CTA:
+    Add first event
+
+After first event is added
+
+Show confirmation state with:
+
+* “Saved. One thing down.”
+* primary CTA:
+    Review week
+* secondary CTA:
+    Add another event
+
+After 2+ events or meaningful planner data exists
+
+Show:
+
+* primary CTA:
+    Review full plan
+* secondary CTA:
+    Add another event
+
+Do not just return the user to a quiet Family page with no obvious next step.
+
+⸻
+
+2. Surface planner outputs directly on the Family home screen
+
+As soon as there is enough data, show a compact Family planning summary on the main Family screen.
+
+Include:
+
+* total events this week
+* weekend count if relevant
+* driver count if relevant
+* busyness level
+* one short summary line such as:
+    * “Saturday solves itself cleanly.”
+    * “Two things on. No real drama.”
+    * “Friday is doing a bit much.”
+    * “One child in two places. Needs a rethink.”
+
+Use the existing engine outputs already computed where possible.
+
+This should appear before the deeper family member management card.
+
+⸻
+
+3. Surface “Worth knowing” earlier and more reliably
+
+If the engine has generated any meaningful insight, show one visible “Worth knowing” card on the Family home screen.
+
+This should not require the user to dig for it.
+
+Even for simple weeks, allow lighter insights such as:
+
+* “One event only. Nothing too exciting.”
+* “Everything currently fits.”
+* “Saturday looks manageable.”
+
+When stronger engine outputs exist, show those instead.
+
+⸻
+
+4. Add a visible “Who’s covering what” preview on Family home
+
+If planSplit exists, show a compact preview on the Family home page, not only deeper in the planner.
+
+Examples:
+
+* “Mum: Saturday”
+* “Dad: Sunday + pickup”
+* “No one assigned yet”
+
+Add CTA:
+See full plan
+
+This helps the engine feel active.
+
+⸻
+
+5. Improve post-save event flow
+
+After saving an event from the Add Event screen, do not drop the user back into Family without direction.
+
+Instead show a lightweight success state or banner:
+
+For first event:
+
+“Saved. Want us to sort the week?”
+
+Buttons:
+
+* Review week
+* Add another
+
+For later events:
+
+“Saved. We’ve updated the family plan.”
+
+Buttons:
+
+* Review full plan
+* Add another
+
+This should make it obvious that Sortii has planning logic underneath.
+
+⸻
+
+6. Differentiate Family states more clearly
+
+Please make the Family module feel clearly different in these cases:
+
+No members
+
+* calm empty state
+* CTA to add people
+
+Members but no events
+
+* family chips visible
+* “Everyone’s here.”
+* prompt to add first event
+* note that Sortii will map the week once events are added
+
+Events exist but simple week
+
+* compact week summary
+* worth knowing card
+* review week CTA
+
+Events exist and planner insights exist
+
+* week summary
+* worth knowing
+* who’s covering what
+* review full plan
+* share plan
+
+This state progression should feel intentional and alive.
+
+⸻
+
+7. Make engine outputs the hero, not the forms
+
+The Family members card and event entry should support the planner, but should not dominate the screen once real data exists.
+
+Once events exist, prioritise:
+
+1. week summary
+2. worth knowing
+3. who’s covering what
+4. review full plan
+5. share / edit actions
+6. family member management below
+
+⸻
+
+8. Tone
+
+Use Sortii tone:
+
+* calm
+* useful
+* lightly cheeky
+* observational
+
+The user should feel:
+
+* “the app has looked at the week and has something useful to say”
+    not
+* “I have entered data into a family form”
+
+⸻
+
+9. Desired end result
+
+When the user adds family members and events, the Family screen should quickly evolve into something that clearly feels powered by the planner logic.
+
+It should feel like:
+
+* “Sortii has interpreted this”
+* “I can see the week”
+* “I know what to do next”
+
+Not just:
+
+* “my event was saved”
