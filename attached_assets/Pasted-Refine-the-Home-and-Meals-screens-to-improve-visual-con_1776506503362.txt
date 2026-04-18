@@ -1,0 +1,92 @@
+Refine the Home and Meals screens to improve visual consistency, clarity, and trust.
+
+GOAL
+Make the app feel like one cohesive system, reduce confusion, and ensure UI matches actual behaviour.
+
+--------------------------------
+1. HOME SCREEN BACKGROUND
+--------------------------------
+
+Change the Home screen background to match the Meals screen.
+
+- Use a clean white base
+- Keep cards slightly off-white (#FFFDF9)
+- Maintain subtle borders and soft shadows
+
+Do not use the warm beige background anymore.
+
+--------------------------------
+2. BOTTOM NAV + ADD BUTTON FIX
+--------------------------------
+
+Fix the floating Add button so it is not cut off.
+
+- Respect iOS safe area insets
+- Ensure the button sits fully above the bottom edge
+- Add proper padding using safe area utilities
+
+The button should feel intentionally placed, not clipped.
+
+--------------------------------
+3. RENAME “BUDGET” (MEALS SCREEN)
+--------------------------------
+
+Update the top action row label:
+
+- Change “Budget” → “Costs”
+
+Reason:
+Avoid confusion with meal filtering. This reflects financial impact, not filtering.
+
+--------------------------------
+4. STRENGTHEN PREFERENCES BUTTON
+--------------------------------
+
+Improve the visibility and importance of the Preferences control.
+
+- Increase visual weight slightly
+- Use a subtle tinted background (soft sage)
+- Slightly increase icon size or stroke weight
+- Ensure it stands out from standard grey chips
+
+It should feel like an important control, not secondary.
+
+--------------------------------
+5. FIX “APPLY ALL SWAPS” LANGUAGE
+--------------------------------
+
+Current wording is misleading because swaps are not fully applied to the shopping list.
+
+Change wording to something more accurate:
+
+Replace:
+“Apply all swaps → save up to $60 this week”
+
+With:
+“Smart swaps available → save up to $60”
+OR
+“Review swaps → save up to $60”
+
+Do NOT imply automatic application.
+
+--------------------------------
+6. REMOVE “GREAT WEEK” BOX
+--------------------------------
+
+Remove the “Great week! Same again next week?” card.
+
+Reason:
+- Not critical to user flow
+- Adds noise
+- Better introduced later once user habits form
+
+--------------------------------
+FINAL GOAL
+
+The experience should feel:
+- clean
+- calm
+- trustworthy
+- consistent across screens
+
+Do not redesign layout structure — only refine visuals, wording, and behaviour alignment.

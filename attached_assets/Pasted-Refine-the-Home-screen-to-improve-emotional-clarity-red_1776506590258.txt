@@ -1,0 +1,109 @@
+Refine the Home screen to improve emotional clarity, reduce overwhelm, and guide the user toward simple next actions.
+
+GOAL
+Make the Home screen feel like:
+- a calm check-in
+- not a dashboard
+- not overwhelming
+- one clear next step
+
+--------------------------------
+1. HEADER COPY REFINEMENT
+--------------------------------
+
+Keep the greeting and reassurance tone, but tighten the wording.
+
+Replace:
+“You’re in reasonable shape. Nothing’s on fire.”
+
+With a more natural, slightly smoother version such as:
+- “You’re in good shape. Nothing’s on fire.”
+OR
+- “Nothing’s on fire. You’re doing alright.”
+
+Keep tone calm, grounded, slightly human.
+
+--------------------------------
+2. DINNER CARD (ANCHOR)
+--------------------------------
+
+Keep the “Tonight’s dinner” card as the primary focus.
+
+Minor tweak:
+- Reduce emphasis on “Sorted ✓”
+- Let the meal name be the visual hero
+
+This card should remain the main anchor of the screen.
+
+--------------------------------
+3. REWORK FAMILY + MONEY SECTION
+--------------------------------
+
+Currently:
+Family and Money appear as equal navigation cards.
+
+Instead:
+Turn this into a “what needs your attention” layer.
+
+IMPLEMENT:
+
+IF there is nothing urgent:
+- Show a soft reassurance line above these cards:
+  “Everything’s ticking along. Nothing you need to jump into.”
+
+- Then show Family and Money cards below
+
+IF something needs setup (e.g. money not set up):
+- Highlight ONLY that card more prominently
+- Add a subtle nudge:
+  “Worth a quick look → your weekly spend”
+
+Do not present multiple competing calls to action.
+
+--------------------------------
+4. WEEK AT A GLANCE
+--------------------------------
+
+Reduce visual dominance of this section.
+
+- Slightly reduce contrast or weight
+- Keep functionality the same
+- Ensure it feels like supporting context, not the main focus
+
+--------------------------------
+5. UPCOMING MODULES (APPOINTMENTS / BILLS)
+--------------------------------
+
+Adjust tone so these feel helpful, not empty.
+
+Replace “Soon” labels with:
+- “On the way”
+OR
+- “Coming to Sortii”
+
+Optional supporting copy:
+- “We’ll help with this soon”
+
+--------------------------------
+6. OVERALL PRIORITY
+--------------------------------
+
+Ensure the Home screen reads in this order:
+
+1. Reassurance (you’re okay)
+2. Tonight (one thing handled)
+3. One gentle nudge (if needed)
+4. Supporting info (week view, future tools)
+
+Avoid presenting multiple competing actions at once.
+
+--------------------------------
+FINAL GOAL
+
+The user should feel:
+- calmer after opening the app
+- not overwhelmed
+- like they only need to do one small thing (if anything)
+
+Do not redesign layout structure.
+Only refine hierarchy, copy, and emphasis.

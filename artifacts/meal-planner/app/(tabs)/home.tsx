@@ -1,8 +1,9 @@
 import { Feather } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
+  Animated,
   Platform,
   Pressable,
   ScrollView,
@@ -17,7 +18,6 @@ import { usePlanner } from "@/context/PlannerContext";
 import { useUserWeek } from "@/context/UserWeekContext";
 import { useLocale } from "@/context/LocaleContext";
 import allRecipesRaw from "@/data/recipes_unified_au.json";
-import { buildHelpItems, HelpItem } from "@/utils/decisionEngine";
 import { computeNudge, recordAppOpen, Nudge } from "@/utils/nudgeEngine";
 
 const allRecipes = allRecipesRaw as { id: string; name: string }[];
@@ -26,8 +26,8 @@ const TEAL      = "#2A8F88";
 const TEAL_TINT = "#E6F3F0";
 const GOLD      = "#D29A22";
 const PLUM      = "#5E3A4C";
-const BG        = "#F7F3EB";
-const CARD_BG   = "#FFFFFF";
+const BG        = "#FFFFFF";
+const CARD_BG   = "#FFFDF9";
 const BORDER    = "#E6E1D7";
 const TEXT      = "#2B2B2B";
 const TEXT_MUTED= "#888888";
@@ -66,7 +66,7 @@ const SUMMARIES: Record<string, string[]> = {
     "A couple of moving parts. All quite manageable.",
   ],
   sorted: [
-    "You're in reasonable shape. Nothing's on fire.",
+    "You're in good shape. Nothing's on fire.",
     "A fairly sorted week. Not much to worry about.",
     "A solid week. Organised without being smug about it.",
   ],
@@ -102,75 +102,74 @@ function NudgeBanner({ nudge, onDismiss }: { nudge: Nudge; onDismiss: () => void
   );
 }
 
-// ── "Help me sort this" overlay ───────────────────────────────────
-// Intentionally simple: 1–2 status statements, always-on dismiss.
+// ── "Help me sort this" overlay — auto relief sequence ───────────────────────
+const RELIEF_LINES = [
+  { text: "Dinner's handled.", check: true },
+  { text: "Tomorrow's behaving.", check: true },
+  { text: "Nothing's falling apart.", check: false },
+];
+
 function HelpOverlay({
   visible,
-  items,
   onDismiss,
 }: {
   visible: boolean;
-  items: HelpItem[];
   onDismiss: () => void;
 }) {
-  const [tapped, setTapped] = useState<Set<string>>(new Set());
+  const op0 = useRef(new Animated.Value(0)).current;
+  const op1 = useRef(new Animated.Value(0)).current;
+  const op2 = useRef(new Animated.Value(0)).current;
+  const opDismiss = useRef(new Animated.Value(0)).current;
+  const opacities = [op0, op1, op2];
+
+  useEffect(() => {
+    if (!visible) {
+      op0.setValue(0); op1.setValue(0); op2.setValue(0); opDismiss.setValue(0);
+      return;
+    }
+    const fade = (val: Animated.Value, delay: number) =>
+      setTimeout(() => Animated.timing(val, { toValue: 1, duration: 380, useNativeDriver: true }).start(), delay);
+
+    const t0 = fade(op0, 450);
+    const t1 = fade(op1, 1600);
+    const t2 = fade(op2, 2750);
+    const t3 = fade(opDismiss, 3700);
+    return () => { clearTimeout(t0); clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); };
+  }, [visible]);
 
   if (!visible) return null;
-
-  function handleTap(id: string) {
-    setTapped((prev) => new Set([...prev, id]));
-  }
 
   return (
     <Pressable style={styles.helpBackdrop} onPress={onDismiss}>
       <Pressable style={styles.helpCard} onPress={(e) => e.stopPropagation()}>
-        <Text style={styles.helpTitle}>Alright. Let's keep this simple.</Text>
+        <Text style={styles.helpTitle}>Right. Let's keep this simple.</Text>
 
         <View style={styles.helpItems}>
-          {items.map((item) => {
-            const wasTapped = tapped.has(item.id);
-            const color = item.positive ? TEAL : GOLD;
-            const iconName = item.positive
-              ? (wasTapped ? "check-circle" : "check")
-              : (wasTapped ? "check" : "circle");
-
-            return (
-              <TouchableOpacity
-                key={item.id}
-                style={[
-                  styles.helpItem,
-                  { borderLeftColor: color + "50" },
-                  wasTapped && styles.helpItemTapped,
-                ]}
-                onPress={() => handleTap(item.id)}
-                activeOpacity={wasTapped ? 1 : 0.7}
-              >
-                <Feather
-                  name={iconName as any}
-                  size={15}
-                  color={wasTapped ? TEAL : color}
-                />
-                <Text
-                  style={[
-                    styles.helpItemText,
-                    wasTapped && styles.helpItemTextTapped,
-                  ]}
-                >
-                  {item.text}
-                </Text>
-              </TouchableOpacity>
-            );
-          })}
+          {RELIEF_LINES.map((line, i) => (
+            <Animated.View
+              key={i}
+              style={[styles.helpItem, { opacity: opacities[i] }]}
+            >
+              {line.check && (
+                <Feather name="check" size={15} color={TEAL} />
+              )}
+              {!line.check && (
+                <View style={{ width: 15 }} />
+              )}
+              <Text style={styles.helpItemText}>{line.text}</Text>
+            </Animated.View>
+          ))}
         </View>
 
-        {/* Always tappable — no gating */}
-        <TouchableOpacity
-          style={styles.helpDismiss}
-          onPress={onDismiss}
-          activeOpacity={0.8}
-        >
-          <Text style={styles.helpDismissText}>That'll do.</Text>
-        </TouchableOpacity>
+        <Animated.View style={{ opacity: opDismiss }}>
+          <TouchableOpacity
+            style={styles.helpDismiss}
+            onPress={onDismiss}
+            activeOpacity={0.8}
+          >
+            <Text style={styles.helpDismissText}>That'll do.</Text>
+          </TouchableOpacity>
+        </Animated.View>
       </Pressable>
     </Pressable>
   );
@@ -205,11 +204,6 @@ export default function HomeTab() {
 
   const greeting = useMemo(() => getGreeting(), []);
   const summary  = useMemo(() => getWeeklySummary(plannedCount), [plannedCount]);
-
-  const helpItems = useMemo(
-    () => buildHelpItems(currentPlan, allRecipes, kidsActivities),
-    [currentPlan, kidsActivities, helpVisible]
-  );
 
   useEffect(() => {
     (async () => {
@@ -408,12 +402,12 @@ export default function HomeTab() {
             <View style={[styles.placeholderCard, { borderColor: TEAL + "30" }]}>
               <Feather name="calendar" size={15} color={TEAL} />
               <Text style={[styles.placeholderLabel, { color: TEAL }]}>Appointments</Text>
-              <View style={styles.soonPill}><Text style={styles.soonText}>Soon</Text></View>
+              <View style={styles.soonPill}><Text style={styles.soonText}>On the way</Text></View>
             </View>
             <View style={[styles.placeholderCard, { borderColor: "#4A7B5E30" }]}>
               <Feather name="file-text" size={15} color="#4A7B5E" />
               <Text style={[styles.placeholderLabel, { color: "#4A7B5E" }]}>Bills</Text>
-              <View style={styles.soonPill}><Text style={styles.soonText}>Soon</Text></View>
+              <View style={styles.soonPill}><Text style={styles.soonText}>On the way</Text></View>
             </View>
           </View>
 
@@ -423,7 +417,6 @@ export default function HomeTab() {
         {/* Help me sort this — rendered above scroll */}
         <HelpOverlay
           visible={helpVisible}
-          items={helpItems}
           onDismiss={() => setHelpVisible(false)}
         />
       </View>
@@ -619,32 +612,20 @@ const styles = StyleSheet.create({
     lineHeight: 26,
   },
 
-  // Items: plain statement rows
-  helpItems: { gap: 10, marginBottom: 24 },
+  // Lines: auto-reveal statement rows
+  helpItems: { gap: 14, marginBottom: 28 },
   helpItem: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 12,
-    paddingVertical: 12,
-    paddingHorizontal: 14,
-    borderRadius: 12,
-    borderLeftWidth: 3,
-    backgroundColor: "#F7F3EB",
-  },
-  helpItemTapped: {
-    backgroundColor: TEAL_TINT,
-    borderLeftColor: TEAL + "50",
+    gap: 10,
+    paddingVertical: 8,
   },
   helpItemText: {
-    fontSize: 15,
+    fontSize: 16,
     fontFamily: "Inter_500Medium",
     color: TEXT,
     flex: 1,
-    lineHeight: 21,
-  },
-  helpItemTextTapped: {
-    color: TEAL,
-    opacity: 0.75,
+    lineHeight: 22,
   },
 
   // Always-on dismiss

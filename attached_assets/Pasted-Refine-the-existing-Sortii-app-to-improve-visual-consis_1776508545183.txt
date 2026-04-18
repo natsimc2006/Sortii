@@ -1,0 +1,355 @@
+Refine the existing Sortii app to improve visual consistency, usability, emotional clarity, and tone across Home and Meals, while preserving the current structure and design system.
+
+IMPORTANT
+This is a refinement pass, not a redesign.
+Do NOT rebuild the app or change the overall architecture.
+Preserve layout, components, and flows where they are working.
+Focus on improving clarity, hierarchy, and tone.
+
+--------------------------------
+1. HOME SCREEN BACKGROUND
+--------------------------------
+
+Change the Home screen background to match the Meals screen.
+
+- Use a clean white base
+- Keep cards slightly off-white (#FFFDF9)
+- Maintain subtle borders and soft shadows
+
+Remove the warm beige background.
+
+Goal:
+Home and Meals should feel like part of the same product.
+
+--------------------------------
+2. BOTTOM NAV + ADD BUTTON FIX
+--------------------------------
+
+Fix the Add (+) button in the bottom navigation.
+
+- Ensure it is not cut off at the bottom
+- Respect iOS safe area insets
+- Add proper bottom padding
+- Button should sit fully above the bottom edge
+
+It should feel intentionally placed, not clipped.
+
+--------------------------------
+3. MEALS SCREEN — TOP CONTROLS REFINEMENT
+--------------------------------
+
+Improve hierarchy and clarity at the top of the Meals screen.
+
+A. ACTION ROW (TOP ROW)
+
+Keep only:
+- Shopping
+- Costs (rename from “Budget”)
+- Recipes
+
+Remove “Preferences” from this row.
+
+This row should feel like:
+- main actions
+- navigation tools
+- slightly more prominent than other elements
+
+Keep icon + label.
+Do NOT convert to icon-only.
+
+--------------------------------
+B. SETTINGS ROW (SECOND ROW)
+
+Keep:
+- 4 people
+- Standard
+- $153–$179
+
+Remove the “Your plan” label.
+
+Add a Preferences icon button to this row.
+
+Preferences button should:
+- be compact
+- icon-led (sliders/settings icon)
+- slightly more prominent than grey chips
+- use subtle tint or outline (soft green/sage)
+- feel like a configuration control
+
+This row should feel:
+- lighter
+- secondary
+- clearly different from the action row
+
+--------------------------------
+C. STRUCTURE
+
+Final layout:
+
+Row 1:
+[ Shopping ] [ Costs ] [ Recipes ]
+
+Row 2:
+4 people · Standard · $153–$179 + Preferences icon
+
+--------------------------------
+4. MEALS SCREEN — COPY + TRUST FIXES
+--------------------------------
+
+A. Rename “Budget” → “Costs”
+
+Reason:
+Avoid confusion with filtering. This reflects financial impact, not filtering.
+
+--------------------------------
+B. Fix “Apply all swaps” wording
+
+Replace:
+“Apply all swaps → save up to $60 this week”
+
+With:
+- “Smart swaps available → save up to $60”
+OR
+- “Review swaps → save up to $60”
+
+Do NOT imply automatic application.
+
+--------------------------------
+C. Remove “Great week” box
+
+Remove:
+“Great week! Same again next week?”
+
+Reason:
+- not essential
+- adds noise
+- better introduced later
+
+--------------------------------
+D. Meals header tone
+
+Update:
+“7 dinners planned. Dinner’s cooperating this week.”
+
+To:
+“7 dinners sorted. Dinner’s behaving itself.”
+
+--------------------------------
+5. HOME SCREEN — HIERARCHY REFINEMENT
+--------------------------------
+
+Improve emotional clarity and reduce overwhelm.
+
+--------------------------------
+A. HEADER COPY
+
+Refine tone:
+
+Replace:
+“You’re in reasonable shape. Nothing’s on fire.”
+
+With:
+- “You’re in good shape. Nothing’s on fire.”
+OR
+- “Nothing’s on fire. You’re doing alright.”
+
+--------------------------------
+B. STRUCTURE PRIORITY
+
+Ensure Home reads in this order:
+
+1. Reassurance (top line)
+2. Tonight (anchor)
+3. One gentle nudge (if needed)
+4. Supporting info (week view, modules)
+
+--------------------------------
+C. FAMILY + MONEY SECTION
+
+If nothing urgent:
+Show a line above cards:
+
+“Everything’s ticking along. Nothing you need to jump into.”
+
+If something needs setup:
+Highlight only that card slightly and add:
+
+“Worth a quick look → your weekly spend”
+
+Avoid multiple competing calls to action.
+
+--------------------------------
+D. WEEK AT A GLANCE
+
+Reduce visual dominance:
+- slightly lower contrast
+- treat as supporting info
+
+--------------------------------
+E. UPCOMING MODULES
+
+Replace “Soon” with:
+- “On the way”
+OR
+- “Coming to Sortii”
+
+--------------------------------
+6. “HELP ME SORT THIS” — FINAL EXPERIENCE
+--------------------------------
+
+Transform into a short, automatic “relief moment”.
+
+--------------------------------
+A. OPENING
+
+Use:
+“Right. Let’s keep this simple.”
+
+--------------------------------
+B. AUTO SEQUENCE (NO USER INPUT)
+
+Show one line at a time with fade-in:
+
+1.
+“Dinner’s handled.” ✓
+
+2.
+“Tomorrow’s behaving.” ✓
+
+3.
+“Nothing’s falling apart.”
+
+--------------------------------
+C. REMOVE INTERACTIONS
+
+Do NOT:
+- require tapping each item
+- show checklists
+- show instructions
+
+--------------------------------
+D. ENDING
+
+Use:
+“That’ll do”
+
+OR auto-dismiss after short delay.
+
+--------------------------------
+E. TIMING
+
+- 1–1.5 seconds per line
+- total 4–5 seconds
+
+--------------------------------
+F. TONE RULE
+
+Do NOT use:
+- “you’ve got this”
+- “take a breath”
+- emotional affirmations
+
+Keep tone:
+dry, grounded, lightly reassuring
+
+--------------------------------
+7. GLOBAL MICROCOPY SYSTEM
+--------------------------------
+
+Apply consistent tone across the app.
+
+--------------------------------
+A. TONE RULES
+
+Use:
+- short sentences
+- understated reassurance
+- light observational humour
+
+Avoid:
+- motivational language
+- corporate tone
+- overly emotional phrasing
+
+--------------------------------
+B. EMPTY STATES
+
+Examples:
+
+Family:
+- “Nothing on here yet. Enjoy the quiet.”
+- “All clear. Rare, but we’ll take it.”
+
+Pickups:
+- “No one needs to be anywhere. Easy.”
+
+Weekend:
+- “Nothing locked in. Plenty of options.”
+
+Notes:
+- “Nothing written down. Living dangerously.”
+
+--------------------------------
+C. SUCCESS STATES
+
+- “That works.”
+- “All sorted. Leave it there.”
+- “Holding steady.”
+
+--------------------------------
+D. ERROR STATES
+
+Replace:
+“Something went wrong”
+
+With:
+- “That didn’t work. Try again.”
+- “Bit of a hiccup. Try again.”
+
+--------------------------------
+E. BUTTON TEXT
+
+Replace generic labels:
+
+Continue → “That’ll do”
+Save → “Keep it”
+Cancel → “Leave it”
+Confirm → “Do it”
+
+--------------------------------
+F. LOADING STATES
+
+Add subtle text:
+- “Sorting it…”
+- “Working it out…”
+- “Putting a week together…”
+
+--------------------------------
+8. FINAL PRODUCT GOAL
+--------------------------------
+
+The app should feel like:
+
+- calm
+- quietly capable
+- lightly witty
+- not demanding
+- not overwhelming
+
+The user should feel:
+
+“Okay. That’s manageable.”
+
+And:
+
+“Nothing urgent. I can leave it there.”
+
+--------------------------------
+IMPORTANT FINAL RULE
+
+If any change adds complexity, remove it.
+
+Sortii should always:
+- reduce decisions
+- reduce pressure
+- reduce mental load

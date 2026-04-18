@@ -118,7 +118,7 @@ type PendingMealAction = {
 // ── Quick-action chip definitions ────────────────────────────────────────────
 const QUICK_ACTIONS = [
   { icon: "shopping-cart", label: "Shopping", route: "/(tabs)/shopping" },
-  { icon: "dollar-sign",   label: "Budget",   route: "/(tabs)/money" },
+  { icon: "dollar-sign",   label: "Costs",    route: "/(tabs)/money" },
   { icon: "book-open",     label: "Recipes",  route: "/(tabs)/recipes" },
 ] as const;
 
@@ -704,7 +704,7 @@ export default function MealsScreen() {
         {weeklySwapSaving >= 2 && !swapBannerDismissed && (
           <View style={styles.swapBanner}>
             <Text style={[styles.swapBannerText, { flex: 1 }]}>
-              💡 Apply all swaps → save up to {currencySymbol}{weeklySwapSaving} this week
+              💡 Review swaps → save up to {currencySymbol}{weeklySwapSaving}
             </Text>
             <TouchableOpacity
               onPress={() => setSwapBannerDismissed(true)}
@@ -770,40 +770,6 @@ export default function MealsScreen() {
           </View>
         )}
 
-        {/* End-of-week prompt */}
-        {isEndOfWeek && isWeekFull && !endWeekDismissed && (
-          <View
-            style={[
-              styles.checkInBanner,
-              { backgroundColor: "#FEF5E8", borderColor: C.gold },
-            ]}
-          >
-            <View style={styles.checkInBannerBody}>
-              <Text style={[styles.checkInBannerTitle, { color: "#5A3A00" }]}>
-                Great week! Same again next week?
-              </Text>
-              <Text style={[styles.checkInBannerText, { color: "#7A6000" }]}>
-                You can save this plan and use it as your starting point next week.
-              </Text>
-            </View>
-            <View style={styles.checkInBannerActions}>
-              <TouchableOpacity
-                onPress={() => { handleSave(); setEndWeekDismissed(true); }}
-                style={[styles.checkInBannerBtn, { backgroundColor: C.gold }]}
-                activeOpacity={0.8}
-              >
-                <Text style={styles.checkInBannerBtnText}>Save plan</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => setEndWeekDismissed(true)}
-                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-                style={styles.checkInBannerClose}
-              >
-                <Feather name="x" size={14} color={C.textSecondary} />
-              </TouchableOpacity>
-            </View>
-          </View>
-        )}
 
         {/* Day-by-day meal cards */}
         {DAYS.map((day) => {

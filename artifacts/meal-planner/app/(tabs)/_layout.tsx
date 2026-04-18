@@ -160,8 +160,8 @@ function AddTabButton({
         {
           flex: 1,
           alignItems: "center",
-          justifyContent: "flex-end",
-          paddingBottom: 2,
+          justifyContent: "center",
+          paddingBottom: Platform.OS === "web" ? 8 : Platform.OS === "ios" ? 6 : 4,
         },
       ]}
       onPress={() => {
@@ -178,12 +178,16 @@ function AddTabButton({
           backgroundColor: GOLD,
           alignItems: "center",
           justifyContent: "center",
-          marginBottom: Platform.OS === "ios" ? 0 : 2,
-          shadowColor: GOLD,
-          shadowOffset: { width: 0, height: 3 },
-          shadowOpacity: 0.3,
-          shadowRadius: 8,
-          elevation: 5,
+          ...Platform.select({
+            web: { boxShadow: `0px 3px 10px ${GOLD}55` },
+            default: {
+              shadowColor: GOLD,
+              shadowOffset: { width: 0, height: 3 },
+              shadowOpacity: 0.32,
+              shadowRadius: 8,
+              elevation: 5,
+            },
+          }),
         }}
       >
         <Feather name="plus" size={20} color="#fff" />
@@ -193,7 +197,7 @@ function AddTabButton({
           fontSize: 10,
           color: GOLD,
           fontFamily: "Inter_500Medium",
-          marginTop: 1,
+          marginTop: 3,
         }}
       >
         Add
