@@ -255,10 +255,7 @@ export default function HomeTab() {
           <TouchableOpacity
             onPress={() => router.push("/(tabs)/meals")}
             activeOpacity={0.8}
-            style={[
-              styles.card,
-              tonightRecipe ? styles.cardTeal : styles.cardNeutral,
-            ]}
+            style={[styles.card, styles.cardNeutral, styles.cardRailTeal]}
           >
             <View style={styles.cardRow}>
               <View style={{ flex: 1 }}>
@@ -282,7 +279,7 @@ export default function HomeTab() {
           <TouchableOpacity
             onPress={() => router.push("/(tabs)/family")}
             activeOpacity={0.8}
-            style={[styles.card, styles.cardNeutral]}
+            style={[styles.card, styles.cardNeutral, styles.cardRailPlum]}
           >
             <View style={styles.cardRow}>
               <View style={{ flex: 1 }}>
@@ -315,7 +312,7 @@ export default function HomeTab() {
             <TouchableOpacity
               onPress={() => router.push("/(tabs)/money")}
               activeOpacity={0.8}
-              style={[styles.card, styles.cardNeutral]}
+              style={[styles.card, styles.cardNeutral, styles.cardRailGold]}
             >
               <View style={styles.cardRow}>
                 <View style={{ flex: 1 }}>
@@ -336,7 +333,7 @@ export default function HomeTab() {
             <TouchableOpacity
               onPress={() => router.push("/(tabs)/more")}
               activeOpacity={0.8}
-              style={[styles.card, styles.cardNeutral]}
+              style={[styles.card, styles.cardNeutral, styles.cardRailGold]}
             >
               <View style={styles.cardRow}>
                 <View style={{ flex: 1 }}>
@@ -500,15 +497,12 @@ const styles = StyleSheet.create({
     lineHeight: 17,
   },
 
-  // Cards — all equal visual weight by default
+  // Cards — consistent off-white surface with category left rail
   card: { borderRadius: 14, borderWidth: 1, padding: 15 },
-  cardTeal: {
-    backgroundColor: TEAL_TINT,
-    borderColor: TEAL + "50",
-    borderLeftWidth: 3,
-    borderLeftColor: TEAL,
-  },
   cardNeutral: { backgroundColor: CARD_BG, borderColor: BORDER },
+  cardRailTeal: { borderLeftWidth: 3.5, borderLeftColor: TEAL },
+  cardRailPlum: { borderLeftWidth: 3.5, borderLeftColor: PLUM },
+  cardRailGold: { borderLeftWidth: 3.5, borderLeftColor: GOLD },
   cardRow: { flexDirection: "row", alignItems: "center", gap: 10 },
   cardLabel: {
     fontSize: 10,

@@ -1,0 +1,153 @@
+Refine the current Sortii app by cleaning up visual consistency, strengthening key controls, and fixing logic issues in the Money flow.
+
+IMPORTANT
+This is a polish and consistency pass, not a redesign.
+Keep the current structure, navigation, and overall app direction.
+Preserve what is already working.
+
+GOAL
+Make the app feel more unified, cleaner, and more trustworthy.
+
+--------------------------------
+1. HOME SCREEN CARD STYLING
+--------------------------------
+
+Refine the three main Home cards:
+- Tonight’s dinner
+- Family
+- Money
+
+Do NOT make each card a completely different full background colour.
+
+Instead:
+- keep a consistent soft off-white card surface for all three
+- add a subtle coloured accent rail or left-edge border to indicate category
+
+Use category cues like:
+- Dinner = teal
+- Family = muted plum
+- Money = mustard
+
+Goal:
+Keep Home calm and cohesive while improving category recognition.
+
+--------------------------------
+2. ADD BUTTON / BOTTOM NAV FIX
+--------------------------------
+
+The orange Add button is still sitting too low and feels cut off at the bottom edge.
+
+Fix this so it properly floats above the navigation bar.
+
+Requirements:
+- respect iOS safe area inset
+- increase bottom spacing so the circle is fully visible
+- anchor it intentionally to the nav bar
+- make it feel like a floating action button, not clipped by the device edge
+
+Do not reduce its importance, just place it correctly.
+
+--------------------------------
+3. MEALS SCREEN — PREFERENCES BUTTON
+--------------------------------
+
+The Preferences / filter button in the Meals settings row is still too weak visually.
+
+Strengthen it so it reads as an important control.
+
+Requirements:
+- make it more visually prominent than the other grey chips
+- use a soft filled tint (sage / soft teal) rather than looking almost neutral
+- slightly increase icon weight or icon size
+- keep it compact and aligned with the settings row
+- it should feel important, not loud
+
+Goal:
+The user should immediately understand this is the main control for shaping the meal plan.
+
+--------------------------------
+4. MONEY PAGES — BACKGROUND CONSISTENCY
+--------------------------------
+
+Unify the Money pages so they match the rest of the app.
+
+Current issue:
+Some money pages use a different background tone and feel like a separate older sub-app.
+
+Fix:
+- use the same clean white base background as Home and Meals
+- keep cards slightly off-white
+- maintain consistent spacing, borders, and typography rhythm
+
+Apply this across:
+- Money landing page
+- Money setup screens
+- Savings goal screens
+- Any intermediate Money steps
+
+Goal:
+Money should feel like part of Sortii, not a different product.
+
+--------------------------------
+5. MONEY FLOW LOGIC — SAVINGS GOAL
+--------------------------------
+
+Fix the savings goal flow so it behaves logically.
+
+Current issue:
+If the user does NOT choose a savings goal, the app still takes them into the savings goal completion step.
+
+Required behaviour:
+- if the user skips savings goal, continue normally
+- do NOT force them through a goal setup page afterward
+- savings goal should remain optional
+- if skipped, the app should move on cleanly to the next step / outcome
+
+Goal:
+Make the flow feel respectful and not pushy.
+
+--------------------------------
+6. MONEY FLOW TONE
+--------------------------------
+
+Keep the Money area practical and lightly human, not judgey or overly “finance app”.
+
+Tone should feel:
+- useful
+- calm
+- non-dramatic
+- optional where appropriate
+
+Avoid:
+- pressure-heavy language
+- overly formal finance phrasing
+- forcing setup where it is optional
+
+--------------------------------
+7. PRESERVE CURRENT GOOD CHANGES
+--------------------------------
+
+Keep the following as they are already working well:
+- Home opening as default screen
+- current Home structure and copy direction
+- current Meals flow opening directly into weekly plan
+- “Costs” wording in Meals top action row
+- honest swaps wording like “Review swaps”
+- current Help me sort this direction and tone
+
+--------------------------------
+8. FINAL SUCCESS STATE
+--------------------------------
+
+After these changes, the app should feel:
+- visually unified across Home / Meals / Money
+- calmer and more intentional
+- easier to trust
+- less like stitched modules
+- more like one coherent Sortii product
+
+The key user reactions should be:
+- “This feels cleaner.”
+- “This all belongs together.”
+- “I’m not being forced into extra steps.”
+- “The important controls are obvious.”

@@ -24,7 +24,7 @@ const C = Colors.light;
 const TEAL = "#2A8F88";
 const PLUM = "#5E3A4C";
 const PLUM_TINT = "#F3E8EE";
-const BG = "#F7F3EB";
+const BG = "#FFFFFF";
 
 const EMOJI_OPTIONS = ["✈️", "🏠", "🎓", "🚗", "🐷"];
 

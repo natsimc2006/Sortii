@@ -147,8 +147,18 @@ export default function MoneySetupScreen() {
       selectedGoal,
     );
     setTimeout(() => {
-      const returnTo = isFreshFlow ? "fresh" : "money";
-      router.replace(`/goal-setup?returnTo=${returnTo}`);
+      if (selectedGoal === 'none') {
+        // User skipped savings goal — go straight to destination
+        if (isFreshFlow) {
+          autoGeneratePlan();
+          router.replace("/(tabs)/planner");
+        } else {
+          router.replace("/(tabs)/money");
+        }
+      } else {
+        const returnTo = isFreshFlow ? "fresh" : "money";
+        router.replace(`/goal-setup?returnTo=${returnTo}`);
+      }
     }, 400);
   };
 

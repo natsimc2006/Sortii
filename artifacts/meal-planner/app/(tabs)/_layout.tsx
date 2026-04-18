@@ -12,6 +12,7 @@ import {
   View,
   useColorScheme,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Colors from "@/constants/Colors";
 
 /**
@@ -153,6 +154,11 @@ function AddTabButton({
   style?: any;
   onPress: () => void;
 }) {
+  const insets = useSafeAreaInsets();
+  const bottomPad = Platform.OS === "ios"
+    ? Math.max(insets.bottom + 2, 12)
+    : Platform.OS === "web" ? 10 : 6;
+
   return (
     <TouchableOpacity
       style={[
@@ -160,8 +166,8 @@ function AddTabButton({
         {
           flex: 1,
           alignItems: "center",
-          justifyContent: "center",
-          paddingBottom: Platform.OS === "web" ? 8 : Platform.OS === "ios" ? 6 : 4,
+          justifyContent: "flex-end",
+          paddingBottom: bottomPad,
         },
       ]}
       onPress={() => {

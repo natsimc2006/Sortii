@@ -680,12 +680,12 @@ export default function MealsScreen() {
               onPress={() => setActiveChip("cost")}
             />
             <TouchableOpacity
-              style={[styles.prefIconBtn, { borderColor: C.cardBorder }]}
+              style={[styles.prefIconBtn, { backgroundColor: C.tealTint, borderColor: TEAL + "40" }]}
               onPress={() => handleQuickNav("/(tabs)/preferences")}
               activeOpacity={0.72}
               hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
             >
-              <Feather name="sliders" size={13} color={C.textSecondary} />
+              <Feather name="sliders" size={14} color={TEAL} />
             </TouchableOpacity>
           </View>
           {preferences.kidFriendly && (
