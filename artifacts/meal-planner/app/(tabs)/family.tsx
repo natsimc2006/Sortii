@@ -15,29 +15,39 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import {
   ALL_DAYS,
+  BusynessLevel,
   FamilyInsight,
   FamilyWeekResult,
+  WeekSummaryData,
+  buildPlanSplit,
   computeFamilyWeek,
   formatTime,
   parseTime,
 } from "@/utils/familyEngine";
-import { DayOfWeek, FamilyEvent, FamilyMember, FamilyState, MEMBER_COLORS, RepeatType } from "@/utils/familyTypes";
+import {
+  DayOfWeek,
+  FamilyEvent,
+  FamilyMember,
+  FamilyState,
+  MEMBER_COLORS,
+  RepeatType,
+} from "@/utils/familyTypes";
 import { loadFamilyState, saveFamilyState } from "@/utils/familyStore";
 
 // ── Brand tokens ───────────────────────────────────────────────────────────────
-const TEAL      = "#2A8F88";
-const TEAL_TINT = "#E6F3F0";
-const GOLD      = "#D29A22";
-const PLUM      = "#5E3A4C";
-const ORANGE    = "#E07B3A";
-const BG        = "#FFFFFF";
-const CARD_BG   = "#FFFDF9";
-const BORDER    = "#E6E1D7";
-const TEXT      = "#2B2B2B";
-const TEXT_MUTED= "#888888";
+const TEAL       = "#2A8F88";
+const TEAL_TINT  = "#E6F3F0";
+const GOLD       = "#D29A22";
+const PLUM       = "#5E3A4C";
+const ORANGE     = "#E07B3A";
+const BG         = "#FFFFFF";
+const CARD_BG    = "#FFFDF9";
+const BORDER     = "#E6E1D7";
+const TEXT       = "#2B2B2B";
+const TEXT_MUTED = "#888888";
 
 const DAY_ABBR: Record<DayOfWeek, string> = {
   Monday: "Mon", Tuesday: "Tue", Wednesday: "Wed", Thursday: "Thu",
@@ -46,6 +56,13 @@ const DAY_ABBR: Record<DayOfWeek, string> = {
 
 const REPEAT_LABELS: Record<RepeatType, string> = {
   none: "One-off", weekly: "Weekly", fortnightly: "Fortnightly", monthly: "Monthly",
+};
+
+const BUSYNESS_CONFIG: Record<BusynessLevel, { label: string; color: string }> = {
+  clear:  { label: "Clear week",  color: TEXT_MUTED },
+  quiet:  { label: "Quiet week",  color: TEAL },
+  steady: { label: "Steady week", color: GOLD },
+  busy:   { label: "Busy week",   color: ORANGE },
 };
 
 // ── Blank event draft ──────────────────────────────────────────────────────────
@@ -82,16 +99,147 @@ function MemberChip({
   );
 }
 
+// ── WeekSummaryCard ────────────────────────────────────────────────────────────
+function WeekSummaryCard({ summary }: { summary: WeekSummaryData }) {
+  if (summary.totalEvents === 0) return null;
+  const { label: busynessLabel, color: busynessColor } = BUSYNESS_CONFIG[summary.busynessLevel];
+
+  return (
+    <View style={styles.weekSummaryCard}>
+      <View style={styles.weekSummaryStats}>
+        <View style={styles.statItem}>
+          <Text style={styles.statNum}>{summary.totalEvents}</Text>
+          <Text style={styles.statLabel}>{summary.totalEvents === 1 ? "event" : "events"}</Text>
+        </View>
+        {summary.weekendCount > 0 && (
+          <View style={styles.statItem}>
+            <Text style={[styles.statNum, { color: GOLD }]}>{summary.weekendCount}</Text>
+            <Text style={styles.statLabel}>this weekend</Text>
+          </View>
+        )}
+        {summary.driverCount > 0 && (
+          <View style={styles.statItem}>
+            <Text style={[styles.statNum, { color: TEAL }]}>{summary.driverCount}</Text>
+            <Text style={styles.statLabel}>{summary.driverCount === 1 ? "driver" : "drivers"}</Text>
+          </View>
+        )}
+        <View style={[styles.busynessPill, { backgroundColor: busynessColor + "18", borderColor: busynessColor + "44" }]}>
+          <View style={[styles.busynessDot, { backgroundColor: busynessColor }]} />
+          <Text style={[styles.busynessText, { color: busynessColor }]}>{busynessLabel}</Text>
+        </View>
+      </View>
+      {summary.unassignedCount > 0 && (
+        <View style={styles.unassignedNote}>
+          <Feather name="alert-circle" size={12} color={TEXT_MUTED} />
+          <Text style={styles.unassignedNoteText}>
+            {summary.unassignedCount} {summary.unassignedCount === 1 ? "event" : "events"} with no driver assigned yet.
+          </Text>
+        </View>
+      )}
+    </View>
+  );
+}
+
+// ── PlanSplitSection ───────────────────────────────────────────────────────────
+function PlanSplitSection({
+  planSplit,
+  members,
+}: {
+  planSplit: Map<string, DayOfWeek[]>;
+  members: FamilyMember[];
+}) {
+  if (planSplit.size === 0) return null;
+
+  return (
+    <View style={styles.planSplitCard}>
+      <View style={styles.planSplitHeader}>
+        <Feather name="navigation" size={13} color={TEAL} />
+        <Text style={styles.planSplitTitle}>Who's covering what</Text>
+      </View>
+      {Array.from(planSplit.entries()).map(([driverId, days]) => {
+        const driver = members.find((m) => m.id === driverId);
+        if (!driver) return null;
+        return (
+          <View key={driverId} style={styles.planSplitRow}>
+            <View style={[styles.planSplitDot, { backgroundColor: driver.color }]} />
+            <Text style={styles.planSplitName}>{driver.name}</Text>
+            <View style={styles.planSplitDays}>
+              {days.map((d) => (
+                <View
+                  key={d}
+                  style={[
+                    styles.planSplitDayChip,
+                    { borderColor: driver.color + "44", backgroundColor: driver.color + "14" },
+                  ]}
+                >
+                  <Text style={[styles.planSplitDayText, { color: driver.color }]}>
+                    {DAY_ABBR[d]}
+                  </Text>
+                </View>
+              ))}
+            </View>
+          </View>
+        );
+      })}
+    </View>
+  );
+}
+
+// ── InsightsSection ────────────────────────────────────────────────────────────
+function InsightsSection({ insights }: { insights: FamilyInsight[] }) {
+  if (insights.length === 0) return null;
+
+  const iconMap: Record<string, string> = {
+    conflict:    "alert-triangle",
+    child_clash: "alert-circle",
+    tight:       "clock",
+    busy:        "layers",
+    solo:        "user",
+  };
+  const colorMap: Record<string, string> = {
+    conflict:    "#C0392B",
+    child_clash: "#C0392B",
+    tight:       ORANGE,
+    busy:        GOLD,
+    solo:        PLUM,
+  };
+
+  return (
+    <View style={styles.insightsCard}>
+      <View style={styles.insightsHeader}>
+        <Feather name="zap" size={13} color={ORANGE} />
+        <Text style={styles.insightsTitle}>Worth knowing</Text>
+      </View>
+      {insights.map((ins, i) => (
+        <View key={i} style={styles.insightRow}>
+          <Feather
+            name={(iconMap[ins.type] ?? "info") as any}
+            size={13}
+            color={colorMap[ins.type] ?? TEXT_MUTED}
+          />
+          <Text style={styles.insightText}>{ins.message}</Text>
+        </View>
+      ))}
+    </View>
+  );
+}
+
 // ── EventCard ──────────────────────────────────────────────────────────────────
 function EventCard({
   event, members, onEdit, onDelete,
-}: { event: FamilyEvent; members: FamilyMember[]; onEdit: () => void; onDelete: () => void }) {
+}: {
+  event: FamilyEvent;
+  members: FamilyMember[];
+  onEdit: () => void;
+  onDelete: () => void;
+}) {
   const [expanded, setExpanded] = useState(false);
-  const driver = event.driverId ? members.find((m) => m.id === event.driverId) : null;
-  const involved = event.personIds.map((id) => members.find((m) => m.id === id)).filter(Boolean) as FamilyMember[];
-
+  const driver   = event.driverId ? members.find((m) => m.id === event.driverId) : null;
+  const involved = event.personIds
+    .map((id) => members.find((m) => m.id === id))
+    .filter(Boolean) as FamilyMember[];
   const timeLabel = formatTime(event.time);
-  const endLabel  = event.endTime ? ` – ${formatTime(event.endTime)}` : "";
+  const endLabel  = event.endTime ? `–${formatTime(event.endTime)}` : "";
 
   return (
     <TouchableOpacity
@@ -101,7 +249,8 @@ function EventCard({
     >
       <View style={styles.eventCardMain}>
         <View style={styles.eventTimePill}>
-          <Text style={styles.eventTimeText}>{timeLabel}{endLabel}</Text>
+          <Text style={styles.eventTimeText}>{timeLabel}</Text>
+          {endLabel ? <Text style={styles.eventTimeEnd}> {endLabel}</Text> : null}
         </View>
         <View style={styles.eventCardBody}>
           <Text style={styles.eventTitle}>{event.title}</Text>
@@ -170,13 +319,10 @@ function DaySection({
   onDeleteEvent: (id: string) => void;
 }) {
   const isWeekend = day === "Saturday" || day === "Sunday";
-
   return (
     <View style={styles.daySection}>
       <View style={[styles.dayHeader, isWeekend && styles.dayHeaderWeekend]}>
-        <Text style={[styles.dayLabel, isWeekend && { color: GOLD }]}>
-          {day}
-        </Text>
+        <Text style={[styles.dayLabel, isWeekend && { color: GOLD }]}>{day}</Text>
         <View style={[styles.eventCountBadge, isWeekend && { backgroundColor: GOLD + "18" }]}>
           <Text style={[styles.eventCountText, isWeekend && { color: GOLD }]}>
             {events.length}
@@ -198,43 +344,7 @@ function DaySection({
   );
 }
 
-// ── InsightsSection ────────────────────────────────────────────────────────────
-function InsightsSection({ insights }: { insights: FamilyInsight[] }) {
-  if (insights.length === 0) return null;
-  const iconMap: Record<string, string> = {
-    conflict: "alert-triangle",
-    tight: "clock",
-    busy: "layers",
-    solo: "user",
-  };
-  const colorMap: Record<string, string> = {
-    conflict: "#C0392B",
-    tight: ORANGE,
-    busy: GOLD,
-    solo: PLUM,
-  };
-
-  return (
-    <View style={styles.insightsCard}>
-      <View style={styles.insightsHeader}>
-        <Feather name="info" size={14} color={TEXT_MUTED} />
-        <Text style={styles.insightsTitle}>Worth knowing</Text>
-      </View>
-      {insights.map((ins, i) => (
-        <View key={i} style={styles.insightRow}>
-          <Feather
-            name={iconMap[ins.type] as any ?? "info"}
-            size={13}
-            color={colorMap[ins.type] ?? TEXT_MUTED}
-          />
-          <Text style={styles.insightText}>{ins.message}</Text>
-        </View>
-      ))}
-    </View>
-  );
-}
-
-// ── AddEventSheet (bottom sheet form) ─────────────────────────────────────────
+// ── AddEventSheet ──────────────────────────────────────────────────────────────
 function AddEventSheet({
   visible,
   members,
@@ -249,7 +359,7 @@ function AddEventSheet({
   onSave: (draft: Omit<FamilyEvent, "id">) => void;
 }) {
   const insets = useSafeAreaInsets();
-  const slideY = useRef(new Animated.Value(600)).current;
+  const slideY   = useRef(new Animated.Value(600)).current;
   const overlayOp = useRef(new Animated.Value(0)).current;
 
   const [draft, setDraft] = useState<Omit<FamilyEvent, "id">>(blankDraft);
@@ -287,9 +397,9 @@ function AddEventSheet({
   function handleSave() {
     const errs: string[] = [];
     if (!draft.title.trim()) errs.push("Add a title for this event.");
-    if (!draft.time.trim()) errs.push("Add a start time (e.g. 3:30pm).");
-    const parsedTime = parseTime(draft.time);
-    if (draft.time.trim() && !parsedTime) errs.push("Time format not recognised — try 3:30pm or 15:30.");
+    if (!draft.time.trim())  errs.push("Add a start time (e.g. 3:30pm).");
+    const parsedTime = draft.time.trim() ? parseTime(draft.time) : "";
+    if (draft.time.trim() && !parsedTime) errs.push("Time not recognised — try 3:30pm or 15:30.");
     if (errs.length) { setErrors(errs); return; }
 
     const parsedEnd = draft.endTime?.trim() ? parseTime(draft.endTime) : undefined;
@@ -352,7 +462,7 @@ function AddEventSheet({
                 style={styles.formInput}
                 value={draft.title}
                 onChangeText={(v) => setField("title", v)}
-                placeholder="Football practice, dentist, party…"
+                placeholder="Football practice, dentist, birthday party…"
                 placeholderTextColor="#bbb"
                 returnKeyType="next"
               />
@@ -390,7 +500,6 @@ function AddEventSheet({
                   placeholder="e.g. 3:30pm"
                   placeholderTextColor="#bbb"
                   autoCapitalize="none"
-                  returnKeyType="next"
                 />
               </View>
               <View style={[styles.formField, { flex: 1 }]}>
@@ -402,7 +511,6 @@ function AddEventSheet({
                   placeholder="e.g. 5pm"
                   placeholderTextColor="#bbb"
                   autoCapitalize="none"
-                  returnKeyType="next"
                 />
               </View>
             </View>
@@ -414,9 +522,8 @@ function AddEventSheet({
                 style={styles.formInput}
                 value={draft.location ?? ""}
                 onChangeText={(v) => setField("location", v)}
-                placeholder="e.g. Memorial Park, Highbury"
+                placeholder="e.g. Memorial Park, Highbury Fields"
                 placeholderTextColor="#bbb"
-                returnKeyType="next"
               />
             </View>
 
@@ -437,17 +544,17 @@ function AddEventSheet({
               </View>
             )}
 
-            {/* Driver */}
+            {/* Driver (adults only) */}
             {adults.length > 0 && (
               <View style={styles.formField}>
                 <Text style={styles.formLabel}>Who's driving?</Text>
                 <View style={styles.chipGroup}>
                   <TouchableOpacity
-                    style={[styles.driverChip, !draft.driverId && styles.driverChipSelected]}
+                    style={[styles.driverChip, !draft.driverId && styles.driverChipNone]}
                     onPress={() => setField("driverId", undefined)}
                     activeOpacity={0.75}
                   >
-                    <Text style={[styles.driverChipText, !draft.driverId && styles.driverChipTextSelected]}>
+                    <Text style={[styles.driverChipText, !draft.driverId && styles.driverChipTextNone]}>
                       No driver
                     </Text>
                   </TouchableOpacity>
@@ -456,13 +563,27 @@ function AddEventSheet({
                       key={m.id}
                       style={[
                         styles.driverChip,
-                        draft.driverId === m.id && { backgroundColor: m.color, borderColor: m.color },
+                        draft.driverId === m.id && {
+                          backgroundColor: m.color,
+                          borderColor: m.color,
+                        },
                       ]}
-                      onPress={() => setField("driverId", draft.driverId === m.id ? undefined : m.id)}
+                      onPress={() =>
+                        setField("driverId", draft.driverId === m.id ? undefined : m.id)
+                      }
                       activeOpacity={0.75}
                     >
-                      <Feather name="navigation" size={12} color={draft.driverId === m.id ? "#fff" : m.color} />
-                      <Text style={[styles.driverChipText, draft.driverId === m.id && { color: "#fff" }]}>
+                      <Feather
+                        name="navigation"
+                        size={12}
+                        color={draft.driverId === m.id ? "#fff" : m.color}
+                      />
+                      <Text
+                        style={[
+                          styles.driverChipText,
+                          draft.driverId === m.id && { color: "#fff" },
+                        ]}
+                      >
                         {m.name}
                       </Text>
                     </TouchableOpacity>
@@ -471,7 +592,7 @@ function AddEventSheet({
               </View>
             )}
 
-            {/* Carpool contact — only when a driver is set */}
+            {/* Carpool contact — only when driver set */}
             {draft.driverId && (
               <View style={styles.formField}>
                 <Text style={styles.formLabel}>Carpool contact (optional)</Text>
@@ -481,7 +602,6 @@ function AddEventSheet({
                   onChangeText={(v) => setField("carpoolContact", v)}
                   placeholder="Name or phone number"
                   placeholderTextColor="#bbb"
-                  returnKeyType="next"
                 />
               </View>
             )}
@@ -497,7 +617,12 @@ function AddEventSheet({
                     onPress={() => setField("repeat", r)}
                     activeOpacity={0.75}
                   >
-                    <Text style={[styles.repeatChipText, draft.repeat === r && styles.repeatChipTextSelected]}>
+                    <Text
+                      style={[
+                        styles.repeatChipText,
+                        draft.repeat === r && styles.repeatChipTextSelected,
+                      ]}
+                    >
                       {REPEAT_LABELS[r]}
                     </Text>
                   </TouchableOpacity>
@@ -522,7 +647,6 @@ function AddEventSheet({
           </ScrollView>
         </KeyboardAvoidingView>
 
-        {/* Save */}
         <TouchableOpacity style={styles.saveBtn} onPress={handleSave} activeOpacity={0.85}>
           <Text style={styles.saveBtnText}>Save event</Text>
         </TouchableOpacity>
@@ -533,24 +657,20 @@ function AddEventSheet({
 
 // ── ManagePeopleSection ────────────────────────────────────────────────────────
 function ManagePeopleSection({
-  members,
-  onAdd,
-  onRemove,
+  members, onAdd, onRemove,
 }: {
   members: FamilyMember[];
   onAdd: (name: string, role: "adult" | "child") => void;
   onRemove: (id: string) => void;
 }) {
   const [adding, setAdding] = useState(false);
-  const [name, setName] = useState("");
-  const [role, setRole] = useState<"adult" | "child">("child");
+  const [name, setName]     = useState("");
+  const [role, setRole]     = useState<"adult" | "child">("child");
 
   function confirm() {
     if (!name.trim()) return;
     onAdd(name.trim(), role);
-    setName("");
-    setRole("child");
-    setAdding(false);
+    setName(""); setRole("child"); setAdding(false);
     Keyboard.dismiss();
   }
 
@@ -574,7 +694,7 @@ function ManagePeopleSection({
               <View style={[styles.peopleColorDot, { backgroundColor: m.color }]} />
               <Text style={styles.peopleName}>{m.name}</Text>
               <View style={[styles.roleTag, m.role === "adult" ? styles.roleTagAdult : styles.roleTagChild]}>
-                <Text style={[styles.roleTagText, m.role === "adult" ? { color: TEAL } : { color: GOLD }]}>
+                <Text style={[styles.roleTagText, { color: m.role === "adult" ? TEAL : GOLD }]}>
                   {m.role === "adult" ? "Adult" : "Child"}
                 </Text>
               </View>
@@ -642,15 +762,15 @@ function ManagePeopleSection({
 
 // ── Main screen ────────────────────────────────────────────────────────────────
 export default function FamilyScreen() {
-  const insets = useSafeAreaInsets();
-  const paddingTop = insets.top + 8;
-  const paddingBottom = insets.bottom + 80;
+  const insets       = useSafeAreaInsets();
+  const paddingTop   = insets.top + 8;
+  const paddingBottom = insets.bottom + 88;
 
-  const [state, setState] = useState<FamilyState>({ members: [], events: [] });
+  const [state, setState]   = useState<FamilyState>({ members: [], events: [] });
   const [result, setResult] = useState<FamilyWeekResult | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const [showForm, setShowForm] = useState(false);
+  const [showForm, setShowForm]     = useState(false);
   const [editingEvent, setEditingEvent] = useState<FamilyEvent | null>(null);
 
   const load = useCallback(async () => {
@@ -668,30 +788,18 @@ export default function FamilyScreen() {
     await saveFamilyState(next);
   }
 
-  // Event CRUD
-  function openAddEvent() {
-    setEditingEvent(null);
-    setShowForm(true);
-  }
-
-  function openEditEvent(ev: FamilyEvent) {
-    setEditingEvent(ev);
-    setShowForm(true);
-  }
+  function openAddEvent()          { setEditingEvent(null); setShowForm(true); }
+  function openEditEvent(ev: FamilyEvent) { setEditingEvent(ev); setShowForm(true); }
 
   async function handleSaveEvent(draft: Omit<FamilyEvent, "id">) {
-    let next: FamilyState;
-    if (editingEvent) {
-      next = {
-        ...state,
-        events: state.events.map((e) =>
-          e.id === editingEvent.id ? { ...draft, id: editingEvent.id } : e
-        ),
-      };
-    } else {
-      const newEvent: FamilyEvent = { ...draft, id: Date.now().toString() };
-      next = { ...state, events: [...state.events, newEvent] };
-    }
+    const next: FamilyState = editingEvent
+      ? {
+          ...state,
+          events: state.events.map((e) =>
+            e.id === editingEvent.id ? { ...draft, id: editingEvent.id } : e
+          ),
+        }
+      : { ...state, events: [...state.events, { ...draft, id: Date.now().toString() }] };
     setShowForm(false);
     setEditingEvent(null);
     await persistState(next);
@@ -704,14 +812,12 @@ export default function FamilyScreen() {
         text: "Remove",
         style: "destructive",
         onPress: async () => {
-          const next = { ...state, events: state.events.filter((e) => e.id !== id) };
-          await persistState(next);
+          await persistState({ ...state, events: state.events.filter((e) => e.id !== id) });
         },
       },
     ]);
   }
 
-  // People CRUD
   async function handleAddMember(name: string, role: "adult" | "child") {
     const usedColors = state.members.map((m) => m.color);
     const color = MEMBER_COLORS.find((c) => !usedColors.includes(c)) ?? MEMBER_COLORS[0]!;
@@ -720,32 +826,29 @@ export default function FamilyScreen() {
   }
 
   async function handleRemoveMember(id: string) {
-    const next: FamilyState = {
+    await persistState({
       members: state.members.filter((m) => m.id !== id),
       events: state.events.map((e) => ({
         ...e,
         personIds: e.personIds.filter((pid) => pid !== id),
         driverId: e.driverId === id ? undefined : e.driverId,
       })),
-    };
-    await persistState(next);
+    });
   }
 
-  // Share plan
   async function handleSharePlan() {
     if (!result) return;
-    try {
-      await Share.share({ message: result.sharePlanText });
-    } catch {
-      // share cancelled
-    }
+    try { await Share.share({ message: result.sharePlanText }); } catch {}
   }
 
-  if (loading) return <View style={styles.loadingView} />;
+  if (loading) return <View style={{ flex: 1, backgroundColor: BG }} />;
 
+  const hasEvents  = state.events.length > 0;
+  const hasMembers = state.members.length > 0;
+  const insights   = result?.insights ?? [];
+  const weekSummary = result?.weekSummary;
+  const planSplit  = result?.planSplit ?? new Map();
   const daysWithEvents = result?.daysWithEvents ?? [];
-  const hasEvents = state.events.length > 0;
-  const insights = result?.insights ?? [];
 
   return (
     <View style={{ flex: 1, backgroundColor: BG }}>
@@ -755,9 +858,9 @@ export default function FamilyScreen() {
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
-        {/* Header */}
+        {/* ── Header ── */}
         <View style={styles.header}>
-          <View>
+          <View style={{ flex: 1 }}>
             <Text style={styles.pageTitle}>Family</Text>
             <Text style={styles.pageSub}>
               {result?.dashboardLine ?? "The moving parts of your week, in one place."}
@@ -775,10 +878,13 @@ export default function FamilyScreen() {
           )}
         </View>
 
-        {/* Insights */}
+        {/* ── Week summary stats ── */}
+        {weekSummary && <WeekSummaryCard summary={weekSummary} />}
+
+        {/* ── Worth knowing (insights) ── */}
         {insights.length > 0 && <InsightsSection insights={insights} />}
 
-        {/* Events by day */}
+        {/* ── Events or empty states ── */}
         {hasEvents ? (
           <View style={styles.weekSection}>
             <Text style={styles.sectionLabel}>THIS WEEK</Text>
@@ -793,37 +899,64 @@ export default function FamilyScreen() {
               />
             ))}
           </View>
+        ) : hasMembers ? (
+          // Has people but nothing planned yet
+          <View style={styles.membersReadyState}>
+            <View style={styles.membersReadyChips}>
+              {state.members.map((m) => (
+                <MemberChip key={m.id} member={m} />
+              ))}
+            </View>
+            <Text style={styles.membersReadyTitle}>Everyone's here.</Text>
+            <Text style={styles.membersReadySub}>
+              Add events as they come up — pickups, activities, anything that needs coordinating.
+            </Text>
+            <TouchableOpacity
+              style={styles.membersReadyCta}
+              onPress={openAddEvent}
+              activeOpacity={0.85}
+            >
+              <Feather name="plus" size={14} color="#fff" />
+              <Text style={styles.membersReadyCtaText}>Add first event</Text>
+            </TouchableOpacity>
+          </View>
         ) : (
+          // Truly empty
           <View style={styles.emptyState}>
-            <Feather name="calendar" size={32} color="#D6D2C8" />
+            <Feather name="calendar" size={34} color="#D6D2C8" />
             <Text style={styles.emptyTitle}>Nothing on this week.</Text>
             <Text style={styles.emptySub}>
-              A rare and peaceful sight. Add things as they come up.
+              A rare and peaceful sight. Add people first, then events as they come up.
             </Text>
           </View>
         )}
 
-        {/* People section */}
+        {/* ── Plan split — who covers what ── */}
+        {planSplit.size > 0 && (
+          <PlanSplitSection planSplit={planSplit} members={state.members} />
+        )}
+
+        {/* ── Family members ── */}
         <ManagePeopleSection
           members={state.members}
           onAdd={handleAddMember}
           onRemove={handleRemoveMember}
         />
 
-        {/* Repeat note */}
+        {/* ── Recurring events note ── */}
         {state.events.some((e) => e.repeat !== "none") && (
           <View style={styles.repeatNote}>
             <Feather name="repeat" size={12} color={TEXT_MUTED} />
             <Text style={styles.repeatNoteText}>
-              Repeating events will carry forward automatically each week.
+              Repeating events carry forward automatically each week.
             </Text>
           </View>
         )}
       </ScrollView>
 
-      {/* Add event FAB */}
+      {/* ── Floating add button ── */}
       <TouchableOpacity
-        style={[styles.fab, { bottom: paddingBottom - 40 }]}
+        style={[styles.fab, { bottom: paddingBottom - 48 }]}
         onPress={openAddEvent}
         activeOpacity={0.88}
       >
@@ -831,7 +964,7 @@ export default function FamilyScreen() {
         <Text style={styles.fabText}>Add event</Text>
       </TouchableOpacity>
 
-      {/* Add/Edit event form sheet */}
+      {/* ── Add / Edit form sheet ── */}
       {showForm && (
         <AddEventSheet
           visible={showForm}
@@ -847,136 +980,111 @@ export default function FamilyScreen() {
 
 // ── Styles ─────────────────────────────────────────────────────────────────────
 const styles = StyleSheet.create({
-  loadingView: { flex: 1, backgroundColor: BG },
-  container: { paddingHorizontal: 20, gap: 16 },
+  container: { paddingHorizontal: 20, gap: 14 },
 
-  header: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    justifyContent: "space-between",
-    gap: 12,
-  },
-  pageTitle: {
-    fontSize: 28,
-    fontFamily: "Manrope_700Bold",
-    color: TEXT,
-    letterSpacing: -0.5,
-  },
+  // Header
+  header: { flexDirection: "row", alignItems: "flex-start", justifyContent: "space-between", gap: 12 },
+  pageTitle: { fontSize: 28, fontFamily: "Manrope_700Bold", color: TEXT, letterSpacing: -0.5 },
   pageSub: {
-    fontSize: 13,
-    fontFamily: "Inter_400Regular",
-    color: TEXT_MUTED,
-    fontStyle: "italic",
-    marginTop: 3,
-    lineHeight: 18,
-    maxWidth: 240,
+    fontSize: 13, fontFamily: "Inter_400Regular", color: TEXT_MUTED, fontStyle: "italic",
+    marginTop: 3, lineHeight: 18, maxWidth: 240,
   },
   sharePlanBtn: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 5,
-    backgroundColor: TEAL_TINT,
-    borderRadius: 20,
-    paddingHorizontal: 12,
-    paddingVertical: 7,
-    borderWidth: 1,
-    borderColor: TEAL + "30",
-    marginTop: 4,
-    flexShrink: 0,
+    flexDirection: "row", alignItems: "center", gap: 5,
+    backgroundColor: TEAL_TINT, borderRadius: 20, paddingHorizontal: 12, paddingVertical: 7,
+    borderWidth: 1, borderColor: TEAL + "30", marginTop: 4, flexShrink: 0,
   },
   sharePlanBtnText: { fontSize: 12, fontFamily: "Inter_600SemiBold", color: TEAL },
 
   sectionLabel: {
-    fontSize: 10,
-    fontFamily: "Inter_600SemiBold",
-    letterSpacing: 1.2,
-    textTransform: "uppercase",
-    color: TEXT_MUTED,
-    marginBottom: 8,
+    fontSize: 10, fontFamily: "Inter_600SemiBold", letterSpacing: 1.2,
+    textTransform: "uppercase", color: TEXT_MUTED, marginBottom: 6,
   },
 
-  // Insights
-  insightsCard: {
+  // Week summary card
+  weekSummaryCard: {
+    backgroundColor: TEAL_TINT,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: TEAL + "30",
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    gap: 10,
+  },
+  weekSummaryStats: { flexDirection: "row", alignItems: "center", flexWrap: "wrap", gap: 14 },
+  statItem: { alignItems: "center", gap: 1 },
+  statNum: { fontSize: 20, fontFamily: "Inter_700Bold", color: TEXT },
+  statLabel: { fontSize: 11, fontFamily: "Inter_400Regular", color: TEXT_MUTED },
+  busynessPill: {
+    flexDirection: "row", alignItems: "center", gap: 5,
+    borderRadius: 20, paddingHorizontal: 10, paddingVertical: 5, borderWidth: 1,
+  },
+  busynessDot: { width: 7, height: 7, borderRadius: 4 },
+  busynessText: { fontSize: 12, fontFamily: "Inter_600SemiBold" },
+  unassignedNote: { flexDirection: "row", alignItems: "center", gap: 6 },
+  unassignedNoteText: { fontSize: 12, fontFamily: "Inter_400Regular", color: TEXT_MUTED, flex: 1 },
+
+  // Plan split card
+  planSplitCard: {
     backgroundColor: CARD_BG,
     borderRadius: 14,
     borderWidth: 1,
     borderColor: BORDER,
     borderLeftWidth: 3,
-    borderLeftColor: ORANGE,
+    borderLeftColor: TEAL,
     padding: 14,
     gap: 10,
   },
+  planSplitHeader: { flexDirection: "row", alignItems: "center", gap: 7 },
+  planSplitTitle: { fontSize: 13, fontFamily: "Inter_600SemiBold", color: TEXT_MUTED },
+  planSplitRow: { flexDirection: "row", alignItems: "center", gap: 10 },
+  planSplitDot: { width: 10, height: 10, borderRadius: 5, flexShrink: 0 },
+  planSplitName: { fontSize: 13, fontFamily: "Inter_600SemiBold", color: TEXT, minWidth: 56 },
+  planSplitDays: { flexDirection: "row", flexWrap: "wrap", gap: 5, flex: 1 },
+  planSplitDayChip: {
+    borderRadius: 8, borderWidth: 1, paddingHorizontal: 8, paddingVertical: 3,
+  },
+  planSplitDayText: { fontSize: 11, fontFamily: "Inter_700Bold" },
+
+  // Insights
+  insightsCard: {
+    backgroundColor: CARD_BG, borderRadius: 14, borderWidth: 1, borderColor: BORDER,
+    borderLeftWidth: 3, borderLeftColor: ORANGE, padding: 14, gap: 10,
+  },
   insightsHeader: { flexDirection: "row", alignItems: "center", gap: 7 },
   insightsTitle: { fontSize: 13, fontFamily: "Inter_600SemiBold", color: TEXT_MUTED },
-  insightRow: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    gap: 8,
-  },
-  insightText: {
-    flex: 1,
-    fontSize: 13,
-    fontFamily: "Inter_400Regular",
-    color: TEXT,
-    lineHeight: 18,
-  },
+  insightRow: { flexDirection: "row", alignItems: "flex-start", gap: 8 },
+  insightText: { flex: 1, fontSize: 13, fontFamily: "Inter_400Regular", color: TEXT, lineHeight: 18 },
 
   // Week section
   weekSection: { gap: 0 },
-
-  // Day sections
   daySection: { marginBottom: 4 },
   dayHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-    paddingVertical: 8,
-    borderBottomWidth: 1,
-    borderBottomColor: BORDER,
-    marginBottom: 6,
+    flexDirection: "row", alignItems: "center", gap: 8,
+    paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: BORDER, marginBottom: 6,
   },
   dayHeaderWeekend: { borderBottomColor: GOLD + "44" },
   dayLabel: { fontSize: 13, fontFamily: "Inter_700Bold", color: TEXT, flex: 1 },
-  eventCountBadge: {
-    backgroundColor: TEAL + "18",
-    borderRadius: 10,
-    paddingHorizontal: 7,
-    paddingVertical: 1,
-  },
+  eventCountBadge: { backgroundColor: TEAL + "18", borderRadius: 10, paddingHorizontal: 7, paddingVertical: 1 },
   eventCountText: { fontSize: 11, fontFamily: "Inter_600SemiBold", color: TEAL },
   daySectionEvents: { gap: 6, marginBottom: 12 },
 
   // Event card
-  eventCard: {
-    backgroundColor: CARD_BG,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: BORDER,
-    overflow: "hidden",
-  },
+  eventCard: { backgroundColor: CARD_BG, borderRadius: 12, borderWidth: 1, borderColor: BORDER, overflow: "hidden" },
   eventCardMain: { flexDirection: "row", gap: 10, padding: 11 },
   eventTimePill: {
-    backgroundColor: TEAL_TINT,
-    borderRadius: 8,
-    paddingHorizontal: 8,
-    paddingVertical: 5,
-    alignSelf: "flex-start",
-    flexShrink: 0,
+    backgroundColor: TEAL_TINT, borderRadius: 8, paddingHorizontal: 8, paddingVertical: 5,
+    alignSelf: "flex-start", flexShrink: 0, flexDirection: "row", alignItems: "center",
   },
-  eventTimeText: { fontSize: 11, fontFamily: "Inter_600SemiBold", color: TEAL },
+  eventTimeText: { fontSize: 11, fontFamily: "Inter_700Bold", color: TEAL },
+  eventTimeEnd: { fontSize: 11, fontFamily: "Inter_400Regular", color: TEAL },
   eventCardBody: { flex: 1, gap: 4 },
   eventTitle: { fontSize: 14, fontFamily: "Inter_600SemiBold", color: TEXT },
   eventMeta: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
   eventMetaItem: { flexDirection: "row", alignItems: "center", gap: 4 },
   eventMetaText: { fontSize: 11, fontFamily: "Inter_400Regular", color: TEXT_MUTED },
   eventInvolvedRow: { flexDirection: "row", flexWrap: "wrap", gap: 5, marginTop: 2 },
-
-  eventActions: {
-    borderTopWidth: 1,
-    borderTopColor: BORDER,
-    padding: 11,
-    gap: 8,
-  },
+  eventActions: { borderTopWidth: 1, borderTopColor: BORDER, padding: 11, gap: 8 },
   carpoolText: { fontSize: 12, fontFamily: "Inter_400Regular", color: TEXT_MUTED, fontStyle: "italic" },
   eventNotes: { fontSize: 12, fontFamily: "Inter_400Regular", color: TEXT_MUTED },
   eventActionBtns: { flexDirection: "row", gap: 10 },
@@ -987,36 +1095,39 @@ const styles = StyleSheet.create({
 
   // Member chip
   memberChip: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 5,
-    borderRadius: 20,
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderWidth: 1,
+    flexDirection: "row", alignItems: "center", gap: 5,
+    borderRadius: 20, paddingHorizontal: 10, paddingVertical: 6, borderWidth: 1,
   },
   memberChipSmall: { paddingHorizontal: 7, paddingVertical: 3 },
   memberChipText: { fontSize: 13, fontFamily: "Inter_600SemiBold" },
   memberChipTextSmall: { fontSize: 11 },
   roleDot: { width: 5, height: 5, borderRadius: 3 },
 
-  // Empty state
-  emptyState: {
-    alignItems: "center",
-    paddingVertical: 40,
-    gap: 10,
+  // "Members exist, no events" state
+  membersReadyState: {
+    backgroundColor: CARD_BG, borderRadius: 16, borderWidth: 1, borderColor: BORDER,
+    padding: 20, alignItems: "center", gap: 10,
   },
+  membersReadyChips: { flexDirection: "row", flexWrap: "wrap", gap: 8, justifyContent: "center" },
+  membersReadyTitle: { fontSize: 16, fontFamily: "Inter_600SemiBold", color: TEXT, marginTop: 4 },
+  membersReadySub: {
+    fontSize: 13, fontFamily: "Inter_400Regular", color: TEXT_MUTED,
+    textAlign: "center", lineHeight: 19,
+  },
+  membersReadyCta: {
+    flexDirection: "row", alignItems: "center", gap: 7,
+    backgroundColor: TEAL, borderRadius: 12, paddingHorizontal: 18, paddingVertical: 11, marginTop: 4,
+  },
+  membersReadyCtaText: { fontSize: 14, fontFamily: "Inter_600SemiBold", color: "#fff" },
+
+  // Truly empty state
+  emptyState: { alignItems: "center", paddingVertical: 40, gap: 10 },
   emptyTitle: { fontSize: 16, fontFamily: "Inter_600SemiBold", color: TEXT },
   emptySub: { fontSize: 13, fontFamily: "Inter_400Regular", color: TEXT_MUTED, textAlign: "center", lineHeight: 19 },
 
   // People section
   peopleSection: {
-    backgroundColor: CARD_BG,
-    borderRadius: 14,
-    borderWidth: 1,
-    borderColor: BORDER,
-    padding: 14,
-    gap: 10,
+    backgroundColor: CARD_BG, borderRadius: 14, borderWidth: 1, borderColor: BORDER, padding: 14, gap: 10,
   },
   peopleSectionHeader: { flexDirection: "row", alignItems: "center", gap: 7 },
   peopleSectionTitle: { fontSize: 13, fontFamily: "Inter_600SemiBold", color: TEXT_MUTED },
@@ -1029,198 +1140,94 @@ const styles = StyleSheet.create({
   roleTagAdult: { backgroundColor: TEAL + "18" },
   roleTagChild: { backgroundColor: GOLD + "18" },
   roleTagText: { fontSize: 11, fontFamily: "Inter_600SemiBold" },
-
   addPersonForm: { gap: 10 },
   addPersonInput: {
-    backgroundColor: "#F7F3EB",
-    borderRadius: 10,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    fontSize: 14,
-    fontFamily: "Inter_400Regular",
-    color: TEXT,
-    borderWidth: 1,
-    borderColor: BORDER,
+    backgroundColor: "#F7F3EB", borderRadius: 10, paddingHorizontal: 12, paddingVertical: 10,
+    fontSize: 14, fontFamily: "Inter_400Regular", color: TEXT, borderWidth: 1, borderColor: BORDER,
   },
   addPersonRoleRow: { flexDirection: "row", gap: 8 },
   addPersonRole: {
-    flex: 1,
-    alignItems: "center",
-    paddingVertical: 8,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: BORDER,
-    backgroundColor: BG,
+    flex: 1, alignItems: "center", paddingVertical: 8, borderRadius: 10,
+    borderWidth: 1, borderColor: BORDER, backgroundColor: BG,
   },
   addPersonRoleSelected: { borderColor: TEAL, backgroundColor: TEAL_TINT },
   addPersonRoleText: { fontSize: 13, fontFamily: "Inter_600SemiBold", color: TEXT_MUTED },
   addPersonBtns: { flexDirection: "row", alignItems: "center", gap: 10 },
   addPersonConfirm: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-    backgroundColor: TEAL,
-    borderRadius: 10,
-    paddingHorizontal: 14,
-    paddingVertical: 9,
+    flexDirection: "row", alignItems: "center", gap: 6,
+    backgroundColor: TEAL, borderRadius: 10, paddingHorizontal: 14, paddingVertical: 9,
   },
   addPersonConfirmText: { fontSize: 13, fontFamily: "Inter_600SemiBold", color: "#fff" },
   addPersonCta: { flexDirection: "row", alignItems: "center", gap: 7 },
   addPersonCtaText: { fontSize: 13, fontFamily: "Inter_600SemiBold", color: TEAL },
 
   // Repeat note
-  repeatNote: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 7,
-    paddingVertical: 4,
-  },
+  repeatNote: { flexDirection: "row", alignItems: "center", gap: 7, paddingVertical: 4 },
   repeatNoteText: { fontSize: 12, fontFamily: "Inter_400Regular", color: TEXT_MUTED, fontStyle: "italic" },
 
   // FAB
   fab: {
-    position: "absolute",
-    right: 20,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 7,
-    backgroundColor: TEAL,
-    borderRadius: 24,
-    paddingHorizontal: 18,
-    paddingVertical: 13,
+    position: "absolute", right: 20,
+    flexDirection: "row", alignItems: "center", gap: 7,
+    backgroundColor: TEAL, borderRadius: 24, paddingHorizontal: 18, paddingVertical: 13,
     ...Platform.select({
       web: { boxShadow: `0px 4px 16px ${TEAL}55` },
       default: {
-        shadowColor: TEAL,
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.35,
-        shadowRadius: 12,
-        elevation: 8,
+        shadowColor: TEAL, shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.35, shadowRadius: 12, elevation: 8,
       },
     }),
   },
   fabText: { fontSize: 14, fontFamily: "Inter_600SemiBold", color: "#fff" },
 
   // Form sheet
-  formOverlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(0,0,0,0.5)",
-  },
+  formOverlay: { ...StyleSheet.absoluteFillObject, backgroundColor: "rgba(0,0,0,0.5)" },
   formSheet: {
-    position: "absolute",
-    left: 0,
-    right: 0,
-    bottom: 0,
-    maxHeight: "92%",
-    backgroundColor: "#fff",
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
-    paddingTop: 12,
-    paddingHorizontal: 20,
+    position: "absolute", left: 0, right: 0, bottom: 0, maxHeight: "92%",
+    backgroundColor: "#fff", borderTopLeftRadius: 24, borderTopRightRadius: 24,
+    paddingTop: 12, paddingHorizontal: 20,
     ...Platform.select({
       web: { boxShadow: "0px -6px 30px rgba(0,0,0,0.14)" },
       default: {
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: -4 },
-        shadowOpacity: 0.14,
-        shadowRadius: 20,
-        elevation: 24,
+        shadowColor: "#000", shadowOffset: { width: 0, height: -4 },
+        shadowOpacity: 0.14, shadowRadius: 20, elevation: 24,
       },
     }),
   },
-  sheetHandle: {
-    width: 36, height: 4, borderRadius: 2,
-    backgroundColor: "#E0E0E0",
-    alignSelf: "center",
-    marginBottom: 14,
-  },
-  sheetTitleRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginBottom: 18,
-  },
+  sheetHandle: { width: 36, height: 4, borderRadius: 2, backgroundColor: "#E0E0E0", alignSelf: "center", marginBottom: 14 },
+  sheetTitleRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 18 },
   sheetTitle: { fontSize: 18, fontFamily: "Inter_700Bold", color: TEXT },
 
   // Form fields
   formField: { gap: 7 },
   formRow: { flexDirection: "row", gap: 12 },
-  formLabel: { fontSize: 12, fontFamily: "Inter_600SemiBold", color: TEXT_MUTED, textTransform: "uppercase", letterSpacing: 0.6 },
+  formLabel: {
+    fontSize: 11, fontFamily: "Inter_600SemiBold", color: TEXT_MUTED,
+    textTransform: "uppercase", letterSpacing: 0.7,
+  },
   formInput: {
-    backgroundColor: "#F7F3EB",
-    borderRadius: 12,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    fontSize: 14,
-    fontFamily: "Inter_400Regular",
-    color: TEXT,
-    borderWidth: 1,
-    borderColor: BORDER,
+    backgroundColor: "#F7F3EB", borderRadius: 12, paddingHorizontal: 14, paddingVertical: 12,
+    fontSize: 14, fontFamily: "Inter_400Regular", color: TEXT, borderWidth: 1, borderColor: BORDER,
   },
-  formTextArea: { minHeight: 80 },
-
+  formTextArea: { minHeight: 76 },
   chipGroup: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
-
-  // Day chips
-  dayChip: {
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: BORDER,
-    backgroundColor: BG,
-  },
+  dayChip: { paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20, borderWidth: 1, borderColor: BORDER, backgroundColor: BG },
   dayChipSelected: { backgroundColor: TEAL, borderColor: TEAL },
   dayChipText: { fontSize: 13, fontFamily: "Inter_600SemiBold", color: TEXT_MUTED },
   dayChipTextSelected: { color: "#fff" },
-
-  // Driver chips
   driverChip: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 5,
-    paddingHorizontal: 12,
-    paddingVertical: 7,
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: BORDER,
-    backgroundColor: BG,
+    flexDirection: "row", alignItems: "center", gap: 5,
+    paddingHorizontal: 12, paddingVertical: 7, borderRadius: 20, borderWidth: 1, borderColor: BORDER, backgroundColor: BG,
   },
-  driverChipSelected: { backgroundColor: "#F0F0F0", borderColor: "#E0E0E0" },
+  driverChipNone: { backgroundColor: "#F0F0F0", borderColor: "#E0E0E0" },
   driverChipText: { fontSize: 13, fontFamily: "Inter_500Medium", color: TEXT_MUTED },
-  driverChipTextSelected: { color: TEXT },
-
-  // Repeat chips
-  repeatChip: {
-    paddingHorizontal: 12,
-    paddingVertical: 7,
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: BORDER,
-    backgroundColor: BG,
-  },
+  driverChipTextNone: { color: TEXT },
+  repeatChip: { paddingHorizontal: 12, paddingVertical: 7, borderRadius: 20, borderWidth: 1, borderColor: BORDER, backgroundColor: BG },
   repeatChipSelected: { backgroundColor: TEAL_TINT, borderColor: TEAL },
   repeatChipText: { fontSize: 13, fontFamily: "Inter_500Medium", color: TEXT_MUTED },
   repeatChipTextSelected: { color: TEAL },
-
-  // Error box
-  errorBox: {
-    backgroundColor: "#FEF2F2",
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: "#FCA5A5",
-    padding: 12,
-    gap: 4,
-  },
+  errorBox: { backgroundColor: "#FEF2F2", borderRadius: 10, borderWidth: 1, borderColor: "#FCA5A5", padding: 12, gap: 4 },
   errorText: { fontSize: 13, fontFamily: "Inter_500Medium", color: "#B91C1C" },
-
-  // Save button
-  saveBtn: {
-    backgroundColor: TEAL,
-    borderRadius: 14,
-    paddingVertical: 15,
-    alignItems: "center",
-    marginTop: 8,
-  },
+  saveBtn: { backgroundColor: TEAL, borderRadius: 14, paddingVertical: 15, alignItems: "center", marginTop: 8 },
   saveBtnText: { fontSize: 15, fontFamily: "Inter_600SemiBold", color: "#fff" },
 });

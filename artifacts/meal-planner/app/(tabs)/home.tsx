@@ -214,7 +214,7 @@ export default function HomeTab() {
       ]);
       const fr = computeFamilyWeek(familyState);
       setFamilyLine(fr.dashboardLine);
-      setFamilySub(fr.dashboardSub);
+      setFamilySub(fr.dashboardSub ?? fr.dashboardLine);
       if (computed) setNudge(computed);
     })();
   }, []);

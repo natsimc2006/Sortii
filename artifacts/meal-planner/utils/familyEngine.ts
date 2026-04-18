@@ -51,9 +51,10 @@ export function parseTime(input: string): string {
   return "";
 }
 
-// ── Engine output types ───────────────────────────────────────────────────────
+// ── Output types ──────────────────────────────────────────────────────────────
 
-export type InsightType = "conflict" | "tight" | "busy" | "solo";
+export type InsightType = "conflict" | "tight" | "busy" | "solo" | "child_clash";
+export type BusynessLevel = "clear" | "quiet" | "steady" | "busy";
 
 export interface FamilyInsight {
   type: InsightType;
@@ -61,11 +62,21 @@ export interface FamilyInsight {
   message: string;
 }
 
+export interface WeekSummaryData {
+  totalEvents: number;
+  weekendCount: number;
+  busynessLevel: BusynessLevel;
+  driverCount: number;
+  unassignedCount: number;
+}
+
 export interface FamilyWeekResult {
   eventsByDay: Record<DayOfWeek, FamilyEvent[]>;
   weekendEvents: FamilyEvent[];
   daysWithEvents: DayOfWeek[];
   insights: FamilyInsight[];
+  weekSummary: WeekSummaryData;
+  planSplit: Map<string, DayOfWeek[]>;
   dashboardLine: string;
   dashboardSub: string;
   sharePlanText: string;
@@ -76,6 +87,7 @@ export interface FamilyWeekResult {
 export function computeFamilyWeek(state: FamilyState): FamilyWeekResult {
   const { events, members } = state;
 
+  // Group events by day, sorted by time
   const eventsByDay = {} as Record<DayOfWeek, FamilyEvent[]>;
   for (const day of ALL_DAYS) eventsByDay[day] = [];
   for (const e of events) {
@@ -89,7 +101,7 @@ export function computeFamilyWeek(state: FamilyState): FamilyWeekResult {
   const daysWithEvents = ALL_DAYS.filter((d) => eventsByDay[d].length > 0);
   const insights: FamilyInsight[] = [];
 
-  // Overlap / tight timing — same driver, consecutive events
+  // ── 1. Driver overlap / tight timing ──────────────────────────────────────
   for (const day of ALL_DAYS) {
     const dayEvs = eventsByDay[day];
     for (let i = 0; i < dayEvs.length - 1; i++) {
@@ -116,31 +128,88 @@ export function computeFamilyWeek(state: FamilyState): FamilyWeekResult {
     }
   }
 
-  // Busy day (3+ events)
+  // ── 2. Child in two places at the same time ────────────────────────────────
+  const children = members.filter((m) => m.role === "child");
+  for (const child of children) {
+    for (const day of ALL_DAYS) {
+      const childEvs = eventsByDay[day].filter((e) =>
+        e.personIds.includes(child.id)
+      );
+      // Check each pair for overlapping times
+      for (let i = 0; i < childEvs.length - 1; i++) {
+        const a = childEvs[i]!;
+        const b = childEvs[i + 1]!;
+        const aEndMins = a.endTime
+          ? timeToMins(a.endTime)
+          : timeToMins(a.time) + 60;
+        const gap = timeToMins(b.time) - aEndMins;
+        if (gap < 0) {
+          insights.push({
+            type: "child_clash",
+            day,
+            message: `${child.name} is in two places at once on ${day} — ${a.title} and ${b.title}.`,
+          });
+        } else if (gap < 20) {
+          insights.push({
+            type: "tight",
+            day,
+            message: `${day}: ${child.name} goes from ${a.title} straight to ${b.title}. Very tight.`,
+          });
+        }
+      }
+    }
+  }
+
+  // ── 3. Busy day (3+ events on one day) ────────────────────────────────────
   for (const day of ALL_DAYS) {
     if (eventsByDay[day].length >= 3) {
       insights.push({
         type: "busy",
         day,
-        message: `${day}: Quite a lot on. One of the busier days this week.`,
+        message: `${day}: Three or more things on. One of the heavier days this week.`,
       });
     }
   }
 
-  // Solo adult covering multiple busy days
+  // ── 4. Solo adult covering multiple busy days ──────────────────────────────
   const adults = members.filter((m) => m.role === "adult");
   if (adults.length === 1 && events.length >= 4) {
     const busyDays = ALL_DAYS.filter((d) => eventsByDay[d].length >= 2);
     if (busyDays.length >= 2) {
       insights.push({
         type: "solo",
-        message: `Multiple busy days with just one adult covering them. Solid effort.`,
+        message: `Multiple busy days — just the one adult holding it together. Noted.`,
       });
     }
   }
 
+  // ── Plan split (who drives which days) ────────────────────────────────────
+  const planSplit = buildPlanSplit(eventsByDay, members);
+
+  // ── Week summary object ───────────────────────────────────────────────────
+  const totalEvents = events.length;
+  const weekendCount = weekendEvents.length;
+  const busynessLevel: BusynessLevel =
+    totalEvents === 0 ? "clear"
+    : totalEvents <= 2 ? "quiet"
+    : totalEvents <= 5 ? "steady"
+    : "busy";
+
+  const unassignedCount = events.filter(
+    (e) => !e.driverId && e.personIds.length > 0
+  ).length;
+
+  const weekSummary: WeekSummaryData = {
+    totalEvents,
+    weekendCount,
+    busynessLevel,
+    driverCount: planSplit.size,
+    unassignedCount,
+  };
+
+  // ── Dashboard copy ────────────────────────────────────────────────────────
   const dashboardLine = buildDashboardLine(events, weekendEvents, insights);
-  const dashboardSub = buildDashboardSub(events, insights);
+  const dashboardSub  = buildDashboardSub(events, insights);
   const sharePlanText = buildSharePlan(eventsByDay, members);
 
   return {
@@ -148,13 +217,34 @@ export function computeFamilyWeek(state: FamilyState): FamilyWeekResult {
     weekendEvents,
     daysWithEvents,
     insights,
+    weekSummary,
+    planSplit,
     dashboardLine,
     dashboardSub,
     sharePlanText,
   };
 }
 
-// ── Dashboard summary (home card) ─────────────────────────────────────────────
+// ── Plan split — who drives which days ───────────────────────────────────────
+
+export function buildPlanSplit(
+  eventsByDay: Record<DayOfWeek, FamilyEvent[]>,
+  members: FamilyMember[]
+): Map<string, DayOfWeek[]> {
+  const split = new Map<string, DayOfWeek[]>();
+  for (const day of ALL_DAYS) {
+    const seen = new Set<string>();
+    for (const ev of eventsByDay[day]) {
+      if (!ev.driverId || seen.has(ev.driverId)) continue;
+      seen.add(ev.driverId);
+      const existing = split.get(ev.driverId) ?? [];
+      split.set(ev.driverId, [...existing, day]);
+    }
+  }
+  return split;
+}
+
+// ── Dashboard summary ─────────────────────────────────────────────────────────
 
 function buildDashboardLine(
   events: FamilyEvent[],
@@ -163,39 +253,34 @@ function buildDashboardLine(
 ): string {
   if (events.length === 0) return "Nothing on the family radar this week.";
 
-  const conflictInsight = insights.find((i) => i.type === "conflict");
-  const tightInsight = insights.find((i) => i.type === "tight");
+  const childClash  = insights.find((i) => i.type === "child_clash");
+  const conflict    = insights.find((i) => i.type === "conflict");
+  const tight       = insights.find((i) => i.type === "tight");
 
-  if (conflictInsight?.day) {
-    return `${conflictInsight.day} needs a bit of thought. Some overlap.`;
-  }
+  if (childClash?.day)  return `${childClash.day}: one child in two places. Worth sorting.`;
+  if (conflict?.day)    return `${conflict.day} needs a bit of thought. Some overlap.`;
 
   if (weekendEvents.length >= 3) {
     return `${weekendEvents.length} things this weekend. Worth mapping it out.`;
   }
-
   if (weekendEvents.length === 2) {
     const weekendTight = insights.some(
-      (i) =>
-        (i.day === "Saturday" || i.day === "Sunday") && i.type === "tight"
+      (i) => (i.day === "Saturday" || i.day === "Sunday") && i.type === "tight"
     );
     return weekendTight
       ? "2 activities this weekend. Timing's a bit tight."
       : "2 activities this weekend. Saturday solves itself.";
   }
-
   if (weekendEvents.length === 1) {
     return `One thing this weekend. ${events.length > 1 ? "Week's otherwise fine." : "That's the lot."}`;
   }
 
-  if (tightInsight?.day) {
-    return `${tightInsight.day} is back-to-back. Worth knowing.`;
-  }
+  if (tight?.day) return `${tight.day} is back-to-back. Worth knowing.`;
 
   if (events.length === 1) return "One thing on this week. Simple enough.";
   if (events.length <= 3) return "A couple of things this week. All manageable.";
   if (events.length <= 5) return `${events.length} things this week. A steady one.`;
-  return `${events.length} things on this week. Busy but covered.`;
+  return `${events.length} things on. Busy, but it's all in one place now.`;
 }
 
 function buildDashboardSub(
@@ -204,28 +289,12 @@ function buildDashboardSub(
 ): string {
   if (events.length === 0) return "A rare and peaceful sight.";
   const hasIssue = insights.some(
-    (i) => i.type === "conflict" || i.type === "tight"
+    (i) => i.type === "conflict" || i.type === "child_clash"
   );
   if (hasIssue) return "Tap to see what needs attention →";
+  const hasTight = insights.some((i) => i.type === "tight");
+  if (hasTight) return "Tap to see the details →";
   return "Tap to see the plan →";
-}
-
-// ── Plan split (who covers what) ──────────────────────────────────────────────
-
-export function buildPlanSplit(
-  eventsByDay: Record<DayOfWeek, FamilyEvent[]>,
-  members: FamilyMember[]
-): Map<string, DayOfWeek[]> {
-  const split = new Map<string, DayOfWeek[]>();
-  for (const day of ALL_DAYS) {
-    const dayEvs = eventsByDay[day];
-    for (const ev of dayEvs) {
-      if (!ev.driverId) continue;
-      const existing = split.get(ev.driverId) ?? [];
-      if (!existing.includes(day)) split.set(ev.driverId, [...existing, day]);
-    }
-  }
-  return split;
 }
 
 // ── Share plan text ───────────────────────────────────────────────────────────
@@ -241,10 +310,10 @@ function buildSharePlan(
     if (dayEvs.length === 0) continue;
     lines.push(`${day}:`);
     for (const e of dayEvs) {
-      const time = formatTime(e.time);
+      const time    = formatTime(e.time);
       const endTime = e.endTime ? ` – ${formatTime(e.endTime)}` : "";
-      const driver = e.driverId
-        ? members.find((m) => m.id === e.driverId)?.name ?? null
+      const driver  = e.driverId
+        ? (members.find((m) => m.id === e.driverId)?.name ?? null)
         : null;
       const who = e.personIds
         .map((id) => members.find((m) => m.id === id)?.name)
@@ -257,6 +326,17 @@ function buildSharePlan(
       if (e.carpoolContact) line += ` · carpool: ${e.carpoolContact}`;
       if (e.repeat !== "none") line += ` [repeats ${e.repeat}]`;
       lines.push(line);
+    }
+    lines.push("");
+  }
+
+  // Plan split summary
+  const split = buildPlanSplit(eventsByDay, members);
+  if (split.size > 0) {
+    lines.push("Who's covering what:");
+    for (const [driverId, days] of split.entries()) {
+      const driver = members.find((m) => m.id === driverId);
+      if (driver) lines.push(`  ${driver.name}: ${days.join(", ")}`);
     }
     lines.push("");
   }

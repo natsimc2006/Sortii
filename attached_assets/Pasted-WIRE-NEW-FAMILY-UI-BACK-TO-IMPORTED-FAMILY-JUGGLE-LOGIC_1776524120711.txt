@@ -1,0 +1,216 @@
+WIRE NEW FAMILY UI BACK TO IMPORTED FAMILY JUGGLE LOGIC
+
+The new Family screens inside Sortii are visually closer to the right direction, but they currently feel disconnected from the original Family Juggle logic that was meant to be reused.
+
+I do NOT want a new simplified Family feature invented from scratch.
+
+I want the new Sortii Family UI to be wired back up to the imported Family Juggle logic, data model, planner rules, and outputs.
+
+Goal
+
+Keep the new Sortii-style Family screens and flow, but reconnect them to the original Family Juggle “brain” so the useful logic and outputs return.
+
+⸻
+
+1. First audit the existing family code
+
+Please inspect the codebase and identify:
+
+* which original Family Juggle files / helpers / logic were already imported
+* which family planner functions are currently unused or disconnected
+* what event / person / planning data model the original family logic expects
+* what outputs the original planner supported, such as:
+    * event grouping
+    * recurrence
+    * conflict / overlap detection
+    * split / assignment logic
+    * “worth knowing” summaries
+    * shareable plan generation
+
+Do not rebuild these from scratch if they already exist in some form.
+
+⸻
+
+2. Keep the new Family UI shell
+
+Preserve the new Family screens and Sortii styling, including:
+
+* Family tab
+* empty state
+* family member card
+* add person flow
+* add event modal
+* Sortii navigation and overall layout
+
+Do not revert the UI back to the old standalone Family Juggle app look.
+
+⸻
+
+3. Reconnect new UI inputs to the original family data model
+
+Wire the new UI fields to the actual reusable family store / planner model.
+
+Family members card
+
+When a user adds a family member:
+
+* save them into the shared family people store
+* preserve role type such as adult / child
+* make these people available in event assignment and planner logic
+
+Add event modal
+
+Map all modal inputs into the real family event model, including:
+
+* event title
+* day / date
+* start time
+* end time
+* location
+* involved people
+* repeat type
+* notes
+
+The new modal must create real planner events, not just local placeholder UI state.
+
+⸻
+
+4. Restore planner behaviours from the old family logic
+
+Once the data is correctly connected, re-enable the useful planner outputs from the old Family Juggle build:
+
+* recurrence handling
+* grouping events by week/day
+* overlap detection
+* tight timing detection
+* assignment / split logic where relevant
+* useful summary generation
+* “worth knowing” style helper messaging
+* shareable family plan output if that logic exists
+
+These should use the existing imported logic wherever possible.
+
+⸻
+
+5. Build a proper non-empty Family flow
+
+Right now the Family page should evolve based on real saved data.
+
+Empty state
+
+Show calm empty state only when there are no family events for the current week.
+
+After adding people only
+
+If people exist but no events exist:
+
+* show the family members
+* prompt the user to add their first event
+
+After adding events
+
+Show a real Family weekly state driven by actual planner data, including:
+
+* this week’s events
+* grouped by day
+* simple summary of how busy the week is
+* any useful warnings or observations from the original logic
+
+⸻
+
+6. Add a proper Family home summary using real logic
+
+The Family tab and dashboard card should not stay generic.
+
+Generate summary copy from actual family data, for example:
+
+* “2 things on this week. Friday needs backup.”
+* “One activity, no real drama.”
+* “Nothing on the family radar this week.”
+* “Saturday is doing a bit much.”
+
+Use real event counts, timing, conflicts, and assignments to drive this.
+
+⸻
+
+7. Reintroduce the best outputs from the old Family Juggle flow, but inside Sortii
+
+Do NOT bring back the old standalone landing page or old shell.
+
+Instead, reintroduce the most valuable outputs within the new Sortii Family module, such as:
+
+* plan view
+* week / weekend grouped event view
+* useful issue detection
+* “worth knowing” summary box
+* optional share plan action
+
+These outputs should appear as native Sortii cards/sections, not as a separate microsite.
+
+⸻
+
+8. Technical architecture preference
+
+Please structure this cleanly:
+
+* family store/state in dedicated shared files
+* family logic/helpers in reusable modules
+* Family UI components should consume that shared store and logic
+* avoid duplicating planner logic inside screen components
+
+Suggested structure:
+
+* familyStore
+* familyLogic
+* familyHelpers
+* familyTypes
+* Family screen components that read/write from this shared state
+
+⸻
+
+9. Do not lose the current Sortii feel
+
+Keep:
+
+* current Sortii Family visual style
+* current app shell
+* current bottom navigation
+* calm empty states
+* simple card layout
+
+The goal is:
+new Sortii shell + original Family Juggle intelligence
+
+Not:
+old standalone UI inside the app
+and not:
+new empty shell with shallow logic
+
+⸻
+
+10. Priority order
+
+Please implement in this order:
+
+1. inspect and identify imported family logic already present
+2. reconnect Family members and Add event modal to real family data model
+3. restore event persistence and current-week retrieval
+4. restore planner logic outputs such as conflicts / summaries / grouped views
+5. surface the best of those outputs in the new Sortii Family page
+6. update dashboard Family card to use real data
+
+Avoid rewriting working logic if reusable logic already exists.
+
+⸻
+
+11. Desired end result
+
+I want the Family module to feel like:
+
+* a native part of Sortii
+* backed by the original Family Juggle logic
+* useful, smart, and calm
+
+The user should feel:
+
+* “This is the same helpful family planner, now living properly inside Sortii.”
