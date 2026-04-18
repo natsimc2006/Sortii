@@ -44,6 +44,32 @@ const HERO_BG = "#E6F3F0";
 const PAGE_BG = "#FFFFFF";
 const sortiiLogo = require("@/assets/images/sortii-logo-v2-money.png");
 
+// ─── Quick win confirm messages ───────────────────────────────
+
+const WIN_CTA: Record<string, string> = {
+  skip_takeaway:      "Give this a go",
+  pause_subscription: "Try this",
+  skip_coffee:        "Give this a go",
+  grocery_trim:       "Apply this",
+  skip_entertainment: "Give this a go",
+  leftover_night:     "Apply this",
+  eating_out_nomeal:  "Sort some dinners",
+  freezer_check:      "Try this",
+};
+
+function confirmMsg(id: string, amount: number, fmt: (n: number) => string): string {
+  switch (id) {
+    case "skip_takeaway":      return `Nice. That freed up ${fmt(amount)}.`;
+    case "pause_subscription": return "Sorted. One less subscription this week.";
+    case "skip_coffee":        return "Done. Small win, but it adds up.";
+    case "grocery_trim":       return "Good call. Smarter swaps, same dinners.";
+    case "skip_entertainment": return "Done. Quiet win.";
+    case "leftover_night":     return "Nice. That batch meal is earning its keep.";
+    case "freezer_check":      return "Sorted. Free food you forgot about.";
+    default:                   return `Done. A little extra breathing room.`;
+  }
+}
+
 // ─── Status pill ────────────────────────────────────────────
 
 function StatusPill({ state }: { state: WeeklyState | null }) {
@@ -130,6 +156,7 @@ function WeeklySnapshotSection({
   dinnerPlanCost,
   hasMealsSetup,
   fmt,
+  appliedSavingsTotal,
 }: {
   money: NonNullable<ReturnType<typeof useUserWeek>["money"]>;
   result: MoneyPageResult;
@@ -137,10 +164,12 @@ function WeeklySnapshotSection({
   dinnerPlanCost: number;
   hasMealsSetup: boolean;
   fmt: (n: number) => string;
+  appliedSavingsTotal: number;
 }) {
   const [open, setOpen] = useState(false);
   const { weeklyIncome, fixedWeeklyCosts, groceriesWeekly, eatingOutWeekly, otherWeeklySpend } = money;
-  const { remaining, weeklyState } = result;
+  const { weeklyState } = result;
+  const remaining = result.remaining + appliedSavingsTotal;
   const isNeg = remaining < 0;
   const remainingColor = isNeg ? C.danger : TEAL;
 
@@ -197,6 +226,11 @@ function WeeklySnapshotSection({
               {isNeg ? `–${fmt(Math.abs(remaining))} over` : fmt(remaining)}
             </Text>
           </View>
+          {appliedSavingsTotal > 0 && (
+            <Text style={styles.appliedWinsNote}>
+              ↑ {fmt(appliedSavingsTotal)} freed up by your easy wins
+            </Text>
+          )}
           {!isNeg && hasMealsSetup && (
             <Text style={styles.mealsCreditNote}>
               Meals planning is doing most of the work here.
@@ -280,12 +314,93 @@ function GroceriesSection({
   );
 }
 
-// ─── 4. Quick Wins (collapsible plum section) ─────────────────
+// ─── 4. Quick Wins — WinRow ───────────────────────────────────
 
-function QuickWinsSection({ suggestions, fmt }: { suggestions: MoneySuggestion[]; fmt: (n: number) => string }) {
+function WinRow({
+  s,
+  fmt,
+  isApplied,
+  onApply,
+  onUndo,
+}: {
+  s: MoneySuggestion;
+  fmt: (n: number) => string;
+  isApplied: boolean;
+  onApply: () => void;
+  onUndo: () => void;
+}) {
+  const isActionable = !s.isGoalProjection && !s.isMonthlyNudge && s.impactAmount > 0;
+  const ctaLabel = WIN_CTA[s.id] ?? "Try this";
+  const message = confirmMsg(s.id, s.impactAmount, fmt);
+
+  return (
+    <View style={[styles.quickWinsRow, isApplied && styles.quickWinsRowApplied]}>
+      <Text style={[styles.quickWinsArrow, isApplied && { color: TEAL }]}>
+        {isApplied ? "✓" : "▸"}
+      </Text>
+      <View style={styles.quickWinsContent}>
+        <Text style={[styles.quickWinsLabel, isApplied && styles.quickWinsLabelApplied]}>
+          {s.label}
+        </Text>
+
+        {isApplied ? (
+          <>
+            <Text style={styles.quickWinsConfirm}>{message}</Text>
+            <TouchableOpacity
+              onPress={() => {
+                Haptics.selectionAsync();
+                onUndo();
+              }}
+              hitSlop={{ top: 6, bottom: 6, left: 8, right: 8 }}
+            >
+              <Text style={styles.quickWinsUndo}>Undo</Text>
+            </TouchableOpacity>
+          </>
+        ) : (
+          <>
+            {s.reason ? <Text style={styles.quickWinsReason}>{s.reason}</Text> : null}
+            {isActionable && (
+              <View style={styles.quickWinsCtaRow}>
+                <Text style={styles.quickWinsImpact}>~{fmt(s.impactAmount)}</Text>
+                <TouchableOpacity
+                  onPress={() => {
+                    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+                    onApply();
+                  }}
+                  style={styles.quickWinsCtaBtn}
+                  activeOpacity={0.78}
+                >
+                  <Text style={styles.quickWinsCtaBtnText}>{ctaLabel}</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+          </>
+        )}
+      </View>
+    </View>
+  );
+}
+
+// ─── 4. Quick Wins (collapsible) ──────────────────────────────
+
+function QuickWinsSection({
+  suggestions,
+  fmt,
+  appliedWins,
+  onApply,
+  onUndo,
+}: {
+  suggestions: MoneySuggestion[];
+  fmt: (n: number) => string;
+  appliedWins: Map<string, number>;
+  onApply: (id: string, amount: number) => void;
+  onUndo: (id: string) => void;
+}) {
   const [open, setOpen] = useState(false);
   const tips = suggestions.slice(0, 3);
   if (tips.length === 0) return null;
+
+  const appliedCount = tips.filter((s) => appliedWins.has(s.id)).length;
 
   return (
     <View style={styles.quickWinsWrap}>
@@ -297,7 +412,14 @@ function QuickWinsSection({ suggestions, fmt }: { suggestions: MoneySuggestion[]
         style={styles.quickWinsHeader}
         activeOpacity={0.7}
       >
-        <Text style={styles.quickWinsTitle}>A few easy wins (if you want them)</Text>
+        <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+          <Text style={styles.quickWinsTitle}>A few easy wins (if you want them)</Text>
+          {appliedCount > 0 && (
+            <View style={styles.quickWinsBadge}>
+              <Text style={styles.quickWinsBadgeText}>{appliedCount}</Text>
+            </View>
+          )}
+        </View>
         <Feather name={open ? "chevron-up" : "chevron-down"} size={17} color="#8A6200" />
       </TouchableOpacity>
 
@@ -305,18 +427,14 @@ function QuickWinsSection({ suggestions, fmt }: { suggestions: MoneySuggestion[]
         <View style={styles.quickWinsBody}>
           <Text style={styles.quickWinsIntro}>If you want to tighten things slightly this week:</Text>
           {tips.map((s) => (
-            <View key={s.id} style={styles.quickWinsRow}>
-              <Text style={styles.quickWinsArrow}>▸</Text>
-              <View style={styles.quickWinsContent}>
-                <Text style={styles.quickWinsLabel}>{s.label}</Text>
-                {s.reason ? (
-                  <Text style={styles.quickWinsReason}>{s.reason}</Text>
-                ) : null}
-                {!s.isGoalProjection && !s.isMonthlyNudge && s.impactAmount > 0 ? (
-                  <Text style={styles.quickWinsImpact}>Save ~{fmt(s.impactAmount)}</Text>
-                ) : null}
-              </View>
-            </View>
+            <WinRow
+              key={s.id}
+              s={s}
+              fmt={fmt}
+              isApplied={appliedWins.has(s.id)}
+              onApply={() => onApply(s.id, s.impactAmount)}
+              onUndo={() => onUndo(s.id)}
+            />
           ))}
         </View>
       )}
@@ -420,6 +538,23 @@ export default function MoneyScreen() {
     weeklyMode, goal, hasMealsSetup, hasMoneySetup,
     money, lifestyleSpend, savingsGoal, isLoaded,
   } = useUserWeek();
+
+  // Applied quick wins (id → impactAmount)
+  const [appliedWins, setAppliedWins] = useState<Map<string, number>>(new Map());
+
+  const applyWin = (id: string, amount: number) => {
+    setAppliedWins((prev) => new Map(prev).set(id, amount));
+  };
+
+  const undoWin = (id: string) => {
+    setAppliedWins((prev) => {
+      const next = new Map(prev);
+      next.delete(id);
+      return next;
+    });
+  };
+
+  const appliedSavingsTotal = Array.from(appliedWins.values()).reduce((a, b) => a + b, 0);
 
   const paddingTop = Platform.OS === "web" ? 24 : insets.top + 8;
   const paddingBottom = Platform.OS === "web" ? 60 : insets.bottom + 80;
@@ -538,6 +673,7 @@ export default function MoneyScreen() {
               dinnerPlanCost={dinnerPlanCost}
               hasMealsSetup={hasMealsSetup}
               fmt={formatMoneyRound}
+              appliedSavingsTotal={appliedSavingsTotal}
             />
           )}
 
@@ -555,7 +691,13 @@ export default function MoneyScreen() {
           )}
 
           {/* 4. Quick wins */}
-          <QuickWinsSection suggestions={result.suggestions} fmt={formatMoneyRound} />
+          <QuickWinsSection
+            suggestions={result.suggestions}
+            fmt={formatMoneyRound}
+            appliedWins={appliedWins}
+            onApply={applyWin}
+            onUndo={undoWin}
+          />
 
           {/* 5. Savings goal card */}
           {savingsGoal ? (
@@ -793,6 +935,51 @@ const styles = StyleSheet.create({
   },
   quickWinsImpact: {
     fontSize: 13, fontFamily: "Inter_700Bold", color: "#8A6200",
+  },
+  quickWinsCtaRow: {
+    flexDirection: "row", alignItems: "center", gap: 10, marginTop: 4,
+  },
+  quickWinsCtaBtn: {
+    paddingHorizontal: 12, paddingVertical: 5, borderRadius: 12,
+    backgroundColor: TEAL,
+    ...Platform.select({
+      web: { boxShadow: "0px 2px 6px rgba(42,143,136,0.28)" },
+      default: {
+        shadowColor: TEAL,
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.28,
+        shadowRadius: 5,
+        elevation: 2,
+      },
+    }),
+  },
+  quickWinsCtaBtnText: {
+    fontSize: 12, fontFamily: "Inter_600SemiBold", color: "#fff",
+  },
+  quickWinsRowApplied: {
+    opacity: 0.85,
+  },
+  quickWinsLabelApplied: {
+    color: C.textMuted,
+  },
+  quickWinsConfirm: {
+    fontSize: 13, fontFamily: "Inter_500Medium", color: TEAL,
+    fontStyle: "italic", lineHeight: 18, marginTop: 2,
+  },
+  quickWinsUndo: {
+    fontSize: 12, fontFamily: "Inter_400Regular",
+    color: C.textMuted, textDecorationLine: "underline", marginTop: 3,
+  },
+  quickWinsBadge: {
+    width: 18, height: 18, borderRadius: 9,
+    backgroundColor: TEAL, alignItems: "center", justifyContent: "center",
+  },
+  quickWinsBadgeText: {
+    fontSize: 10, fontFamily: "Inter_700Bold", color: "#fff",
+  },
+  appliedWinsNote: {
+    fontSize: 12, fontFamily: "Inter_500Medium", color: TEAL,
+    fontStyle: "italic", marginTop: 2,
   },
 
   // 5. Savings goal card
