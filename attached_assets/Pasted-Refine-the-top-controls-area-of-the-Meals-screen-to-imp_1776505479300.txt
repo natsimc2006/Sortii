@@ -1,0 +1,94 @@
+Refine the top controls area of the Meals screen to improve fit, clarity, and visual logic.
+
+IMPORTANT CONTEXT
+The hierarchy is now much better:
+- top row = action tools
+- second row = meal plan settings
+
+However, there are still two issues:
+1. The “Preferences” button in the top action row is falling off the page on mobile
+2. The “Your plan” label is now unnecessary visual noise
+
+GOAL
+Tighten the top controls so they feel cleaner, more intentional, and better suited to mobile width.
+
+CHANGES REQUIRED
+
+1. REMOVE “YOUR PLAN” LABEL
+Remove the “Your plan” heading above the settings chips.
+
+Reason:
+The hierarchy is already clear enough visually.
+The label adds unnecessary clutter.
+
+2. TOP ACTION ROW
+Keep the green action/tool row, but limit it to:
+- Shopping
+- Budget
+- Recipes
+
+Do NOT include “Preferences” in this top row anymore.
+
+Reason:
+These three are destination-style tools and belong together.
+“Preferences” is a setup/configuration control, not the same type of action.
+
+3. MOVE PREFERENCES INTO THE SETTINGS ROW
+Move “Preferences” out of the green action row and place it alongside the lighter settings chips row.
+
+Settings row should contain:
+- 4 people
+- Standard
+- $153–$179
+- Preferences icon button
+
+IMPORTANT:
+Do not make Preferences a long text chip here.
+Instead, make it a compact icon-led control.
+
+PREFERENCES BUTTON STYLE
+Make the Preferences control:
+- compact
+- clearly tappable
+- visually aligned with the settings chips
+- lighter and quieter than the green action row
+- suitable for mobile width
+
+Preferred direction:
+- small rounded square or rounded pill
+- sliders/settings icon
+- subtle tint or outline
+- should feel like a plan configuration control
+
+4. PRESERVE THE TOP ROW STYLE
+Keep the top row as the more prominent action row with:
+- soft green tint
+- icon + text
+- clear pill buttons
+
+Do NOT convert this row into icon-only controls yet.
+
+5. MOBILE FIT
+Make sure the top controls area fits cleanly on mobile without buttons falling off the page.
+The result should feel intentional, not cramped.
+
+DESIRED FINAL STRUCTURE
+
+Row 1:
+- Shopping
+- Budget
+- Recipes
+
+Row 2:
+- 4 people
+- Standard
+- $153–$179
+- Preferences icon button
+
+GOAL
+The user should intuitively understand:
+- Row 1 = where I can go
+- Row 2 = how this meal plan is set up
+
+Do not redesign the rest of the Meals screen.
+Only refine this top controls area.

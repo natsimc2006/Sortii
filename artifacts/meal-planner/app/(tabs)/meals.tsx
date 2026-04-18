@@ -120,7 +120,6 @@ const QUICK_ACTIONS = [
   { icon: "shopping-cart", label: "Shopping", route: "/(tabs)/shopping" },
   { icon: "dollar-sign",   label: "Budget",   route: "/(tabs)/money" },
   { icon: "book-open",     label: "Recipes",  route: "/(tabs)/recipes" },
-  { icon: "sliders",       label: "Preferences", route: "/(tabs)/preferences" },
 ] as const;
 
 function getTodayName() {
@@ -662,9 +661,8 @@ export default function MealsScreen() {
         style={{ flex: 1 }}
         contentContainerStyle={styles.content}
       >
-        {/* "Your plan" settings — lighter chips, scroll away with content */}
+        {/* Plan settings + Preferences — lighter row, scrolls away */}
         <View style={styles.planSettingsSection}>
-          <Text style={[styles.planSettingsLabel, { color: C.textMuted }]}>YOUR PLAN</Text>
           <View style={styles.planSettingsChipRow}>
             <PlanChip
               label={`${preferences.householdSize} ${preferences.householdSize === 1 ? "person" : "people"}`}
@@ -681,6 +679,14 @@ export default function MealsScreen() {
               icon="shopping-bag"
               onPress={() => setActiveChip("cost")}
             />
+            <TouchableOpacity
+              style={[styles.prefIconBtn, { borderColor: C.cardBorder }]}
+              onPress={() => handleQuickNav("/(tabs)/preferences")}
+              activeOpacity={0.72}
+              hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
+            >
+              <Feather name="sliders" size={13} color={C.textSecondary} />
+            </TouchableOpacity>
           </View>
           {preferences.kidFriendly && (
             <Text style={[styles.kidFriendlyNote, { color: C.textSecondary }]}>
@@ -1317,13 +1323,6 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: "#EDE9E1",
   },
-  planSettingsLabel: {
-    fontSize: 10,
-    fontFamily: "Inter_500Medium",
-    letterSpacing: 0.8,
-    textTransform: "uppercase",
-    marginBottom: 2,
-  },
   planSettingsChipRow: {
     flexDirection: "row",
     flexWrap: "wrap",
@@ -1342,6 +1341,15 @@ const styles = StyleSheet.create({
   planChipText: {
     fontSize: 11,
     fontFamily: "Inter_400Regular",
+  },
+  prefIconBtn: {
+    width: 30,
+    height: 28,
+    borderRadius: 14,
+    borderWidth: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "transparent",
   },
 
   kidFriendlyNote: {
