@@ -1,5 +1,4 @@
 import { Feather } from "@expo/vector-icons";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
@@ -19,6 +18,8 @@ import { useUserWeek } from "@/context/UserWeekContext";
 import { useLocale } from "@/context/LocaleContext";
 import allRecipesRaw from "@/data/recipes_unified_au.json";
 import { computeNudge, recordAppOpen, Nudge } from "@/utils/nudgeEngine";
+import { loadFamilyState } from "@/utils/familyStore";
+import { computeFamilyWeek } from "@/utils/familyEngine";
 
 const allRecipes = allRecipesRaw as { id: string; name: string }[];
 
@@ -31,8 +32,6 @@ const CARD_BG   = "#FFFDF9";
 const BORDER    = "#E6E1D7";
 const TEXT      = "#2B2B2B";
 const TEXT_MUTED= "#888888";
-
-const KIDS_KEY = "@sortii_kids_activities";
 
 const DAYS     = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
 const DAY_ABBR = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
@@ -182,9 +181,10 @@ export default function HomeTab() {
   const { money, hasMoneySetup } = useUserWeek();
   const { currencySymbol } = useLocale();
 
-  const [helpVisible, setHelpVisible]       = useState(false);
-  const [nudge, setNudge]                   = useState<Nudge | null>(null);
-  const [kidsActivities, setKidsActivities] = useState<{ id: string; name: string }[]>([]);
+  const [helpVisible, setHelpVisible]   = useState(false);
+  const [nudge, setNudge]               = useState<Nudge | null>(null);
+  const [familyLine, setFamilyLine]     = useState<string>("Nothing on the family radar this week.");
+  const [familySub, setFamilySub]       = useState<string>("A rare and peaceful sight.");
 
   const todayName    = getTodayName();
   const todayIdx     = DAYS.indexOf(todayName);
@@ -207,13 +207,15 @@ export default function HomeTab() {
 
   useEffect(() => {
     (async () => {
-      const raw = await AsyncStorage.getItem(KIDS_KEY);
-      if (raw) setKidsActivities(JSON.parse(raw));
-
-      const computed = await computeNudge(currentPlan, allRecipes);
+      const [familyState, computed] = await Promise.all([
+        loadFamilyState(),
+        computeNudge(currentPlan, allRecipes),
+        recordAppOpen(),
+      ]);
+      const fr = computeFamilyWeek(familyState);
+      setFamilyLine(fr.dashboardLine);
+      setFamilySub(fr.dashboardSub);
       if (computed) setNudge(computed);
-
-      await recordAppOpen();
     })();
   }, []);
 
@@ -284,22 +286,10 @@ export default function HomeTab() {
             <View style={styles.cardRow}>
               <View style={{ flex: 1 }}>
                 <Text style={[styles.cardLabel, { color: PLUM }]}>FAMILY</Text>
-                {kidsActivities.length > 0 ? (
-                  <>
-                    <Text style={styles.cardTitle}>
-                      {kidsActivities[0].name}
-                      {kidsActivities.length > 1 ? ` + ${kidsActivities.length - 1} more` : ""}
-                    </Text>
-                    <Text style={[styles.cardSub, { color: TEXT_MUTED }]}>On the list. ✓</Text>
-                  </>
-                ) : (
-                  <>
-                    <Text style={styles.cardTitle}>Nothing on here yet.</Text>
-                    <Text style={[styles.cardSub, { fontStyle: "italic", color: TEXT_MUTED }]}>
-                      A rare and peaceful sight.
-                    </Text>
-                  </>
-                )}
+                <Text style={styles.cardTitle}>{familyLine}</Text>
+                <Text style={[styles.cardSub, { color: TEXT_MUTED, fontStyle: "italic" }]}>
+                  {familySub}
+                </Text>
               </View>
               <View style={[styles.cardChevron, { backgroundColor: PLUM + "12" }]}>
                 <Feather name="chevron-right" size={16} color={PLUM} />

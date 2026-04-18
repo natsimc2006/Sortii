@@ -1,0 +1,178 @@
+MIGRATE EXISTING FAMILY JUGGLE BUILD INTO SORTII WITHOUT FULL REBUILD
+
+I already have an existing Family Juggle build in Replit with working logic, screens, forms, planning outputs, summary cards, event repeat logic, split assignment logic, and share-plan behaviour.
+
+I do NOT want a full rebuild from scratch.
+
+I want to bring this into the Sortii iOS app in a way that:
+
+* reuses as much existing logic and structure as possible
+* avoids duplicating working logic unnecessarily
+* does NOT feel like a separate or bolted-on mini app
+* feels like a native Sortii module inside the same app shell
+
+Goal
+
+Create a Sortii Family module by transplanting the current Family Juggle feature into the Sortii app codebase.
+
+⸻
+
+1. Keep and reuse wherever possible
+
+Please preserve and migrate:
+
+* event creation logic
+* recurring event logic
+* driver / parent assignment logic
+* overlap / tight timing logic
+* plan split logic
+* summary calculations
+* “worth knowing” logic
+* share-plan generation
+* existing data model and local persistence where practical
+
+Do not rebuild these from scratch unless technically necessary.
+
+⸻
+
+2. Replace the outer shell so it feels native to Sortii
+
+The Family module must adopt:
+
+* Sortii navigation
+* Sortii screen wrappers
+* Sortii spacing
+* Sortii card styles
+* Sortii button hierarchy
+* Sortii colours and typography
+* Sortii tone of voice
+
+Remove or refactor anything that makes it feel like a separate standalone product or microsite.
+
+⸻
+
+3. Preferred technical approach
+
+Use a modular transplant approach:
+
+* extract reusable family logic into dedicated files such as:
+    * familyLogic
+    * familyStore
+    * familyTypes
+    * familyHelpers
+* move Family screens/components into a shared module folder such as:
+    * /modules/family
+* connect the Family module to the existing Sortii app router and bottom navigation
+* reuse the existing logic and internal structures first
+* then refactor presentation to match Sortii
+
+Do NOT use a permanent iframe/webview solution unless only as a temporary internal bridge.
+
+⸻
+
+4. First-pass deliverables
+
+Please implement:
+
+A. Family dashboard card on the Sortii home screen
+
+Show compact smart summary examples like:
+
+* “2 activities this weekend. Saturday solves itself.”
+* “Friday needs backup.”
+* “One child in three places. Strong effort.”
+
+Tapping this card should open the Family module.
+
+B. Family module entry screen inside Sortii
+
+Use existing family feature logic, but inside Sortii’s app shell and navigation.
+
+C. Re-skinned versions of the most important existing screens
+
+Prioritise:
+
+* Family overview / entry
+* Event form / add event flow
+* Plan view
+* Weekend view
+* Summary / worth knowing / share plan section
+
+D. Shared theme integration
+
+Convert Family module styles to use Sortii theme tokens and shared components where possible.
+
+⸻
+
+5. What should change visually
+
+Please update the Family module so it visually matches Sortii:
+
+* no standalone hero/branding treatment once inside app
+* same background and card language as Meals and Money
+* same CTA styling
+* same heading hierarchy
+* same spacing rhythm
+* same rounded cards / border softness
+* consistent bottom nav and top header patterns
+
+The user should feel this is part of one product.
+
+⸻
+
+6. What should remain functionally intact
+
+Do not lose these behaviours:
+
+* repeat weekly / monthly event logic
+* plan split logic
+* parent / driver assignment
+* contact / carpool support
+* overlap / issue detection
+* smart summary generation
+* plan sharing
+
+Keep these working while refactoring presentation.
+
+⸻
+
+7. Shared app intelligence
+
+Once the Family module is inside Sortii, structure it so it can later feed:
+
+* dashboard summaries
+* weekly reset
+* carry-forward suggestions
+* busy-day detection across modules
+
+No need to fully build all cross-module logic right now, but prepare for it cleanly.
+
+⸻
+
+8. Implementation rule
+
+Priority order:
+
+1. preserve working logic
+2. migrate into Sortii module structure
+3. re-skin to match Sortii
+4. connect to dashboard and nav
+5. clean up any remaining UX mismatch
+
+Avoid unnecessary rewrites.
+
+⸻
+
+9. End result
+
+The final result should feel like:
+
+* one Sortii app
+* one shared weekly dashboard
+* Family as a native module alongside Meals and Money
+
+Not:
+
+* a separate app inside another app
+* a webview patch
+* duplicated logic rebuilt from scratch
