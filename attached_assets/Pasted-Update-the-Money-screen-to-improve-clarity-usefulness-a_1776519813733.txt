@@ -1,0 +1,128 @@
+Update the Money screen to improve clarity, usefulness, and tone. This includes copy changes, logic upgrades, and UI fixes.
+
+⸻
+
+1. Reframe “Dinner does most of the damage”
+
+Replace current wording with a baseline → improvement framing.
+
+New structure:
+
+* Title:
+    “Your usual dinner spend” (or similar calm label)
+* Body:
+    “Based on your grocery input, dinners would normally land around $X/week.
+    This week, Sortii has already helped pull some of that back.”
+
+Requirements:
+
+* This must reflect the user’s baseline grocery spend
+* It must NOT sound like dinner is still the problem
+* It must subtly position Sortii as already helping
+
+⸻
+
+2. Upgrade “A few easy wins” to dynamic logic
+
+Replace static tips with conditional, personalised suggestions
+
+Logic rules:
+
+IF takeaway_spend > threshold:
+→ Show:
+“You’re leaning a bit on takeaway.
+Skipping one this week could ease things nicely.
+Save ~ $X”
+
+IF streaming_subscriptions > threshold:
+→ Show:
+“Subscriptions are quietly stacking up.
+Pausing one for a month wouldn’t hurt.
+Save ~ $X”
+
+IF coffee_spend > threshold:
+→ Show:
+“Coffee’s doing its thing.
+Skip a couple this week if things feel tight.
+Save ~ $X”
+
+IF grocery_spend high (based on household size):
+→ Show:
+“Your grocery shop is on the higher side.
+One or two brand swaps could take the edge off.
+Save ~ $X”
+
+IF entertainment_spend high:
+→ Show:
+“A lot happening this week.
+One quieter night in could help balance things.
+Save ~ $X”
+
+⸻
+
+Add intro line above suggestions:
+
+“If you want to tighten things slightly this week:”
+
+⸻
+
+Tone rules:
+
+* Always optional, never instructive
+* Calm, supportive, slightly cheeky
+* No judgmental language
+
+⸻
+
+3. Fix floating “Add” button (currently cut off)
+
+Ensure button is NOT inside scroll container.
+
+Apply:
+
+* position: absolute
+* bottom: 20px
+* left: 50%
+* transform: translateX(-50%)
+* z-index: 1000
+
+Also:
+
+* Add padding-bottom (~80px) to scroll container
+* Ensure parent container has:
+    position: relative
+    overflow: visible
+
+Result:
+
+Button floats above content and is always visible
+
+⸻
+
+4. Strengthen Meals “Preferences” button
+
+Update to a clear primary CTA style:
+
+* Background: #D6A23A
+* Text: white
+* Font-weight: 600
+* Border: none
+* Add subtle shadow
+
+Optional label improvements:
+
+* “Adjust plan”
+* “Tune meals”
+
+⸻
+
+5. Tone pass across Money screen
+
+Ensure all copy:
+
+* Feels like a helpful companion, not a budgeting tool
+* Uses soft language:
+    * “could help”
+    * “if you want to”
+    * “quietly”
+* Avoids pressure or guilt

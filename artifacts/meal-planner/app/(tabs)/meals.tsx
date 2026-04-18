@@ -685,12 +685,13 @@ export default function MealsScreen() {
               onPress={() => setActiveChip("cost")}
             />
             <TouchableOpacity
-              style={[styles.prefIconBtn, { backgroundColor: C.tealTint, borderColor: TEAL + "40" }]}
+              style={styles.prefBtn}
               onPress={() => handleQuickNav("/(tabs)/preferences")}
-              activeOpacity={0.72}
+              activeOpacity={0.80}
               hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
             >
-              <Feather name="sliders" size={14} color={TEAL} />
+              <Feather name="sliders" size={11} color="#fff" />
+              <Text style={styles.prefBtnLabel}>Adjust plan</Text>
             </TouchableOpacity>
           </View>
           {preferences.kidFriendly && (
@@ -1327,6 +1328,30 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "transparent",
+  },
+  prefBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 14,
+    backgroundColor: "#D6A23A",
+    ...Platform.select({
+      web: { boxShadow: "0px 2px 6px rgba(210,154,34,0.30)" },
+      default: {
+        shadowColor: "#D29A22",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.30,
+        shadowRadius: 6,
+        elevation: 3,
+      },
+    }),
+  },
+  prefBtnLabel: {
+    fontSize: 11,
+    fontFamily: "Inter_600SemiBold",
+    color: "#fff",
   },
 
   kidFriendlyNote: {

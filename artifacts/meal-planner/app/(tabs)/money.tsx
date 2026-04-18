@@ -250,17 +250,18 @@ function GroceriesSection({
 
   return (
     <View style={styles.groceriesSection}>
-      <Text style={styles.groceriesSectionTitle}>Dinner does most of the damage</Text>
+      <Text style={styles.groceriesSectionTitle}>Your usual dinner spend</Text>
 
       <View style={styles.groceriesStatsRow}>
         <View style={styles.groceriesStat}>
+          <Text style={styles.groceriesStatLabel}>Usual baseline</Text>
           <Text style={styles.groceriesStatValue}>{fmt(estimatedDinnerSpend)}</Text>
         </View>
         {hasMealsSetup && dinnerPlanCost > 0 && (
           <>
             <View style={styles.groceriesStatDivider} />
             <View style={styles.groceriesStat}>
-              <Text style={styles.groceriesStatLabel}>Your dinner plan</Text>
+              <Text style={styles.groceriesStatLabel}>This week's plan</Text>
               <View style={styles.groceriesStatValueRow}>
                 <Text style={[styles.groceriesStatValue, { color: TEAL }]}>
                   {fmt(dinnerPlanCost)}
@@ -302,6 +303,7 @@ function QuickWinsSection({ suggestions, fmt }: { suggestions: MoneySuggestion[]
 
       {open && (
         <View style={styles.quickWinsBody}>
+          <Text style={styles.quickWinsIntro}>If you want to tighten things slightly this week:</Text>
           {tips.map((s) => (
             <View key={s.id} style={styles.quickWinsRow}>
               <Text style={styles.quickWinsArrow}>▸</Text>
@@ -770,6 +772,10 @@ const styles = StyleSheet.create({
   },
   quickWinsBody: {
     paddingHorizontal: 18, paddingBottom: 16, gap: 12,
+  },
+  quickWinsIntro: {
+    fontSize: 13, fontFamily: "Inter_400Regular", fontStyle: "italic",
+    color: "#8A6200", lineHeight: 18, marginBottom: 4,
   },
   quickWinsRow: {
     flexDirection: "row", alignItems: "flex-start", gap: 8,

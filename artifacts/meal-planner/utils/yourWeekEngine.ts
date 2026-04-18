@@ -229,158 +229,102 @@ function buildDynamicSuggestions(
   const isOverOrTight = weeklyState === 'over' || weeklyState === 'tight';
   const isOkOrBetter = !isOverOrTight;
 
-  const candidatesOverTight: MoneySuggestion[] = [];
-  const candidatesOkPlus: MoneySuggestion[] = [];
-  const alwaysLast: MoneySuggestion[] = [];
+  // ── Personalised tips — shown in all states when thresholds met ─
+  const personalised: MoneySuggestion[] = [];
 
-  // ── over/tight candidates ──────────────────────────────────
-
-  // pause_subscription (personalised)
-  if (ls.streaming > 0 && isOverOrTight) {
-    const impact = Math.round(ls.streaming * 0.5);
-    if (impact > 0) {
-      candidatesOverTight.push({
-        id: 'pause_subscription',
-        label: `You've got ${fmt(ls.streaming)} on streaming this week. Pause one.`,
-        reason: "When did you last actually watch it?",
-        impactAmount: impact,
-        category: 'money',
-      });
-    }
-  }
-
-  // skip_coffee (personalised) — over/tight only
-  if (ls.coffee > 0 && isOverOrTight) {
-    const impact = Math.round(ls.coffee / 4);
-    if (impact > 0) {
-      const coffeeCount = Math.round(ls.coffee / 5);
-      candidatesOverTight.push({
-        id: 'skip_coffee',
-        label: `You've got ${fmt(ls.coffee)} going to coffee this week. Skip one run.`,
-        reason: `That's roughly ${coffeeCount} coffee${coffeeCount !== 1 ? 's' : ''}. One less is still a win.`,
-        impactAmount: impact,
-        category: 'money',
-      });
-    }
-  }
-
-  // skip_entertainment (personalised)
-  if (ls.entertainment > 30 && isOverOrTight) {
-    const impact = Math.round(ls.entertainment * 0.4);
-    if (impact > 0) {
-      candidatesOverTight.push({
-        id: 'skip_entertainment',
-        label: `One less night out this week could save you ~${fmt(impact)}.`,
-        reason: "The dinners are sorted — that's already a win.",
-        impactAmount: impact,
-        category: 'money',
-      });
-    }
-  }
-
-  // eating_out_swap
-  if (eatingOutWeekly >= 40 && hasMealsSetup) {
-    candidatesOverTight.push({
-      id: 'eating_out_swap',
-      label: "Swap one meal out for a planned dinner.",
-      reason: "Your plan's already there — use it.",
-      impactAmount: 22,
-      category: 'combined',
+  if (eatingOutWeekly >= 30) {
+    const impact = Math.max(Math.round(eatingOutWeekly * 0.4), 20);
+    personalised.push({
+      id: 'skip_takeaway',
+      label: "You're leaning a bit on takeaway.",
+      reason: "Skipping one this week could ease things nicely.",
+      impactAmount: impact,
+      category: 'money',
     });
   }
 
-  // eating_out_nomeal — eating out spend logged but no dinners planned
-  if (eatingOutWeekly > 0 && !hasMealsSetup) {
-    candidatesOverTight.push({
+  if (ls.streaming > 15) {
+    const impact = Math.round(ls.streaming * 0.5);
+    if (impact > 0) {
+      personalised.push({
+        id: 'pause_subscription',
+        label: "Subscriptions are quietly stacking up.",
+        reason: "Pausing one for a month wouldn't hurt.",
+        impactAmount: impact,
+        category: 'money',
+      });
+    }
+  }
+
+  if (ls.coffee > 12) {
+    const impact = Math.round(ls.coffee / 3);
+    if (impact > 0) {
+      personalised.push({
+        id: 'skip_coffee',
+        label: "Coffee's doing its thing.",
+        reason: "Skip a couple this week if things feel tight.",
+        impactAmount: impact,
+        category: 'money',
+      });
+    }
+  }
+
+  if (groceriesWeekly > 150) {
+    personalised.push({
+      id: 'grocery_trim',
+      label: "Your grocery shop is on the higher side.",
+      reason: "One or two brand swaps could take the edge off.",
+      impactAmount: 18,
+      category: 'money',
+    });
+  }
+
+  if (ls.entertainment > 25) {
+    const impact = Math.round(ls.entertainment * 0.4);
+    if (impact > 0) {
+      personalised.push({
+        id: 'skip_entertainment',
+        label: "A lot happening this week.",
+        reason: "One quieter night in could help balance things.",
+        impactAmount: impact,
+        category: 'money',
+      });
+    }
+  }
+
+  // ── Meals-based tips ──────────────────────────────────────
+  const mealsTips: MoneySuggestion[] = [];
+
+  if (hasMealsSetup && hasBatchMeal) {
+    mealsTips.push({
+      id: 'leftover_night',
+      label: "You've got a batch meal this week. Let it cover two nights.",
+      reason: "Cook once. Eat twice. The shopping list already accounts for it.",
+      impactAmount: 15,
+      category: 'meals',
+    });
+  } else if (eatingOutWeekly > 0 && !hasMealsSetup) {
+    mealsTips.push({
       id: 'eating_out_nomeal',
-      label: `You've got ${fmt(eatingOutWeekly)} on eating out and no dinners planned. That's where Sortii earns its keep.`,
+      label: `You've got ${fmt(eatingOutWeekly)} on eating out and no dinners planned.`,
       reason: "Lock in a few dinners and watch that number shrink.",
       impactAmount: Math.round(eatingOutWeekly * 0.3),
       category: 'combined',
     });
   }
 
-  // swap_takeaway — only show if user has eating-out spend (not totally out of nowhere)
-  if (eatingOutWeekly > 0) {
-    candidatesOverTight.push({
-      id: 'swap_takeaway',
-      label: "Skip one takeaway this week.",
-      reason: "Dinner's already sorted — you're literally 90% there.",
-      impactAmount: 25,
-      category: 'money',
-    });
-  }
-
-  // leftover_night / batch_meal — mutually exclusive with fridge_raid
-  if (hasMealsSetup && hasBatchMeal) {
-    candidatesOverTight.push({
-      id: 'leftover_night',
-      label: "You've got a batch meal this week. Let it cover two nights.",
-      reason: "Cook once. Eat twice. The shopping list already accounts for it.",
-      impactAmount: 15,
-      category: 'meals',
-    });
-  } else {
-    candidatesOverTight.push({
-      id: 'batch_meal',
-      label: "Cook once, eat twice. Pick your biggest meal and double it.",
-      reason: "Less faff. Less cost. Future you approves.",
-      impactAmount: 15,
-      category: 'meals',
-    });
-    // fridge_raid only when there's no leftover_night nudge already (same behavioural intent)
-    candidatesOverTight.push({
-      id: 'fridge_raid',
-      label: "One night: open the fridge, wing it. Sortii calls that a win.",
-      impactAmount: 20,
-      category: 'money',
-    });
-  }
-
-  // grocery_trim — fires for any state when groceries are on the higher side
-  if (groceriesWeekly > 200) {
-    candidatesOverTight.push({
-      id: 'grocery_trim',
-      label: "Your grocery spend is on the higher side. One swap could help.",
-      reason: "Try one own-brand swap on something you buy every week.",
-      impactAmount: 18,
-      category: 'money',
-    });
-    candidatesOkPlus.push({
-      id: 'grocery_trim',
-      label: "Your grocery spend is on the higher side. One swap could help.",
-      reason: "Try one own-brand swap on something you buy every week.",
-      impactAmount: 18,
-      category: 'money',
-    });
-  }
-
-  // ── ok/good/great candidates ──────────────────────────────
-
-  // leftover_night
-  if (hasMealsSetup && hasBatchMeal) {
-    candidatesOkPlus.push({
-      id: 'leftover_night',
-      label: "You've got a batch meal this week. Let it cover two nights.",
-      reason: "Cook once. Eat twice. The shopping list already accounts for it.",
-      impactAmount: 15,
-      category: 'meals',
-    });
-  }
-
-  // freezer_check (static)
-  candidatesOkPlus.push({
+  // ── Fallback static tip ───────────────────────────────────
+  const freezerCheck: MoneySuggestion = {
     id: 'freezer_check',
-    label: "Do a freezer audit before you shop.",
-    reason: "There's definitely something in there.",
+    label: "There's almost definitely something in the freezer.",
+    reason: "Check before you shop — free food you forgot about.",
     impactAmount: 10,
     category: 'money',
-  });
+  };
 
-  // ── always-last nudges ────────────────────────────────────
+  // ── Always-last nudges (goal projections) ─────────────────
+  const alwaysLast: MoneySuggestion[] = [];
 
-  // goal_almost_there — fires when goal is under 3 weeks away (urgent motivating moment)
-  // Checked first so we can suppress monthly_projection_nudge when it fires
   let goalAlmostThereFired = false;
   if (goal !== 'none' && isOkOrBetter && weeklySortiiSaving > 0) {
     const target = GOAL_TARGETS[goal];
@@ -415,13 +359,12 @@ function buildDynamicSuggestions(
     }
   }
 
-  // monthly_projection_nudge — suppressed when goal_almost_there fires
   if (!goalAlmostThereFired && isOkOrBetter && hasMealsSetup && weeklySortiiSaving > 0) {
     const monthlyProjection = Math.round(weeklySortiiSaving * 4);
     if (monthlyProjection > 0) {
       alwaysLast.push({
         id: 'monthly_projection_nudge',
-        label: `You're tracking well. Keep this up and that's ~${fmt(monthlyProjection)}/month saved on dinners.`,
+        label: `Keep this up — that's ~${fmt(monthlyProjection)}/month saved on dinners.`,
         impactAmount: 0,
         category: 'combined',
         isMonthlyNudge: true,
@@ -429,14 +372,7 @@ function buildDynamicSuggestions(
     }
   }
 
-  // goal_projection_forward
-  if (
-    goal !== 'none' &&
-    isOkOrBetter &&
-    hasMealsSetup &&
-    dinnerPlanCost > 0 &&
-    weeklySortiiSaving > 0
-  ) {
+  if (goal !== 'none' && isOkOrBetter && hasMealsSetup && dinnerPlanCost > 0 && weeklySortiiSaving > 0) {
     const target = GOAL_TARGETS[goal];
     const goalLabel = GOAL_LABELS[goal];
     const goalEmoji = GOAL_EMOJIS[goal];
@@ -457,17 +393,19 @@ function buildDynamicSuggestions(
     }
   }
 
-  // ── Apply state limits ────────────────────────────────────
-  let selected: MoneySuggestion[] = [];
-  if (isOverOrTight) {
-    const sorted = [...candidatesOverTight].sort((a, b) => b.impactAmount - a.impactAmount);
-    selected = sorted.slice(0, 3);
-  } else {
-    const sorted = [...candidatesOkPlus].sort((a, b) => b.impactAmount - a.impactAmount);
-    selected = [...sorted.slice(0, 2), ...alwaysLast];
-  }
+  // ── Select ────────────────────────────────────────────────
+  const sortedPersonalised = [...personalised].sort((a, b) => b.impactAmount - a.impactAmount);
 
-  return selected;
+  if (isOverOrTight) {
+    const combined = [...sortedPersonalised, ...mealsTips];
+    if (combined.length < 3) combined.push(freezerCheck);
+    return combined.slice(0, 3);
+  } else {
+    const topPersonalised = sortedPersonalised.slice(0, 2);
+    const base = [...topPersonalised, ...mealsTips];
+    if (base.length < 2) base.push(freezerCheck);
+    return [...base.slice(0, 2), ...alwaysLast].slice(0, 3);
+  }
 }
 
 export function buildMoneyPage(
@@ -528,18 +466,18 @@ export function buildMoneyPage(
   if (!hasGroceries) {
     dinnerInsight = 'Add your weekly grocery spend to see how your dinners track.';
   } else if (!hasMealsSetup || dinnerPlanCost === 0) {
-    dinnerInsight = `About 65% of your grocery spend goes to dinners — roughly ${fmt(Math.round(fullWeekDinnerEstimate > 0 ? fullWeekDinnerEstimate : groceriesWeekly * 0.65))} for the week.`;
+    dinnerInsight = `Based on your grocery input, dinners would normally land around ${fmt(Math.round(fullWeekDinnerEstimate > 0 ? fullWeekDinnerEstimate : groceriesWeekly * 0.65))} for the week.`;
   } else {
     const coverageNote = dinnersPlanned < TOTAL_DINNERS_IN_WEEK
       ? `This plan covers ${dinnersPlanned} of ${TOTAL_DINNERS_IN_WEEK} dinners. `
       : '';
 
     if (dinnerPlanCost < estimatedDinnerSpend * 0.9) {
-      dinnerInsight = `${coverageNote}Dinners are under budget. That's the plan working.`;
+      dinnerInsight = `${coverageNote}Sortii has already helped pull some of that back this week.`;
     } else if (dinnerPlanCost > estimatedDinnerSpend * 1.2) {
-      dinnerInsight = `${coverageNote}Dinner spend is nudging over. One swap could sort it.`;
+      dinnerInsight = `${coverageNote}Dinner spend is nudging over your usual. One swap could sort it.`;
     } else {
-      dinnerInsight = `${coverageNote}Dinners are tracking well. Nothing to worry about here.`;
+      dinnerInsight = `${coverageNote}Dinners are tracking close to your usual spend. Nothing to worry about.`;
     }
   }
 
