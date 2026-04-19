@@ -5,14 +5,17 @@ import { SortiiCalEvent, GoogleCalendarMeta, GOOGLE_TOKEN_KEY } from "./calendar
 
 const GOOGLE_REFRESH_KEY = "sortii_google_refresh_token";
 
-// Resolve client ID from env (dev) or app.config.js extra (production/Replit secrets)
+// EXPO_PUBLIC_GOOGLE_CLIENT_ID is forwarded from the GOOGLE_CLIENT_ID secret
+// via the dev script and inlined by Metro at bundle time.
+// Falls back to Constants.expoConfig.extra for EAS / production builds.
 function resolveGoogleClientId(): string {
-  return (
-    process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID ??
-    ((Constants.expoConfig?.extra as Record<string, unknown> | null)
-      ?.googleClientId as string | null) ??
-    ""
-  );
+  if (process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID) {
+    return process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID;
+  }
+  const extra = Constants.expoConfig?.extra as Record<string, unknown> | undefined;
+  const fromExtra = extra?.googleClientId;
+  if (typeof fromExtra === "string" && fromExtra) return fromExtra;
+  return "";
 }
 
 const GOOGLE_CLIENT_ID = resolveGoogleClientId();

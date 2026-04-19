@@ -5,11 +5,21 @@
 
 const base = require("./app.json");
 
+const googleClientId    = process.env.GOOGLE_CLIENT_ID    ?? null;
+const googleIosClientId = process.env.GOOGLE_IOS_CLIENT_ID ?? null;
+
+console.error(
+  "[Sortii Config] GOOGLE_CLIENT_ID:",    googleClientId    ? "present ✓" : "MISSING ✗"
+);
+console.error(
+  "[Sortii Config] GOOGLE_IOS_CLIENT_ID:", googleIosClientId ? "present ✓" : "MISSING ✗"
+);
+
 module.exports = {
   ...base.expo,
   extra: {
     ...(base.expo.extra ?? {}),
-    googleClientId:    process.env.GOOGLE_CLIENT_ID    ?? null,
-    googleIosClientId: process.env.GOOGLE_IOS_CLIENT_ID ?? null,
+    googleClientId,
+    googleIosClientId,
   },
 };
