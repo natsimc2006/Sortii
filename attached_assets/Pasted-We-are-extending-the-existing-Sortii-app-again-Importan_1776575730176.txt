@@ -1,0 +1,389 @@
+We are extending the existing Sortii app again.
+
+Important:
+Do not rebuild the app.
+Do not remove or break existing logic in Meals, Juggle, Appointments or Bills.
+This task is to add a new cross-module layer that makes the app feel more like one helpful system.
+
+We are adding:
+1. A combined “What’s coming up” screen
+2. Gentle reminder logic
+3. Optional “assigned to me / assigned to partner / assigned to child” views
+4. Weekly glance summary cards with calm, human summary copy
+
+Sortii principles must remain:
+- calm
+- clear
+- low mental load
+- supportive
+- slightly cheeky in small doses only
+- never stressful
+- never over-designed
+- never like a corporate dashboard
+- never like project management software
+
+Use the existing Sortii styling system:
+- soft white / warm white background
+- soft cards
+- clean hierarchy
+- gentle accent colour use
+- same voice and spacing rules as the existing modules
+
+--------------------------------------------------
+PART 1: “WHAT’S COMING UP” SCREEN
+--------------------------------------------------
+
+Create a new top-level screen or dashboard section called:
+
+“What’s Coming Up”
+
+Goal:
+Give the user one simple, glanceable place to see the next few days across all modules:
+- Meals
+- Juggle
+- Appointments
+- Bills
+
+This should feel like relief, not another wall of information.
+
+The screen should:
+- combine items from all modules into one unified timeline / grouped view
+- show only relevant upcoming items
+- prioritise near-term items
+- group clearly by time buckets
+
+Suggested time buckets:
+- Today
+- Tomorrow
+- This week
+- Later
+
+Each item in the combined view should show:
+- module type
+- title
+- date / time if relevant
+- assigned person if relevant
+- key support text if relevant
+- status chip if relevant
+
+Examples:
+- Meal: “Chicken tray bake” — Tonight
+- Juggle: “Soccer pickup” — 4:30 PM — For: Max
+- Appointment: “Dentist” — Tuesday 3:30 PM — For: Ella
+- Bill: “Electricity” — Due Thursday — $142
+
+Add a small module icon or chip per item:
+- Meals
+- Juggle
+- Appointments
+- Bills
+
+But keep it clean and understated.
+
+What’s Coming Up top summary panel:
+Include a simple top card with calm human copy generated from the upcoming week.
+Examples:
+- “A few moving parts this week, but nothing wildly offensive.”
+- “Thursday’s doing a bit much.”
+- “A fairly decent run at the moment.”
+- “You’ve got a couple of things creeping up.”
+
+This summary should be generated from simple logic, not random.
+
+Suggested logic examples:
+- If 1–3 items total in next 7 days: “A fairly light week by the looks.”
+- If 4–7 items: “A few moving parts, but manageable.”
+- If 8+ items: “This week’s got a bit on.”
+- If one day has significantly more items than others: call out that day
+- If there are overdue bills or multiple prep-needed items: mention that gently
+
+Do not use robotic phrasing.
+Do not use panic tone.
+
+Also include quick summary chips:
+- Meals left this week
+- Appointments upcoming
+- Bills due soon
+- Juggle items left
+
+--------------------------------------------------
+PART 2: COMBINED DATA / AGGREGATION LOGIC
+--------------------------------------------------
+
+Create a reusable aggregation layer that pulls data from existing module stores/models.
+
+Create a unified derived item shape for timeline entries, something like:
+- id
+- sourceType (meal, juggle, appointment, bill)
+- title
+- date
+- time optional
+- assignedTo optional
+- status optional
+- secondaryText optional
+- urgencyLevel optional
+- rawSourceId
+
+Use this for:
+- What’s Coming Up screen
+- Weekly glance card
+- Reminder logic
+
+Sorting rules:
+- Sort by nearest upcoming date/time
+- Items without time should still sort reasonably within that date
+- Overdue bills should surface prominently in the relevant near-term section
+- Completed/done/paid items should not clutter the main upcoming view unless specifically requested
+
+Filtering:
+Allow filter chips:
+- All
+- Me
+- Partner
+- Child
+- Meals
+- Juggle
+- Appointments
+- Bills
+
+If exact family member names already exist in app data, use those instead of generic labels where possible.
+If not, support generic labels for now:
+- Me
+- Partner
+- Child
+
+--------------------------------------------------
+PART 3: ASSIGNED VIEWS
+--------------------------------------------------
+
+Add optional assigned-person views across modules and combined views.
+
+Goal:
+Allow a user to quickly see:
+- what’s assigned to me
+- what’s assigned to my partner
+- what’s assigned to a child
+
+This does not need to be overcomplicated.
+
+Support a shared person model that can be used across:
+- Juggle
+- Appointments
+- Bills
+- future modules
+
+For now, support:
+- Me
+- Partner
+- Child / children names if available
+
+Examples of how assignment should appear:
+- “For: Mum”
+- “For: Dad”
+- “For: Ava”
+- “Assigned to: Me”
+
+Add filter tabs or chips:
+- Everyone
+- Me
+- Partner
+- Child
+
+If there are multiple children, allow child-specific filtering where the data exists.
+
+Important:
+Do not force assignment for meals unless it naturally fits existing meal logic.
+Meals can still appear in combined view without assignment where appropriate.
+
+--------------------------------------------------
+PART 4: GENTLE REMINDER LOGIC
+--------------------------------------------------
+
+Add reminder logic, but make it soft and useful.
+
+This is not a push notification system unless one already exists.
+For now, implement reminder surfacing inside the app UI as reminder banners, badges, or “coming up” flags.
+
+Reminder logic should identify things like:
+- appointment within 24 hours with reminder enabled
+- appointment with unfinished prep checklist
+- bill due within 3 days
+- overdue unpaid bill
+- juggle event happening today
+- meal not yet planned for a near day if that logic exists already
+
+Create a reusable reminder model:
+- id
+- sourceType
+- sourceId
+- title
+- reminderType
+- triggerDate
+- assignedTo optional
+- severity (gentle, heads-up, important)
+- displayText
+
+Tone examples:
+- “Dentist tomorrow for Ava.”
+- “Electricity bill due in 2 days.”
+- “Soccer pickup later today.”
+- “A few bits need sorting before Thursday.”
+- “This one’s creeping up.”
+
+Important:
+No scary language.
+No alarmist red-alert style.
+No guilt.
+No “urgent action required” unless absolutely necessary.
+Use soft hierarchy:
+- gentle
+- heads-up
+- important
+
+Display reminders:
+- on the What’s Coming Up screen
+- on the home/dashboard preview
+- optionally at the top of relevant module screens
+
+--------------------------------------------------
+PART 5: WEEKLY GLANCE CARD
+--------------------------------------------------
+
+Add a reusable “Weekly Glance” card to the home/dashboard.
+
+Goal:
+Give a one-card summary of the upcoming week in Sortii voice.
+
+This should pull from the same aggregated layer as “What’s Coming Up”.
+
+The card should include:
+- one main sentence summary
+- 2–4 tiny sub-points or chips
+- a CTA to open full “What’s Coming Up”
+
+Example main lines:
+- “Thursday’s doing a bit much.”
+- “A few moving parts this week.”
+- “Surprisingly civilised so far.”
+- “You’ve got a couple of things lining up.”
+
+Example supporting chips:
+- 2 appointments
+- 1 bill due
+- 3 juggle items
+- 4 meals left
+
+Logic ideas:
+- if one day has 3+ items across modules, mention the day
+- if overdue bills exist, mention that gently
+- if there are multiple items needing prep, mention that
+- if the week is light, say so
+
+Examples:
+- “Thursday’s doing a bit much.” / chips: 2 appointments, 1 pickup, 1 bill due
+- “A fairly light run this week.” / chips: 1 appointment, 3 meals planned
+- “A couple of things need your attention.” / chips: 1 overdue bill, 1 prep item
+
+Do not make this card too large.
+It should feel glanceable.
+
+--------------------------------------------------
+PART 6: UX / PRESENTATION RULES
+--------------------------------------------------
+
+Important UX rules:
+- Keep the combined view clean and scannable
+- Do not dump raw data from four modules into one messy list
+- Use date grouping and spacing carefully
+- Use plain-English labels
+- Avoid icon-only controls
+- Keep primary CTAs visible and never blocked by sticky nav
+- Completed items should not dominate
+- Use subtle colour chips for source type and status
+- Use human-readable dates and times only
+- Never show raw time logic like minute counts from midnight
+
+Examples of good microcopy:
+- “One less thing to keep in your head.”
+- “A few things on the radar.”
+- “This one’s edging closer.”
+- “Tomorrow’s got a couple of moving parts.”
+
+Examples of bad tone:
+- “Urgent”
+- “Critical”
+- “You are behind”
+- “Action required immediately”
+
+--------------------------------------------------
+PART 7: TECHNICAL / ARCHITECTURE
+--------------------------------------------------
+
+Requirements:
+- Build this using reusable selectors / derived state where possible
+- Do not duplicate sorting logic in multiple places
+- Create reusable helper functions for:
+  - get upcoming items
+  - group items by date bucket
+  - generate weekly summary text
+  - derive reminders
+  - filter by assigned person
+- Keep modules modular
+- Do not tightly couple source modules to the combined screen
+- Use a clean shared type/interface for aggregated items and reminders
+
+Need reusable components:
+- Weekly glance card
+- Combined timeline list item
+- Source chip
+- Reminder banner / reminder row
+- Filter chip row
+- Empty state for What’s Coming Up
+
+Empty state suggestion:
+- “Nothing major coming up. Frankly, love that for you.”
+
+--------------------------------------------------
+PART 8: HOME SCREEN INTEGRATION
+--------------------------------------------------
+
+Update the home/dashboard to include:
+1. Weekly Glance card
+2. Small reminder section if reminders exist
+3. CTA into full “What’s Coming Up” screen
+
+Example home structure:
+- Greeting / summary
+- Weekly Glance card
+- Reminder strip if needed
+- Existing module cards:
+  Meals
+  Juggle
+  Appointments
+  Bills
+
+Keep it airy and not too dense.
+
+--------------------------------------------------
+PART 9: SANITY CHECK BEFORE FINISHING
+--------------------------------------------------
+
+Before finishing, verify:
+- combined timeline pulls correctly from all 4 modules
+- overdue bills surface properly
+- appointments sort correctly by date/time
+- completed/paid items are handled correctly
+- assigned filters work cleanly
+- weekly summary text changes based on real data
+- tone still feels like Sortii
+- no CTA is hidden behind bottom nav
+- the whole thing feels simpler, not busier
+
+Output required:
+Implement the full cross-module layer with:
+- What’s Coming Up screen
+- gentle reminders
+- assigned person filters/views
+- Weekly Glance card
+- home integration
+- reusable aggregation logic

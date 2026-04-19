@@ -19,10 +19,18 @@ import { useLocale } from "@/context/LocaleContext";
 import allRecipesRaw from "@/data/recipes_unified_au.json";
 import { computeNudge, recordAppOpen, Nudge } from "@/utils/nudgeEngine";
 import { loadFamilyState } from "@/utils/familyStore";
+import { FamilyState } from "@/utils/familyTypes";
 import { computeFamilyWeek } from "@/utils/familyEngine";
 import { loadAppointments, Appointment } from "@/utils/appointmentStore";
 import { loadBills, computeBillStatus, Bill } from "@/utils/billStore";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import {
+  buildTimelineItems,
+  deriveReminders,
+  TimelineItem,
+  ReminderItem,
+} from "@/utils/weeklyAggregate";
+import { WeeklyGlanceCard, ReminderStrip } from "./upcoming";
 
 const JUGGLE_RESULT_KEY = "@sortii_juggle_result_v1";
 
@@ -205,6 +213,9 @@ export default function HomeTab() {
   const [juggleResult, setJuggleResult] = useState<JuggleResult | null>(null);
   const [nextAppt, setNextAppt]         = useState<Appointment | null>(null);
   const [billsData, setBillsData]       = useState<{ overdue: number; dueSoon: number; total: number } | null>(null);
+  const [allBills,  setAllBills]        = useState<Bill[]>([]);
+  const [allItems,  setAllItems]        = useState<TimelineItem[]>([]);
+  const [reminders, setReminders]       = useState<ReminderItem[]>([]);
 
   const todayName    = getTodayName();
   const todayIdx     = DAYS.indexOf(todayName);
@@ -244,7 +255,6 @@ export default function HomeTab() {
         try { setJuggleResult(JSON.parse(savedJuggle)); } catch {}
       }
       // Next upcoming appointment
-      const today = new Date(); today.setHours(0, 0, 0, 0);
       const upcoming = appts
         .filter((a) => !a.isDone && !a.isCancelled)
         .sort((a, b) => a.date.localeCompare(b.date) || a.startTime.localeCompare(b.startTime));
@@ -254,6 +264,17 @@ export default function HomeTab() {
       const dueSoon  = bills.filter((b) => computeBillStatus(b) === "Due Soon").length;
       const total    = bills.filter((b) => !b.isPaid).reduce((s, b) => s + b.amount, 0);
       setBillsData(bills.length > 0 ? { overdue, dueSoon, total } : null);
+      setAllBills(bills);
+      // Cross-module timeline
+      const builtItems = buildTimelineItems({
+        plan:         currentPlan,
+        recipes:      allRecipes,
+        appointments: appts,
+        bills,
+        familyState,
+      });
+      setAllItems(builtItems);
+      setReminders(deriveReminders({ appointments: appts, bills, familyState }));
     })();
   }, []);
 
@@ -285,6 +306,18 @@ export default function HomeTab() {
 
           {/* Weekly summary */}
           <Text style={styles.summary}>{summary}</Text>
+
+          {/* Weekly Glance card — cross-module overview */}
+          <WeeklyGlanceCard
+            items={allItems}
+            bills={allBills}
+            onViewAll={() => router.push("/(tabs)/upcoming")}
+          />
+
+          {/* Reminder strip */}
+          {reminders.length > 0 && (
+            <ReminderStrip reminders={reminders} />
+          )}
 
           {/* Smart nudge banner */}
           {nudge && (

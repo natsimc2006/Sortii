@@ -357,6 +357,7 @@ export default function TabLayout() {
         <Tabs.Screen name="preferences"  options={{ href: null }} />
         <Tabs.Screen name="appointments" options={{ href: null }} />
         <Tabs.Screen name="bills"        options={{ href: null }} />
+        <Tabs.Screen name="upcoming"     options={{ href: null }} />
         <Tabs.Screen name="index"        options={{ href: null }} />
       </Tabs>
 

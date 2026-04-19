@@ -110,6 +110,19 @@ Expo / React Native mobile app — **Sortii**, a weekly household meal planner f
 - `app/(tabs)/shopping.tsx` — grouped shopping list with copy/share
 - `app/home.tsx` — info/about screen with Sortii logo and how-it-works
 
+**Cross-module layer (v3 additions):**
+- `utils/weeklyAggregate.ts` — pure aggregation layer: `buildTimelineItems`, `groupByBucket`, `generateWeeklySummary`, `deriveReminders`, `filterItems`, shared types `TimelineItem`, `ReminderItem`, `SourceType`, `DateBucket`
+- `app/(tabs)/upcoming.tsx` — "What's Coming Up" unified timeline screen; also exports `WeeklyGlanceCard` and `ReminderStrip` components for home.tsx
+- `app/(tabs)/home.tsx` — imports WeeklyGlanceCard (hides when no data) + ReminderStrip (shows top 3 reminders with severity colours)
+- `app/(tabs)/appointments.tsx` — full CRUD: 8 categories, date/time pickers, prep checklists, reminder/recurring toggles
+- `app/(tabs)/bills.tsx` — full CRUD: 10 categories, recurring bills, auto-advance on mark-paid, status computed from due date
+- `app/(tabs)/more.tsx` — "Organised life" section links to What's Coming Up, Appointments, Bills
+
+**Data model:**
+- AsyncStorage keys: `@sortii_appointments_v1`, `@sortii_bills_v1`, `@sortii_family_v2`, `@sortii_juggle_result_v1`
+- `FamilyState.members` — `{ id, name, role, color }` with `FamilyEvent` having `personIds[]` and optional `driverId`
+- Reminder severities: `important` (red) → `heads_up` (gold) → `gentle` (teal)
+
 **Colour palette tokens** (in `constants/Colors.ts`):
 - `primary` = teal `#2A8F88`, `primaryDark` = `#257D78`, `gold` = `#D29A22`, `goldDark` = `#B97D12`
 - `plum` = `#5E3A4C`, `plumTint` = `#F3E8EE`, `tealTint` = `#E6F3F0`, `goldTint` = `#F6E6BA`

@@ -56,6 +56,13 @@ export default function MoreScreen() {
       title: "Organised life",
       items: [
         {
+          icon: "layers",
+          color: TEAL,
+          label: "What's Coming Up",
+          sub: "Everything across all modules, in one place",
+          onPress: () => router.push("/(tabs)/upcoming"),
+        },
+        {
           icon: "calendar",
           color: PLUM,
           label: "Appointments",
@@ -68,19 +75,6 @@ export default function MoreScreen() {
           label: "Bills",
           sub: "Track what's coming up and what's paid",
           onPress: () => router.push("/(tabs)/bills"),
-        },
-      ],
-    },
-    {
-      title: "Also on the way",
-      items: [
-        {
-          icon: "bell",
-          color: "#E07B3A",
-          label: "Reminders",
-          sub: "Gentle nudges for your week",
-          badge: "Soon",
-          onPress: () => {},
         },
       ],
     },
