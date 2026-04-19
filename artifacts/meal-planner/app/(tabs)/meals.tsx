@@ -620,6 +620,15 @@ export default function MealsScreen() {
               <Text style={[styles.toolBtnText, { color: C.primaryDark }]}>{action.label}</Text>
             </TouchableOpacity>
           ))}
+          <TouchableOpacity
+            style={[styles.toolBtn, { backgroundColor: GOLD, borderColor: GOLD + "60" }]}
+            onPress={() => handleQuickNav("/(tabs)/preferences")}
+            activeOpacity={0.80}
+            hitSlop={{ top: 4, bottom: 4 }}
+          >
+            <Feather name="sliders" size={12} color="#fff" />
+            <Text style={[styles.toolBtnText, { color: "#fff" }]}>Adjust</Text>
+          </TouchableOpacity>
         </ScrollView>
       </View>
 
@@ -679,15 +688,6 @@ export default function MealsScreen() {
               range={filledCount > 0 ? estimatedCostBand : undefined}
               onPress={() => setActiveChip("budget")}
             />
-            <TouchableOpacity
-              style={styles.prefBtn}
-              onPress={() => handleQuickNav("/(tabs)/preferences")}
-              activeOpacity={0.80}
-              hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
-            >
-              <Feather name="sliders" size={11} color="#fff" />
-              <Text style={styles.prefBtnLabel}>Adjust</Text>
-            </TouchableOpacity>
           </View>
           {preferences.kidFriendly && (
             <Text style={[styles.kidFriendlyNote, { color: C.textSecondary }]}>
