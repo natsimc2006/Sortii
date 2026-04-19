@@ -674,6 +674,11 @@ export default function AppointmentsScreen() {
 
   // ── Calendar connection: Google ────────────────────────────────────────────
   async function handleConnectGoogle() {
+    // OAuth uses auth.expo.io proxy which only works on native — not in a web browser
+    if (Platform.OS === "web") {
+      showToast("Google Calendar works in the Sortii app on your phone.", false);
+      return;
+    }
     if (!isGoogleConfigured()) {
       showToast("Google Calendar coming soon — use iPhone Calendar for now.", false);
       return;
