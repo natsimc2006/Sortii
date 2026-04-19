@@ -1,7 +1,18 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import Constants from "expo-constants";
 import { SortiiCalEvent, GoogleCalendarMeta, GOOGLE_TOKEN_KEY } from "./calendarTypes";
 
-const GOOGLE_CLIENT_ID = process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID ?? "";
+// Prefer EXPO_PUBLIC_ env var (dev), then fall back to extra config injected
+// via app.config.js at bundle time (production / Replit secrets).
+function resolveGoogleClientId(): string {
+  return (
+    process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID ??
+    (Constants.expoConfig?.extra as Record<string, unknown> | null)?.googleClientId as string | null ??
+    ""
+  );
+}
+
+const GOOGLE_CLIENT_ID = resolveGoogleClientId();
 
 export function isGoogleConfigured(): boolean {
   return !!GOOGLE_CLIENT_ID && GOOGLE_CLIENT_ID !== "";
