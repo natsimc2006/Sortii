@@ -20,6 +20,20 @@ import allRecipesRaw from "@/data/recipes_unified_au.json";
 import { computeNudge, recordAppOpen, Nudge } from "@/utils/nudgeEngine";
 import { loadFamilyState } from "@/utils/familyStore";
 import { computeFamilyWeek } from "@/utils/familyEngine";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+const JUGGLE_RESULT_KEY = "@sortii_juggle_result_v1";
+
+interface JuggleResult {
+  status: "sorted" | "tight" | "needs_attention";
+  summary: string;
+  smart_note: string | null;
+  plan: Array<{ adult: string; day: string; duty: string }>;
+  conflicts: Array<{ type: string; description: string }>;
+  adult_lists: Record<string, string>;
+  unassigned_events: string[];
+  solvedAt: number;
+}
 
 const allRecipes = allRecipesRaw as { id: string; name: string }[];
 
@@ -185,6 +199,8 @@ export default function HomeTab() {
   const [nudge, setNudge]               = useState<Nudge | null>(null);
   const [familyLine, setFamilyLine]     = useState<string>("Nothing on the family radar this week.");
   const [familySub, setFamilySub]       = useState<string>("A rare and peaceful sight.");
+  const [familyEventCount, setFamilyEventCount] = useState(0);
+  const [juggleResult, setJuggleResult] = useState<JuggleResult | null>(null);
 
   const todayName    = getTodayName();
   const todayIdx     = DAYS.indexOf(todayName);
@@ -207,15 +223,20 @@ export default function HomeTab() {
 
   useEffect(() => {
     (async () => {
-      const [familyState, computed] = await Promise.all([
+      const [familyState, nudgeResult, , savedJuggle] = await Promise.all([
         loadFamilyState(),
         computeNudge(currentPlan, allRecipes),
         recordAppOpen(),
+        AsyncStorage.getItem(JUGGLE_RESULT_KEY),
       ]);
       const fr = computeFamilyWeek(familyState);
+      setFamilyEventCount(familyState.events.length);
       setFamilyLine(fr.dashboardLine);
       setFamilySub(fr.dashboardSub ?? fr.dashboardLine);
-      if (computed) setNudge(computed);
+      if (nudgeResult) setNudge(nudgeResult);
+      if (savedJuggle) {
+        try { setJuggleResult(JSON.parse(savedJuggle)); } catch {}
+      }
     })();
   }, []);
 
@@ -278,24 +299,51 @@ export default function HomeTab() {
           </TouchableOpacity>
 
           {/* C — Family */}
-          <TouchableOpacity
-            onPress={() => router.push("/(tabs)/family")}
-            activeOpacity={0.8}
-            style={[styles.card, styles.cardNeutral, styles.cardRailPlum]}
-          >
-            <View style={styles.cardRow}>
-              <View style={{ flex: 1 }}>
-                <Text style={[styles.cardLabel, { color: PLUM }]}>FAMILY</Text>
-                <Text style={styles.cardTitle}>{familyLine}</Text>
-                <Text style={[styles.cardSub, { color: TEXT_MUTED, fontStyle: "italic" }]}>
-                  {familySub}
-                </Text>
-              </View>
-              <View style={[styles.cardChevron, { backgroundColor: PLUM + "12" }]}>
-                <Feather name="chevron-right" size={16} color={PLUM} />
-              </View>
-            </View>
-          </TouchableOpacity>
+          {(() => {
+            // Determine family card state based on events and AI solve result
+            const hasEvents = familyEventCount > 0;
+            const hasSolved = !!juggleResult;
+            const hasConflicts = hasSolved && juggleResult!.conflicts.length > 0;
+            const cardColor =
+              hasConflicts ? "#E8A838"
+              : hasSolved  ? TEAL
+              : PLUM;
+            const cardLine =
+              !hasEvents  ? familyLine
+              : hasSolved && hasConflicts
+                ? `${juggleResult!.conflicts.length} thing${juggleResult!.conflicts.length > 1 ? "s" : ""} need${juggleResult!.conflicts.length === 1 ? "s" : ""} sorting.`
+              : hasSolved
+                ? `Weekend sorted. ${juggleResult!.plan.length} ${juggleResult!.plan.length === 1 ? "duty" : "duties"} mapped.`
+              : `${familyEventCount} thing${familyEventCount > 1 ? "s" : ""} on this week.`;
+            const cardSub =
+              !hasEvents  ? familySub
+              : hasSolved && hasConflicts
+                ? "Tap to see what needs a plan →"
+              : hasSolved
+                ? "Tap to see the plan →"
+              : "Tap to sort the juggle →";
+
+            return (
+              <TouchableOpacity
+                onPress={() => router.push("/(tabs)/family")}
+                activeOpacity={0.8}
+                style={[styles.card, styles.cardNeutral, { borderLeftColor: cardColor, borderLeftWidth: 3 }]}
+              >
+                <View style={styles.cardRow}>
+                  <View style={{ flex: 1 }}>
+                    <Text style={[styles.cardLabel, { color: cardColor }]}>FAMILY</Text>
+                    <Text style={styles.cardTitle}>{cardLine}</Text>
+                    <Text style={[styles.cardSub, { color: hasSolved || hasEvents ? cardColor : TEXT_MUTED, fontStyle: "italic" }]}>
+                      {cardSub}
+                    </Text>
+                  </View>
+                  <View style={[styles.cardChevron, { backgroundColor: cardColor + "12" }]}>
+                    <Feather name="chevron-right" size={16} color={cardColor} />
+                  </View>
+                </View>
+              </TouchableOpacity>
+            );
+          })()}
 
           {/* D — Money */}
           {hasMoneySetup && weeklyBreathingRoom > 0 ? (

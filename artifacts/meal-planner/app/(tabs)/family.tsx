@@ -35,6 +35,8 @@ import {
   RepeatType,
 } from "@/utils/familyTypes";
 import { loadFamilyState, saveFamilyState } from "@/utils/familyStore";
+import { buildJugglePrompt } from "@/utils/buildJugglePrompt";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 // ── Brand tokens ───────────────────────────────────────────────────────────────
 const TEAL       = "#2A8F88";
@@ -52,6 +54,29 @@ const DAY_ABBR: Record<DayOfWeek, string> = {
   Monday: "Mon", Tuesday: "Tue", Wednesday: "Wed", Thursday: "Thu",
   Friday: "Fri", Saturday: "Sat", Sunday: "Sun",
 };
+
+const JUGGLE_RESULT_KEY = "@sortii_juggle_result_v1";
+
+// ── Juggle AI result types ─────────────────────────────────────────────────────
+export interface JugglePlanItem {
+  adult: string;
+  day: string;
+  duty: string;
+}
+export interface JuggleConflict {
+  type: "overlap" | "impossible" | "tight";
+  description: string;
+}
+export interface JuggleResult {
+  status: "sorted" | "tight" | "needs_attention";
+  summary: string;
+  smart_note: string | null;
+  plan: JugglePlanItem[];
+  conflicts: JuggleConflict[];
+  adult_lists: Record<string, string>;
+  unassigned_events: string[];
+  solvedAt: number;
+}
 
 const REPEAT_LABELS: Record<RepeatType, string> = {
   none: "One-off", weekly: "Weekly", fortnightly: "Fortnightly", monthly: "Monthly",
@@ -236,6 +261,272 @@ function getLightInsight(result: FamilyWeekResult): string | null {
   if (busynessLevel === "steady") return "A steady week with nothing clashing.";
   if (busynessLevel === "busy") return "A full week — but it's all in one place now.";
   return "Everything currently fits.";
+}
+
+// ── JuggleProcessingOverlay ────────────────────────────────────────────────────
+const JUGGLE_LINES = [
+  "Untangling the family juggle…",
+  "Working out who goes where.",
+  "Finding the least painful version.",
+  "Checking if anyone gets a breather.",
+];
+
+function JuggleProcessingOverlay() {
+  const lineIndex = useRef(0);
+  const [lineText, setLineText] = useState(JUGGLE_LINES[0]!);
+  const fadeAnim  = useRef(new Animated.Value(1)).current;
+  const pulseAnim = useRef(new Animated.Value(0.85)).current;
+
+  useEffect(() => {
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(pulseAnim, { toValue: 1.12, duration: 900, useNativeDriver: true }),
+        Animated.timing(pulseAnim, { toValue: 0.85, duration: 900, useNativeDriver: true }),
+      ])
+    ).start();
+
+    const interval = setInterval(() => {
+      Animated.timing(fadeAnim, { toValue: 0, duration: 300, useNativeDriver: true }).start(() => {
+        lineIndex.current = (lineIndex.current + 1) % JUGGLE_LINES.length;
+        setLineText(JUGGLE_LINES[lineIndex.current]!);
+        Animated.timing(fadeAnim, { toValue: 1, duration: 300, useNativeDriver: true }).start();
+      });
+    }, 2500);
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <View style={styles.juggleOverlay}>
+      <Animated.View style={[styles.jugglePulse, { transform: [{ scale: pulseAnim }] }]}>
+        <Feather name="navigation" size={28} color="#fff" />
+      </Animated.View>
+      <Animated.Text style={[styles.juggleLineText, { opacity: fadeAnim }]}>
+        {lineText}
+      </Animated.Text>
+      <Text style={styles.juggleSubText}>This usually takes a few seconds.</Text>
+    </View>
+  );
+}
+
+// ── JuggleResultSheet ─────────────────────────────────────────────────────────
+function JuggleResultSheet({
+  visible,
+  juggle,
+  members,
+  onClose,
+  onSortAgain,
+  onShare,
+}: {
+  visible: boolean;
+  juggle: JuggleResult | null;
+  members: FamilyMember[];
+  onClose: () => void;
+  onSortAgain: () => void;
+  onShare: (text: string) => void;
+}) {
+  const insets   = useSafeAreaInsets();
+  const slideY   = useRef(new Animated.Value(900)).current;
+  const overlayOp = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    if (visible) {
+      Animated.parallel([
+        Animated.spring(slideY, { toValue: 0, useNativeDriver: true, tension: 70, friction: 11 }),
+        Animated.timing(overlayOp, { toValue: 1, duration: 200, useNativeDriver: true }),
+      ]).start();
+    } else {
+      Animated.parallel([
+        Animated.timing(slideY, { toValue: 900, duration: 220, useNativeDriver: true }),
+        Animated.timing(overlayOp, { toValue: 0, duration: 180, useNativeDriver: true }),
+      ]).start();
+    }
+  }, [visible]);
+
+  if (!visible || !juggle) return null;
+
+  const statusColor =
+    juggle.status === "sorted"          ? TEAL
+    : juggle.status === "tight"         ? GOLD
+    : "#C0392B";
+  const statusLabel =
+    juggle.status === "sorted"          ? "Weekend sorted"
+    : juggle.status === "tight"         ? "Tight but workable"
+    : "Some things to sort";
+  const statusIcon =
+    juggle.status === "sorted"          ? "check-circle"
+    : juggle.status === "tight"         ? "clock"
+    : "alert-triangle";
+
+  function buildShareText(): string {
+    const lines = ["📋 Family juggle — sorted.", ""];
+    lines.push(juggle.summary);
+    if (juggle.smart_note) { lines.push(""); lines.push(`Worth knowing: ${juggle.smart_note}`); }
+    if (Object.keys(juggle.adult_lists).length > 0) {
+      lines.push(""); lines.push("Who's covering what:");
+      for (const [name, duties] of Object.entries(juggle.adult_lists)) {
+        lines.push(`\n${name}:`); lines.push(duties);
+      }
+    }
+    if (juggle.conflicts.length > 0) {
+      lines.push(""); lines.push("Needs attention:");
+      juggle.conflicts.forEach((c) => lines.push(`• ${c.description}`));
+    }
+    lines.push(""); lines.push("— Sent from Sortii.");
+    return lines.join("\n");
+  }
+
+  return (
+    <View style={StyleSheet.absoluteFill} pointerEvents="box-none">
+      <Animated.View style={[StyleSheet.absoluteFill, { opacity: overlayOp }]}>
+        <Pressable style={styles.formOverlay} onPress={onClose} />
+      </Animated.View>
+
+      <Animated.View
+        style={[
+          styles.formSheet,
+          { transform: [{ translateY: slideY }], paddingBottom: insets.bottom + 16, maxHeight: "94%" },
+        ]}
+      >
+        <View style={styles.sheetHandle} />
+
+        {/* Header */}
+        <View style={styles.sheetTitleRow}>
+          <View>
+            <Text style={styles.sheetTitle}>Weekend plan</Text>
+            <Text style={styles.sheetSubTitle}>AI-sorted · just now</Text>
+          </View>
+          <View style={{ flexDirection: "row", gap: 12, alignItems: "center" }}>
+            <TouchableOpacity onPress={onSortAgain} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+              <Text style={styles.juggleSortAgain}>Sort again</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={onClose} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+              <Feather name="x" size={18} color={TEXT_MUTED} />
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ gap: 14, paddingBottom: 12 }}>
+          {/* Status pill */}
+          <View style={[styles.juggleStatusPill, { backgroundColor: statusColor + "14", borderColor: statusColor + "40" }]}>
+            <Feather name={statusIcon as any} size={14} color={statusColor} />
+            <Text style={[styles.juggleStatusLabel, { color: statusColor }]}>{statusLabel}</Text>
+          </View>
+
+          {/* Summary */}
+          <View style={styles.summaryBlock}>
+            <Text style={styles.summaryBlockLabel}>THE SUMMARY</Text>
+            <Text style={styles.juggleSummaryText}>{juggle.summary}</Text>
+            {juggle.smart_note && (
+              <View style={styles.juggleSmartNote}>
+                <Feather name="zap" size={12} color={GOLD} />
+                <Text style={styles.juggleSmartNoteText}>{juggle.smart_note}</Text>
+              </View>
+            )}
+          </View>
+
+          {/* Plan — who does what */}
+          {juggle.plan.length > 0 && (
+            <View style={styles.summaryBlock}>
+              <Text style={styles.summaryBlockLabel}>THE PLAN</Text>
+              {juggle.plan.map((item, i) => {
+                const member = members.find((m) => m.name === item.adult);
+                const dotColor = member?.color ?? TEAL;
+                return (
+                  <View key={i} style={styles.jugglePlanRow}>
+                    <View style={[styles.planSplitDot, { backgroundColor: dotColor }]} />
+                    <View style={{ flex: 1 }}>
+                      <Text style={styles.jugglePlanAdult}>{item.adult} — <Text style={{ fontFamily: "Inter_400Regular" }}>{item.day}</Text></Text>
+                      <Text style={styles.jugglePlanDuty}>{item.duty}</Text>
+                    </View>
+                  </View>
+                );
+              })}
+            </View>
+          )}
+
+          {/* Conflicts */}
+          {juggle.conflicts.length > 0 && (
+            <View style={[styles.summaryInsightBlock, { borderLeftColor: "#C0392B" }]}>
+              <Text style={styles.summaryBlockLabel}>NEEDS SORTING</Text>
+              {juggle.conflicts.map((c, i) => {
+                const conflictIcon =
+                  c.type === "impossible" ? "alert-triangle"
+                  : c.type === "tight"    ? "clock"
+                  : "alert-circle";
+                const conflictColor =
+                  c.type === "impossible" ? "#C0392B"
+                  : c.type === "tight"    ? GOLD
+                  : ORANGE;
+                return (
+                  <View key={i} style={styles.summaryInsightRow}>
+                    <Feather name={conflictIcon as any} size={13} color={conflictColor} />
+                    <Text style={styles.summaryInsightText}>{c.description}</Text>
+                  </View>
+                );
+              })}
+            </View>
+          )}
+
+          {/* Worth knowing */}
+          {juggle.smart_note && juggle.conflicts.length === 0 && (
+            <View style={styles.summaryBlock}>
+              <Text style={styles.summaryBlockLabel}>WORTH KNOWING</Text>
+              <View style={styles.summaryInsightRow}>
+                <Feather name="check-circle" size={13} color={TEAL} />
+                <Text style={styles.summaryInsightText}>{juggle.smart_note}</Text>
+              </View>
+            </View>
+          )}
+
+          {/* Per-adult action lists */}
+          {Object.keys(juggle.adult_lists).length > 0 && (
+            <View style={styles.summaryBlock}>
+              <Text style={styles.summaryBlockLabel}>SEND EACH PERSON</Text>
+              {Object.entries(juggle.adult_lists).map(([name, duties]) => {
+                const member = members.find((m) => m.name === name);
+                const dotColor = member?.color ?? TEAL;
+                function shareAdult() {
+                  onShare(`Hi ${name} — here's what you're covering this week:\n\n${duties}\n\n— Sent from Sortii.`);
+                }
+                return (
+                  <TouchableOpacity key={name} style={styles.juggleAdultRow} onPress={shareAdult} activeOpacity={0.8}>
+                    <View style={[styles.planSplitDot, { backgroundColor: dotColor }]} />
+                    <View style={{ flex: 1 }}>
+                      <Text style={styles.jugglePlanAdult}>{name}'s list</Text>
+                      <Text style={styles.jugglePlanDuty} numberOfLines={2}>{duties}</Text>
+                    </View>
+                    <Feather name="send" size={14} color={TEAL} />
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+          )}
+
+          {/* Unassigned */}
+          {juggle.unassigned_events.length > 0 && (
+            <View style={styles.summaryUnassignedNote}>
+              <Feather name="alert-circle" size={13} color={TEXT_MUTED} />
+              <Text style={styles.summaryUnassignedText}>
+                Unassigned: {juggle.unassigned_events.join(", ")} — tap the event to assign a driver.
+              </Text>
+            </View>
+          )}
+        </ScrollView>
+
+        {/* Actions */}
+        <View style={styles.summaryActions}>
+          <TouchableOpacity style={styles.summaryShareBtn} onPress={() => onShare(buildShareText())} activeOpacity={0.85}>
+            <Feather name="send" size={14} color="#fff" />
+            <Text style={styles.summaryShareBtnText}>Share full plan</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.summaryAddBtn} onPress={onSortAgain} activeOpacity={0.85}>
+            <Feather name="refresh-cw" size={14} color={TEAL} />
+            <Text style={styles.summaryAddBtnText}>Sort again</Text>
+          </TouchableOpacity>
+        </View>
+      </Animated.View>
+    </View>
+  );
 }
 
 // ── SavedBanner ────────────────────────────────────────────────────────────────
@@ -1163,14 +1454,23 @@ export default function FamilyScreen() {
     type: BannerType; title: string;
   } | null>(null);
 
-  const [showForm, setShowForm]           = useState(false);
-  const [editingEvent, setEditingEvent]   = useState<FamilyEvent | null>(null);
+  const [showForm, setShowForm]               = useState(false);
+  const [editingEvent, setEditingEvent]       = useState<FamilyEvent | null>(null);
   const [showPlanSummary, setShowPlanSummary] = useState(false);
+  const [isJuggleSolving, setIsJuggleSolving] = useState(false);
+  const [juggleResult, setJuggleResult]       = useState<JuggleResult | null>(null);
+  const [showJuggleResult, setShowJuggleResult] = useState(false);
 
   const load = useCallback(async () => {
-    const s = await loadFamilyState();
+    const [s, savedJuggle] = await Promise.all([
+      loadFamilyState(),
+      AsyncStorage.getItem(JUGGLE_RESULT_KEY),
+    ]);
     setState(s);
     setResult(computeFamilyWeek(s));
+    if (savedJuggle) {
+      try { setJuggleResult(JSON.parse(savedJuggle)); } catch {}
+    }
     setLoading(false);
   }, []);
 
@@ -1256,6 +1556,42 @@ export default function FamilyScreen() {
   async function handleSharePlan() {
     if (!result) return;
     try { await Share.share({ message: result.sharePlanText }); } catch {}
+  }
+
+  async function handleSortJuggle() {
+    const adults = state.members.filter((m) => m.role === "adult");
+    if (adults.length === 0 || state.events.length === 0) return;
+    setIsJuggleSolving(true);
+    dismissBanner();
+    try {
+      const prompt = buildJugglePrompt(state.members, state.events);
+      const apiBase = process.env.EXPO_PUBLIC_DOMAIN
+        ? `https://${process.env.EXPO_PUBLIC_DOMAIN}`
+        : "http://localhost:8080";
+      const res = await fetch(`${apiBase}/api/juggle`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt }),
+      });
+      if (!res.ok) throw new Error(`API error ${res.status}`);
+      const data = await res.json() as { result: Omit<JuggleResult, "solvedAt"> };
+      const full: JuggleResult = { ...data.result, solvedAt: Date.now() };
+      await AsyncStorage.setItem(JUGGLE_RESULT_KEY, JSON.stringify(full));
+      setJuggleResult(full);
+      setIsJuggleSolving(false);
+      setShowJuggleResult(true);
+    } catch {
+      setIsJuggleSolving(false);
+      Alert.alert(
+        "Couldn't reach the solver",
+        "Check your connection and try again.",
+        [{ text: "OK" }]
+      );
+    }
+  }
+
+  async function handleShareJuggle(text: string) {
+    try { await Share.share({ message: text }); } catch {}
   }
 
   if (loading) return <View style={{ flex: 1, backgroundColor: BG }} />;
@@ -1348,6 +1684,36 @@ export default function FamilyScreen() {
                 onAddAnother={openAddEvent}
               />
             )}
+
+            {/* 6. Sort the family juggle — AI solve button */}
+            {state.members.some((m) => m.role === "adult") && (
+              <View style={styles.juggleSection}>
+                {juggleResult && (
+                  <TouchableOpacity
+                    style={styles.jugglePriorResult}
+                    onPress={() => setShowJuggleResult(true)}
+                    activeOpacity={0.85}
+                  >
+                    <Feather name="check-circle" size={13} color={TEAL} />
+                    <Text style={styles.jugglePriorResultText}>
+                      Last sorted {new Date(juggleResult.solvedAt).toLocaleDateString("en-AU", { weekday: "short", day: "numeric", month: "short" })} — tap to view
+                    </Text>
+                    <Feather name="chevron-right" size={13} color={TEXT_MUTED} />
+                  </TouchableOpacity>
+                )}
+                <TouchableOpacity
+                  style={styles.juggleSolveBtn}
+                  onPress={handleSortJuggle}
+                  activeOpacity={0.88}
+                >
+                  <Feather name="zap" size={16} color="#fff" />
+                  <Text style={styles.juggleSolveBtnText}>Sort the family juggle →</Text>
+                </TouchableOpacity>
+                <Text style={styles.juggleSolveSub}>
+                  AI maps who goes where and flags anything worth knowing.
+                </Text>
+              </View>
+            )}
           </>
         ) : hasMembers ? (
           /* ── Members exist, no events ── */
@@ -1430,6 +1796,21 @@ export default function FamilyScreen() {
           onClose={() => setShowPlanSummary(false)}
           onShare={handleSharePlan}
           onAddAnother={() => { setShowPlanSummary(false); openAddEvent(); }}
+        />
+      )}
+
+      {/* ── AI juggle processing overlay ── */}
+      {isJuggleSolving && <JuggleProcessingOverlay />}
+
+      {/* ── AI juggle results sheet ── */}
+      {showJuggleResult && (
+        <JuggleResultSheet
+          visible={showJuggleResult}
+          juggle={juggleResult}
+          members={state.members}
+          onClose={() => setShowJuggleResult(false)}
+          onSortAgain={() => { setShowJuggleResult(false); handleSortJuggle(); }}
+          onShare={handleShareJuggle}
         />
       )}
     </View>
@@ -1759,6 +2140,69 @@ const styles = StyleSheet.create({
     paddingHorizontal: 11, paddingVertical: 9,
   },
   noAdultsHintText: { flex: 1, fontSize: 12, fontFamily: "Inter_400Regular", color: TEXT, lineHeight: 17 },
+
+  // Juggle AI section
+  juggleSection: { gap: 10, marginTop: 4 },
+  jugglePriorResult: {
+    flexDirection: "row", alignItems: "center", gap: 8,
+    backgroundColor: TEAL_TINT, borderRadius: 10, borderWidth: 1, borderColor: TEAL + "30",
+    paddingHorizontal: 12, paddingVertical: 10,
+  },
+  jugglePriorResultText: { flex: 1, fontSize: 12, fontFamily: "Inter_500Medium", color: TEXT },
+  juggleSolveBtn: {
+    flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 10,
+    backgroundColor: TEAL, borderRadius: 14, height: 52,
+    ...Platform.select({
+      web: { boxShadow: `0px 3px 12px ${TEAL}44` },
+      default: { shadowColor: TEAL, shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.28, shadowRadius: 10, elevation: 5 },
+    }),
+  },
+  juggleSolveBtnText: { fontSize: 16, fontFamily: "Inter_700Bold", color: "#fff", letterSpacing: 0.2 },
+  juggleSolveSub: { fontSize: 12, fontFamily: "Inter_400Regular", color: TEXT_MUTED, textAlign: "center" },
+
+  // Juggle processing overlay
+  juggleOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "#FFFFFF",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 20,
+    zIndex: 9999,
+  },
+  jugglePulse: {
+    width: 80, height: 80, borderRadius: 40,
+    backgroundColor: TEAL,
+    alignItems: "center", justifyContent: "center",
+    ...Platform.select({
+      web: { boxShadow: `0px 4px 24px ${TEAL}55` },
+      default: { shadowColor: TEAL, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.32, shadowRadius: 16, elevation: 8 },
+    }),
+  },
+  juggleLineText: { fontSize: 16, fontFamily: "Inter_600SemiBold", color: TEXT, textAlign: "center", paddingHorizontal: 40 },
+  juggleSubText: { fontSize: 13, fontFamily: "Inter_400Regular", color: TEXT_MUTED, textAlign: "center" },
+
+  // Juggle result sheet
+  juggleStatusPill: {
+    flexDirection: "row", alignItems: "center", gap: 8,
+    alignSelf: "flex-start", borderRadius: 20, borderWidth: 1,
+    paddingHorizontal: 12, paddingVertical: 6,
+  },
+  juggleStatusLabel: { fontSize: 13, fontFamily: "Inter_600SemiBold" },
+  juggleSummaryText: { fontSize: 14, fontFamily: "Inter_400Regular", color: TEXT, lineHeight: 21 },
+  juggleSmartNote: {
+    flexDirection: "row", alignItems: "flex-start", gap: 7,
+    backgroundColor: GOLD + "12", borderRadius: 9, borderWidth: 1, borderColor: GOLD + "30",
+    paddingHorizontal: 10, paddingVertical: 8, marginTop: 6,
+  },
+  juggleSmartNoteText: { flex: 1, fontSize: 13, fontFamily: "Inter_400Regular", color: TEXT, lineHeight: 18 },
+  jugglePlanRow: { flexDirection: "row", alignItems: "flex-start", gap: 10, paddingVertical: 4 },
+  jugglePlanAdult: { fontSize: 13, fontFamily: "Inter_600SemiBold", color: TEXT },
+  jugglePlanDuty: { fontSize: 12, fontFamily: "Inter_400Regular", color: TEXT_MUTED, marginTop: 1, lineHeight: 17 },
+  juggleAdultRow: {
+    flexDirection: "row", alignItems: "center", gap: 10,
+    paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: BORDER,
+  },
+  juggleSortAgain: { fontSize: 13, fontFamily: "Inter_600SemiBold", color: TEAL },
 
   // Repeat note
   repeatNote: { flexDirection: "row", alignItems: "center", gap: 7, paddingVertical: 4 },

@@ -1,0 +1,417 @@
+════════════════════════════════════════════
+SORTII — FAMILY TAB JUGGLE ENGINE CONNECTION
+════════════════════════════════════════════
+
+TASK
+────
+The Family tab currently stores and displays
+events but does not run them through the
+juggle solving engine. The logic files from
+the original Juggle Solver exist in this
+codebase but are not being called.
+
+This prompt connects the existing engine
+to the Family tab output.
+
+Do not rebuild the UI. Do not rebuild the
+logic files. Only wire them together.
+
+════════════════════════════════════════════
+STEP 1 — LOCATE THE EXISTING ENGINE FILES
+════════════════════════════════════════════
+
+Before writing any code, search the codebase
+and identify the following:
+
+1. The file containing the Anthropic API call
+   for juggle solving — look for:
+   - "claude-sonnet" or "claude-haiku"
+   - "family weekend logistics solver"
+   - The system prompt text
+   - max_tokens setting
+   Note the exact filename and location.
+
+2. The file containing safeParseJuggleResponse
+   or the JSON parsing logic.
+   Note the exact filename and location.
+
+3. The file containing the output rendering
+   logic — look for:
+   - "HERE'S THE SPLIT"
+   - "THE PLAN" table
+   - "NEEDS SORTING"
+   - "WORTH KNOWING"
+   - Visual timeline rendering
+   Note the exact filename and location.
+
+4. Any existing types or interfaces for:
+   - Event objects
+   - Adult/family member objects  
+   - API response structure
+   Note the exact filename and location.
+
+DO NOT proceed to Step 2 until all four
+files are located and confirmed to exist.
+
+If any file is missing, note which one
+and flag it — do not attempt to recreate
+it without confirming first.
+
+════════════════════════════════════════════
+STEP 2 — UNDERSTAND THE CURRENT DATA FLOW
+════════════════════════════════════════════
+
+In the Family tab, trace and note:
+
+A. Where family members are stored
+   (localStorage key name, state variable,
+   or context — note the exact key/variable)
+
+B. Where events are stored after being added
+   via the Add Event sheet
+   (localStorage key, state, or context)
+
+C. What data structure each event uses
+   (list every field currently on an event
+   object as it exists in the Family tab)
+
+D. What triggers currently happen after
+   an event is saved — does anything
+   process the events or just store them?
+
+E. Where the Family tab renders its output
+   — which component/file shows the
+   weekly view or event list
+
+This mapping tells us exactly where to
+insert the engine call.
+
+════════════════════════════════════════════
+STEP 3 — MAP FAMILY DATA TO ENGINE FORMAT
+════════════════════════════════════════════
+
+The juggle engine expects this input format:
+
+ADULTS FORMAT:
+"Available adults:
+[Name], can drive: [yes/no]
+[Name], can drive: [yes/no]"
+
+EVENTS FORMAT:
+"Weekend events:
+Child: [name]
+Activity: [activity/event title]
+Location: [location or 'not specified']
+Day: [Saturday/Sunday/weekday]
+Start: [time]
+End: [time or 'not specified']
+Assigned adult: [name or 'unassigned']
+Notes: [any notes or 'none']"
+
+Write a transformer function called
+buildJugglePrompt() that:
+
+- Takes the family members array
+  (from wherever they are stored in Step 2A)
+- Takes the events array
+  (from wherever they are stored in Step 2B)
+- Filters family members into adults 
+  (role: 'adult' or 'Adult/driver') 
+  and children (role: 'child' or 'Child')
+- Maps each event's fields to the engine
+  format — handle missing fields gracefully
+  (use 'not specified' for optional fields)
+- Returns a complete formatted string
+  ready to send to the API
+
+Place this function in a new file:
+/utils/buildJugglePrompt.js
+(or .ts if the project uses TypeScript)
+
+════════════════════════════════════════════
+STEP 4 — CREATE THE SOLVE TRIGGER
+════════════════════════════════════════════
+
+The engine needs a trigger point in the
+Family tab. Add the following:
+
+── THE TRIGGER BUTTON ────────────────────
+
+In the Family tab, when events exist,
+show a prominent button:
+
+Text: "Sort the family juggle →"
+Style: full width, teal #2A8F88, 
+white text, bold, 50px height,
+border radius 12px.
+
+Position: below the events list,
+above any bottom padding.
+
+Only show this button when:
+- At least 1 adult exists in family members
+- At least 1 event exists this week
+
+When no events exist yet:
+Hide the button entirely.
+The existing empty state UI handles this.
+
+── ON BUTTON TAP ─────────────────────────
+
+1. Set loading state to true
+2. Show the processing overlay (see Step 5)
+3. Call buildJugglePrompt() with current
+   family members and events
+4. Call the existing juggle API function
+   with the built prompt
+5. On success: navigate to results view
+6. On failure: show retry state
+7. Set loading state to false
+
+════════════════════════════════════════════
+STEP 5 — PROCESSING STATE
+════════════════════════════════════════════
+
+When the API call is in progress show
+a full-screen overlay on the Family tab:
+
+Background: white, full screen.
+Centre of screen:
+
+Animated teal pulse circle
+(same as existing juggle solver
+processing screen if it exists,
+otherwise CSS pulse animation)
+
+Rotating text (cycles every 2.5 seconds,
+fade transition):
+Line 1: "Untangling the family juggle…"
+Line 2: "Working out who goes where."
+Line 3: "Finding the least painful version."
+Line 4: "Checking if anyone gets a breather."
+
+This should be the same component used
+in the standalone juggle solver if it
+exists. Reuse it — do not rebuild it.
+
+════════════════════════════════════════════
+STEP 6 — RESULTS OUTPUT IN FAMILY TAB
+════════════════════════════════════════════
+
+After a successful API response,
+display results within the Family tab.
+
+── NAVIGATION APPROACH ───────────────────
+
+Push a new screen/view onto the Family
+tab stack called FamilyJuggleResults.
+
+This keeps the Family tab navigation
+intact — user can go back to the
+Family tab home with back button.
+
+Header of results screen:
+Left: back arrow "← Family"
+Centre: "YOUR WEEKEND PLAN"
+Right: "Sort again" text link
+
+── REUSE EXISTING RENDER COMPONENTS ──────
+
+The standalone juggle solver already has
+working render components for:
+- Status summary grid (Events/Sorted/Tight/Issues)
+- Status pill (green/amber/red)
+- Visual timeline (HERE'S THE SPLIT)
+- THE PLAN table
+- NEEDS SORTING card
+- WORTH KNOWING card
+- Share full plan button
+- Send [Adult]'s list button
+
+REUSE ALL OF THESE COMPONENTS directly.
+Do not rebuild them.
+Import them from wherever they currently live.
+
+If they are not currently componentised
+(i.e. they are inline in one large file),
+extract them into separate component files
+first, then import into FamilyJuggleResults.
+
+── COLOUR CONSISTENCY ────────────────────
+
+The results screen should match the
+main Sortii app styling exactly:
+
+Background: white #FFFFFF
+Cards: white with shadow
+  box-shadow: 0 2px 12px rgba(0,0,0,0.07)
+  border: 1px solid #F0EDEA
+  border-radius: 14px
+
+Brand teal: #2A8F88
+Plum: #5E3A4C (section labels)
+Gold: #D29A22 (matches Sortii money tab)
+Warm background between cards: #FAFAF8
+
+All status colours unchanged:
+resolved: #2A8F88
+tight: #E8A838  
+impossible: #B86557
+free: #4AB88A
+
+────────────────────────────────────────
+RESULTS SCREEN SECTION ORDER:
+────────────────────────────────────────
+
+1. View toggle [Plan view] [Weekend view]
+2. Status summary 2x2 grid
+3. Status pill
+4. Least painful version card (if applicable)
+5. HERE'S THE SPLIT (visual timeline)
+6. THE PLAN table
+7. THIS BIT NEEDS A PLAN (if conflicts)
+8. WORTH KNOWING (if smart_note exists)
+9. Share full plan button
+10. Send [Adult]'s list buttons
+11. "Different weekend?" link
+
+════════════════════════════════════════════
+STEP 7 — CONNECT CARPOOL CONTACTS
+════════════════════════════════════════════
+
+The Family tab's event entry sheet
+already has a "CARPOOL CONTACT (OPTIONAL)"
+field visible in the screenshots.
+
+Connect this to the juggle engine:
+
+When building the API prompt in
+buildJugglePrompt(), also include
+any carpool contacts stored in:
+- The event's carpool contact field
+- localStorage key 'sortii_carpool_contacts'
+  (from the standalone juggle solver)
+
+Check both sources and deduplicate.
+
+Add to the prompt string:
+
+"Carpool contacts available:
+[Name], relationship: [relationship],
+can help with: [child names],
+notes: [notes]"
+
+If no contacts exist, omit this section
+from the prompt entirely.
+
+════════════════════════════════════════════
+STEP 8 — HANDLE RECURRING EVENTS
+════════════════════════════════════════════
+
+Check localStorage for:
+'sortii_recurring_events'
+'sortii_saved_events'
+
+If recurring events exist for the
+current week, include them automatically
+when building the juggle prompt.
+
+The user should not have to re-add
+recurring events in the Family tab —
+they should appear automatically from
+the saved regulars system.
+
+If the Family tab has its own event
+storage that is separate from the
+juggle solver's recurring events:
+
+Show a one-time prompt in the Family tab:
+"You have saved regulars from Juggle Solver.
+ Import them into Family?"
+[Import regulars] [Start fresh]
+
+This prevents data fragmentation between
+the two systems.
+
+════════════════════════════════════════════
+STEP 9 — HOME TAB FAMILY CARD UPDATE
+════════════════════════════════════════════
+
+The Home tab currently shows:
+"FAMILY — Nothing on the family radar
+this week. A rare and peaceful sight."
+
+Update this card to reflect real data:
+
+IF no events this week:
+Keep current copy.
+
+IF events exist but not yet solved:
+"FAMILY"
+"[X] things on this weekend."
+Subtext: "Tap to sort the juggle."
+Tapping → opens Family tab and
+auto-scrolls to Sort button.
+
+IF events exist and solved:
+"FAMILY"
+"Weekend sorted. [X] events, 
+[X] sorted." in teal
+Subtext: "Tap to see the plan."
+Tapping → opens FamilyJuggleResults
+with last solve results.
+
+IF conflicts exist in last solve:
+"FAMILY"  
+"[X] things need sorting." in amber
+Subtext: "Tap to see what needs a plan."
+Right arrow in amber colour.
+
+This makes the home screen genuinely
+useful as a status dashboard rather
+than a static placeholder.
+
+════════════════════════════════════════════
+WHAT NOT TO CHANGE
+════════════════════════════════════════════
+
+✓ Home tab layout and other cards
+  (Dinner, Money)
+✓ Meals tab — do not touch
+✓ Add button and event entry sheet
+✓ Family member setup flow
+✓ All existing colour variables
+✓ Bottom navigation bar
+✓ The standalone juggle solver URL
+  (keep it working independently)
+✓ All localStorage keys from juggle solver
+✓ Sortii logo and branding
+
+════════════════════════════════════════════
+SUCCESS CRITERIA
+════════════════════════════════════════════
+
+The integration is working correctly when:
+
+1. Adding Mum + Dad as adults and
+   3 overlapping Saturday events,
+   then tapping "Sort the family juggle →"
+   produces the full results screen with
+   timeline, plan table and conflict cards.
+
+2. The Home tab Family card shows
+   "Weekend sorted" after a successful solve.
+
+3. Carpool contacts from either the
+   event entry sheet or the existing
+   carpool crew are passed to the engine
+   and appear in conflict suggestions.
+
+4. Tapping back from results returns to
+   the Family tab without losing data.
+
+5. The results screen matches the
+   Sortii visual style — white cards,
+   shadows, teal/plum/gold colours —
+   not the dark theme of the original
+   standalone juggle solver.
