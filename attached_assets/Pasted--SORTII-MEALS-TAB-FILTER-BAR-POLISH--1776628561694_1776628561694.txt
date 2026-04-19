@@ -1,0 +1,133 @@
+════════════════════════════════════════════
+SORTII MEALS TAB — FILTER BAR POLISH
+════════════════════════════════════════════
+
+TASK
+────
+Four small targeted fixes to the Meals tab
+filter bar and bottom navigation.
+Do not change anything else.
+
+════════════════════════════════════════════
+FIX 1 — ADD COST RANGE BACK TO BUDGET CHIP
+════════════════════════════════════════════
+
+The budget/standard chip should show the
+estimated weekly cost range alongside
+the budget level label.
+
+CURRENT: [$ Standard ↓]
+RESTORE TO: [$ Standard · $103–$121 ↓]
+
+The cost range sits inside the same chip,
+separated by a · character.
+Font size of the range: 12px, slightly
+muted compared to the label.
+
+Logic:
+- Range updates when budget level changes
+- Range updates when people count changes
+- Range updates when a new plan generates
+- If no plan exists yet: show label only,
+  no range
+
+Same applies to all budget levels:
+[$ Budget · $68–$84 ↓]
+[$ Standard · $103–$121 ↓]
+[$ Premium · $156–$188 ↓]
+
+This gives the user immediate feedback
+on what changing the filter actually
+means in dollar terms.
+
+════════════════════════════════════════════
+FIX 2 — ADJUST BUTTON ICON
+════════════════════════════════════════════
+
+The Adjust button currently shows two
+cog icons side by side (⚙⚙).
+
+Replace with a single sliders/tune icon.
+Use the existing icon library — look for:
+- Ionicons: "options-outline"
+- MaterialIcons: "tune"
+- Feather: "sliders"
+
+Whichever is already available in the
+project icon set.
+
+Single icon only. No emoji. No duplicate.
+
+Button should read: [⚙ Adjust] or
+[≡ Adjust] — one icon, one word.
+
+════════════════════════════════════════════
+FIX 3 — RENAME OR REMOVE "COSTS" CHIP
+════════════════════════════════════════════
+
+The "Costs" chip in the top row
+(Shopping · Costs · Recipes) is unclear.
+It sits between Shopping and Recipes
+and users won't immediately know what
+it opens.
+
+Two options — pick whichever matches
+what it currently does:
+
+IF it opens the cost breakdown / money
+view for the current meal plan:
+Rename to: "This week's cost"
+Or simply: "Breakdown"
+
+IF it navigates to the Money tab:
+Remove it entirely — Money now has
+its own bottom nav tab. No need to
+duplicate the entry point here.
+The bottom nav Money tab is the
+correct home for that.
+
+IF it shows per-recipe costs inline:
+Rename to: "Costs per meal"
+
+Check what it currently does and apply
+the appropriate rename or removal.
+
+════════════════════════════════════════════
+FIX 4 — BOTTOM NAV "MONEY" LABEL
+════════════════════════════════════════════
+
+Current bottom nav:
+Home | Meals | Add(+) | Family | Money
+
+"Money" is correct as a label.
+It's direct, clear, and matches the
+card label on the Home screen.
+
+However check the icon currently used —
+it should be a wallet or dollar sign.
+If it's showing a generic grid or
+unrelated icon, update to:
+- Ionicons: "wallet-outline"
+- Or: "cash-outline"
+- Or: "card-outline"
+
+The icon should clearly signal
+"finances" at a glance without
+needing to read the label.
+
+Color when active: var(--gold) #D29A22
+This matches the gold used on the
+Money card on the Home screen —
+consistent colour coding throughout.
+
+════════════════════════════════════════════
+DO NOT CHANGE
+════════════════════════════════════════════
+
+✓ Meals tab recipe cards
+✓ Swap banner and pantry tips
+✓ Shopping list
+✓ Plan generation logic
+✓ All other bottom nav tabs
+✓ All colour variables
+✓ Budget level filter logic

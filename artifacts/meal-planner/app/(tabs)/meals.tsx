@@ -118,7 +118,6 @@ type PendingMealAction = {
 // ── Quick-action chip definitions ────────────────────────────────────────────
 const QUICK_ACTIONS = [
   { icon: "shopping-cart", label: "Shopping", route: "/(tabs)/shopping" },
-  { icon: "dollar-sign",   label: "Costs",    route: "/(tabs)/money" },
   { icon: "book-open",     label: "Recipes",  route: "/(tabs)/recipes" },
 ] as const;
 
@@ -677,6 +676,7 @@ export default function MealsScreen() {
             <PlanChip
               label={budgeLabel}
               icon="dollar-sign"
+              range={filledCount > 0 ? estimatedCostBand : undefined}
               onPress={() => setActiveChip("budget")}
             />
             <TouchableOpacity
@@ -685,8 +685,8 @@ export default function MealsScreen() {
               activeOpacity={0.80}
               hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
             >
-              <Feather name="settings" size={11} color="#fff" />
-              <Text style={styles.prefBtnLabel}>⚙ Adjust</Text>
+              <Feather name="sliders" size={11} color="#fff" />
+              <Text style={styles.prefBtnLabel}>Adjust</Text>
             </TouchableOpacity>
           </View>
           {preferences.kidFriendly && (
@@ -1203,10 +1203,12 @@ export default function MealsScreen() {
 function PlanChip({
   label,
   icon,
+  range,
   onPress,
 }: {
   label: string;
   icon: string;
+  range?: string;
   onPress: () => void;
 }) {
   const C = Colors.light;
@@ -1219,6 +1221,9 @@ function PlanChip({
     >
       <Feather name={icon as any} size={10} color={C.textMuted} />
       <Text style={[styles.planChipText, { color: C.textSecondary }]}>{label}</Text>
+      {!!range && (
+        <Text style={[styles.planChipRange, { color: C.textMuted }]}>· {range}</Text>
+      )}
       <Feather name="chevron-down" size={9} color={C.textMuted} style={{ marginLeft: 1 }} />
     </TouchableOpacity>
   );
@@ -1314,6 +1319,11 @@ const styles = StyleSheet.create({
   planChipText: {
     fontSize: 11,
     fontFamily: "Inter_400Regular",
+  },
+  planChipRange: {
+    fontSize: 11,
+    fontFamily: "Inter_400Regular",
+    opacity: 0.65,
   },
   prefIconBtn: {
     width: 30,
