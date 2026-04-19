@@ -1,0 +1,416 @@
+════════════════════════════════════════════
+SORTII FAMILY TAB — RESULTS OUTPUT FIX
+════════════════════════════════════════════
+
+TASK
+────
+Two targeted fixes only:
+
+1. The AI system prompt is too cautious —
+   it asks for clarification instead of
+   making best-guess decisions.
+
+2. The results screen format doesn't match
+   the standalone juggle solver output —
+   it needs THE PLAN table, swap buttons,
+   and actionable conflict cards.
+
+Do not change the event entry flow.
+Do not change the Family tab main screen.
+Do not change the processing overlay.
+
+════════════════════════════════════════════
+FIX 1 — REPLACE THE SYSTEM PROMPT
+════════════════════════════════════════════
+
+Find the juggle API route file
+(api-server or similar, contains /api/juggle)
+
+Replace the current system prompt entirely
+with this version:
+
+──────────────────────────────────────────
+You are a family weekend logistics solver
+for Sortii. You receive a list of events
+and available adults/drivers.
+
+YOUR JOB IS TO DECIDE — not to ask.
+Never say you need more information.
+Never say "awaiting clarification".
+If information is missing, make the most
+sensible assumption and state it briefly.
+
+DECISION RULES:
+───────────────
+1. Sort all events by time
+
+2. Assign available adults to events:
+   - Adults marked as drivers get
+     transport events
+   - If a child is named on an event,
+     assume that child needs taking there
+   - If no child is named, assume any
+     available adult can cover it
+   - Split events across adults to reduce
+     load — do not assign everything to
+     one adult if two are available
+
+3. Detect conflicts:
+   - Two events at the same time requiring
+     the same adult = conflict
+   - Flag it but still assign someone
+     and state your assumption
+
+4. When in doubt, make a call:
+   - "Mum takes the 10am, Dad takes 11am"
+     is always better than
+     "we need to know who goes where"
+   - State assumptions in plain English
+     at the bottom of the smart_note field
+
+5. Free windows:
+   - Note any adult with 30+ min free
+   - Frame as a positive, not just data
+
+TONE:
+─────
+Warm, direct, decisive.
+Never corporate. Never alarming.
+Short sentences. Make the call.
+The parent is tired — give them an answer.
+
+OUTPUT: Return ONLY valid JSON.
+No text before or after the JSON.
+Strip any markdown code fences.
+
+{
+  "weekend_summary": {
+    "total_events": number,
+    "conflicts_resolved": number,
+    "tight_windows": number,
+    "impossible_clashes": number
+  },
+  "events": [
+    {
+      "id": "string",
+      "child": "string or null",
+      "activity": "string",
+      "location": "string or null",
+      "day": "Saturday | Sunday | Weekday",
+      "start_time": "HH:MM",
+      "end_time": "HH:MM",
+      "assigned_adult": "string",
+      "adult_must_stay": false,
+      "child_colour_index": 0
+    }
+  ],
+  "conflicts": [
+    {
+      "id": "string",
+      "type": "overlap | unassigned | tight",
+      "severity": "tight | warning | impossible",
+      "description": "string — plain English,
+        max 12 words, state what clashes",
+      "involved_events": ["event_id"],
+      "involved_adults": ["string"],
+      "suggested_contacts": [],
+      "recommendation": "string — what to do,
+        action-first, decisive, max 15 words",
+      "options": [
+        "string — action first, max 10 words",
+        "string — action first, max 10 words"
+      ]
+    }
+  ],
+  "adult_plans": [
+    {
+      "adult": "string",
+      "can_drive": true,
+      "schedule": [
+        {
+          "time": "HH:MM",
+          "child": "string or null",
+          "activity": "string",
+          "location": "string or null",
+          "event_id": "string"
+        }
+      ],
+      "free_windows": [
+        {
+          "from": "HH:MM",
+          "to": "HH:MM",
+          "duration_minutes": number,
+          "is_end_of_day": false
+        }
+      ]
+    }
+  ],
+  "travel_estimates": [],
+  "least_painful_version": {
+    "applicable": false
+  },
+  "smart_note": "string or null —
+    max 2 sentences.
+    State any assumptions made.
+    Note one useful observation.
+    Return null if nothing to add."
+}
+──────────────────────────────────────────
+
+Also add this JSON cleaning step in the
+route handler, immediately after getting
+the API response text:
+
+// Strip markdown fences if present
+let cleanText = responseText
+  .replace(/```json\n?/g, '')
+  .replace(/```\n?/g, '')
+  .trim();
+
+// Find JSON boundaries
+const start = cleanText.indexOf('{');
+const end = cleanText.lastIndexOf('}');
+if (start !== -1 && end !== -1) {
+  cleanText = cleanText.slice(start, end + 1);
+}
+
+const result = JSON.parse(cleanText);
+
+════════════════════════════════════════════
+FIX 2 — REPLACE THE RESULTS SCREEN OUTPUT
+════════════════════════════════════════════
+
+Find the results Modal/Screen that currently
+shows THE SUMMARY, THIS BIT NEEDS A PLAN,
+WORTH KNOWING, and SEND EACH PERSON.
+
+Replace the content inside the ScrollView
+with this structure:
+
+── STATUS SUMMARY GRID ───────────────────
+
+Four boxes in a 2x2 grid:
+
+┌──────────────┬──────────────┐
+│  [X] Events  │  [X] Sorted  │
+│              │      ✓       │
+├──────────────┼──────────────┤
+│  [X] Tight   │  [X] Issues  │
+│      ⚠       │      !       │
+└──────────────┴──────────────┘
+
+Then a full-width status pill below:
+
+IF impossible_clashes = 0 AND tight = 0:
+  Green pill: "That's the lot. ✓"
+  backgroundColor: '#E8F8F0'
+  color: '#2A8F88'
+
+IF tight > 0 AND impossible = 0:
+  Amber pill: "Manageable — one bit to watch."
+  backgroundColor: '#FDF3DC'
+  color: '#E8A838'
+
+IF impossible_clashes > 0:
+  Red pill: "[X] things need a plan."
+  backgroundColor: '#F7E9E8'
+  color: '#B86557'
+
+── HERE'S THE SPLIT ──────────────────────
+
+Section label: "HERE'S THE SPLIT"
+color: '#5E3A4C' plum
+fontSize: 11, uppercase, letterSpacing: 0.1
+
+One card per adult from adult_plans.
+
+Each adult card:
+- Header: adult name, bold 16px
+- Their schedule items in time order:
+
+  Each schedule item:
+  [TIME PILL] [Activity] [Location muted]
+  "with [child]" if child is named
+
+  TIME PILL:
+    backgroundColor: '#5E3A4C'
+    color: white
+    borderRadius: 20
+    paddingHorizontal: 8
+    paddingVertical: 3
+    fontSize: 11
+
+  Free window at bottom of card if exists:
+  "You've got a breather from [TIME]"
+  or "~[X] min to yourself in here"
+  color: '#4AB88A' green
+  fontSize: 13
+
+  Send button below schedule:
+  "[Adult]'s list →"
+  border-only teal button
+  Opens share sheet with that adult's
+  plain text schedule
+
+── THE PLAN TABLE ────────────────────────
+
+Section label: "THE PLAN"
+Subtext: "What's happening. Who's on it."
+
+Teal header row: TIME | WHO | WHERE
+
+One row per event from adult_plans,
+sorted by time across all adults:
+
+TIME: plum pill (#5E3A4C background)
+WHO: "[Adult] · [Child]" — plain text
+     Add a small [⇄ Swap] pill in plum tint
+     next to the adult name
+WHERE: "[Location] · [Activity]" muted
+
+SWAP PILL:
+  backgroundColor: '#F3E8EE'
+  color: '#5E3A4C'
+  borderRadius: 20
+  padding: '2px 8px'
+  fontSize: 11
+  text: "⇄ Swap"
+
+ON TAP SWAP PILL:
+  If 2 adults: swap immediately,
+  update that row's adult assignment.
+  Show brief "Swapped ✓" for 2 seconds.
+  
+  If 3+ adults: show inline picker
+  with available adult names as pills.
+
+── THIS BIT NEEDS A PLAN ─────────────────
+
+Only show if conflicts exist.
+
+Card with '#B86557' left border 3px.
+Label: "THIS BIT NEEDS A PLAN"
+color: '#B86557', uppercase 11px.
+
+Each conflict:
+⚠ [description — plain English, short]
+[recommendation in teal — the suggested action]
+
+Options list:
+· [option 1]
+· [option 2]
+
+If no carpool contacts saved:
+Show nudge below options:
+"Know someone who could help?
+ Add them to your carpool crew."
+Small teal link: "+ Add a contact"
+Tapping opens the event entry sheet
+focused on a new contact entry.
+
+── WORTH KNOWING ─────────────────────────
+
+Only show if smart_note is not null.
+
+Card with '#5E3A4C' left border 3px.
+Background: '#F3E8EE' plum tint.
+Label: "✦ WORTH KNOWING"
+color: '#5E3A4C', uppercase 11px.
+
+smart_note text.
+fontSize: 14, lineHeight: 21.
+
+── SHARE SECTION ─────────────────────────
+
+Full width teal button:
+"Share full plan"
+Shares plain text summary via
+native share sheet.
+
+Plain text format:
+---
+WEEKEND PLAN — [day]
+
+[TIME] [Adult] → [Child] · [Activity] · [Location]
+[TIME] [Adult] → [Child] · [Activity] · [Location]
+
+[If conflicts:]
+⚠ NEEDS SORTING:
+[conflict description]
+· [option]
+· [option]
+
+Made with Sortii.
+---
+
+"Sort again" text link below in muted.
+Tapping re-runs handleSortJuggle with
+same events and family members.
+
+"← Family" back link below that.
+Closes results and returns to Family tab.
+
+════════════════════════════════════════════
+FIX 3 — REMOVE THESE FROM OUTPUT
+════════════════════════════════════════════
+
+Remove these sections entirely
+from the results screen:
+
+✗ "THE SUMMARY" paragraph card
+  (replaced by status grid + HERE'S THE SPLIT)
+
+✗ "SEND EACH PERSON" section with
+  "Awaiting clarification" text
+  (replaced by individual adult
+  send buttons within each adult's card)
+
+✗ Any section that says "awaiting",
+  "clarification needed", or
+  "need more information"
+
+If the AI returns a smart_note containing
+these phrases, display it anyway but
+the system prompt change in Fix 1 should
+prevent this from happening.
+
+════════════════════════════════════════════
+DO NOT CHANGE
+════════════════════════════════════════════
+
+✓ Event entry sheet and Add event button
+✓ Family tab main screen layout
+✓ Family member display and management
+✓ Processing overlay and rotating text
+✓ "Sort the family juggle →" button
+✓ Home tab
+✓ Meals tab
+✓ All navigation
+✓ All colour tokens
+✓ localStorage/AsyncStorage data structure
+✓ The /api/juggle route URL and method
+
+════════════════════════════════════════════
+TEST AFTER BUILD
+════════════════════════════════════════════
+
+Add these two events then tap Sort:
+
+Event 1:
+Football · Saturday · 10am · Speers Point
+Involved: Tom · Driver: Mum
+
+Event 2:
+Netball · Saturday · 10:30am · Wangi Wangi
+Involved: Izzy · Driver: Dad
+
+Expected output:
+- Summary: 2 events, 1 tight (overlapping
+  times, different locations)
+- HERE'S THE SPLIT shows:
+  Mum — 10:00 Tom · Football · Speers Point
+  Dad — 10:30 Izzy · Netball · Wangi Wangi
+- THE PLAN table shows both rows with
+  Swap pills
+- WORTH KNOWING: tight turnaround note
+- NO "awaiting clarification" anywhere
