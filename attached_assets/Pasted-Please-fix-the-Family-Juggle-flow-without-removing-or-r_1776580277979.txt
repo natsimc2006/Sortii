@@ -1,0 +1,77 @@
+Please fix the Family / Juggle flow without removing or rewriting the existing sorting engine logic.
+
+Current problems:
+1. The “Sort the week” CTA is too visually underplayed. It needs to feel like the obvious next step and primary hero action on the Family screen.
+2. When the user taps “Sort the week”, the loading screen appears, but after loading completes the app returns to the input screen instead of progressing to the third results/output page we already had set up.
+3. The 3 page flow must be restored and preserved:
+   - Page 1 = family members + weekly events input
+   - Page 2 = loading / “working out who goes where”
+   - Page 3 = sorted / untangled weekly output
+4. Do not remove or alter the existing smart sorting logic underneath. Preserve all current background logic, including travel/time/location intelligence and event handling. This is a flow/state fix, not a logic rebuild.
+
+What to fix:
+
+A. Restore the intended 3 page flow
+- Tapping “Sort the week” should always move from input screen to loading screen, then automatically to the sorted results screen.
+- Do not return the user to the input screen after processing unless they explicitly choose to edit or re-sort.
+- Preserve the sorted output in state until the user changes inputs or taps an edit/back action.
+- Check for any state reset, route reset, or useEffect that is sending the user back to the Family input page after loading completes.
+- If there is a `step`, `view`, `mode`, `screen`, or `currentPage` state, make sure it progresses cleanly:
+  - input -> loading -> results
+- If sort results exist, show the results screen rather than re-rendering the input screen.
+
+B. Make “Sort the week” the clear hero CTA
+- Move it higher and make it visually dominant.
+- It should sit in a stronger hero card near the transition point after the event list, with clearer hierarchy and more confidence.
+- Suggested structure:
+  - headline: “Ready to untangle this week?”
+  - supporting line: “We’ll work out who goes where, where the squeezes are, and what needs a second pair of hands.”
+  - primary button: “Sort the week”
+- Increase visual prominence using the Sortii palette:
+  - white/soft cream card
+  - stronger shadow/elevation
+  - mustard CTA button
+  - better spacing above and below
+- This should feel like the obvious next step, not a secondary action.
+
+C. Keep the bottom “Add another event” action from competing with the main sort CTA
+- The sticky bottom add-event bar is currently dominating attention.
+- Reduce its visual competition while still keeping it accessible.
+- It should not overpower the “Sort the week” action.
+- Consider softening the sticky add bar styling until the user scrolls further or making it less visually loud than the hero CTA.
+
+D. Preserve user confidence through the transition
+- Loading screen should remain brief and then automatically advance to the results page.
+- Keep the current calm tone.
+- If needed, slightly improve the loading copy:
+  - “Working out who goes where.”
+  - “Just a few seconds.”
+- No dead-end state where the user lands back at input with no explanation.
+
+E. Add debug safeguards
+- Add a console log or temporary debug trace for:
+  - sort button tapped
+  - loading state entered
+  - sort completed
+  - results payload created
+  - results screen activated
+- This is to identify whether the issue is:
+  - results not being returned
+  - results being returned but not stored
+  - results being stored but results screen not being shown
+  - a route/state reset occurring after completion
+
+Important constraints:
+- Do not remove existing scheduling/sorting intelligence.
+- Do not redesign the entire Family module.
+- This is a focused UX hierarchy + flow state repair.
+- Maintain the soft, calm, lightly witty Sortii feel.
+- Keep mobile-first spacing and ensure nothing is hidden behind the sticky bottom nav.
+
+Success outcome:
+- User adds family members and events
+- User clearly sees “Sort the week” as the next main action
+- Tap -> loading screen
+- Loading completes
+- User lands on the third sorted output screen every time
+- Results remain visible until user chooses to edit or re-run

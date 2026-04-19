@@ -5,7 +5,6 @@ import {
   Animated,
   Keyboard,
   KeyboardAvoidingView,
-  Modal,
   Platform,
   Pressable,
   SafeAreaView,
@@ -1713,26 +1712,26 @@ function SetupReadyStrip({
 function SortContextCard({
   events,
   juggleResult,
-  isJuggleSolving,
+  sortError,
   onSort,
   onViewPlan,
   onReSort,
 }: {
   events: FamilyEvent[];
   juggleResult: JuggleResult | null;
-  isJuggleSolving: boolean;
+  sortError: string | null;
   onSort: () => void;
   onViewPlan: () => void;
   onReSort: () => void;
 }) {
-  const isSorted = !!juggleResult && !isJuggleSolving;
+  const isSorted = !!juggleResult;
   const sortedDate = juggleResult?.solvedAt
     ? new Date(juggleResult.solvedAt).toLocaleDateString("en-AU", {
         weekday: "short", day: "numeric", month: "short",
       })
     : null;
 
-  const microcopy =
+  const subline =
     events.length >= 5 ? "Bit of a juggle here."
     : events.length >= 2 ? "This week's got a few moving parts."
     : "Even one thing is worth planning around.";
@@ -1762,12 +1761,18 @@ function SortContextCard({
 
   return (
     <View style={styles.sortCard}>
-      <View style={styles.sortCardLeft}>
-        <Text style={styles.sortCardTitle}>Ready to untangle this week?</Text>
-        <Text style={styles.sortCardSub}>{microcopy}</Text>
-      </View>
+      <Text style={styles.sortCardTitle}>Ready to untangle this week?</Text>
+      <Text style={styles.sortCardSub}>
+        {subline}{"\n"}We'll work out who goes where, where the squeezes are, and what needs a second pair of hands.
+      </Text>
+      {sortError ? (
+        <View style={styles.sortCardError}>
+          <Feather name="alert-circle" size={13} color="#C04040" />
+          <Text style={styles.sortCardErrorText}>{sortError}</Text>
+        </View>
+      ) : null}
       <TouchableOpacity style={styles.sortCardBtn} onPress={onSort} activeOpacity={0.85}>
-        <Feather name="zap" size={13} color="#fff" />
+        <Feather name="zap" size={15} color="#fff" />
         <Text style={styles.sortCardBtnText}>Sort the week</Text>
       </TouchableOpacity>
     </View>
@@ -1792,9 +1797,10 @@ export default function FamilyScreen() {
   const [showForm, setShowForm]               = useState(false);
   const [editingEvent, setEditingEvent]       = useState<FamilyEvent | null>(null);
   const [showPlanSummary, setShowPlanSummary] = useState(false);
-  const [isJuggleSolving, setIsJuggleSolving] = useState(false);
+  // familyStep drives the 3-page flow: input → sorting → results
+  const [familyStep, setFamilyStep]           = useState<"input" | "sorting" | "results">("input");
   const [juggleResult, setJuggleResult]       = useState<JuggleResult | null>(null);
-  const [showJuggleResult, setShowJuggleResult] = useState(false);
+  const [sortError, setSortError]             = useState<string | null>(null);
 
   // Compute a map from eventId → AI-assigned adult name (including swaps)
   const juggleDriverMap = React.useMemo(() => {
@@ -1838,9 +1844,8 @@ export default function FamilyScreen() {
   function openPlanSummary() {
     dismissBanner();
     if (juggleResult) {
-      setShowJuggleResult(true);
+      setFamilyStep("results");
     }
-    // No juggle result yet — just dismiss banner; events are visible below
   }
 
   function showBanner(type: BannerType, title: string) {
@@ -1923,9 +1928,12 @@ export default function FamilyScreen() {
   async function handleSortJuggle() {
     const adults = state.members.filter((m) => m.role === "adult");
     if (adults.length === 0 || state.events.length === 0) return;
-    setIsJuggleSolving(true);
-    setShowJuggleResult(false);
+
+    console.log("[Sortii] Sort triggered — adults:", adults.length, "events:", state.events.length);
+    setSortError(null);
+    setFamilyStep("sorting");
     dismissBanner();
+
     try {
       // Build prompt using actual field names from FamilyEvent
       const adultsStr = adults.map((a) => `${a.name}, can drive: yes`).join("\n");
@@ -1947,6 +1955,7 @@ export default function FamilyScreen() {
       }).join("\n---\n");
       const prompt = `Available adults:\n${adultsStr}\n\nEvents this week:\n${eventsStr}\n\nPlease solve this schedule.`;
 
+      console.log("[Sortii] Loading state entered — calling API");
       // Web: use root-relative URL (proxied at /api). Native: localhost directly.
       const apiBase = Platform.OS === "web" ? "" : "http://localhost:8080";
       const res = await fetch(`${apiBase}/api/juggle`, {
@@ -1958,21 +1967,16 @@ export default function FamilyScreen() {
       const data = await res.json() as { result: Omit<JuggleResult, "solvedAt"> };
       const resultData = data.result ?? (data as unknown as Omit<JuggleResult, "solvedAt">);
       const full: JuggleResult = { ...resultData, solvedAt: Date.now() };
+
+      console.log("[Sortii] Sort completed — results payload created, events in result:", full.events?.length);
       await AsyncStorage.setItem(JUGGLE_RESULT_KEY, JSON.stringify(full));
       setJuggleResult(full);
-      setIsJuggleSolving(false);
-      setShowJuggleResult(true);
+      setFamilyStep("results");
+      console.log("[Sortii] Results screen activated");
     } catch (err) {
-      console.error("Juggle solve error:", err);
-      setIsJuggleSolving(false);
-      Alert.alert(
-        "That one got complicated.",
-        "Too many moving parts at once. Try again — it usually works second time.",
-        [
-          { text: "Try again", onPress: handleSortJuggle },
-          { text: "Not now", style: "cancel" },
-        ]
-      );
+      console.error("[Sortii] Sort error:", err);
+      setFamilyStep("input");
+      setSortError("Couldn't sort right now. Check your connection and try again.");
     }
   }
 
@@ -1981,6 +1985,42 @@ export default function FamilyScreen() {
   }
 
   if (loading) return <View style={{ flex: 1, backgroundColor: BG }} />;
+
+  // ── Page 2: Sorting / loading screen ───────────────────────────────────────
+  if (familyStep === "sorting") {
+    return (
+      <SafeAreaView style={{ flex: 1, backgroundColor: BG }}>
+        <JuggleProcessingOverlay />
+      </SafeAreaView>
+    );
+  }
+
+  // ── Page 3: Results screen ─────────────────────────────────────────────────
+  if (familyStep === "results" && juggleResult) {
+    return (
+      <SafeAreaView style={{ flex: 1, backgroundColor: "#FAFAF8" }}>
+        <View style={styles.resultsHeader}>
+          <TouchableOpacity onPress={() => setFamilyStep("input")}>
+            <Text style={styles.resultsBack}>← Back</Text>
+          </TouchableOpacity>
+          <View style={{ alignItems: "center", flex: 1 }}>
+            <Text style={styles.resultsTitle}>Here's the plan</Text>
+          </View>
+          <TouchableOpacity onPress={() => handleSortJuggle()}>
+            <Text style={styles.resultsRetry}>Sort again</Text>
+          </TouchableOpacity>
+        </View>
+        <JuggleResultsContent
+          juggleResult={juggleResult}
+          members={state.members}
+          onClose={() => setFamilyStep("input")}
+          onSortAgain={() => handleSortJuggle()}
+          onShare={handleShareJuggle}
+          onSwapApplied={handleSwapApplied}
+        />
+      </SafeAreaView>
+    );
+  }
 
   const hasEvents      = state.events.length > 0;
   const hasMembers     = state.members.length > 0;
@@ -2060,15 +2100,15 @@ export default function FamilyScreen() {
               </View>
             )}
 
-            {/* Inline Sort card — shown once any event exists */}
+            {/* Inline Sort hero card — shown once any event exists */}
             {state.events.length >= 1 && (
               <SortContextCard
                 events={state.events}
                 juggleResult={juggleResult}
-                isJuggleSolving={isJuggleSolving}
+                sortError={sortError}
                 onSort={handleSortJuggle}
-                onViewPlan={() => setShowJuggleResult(true)}
-                onReSort={() => { setShowJuggleResult(false); handleSortJuggle(); }}
+                onViewPlan={() => setFamilyStep("results")}
+                onReSort={() => handleSortJuggle()}
               />
             )}
 
@@ -2114,31 +2154,23 @@ export default function FamilyScreen() {
         )}
       </ScrollView>
 
-      {/* ── Sticky CTA bar ── */}
+      {/* ── Sticky bar — "Add another event" primary, softer when unsorted so sort hero leads ── */}
       {hasEvents && (
-        <View style={[styles.sortCtaBar, { paddingBottom: insets.bottom + 12 }]}>
-          {/* Primary: always visible */}
+        <View style={[
+          styles.sortCtaBar,
+          { paddingBottom: insets.bottom + 12 },
+          !juggleResult && styles.sortCtaBarSoft,
+        ]}>
           <TouchableOpacity
-            style={styles.sortCtaBtn}
+            style={[styles.sortCtaBtn, !juggleResult && styles.sortCtaBtnSoft]}
             onPress={openAddEvent}
             activeOpacity={0.88}
           >
-            <Feather name="plus" size={16} color="#fff" />
-            <Text style={styles.sortCtaBtnText}>Add another event</Text>
+            <Feather name="plus" size={15} color={juggleResult ? "#fff" : TEAL} />
+            <Text style={[styles.sortCtaBtnText, !juggleResult && { color: TEAL }]}>
+              Add another event
+            </Text>
           </TouchableOpacity>
-          {/* Secondary: Sort or Re-sort — only when adults exist to run the logic */}
-          {canSort && (
-            <TouchableOpacity
-              style={styles.sortCtaAddBtn}
-              onPress={juggleResult ? () => { setShowJuggleResult(false); handleSortJuggle(); } : handleSortJuggle}
-              activeOpacity={0.8}
-            >
-              <Feather name="zap" size={13} color={juggleResult ? TEXT_MUTED : GOLD} />
-              <Text style={[styles.sortCtaAddBtnText, juggleResult ? {} : { color: GOLD }]}>
-                {juggleResult ? "Re-sort week" : "Sort the week"}
-              </Text>
-            </TouchableOpacity>
-          )}
         </View>
       )}
 
@@ -2153,40 +2185,7 @@ export default function FamilyScreen() {
         />
       )}
 
-      {/* ── AI juggle processing overlay ── */}
-      {isJuggleSolving && <JuggleProcessingOverlay />}
-
-      {/* ── AI juggle results — full results screen ── */}
-      {juggleResult && (
-        <Modal
-          visible={showJuggleResult}
-          animationType="slide"
-          presentationStyle="pageSheet"
-          onRequestClose={() => setShowJuggleResult(false)}
-        >
-          <SafeAreaView style={{ flex: 1, backgroundColor: "#FAFAF8" }}>
-            <View style={styles.resultsHeader}>
-              <TouchableOpacity onPress={() => setShowJuggleResult(false)}>
-                <Text style={styles.resultsBack}>← Back</Text>
-              </TouchableOpacity>
-              <View style={{ alignItems: "center", flex: 1 }}>
-                <Text style={styles.resultsTitle}>Here's the plan</Text>
-              </View>
-              <TouchableOpacity onPress={() => { setShowJuggleResult(false); handleSortJuggle(); }}>
-                <Text style={styles.resultsRetry}>Sort again</Text>
-              </TouchableOpacity>
-            </View>
-            <JuggleResultsContent
-              juggleResult={juggleResult}
-              members={state.members}
-              onClose={() => setShowJuggleResult(false)}
-              onSortAgain={() => { setShowJuggleResult(false); handleSortJuggle(); }}
-              onShare={handleShareJuggle}
-              onSwapApplied={handleSwapApplied}
-            />
-          </SafeAreaView>
-        </Modal>
-      )}
+      {/* Modal + overlay removed — results now use familyStep early-return above */}
     </View>
   );
 }
@@ -2711,6 +2710,13 @@ const styles = StyleSheet.create({
     }),
   },
   sortCtaBtnText: { fontSize: 17, fontFamily: "Inter_700Bold", color: "#fff", letterSpacing: 0.2 },
+  // Softer variants — used when juggle not yet run, so sort hero card leads attention
+  sortCtaBarSoft: { borderTopColor: BORDER, backgroundColor: "#fff" },
+  sortCtaBtnSoft: {
+    backgroundColor: "transparent", borderWidth: 1.5, borderColor: TEAL + "55",
+    shadowOpacity: 0,
+    ...Platform.select({ web: { boxShadow: "none" }, default: { elevation: 0 } }),
+  },
   sortCtaAddBtn: {
     flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 6,
     paddingVertical: 8,
@@ -2730,26 +2736,30 @@ const styles = StyleSheet.create({
   },
   setupViewPlanBtnText: { fontSize: 12, fontFamily: "Inter_500Medium", color: TEAL },
 
-  // Sort context card — pre-sort state
+  // Sort context card — pre-sort hero state
   sortCard: {
-    flexDirection: "row", alignItems: "center", gap: 12,
-    backgroundColor: "#fff",
-    borderRadius: 14, borderWidth: 1, borderColor: GOLD + "44",
-    paddingHorizontal: 16, paddingVertical: 14,
-  },
-  sortCardLeft: { flex: 1, gap: 3 },
-  sortCardTitle: { fontSize: 14, fontFamily: "Inter_600SemiBold", color: TEXT },
-  sortCardSub: { fontSize: 12, fontFamily: "Inter_400Regular", color: TEXT_MUTED, lineHeight: 17 },
-  sortCardBtn: {
-    flexDirection: "row", alignItems: "center", gap: 6,
-    backgroundColor: GOLD, borderRadius: 20,
-    paddingHorizontal: 14, paddingVertical: 9,
+    backgroundColor: "#FFFDF9",
+    borderRadius: 18, borderWidth: 1, borderColor: GOLD + "55",
+    paddingHorizontal: 20, paddingVertical: 22,
+    gap: 10,
     ...Platform.select({
-      web: { boxShadow: `0px 2px 8px ${GOLD}55` },
-      default: { shadowColor: GOLD, shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.3, shadowRadius: 6, elevation: 4 },
+      web: { boxShadow: `0px 4px 20px rgba(0,0,0,0.10)` },
+      default: { shadowColor: "#000", shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.10, shadowRadius: 16, elevation: 5 },
     }),
   },
-  sortCardBtnText: { fontSize: 13, fontFamily: "Inter_600SemiBold", color: "#fff" },
+  sortCardTitle: { fontSize: 18, fontFamily: "Manrope_700Bold", color: TEXT, letterSpacing: -0.3 },
+  sortCardSub: { fontSize: 13, fontFamily: "Inter_400Regular", color: TEXT_MUTED, lineHeight: 20 },
+  sortCardError: { flexDirection: "row", alignItems: "flex-start", gap: 7, marginTop: 2 },
+  sortCardErrorText: { fontSize: 12, fontFamily: "Inter_400Regular", color: "#C04040", flex: 1 },
+  sortCardBtn: {
+    flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8,
+    backgroundColor: GOLD, borderRadius: 14, height: 52, marginTop: 4,
+    ...Platform.select({
+      web: { boxShadow: `0px 3px 12px ${GOLD}55` },
+      default: { shadowColor: GOLD, shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.35, shadowRadius: 10, elevation: 6 },
+    }),
+  },
+  sortCardBtnText: { fontSize: 16, fontFamily: "Inter_700Bold", color: "#fff", letterSpacing: 0.1 },
 
   // Sort context card — post-sort state
   sortCardSorted: {
