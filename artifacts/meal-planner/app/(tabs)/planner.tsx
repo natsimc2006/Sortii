@@ -3,6 +3,7 @@ import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Pressable } from "react-native";
 import {
   Animated,
   Image,
@@ -960,7 +961,7 @@ export default function PlannerScreen() {
           >
             {swapSheet && (() => {
               const swaps = getRecipeSwapsForNeed(
-                swapSheet.recipe.ingredients.map((i) => i.name),
+                swapSheet.recipe.ingredients,
                 swapSheet.need as DietarySwapNeed
               );
               const needLabel: Record<string, string> = {
@@ -994,7 +995,7 @@ export default function PlannerScreen() {
                         >
                           <View style={styles.swapRowIngredient}>
                             <Text style={[styles.swapOriginal, { color: C.text }]}>
-                              {s.ingredient}
+                              {s.original}
                             </Text>
                             <Feather
                               name="arrow-right"
@@ -1003,7 +1004,7 @@ export default function PlannerScreen() {
                               style={{ marginHorizontal: 4 }}
                             />
                             <Text style={[styles.swapReplacement, { color: "#2A8F88" }]}>
-                              {s.replacement}
+                              {s.swap}
                             </Text>
                           </View>
                           {s.note && (
