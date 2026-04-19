@@ -1,0 +1,726 @@
+════════════════════════════════════════════
+SORTII — FAMILY TAB UI FLOW FIX
+════════════════════════════════════════════
+
+TASK
+────
+The juggle engine API is confirmed working.
+The problem is the UI components are not
+appearing on screen — the button, processing
+overlay, and results sheet are either in
+the wrong position in the JSX tree or
+outside the rendered view.
+
+Do not rebuild the engine or API.
+Only fix the UI rendering and flow.
+
+════════════════════════════════════════════
+STEP 1 — AUDIT WHAT WAS ACTUALLY ADDED
+════════════════════════════════════════════
+
+Open family.tsx and confirm these exist:
+
+CHECK A: The Sort button
+Search for the text "Sort the family juggle"
+Tell me:
+- Does it exist in the file? Y/N
+- Is it inside the main return() statement?
+- Is it inside a ScrollView or View that
+  is actually rendered?
+- Is it wrapped in any conditional that
+  might be hiding it? (e.g. only shows
+  when a specific state is true)
+
+CHECK B: The processing overlay
+Search for "JuggleProcessingOverlay" 
+or "Untangling"
+Tell me:
+- Does it exist in the file? Y/N
+- Is it inside the main return() statement?
+- What condition controls its visibility?
+- Is that condition ever being set to true?
+
+CHECK C: The results sheet
+Search for "JuggleResultSheet" or 
+"HERE'S THE SPLIT" or "juggleResult"
+Tell me:
+- Does it exist in the file? Y/N
+- Is it inside the main return() statement?
+- What condition controls its visibility?
+
+CHECK D: The handler function
+Search for "handleSortJuggle"
+Tell me:
+- Does the function exist? Y/N
+- Is it connected to any button's onPress?
+- Does it actually call the juggle API?
+
+Report all findings before changing anything.
+
+════════════════════════════════════════════
+STEP 2 — FIX THE BUTTON VISIBILITY
+════════════════════════════════════════════
+
+The "Sort the family juggle →" button must:
+
+1. Be inside the main ScrollView of the
+   Family tab screen
+2. Appear BELOW the events list
+3. Be visible when at least 1 event exists
+4. NOT be hidden inside a modal or sheet
+   that isn't open
+
+CORRECT PLACEMENT in the JSX:
+
+Find the section of the return() that
+renders the events list or the 
+WeekSortedCard. Place the button
+immediately after that section,
+before the closing ScrollView tag.
+
+EXACT BUTTON CODE:
+──────────────────
+{events.length > 0 && familyMembers.some(m => 
+  m.role === 'adult' || m.role === 'Adult/driver'
+) && (
+  <TouchableOpacity
+    style={styles.sortJuggleButton}
+    onPress={handleSortJuggle}
+    activeOpacity={0.85}
+  >
+    <Text style={styles.sortJuggleButtonText}>
+      Sort the family juggle →
+    </Text>
+  </TouchableOpacity>
+)}
+
+BUTTON STYLES:
+──────────────
+sortJuggleButton: {
+  backgroundColor: '#2A8F88',
+  borderRadius: 12,
+  paddingVertical: 16,
+  paddingHorizontal: 24,
+  marginHorizontal: 16,
+  marginTop: 16,
+  marginBottom: 8,
+  alignItems: 'center',
+},
+sortJuggleButtonText: {
+  color: '#FFFFFF',
+  fontSize: 16,
+  fontWeight: '700',
+  letterSpacing: 0.2,
+},
+
+If the button already exists but is
+wrapped in a condition that is never
+true, remove the condition temporarily
+to confirm it renders, then restore
+the correct condition.
+
+════════════════════════════════════════════
+STEP 3 — FIX THE PROCESSING OVERLAY
+════════════════════════════════════════════
+
+The processing overlay must sit at the
+ROOT level of the screen component —
+not inside a ScrollView — so it covers
+the entire screen.
+
+CORRECT PLACEMENT:
+──────────────────
+The main return() of the Family screen
+should look like this structure:
+
+return (
+  <View style={styles.container}>
+    
+    {/* Main scrollable content */}
+    <ScrollView>
+      {/* ... all existing content ... */}
+      {/* Sort button goes here */}
+    </ScrollView>
+
+    {/* Processing overlay — ROOT LEVEL */}
+    {isJuggleSolving && (
+      <View style={styles.processingOverlay}>
+        {/* pulse animation */}
+        <Text style={styles.processingText}>
+          {processingMessage}
+        </Text>
+      </View>
+    )}
+
+    {/* Results sheet — ROOT LEVEL */}
+    {juggleResult && showJuggleResults && (
+      <JuggleResultSheet
+        result={juggleResult}
+        onClose={() => setShowJuggleResults(false)}
+        familyMembers={familyMembers}
+      />
+    )}
+
+  </View>
+);
+
+If the overlay or sheet are inside the
+ScrollView, move them outside it.
+If they are missing from the return()
+entirely, add them now.
+
+STATE VARIABLES REQUIRED:
+──────────────────────────
+Confirm these state variables exist.
+Add any that are missing:
+
+const [isJuggleSolving, setIsJuggleSolving] = 
+  useState(false);
+const [processingMessage, setProcessingMessage] = 
+  useState('Untangling the family juggle…');
+const [juggleResult, setJuggleResult] = 
+  useState(null);
+const [showJuggleResults, setShowJuggleResults] = 
+  useState(false);
+
+PROCESSING OVERLAY STYLES:
+───────────────────────────
+processingOverlay: {
+  position: 'absolute',
+  top: 0,
+  left: 0,
+  right: 0,
+  bottom: 0,
+  backgroundColor: '#FFFFFF',
+  alignItems: 'center',
+  justifyContent: 'center',
+  zIndex: 1000,
+},
+processingText: {
+  fontSize: 20,
+  fontWeight: '700',
+  color: '#1A2E2D',
+  marginTop: 24,
+  textAlign: 'center',
+  paddingHorizontal: 32,
+},
+processingSubText: {
+  fontSize: 14,
+  color: '#7A9E9B',
+  marginTop: 8,
+  textAlign: 'center',
+},
+
+════════════════════════════════════════════
+STEP 4 — FIX THE HANDLER FUNCTION
+════════════════════════════════════════════
+
+Confirm handleSortJuggle exists and
+contains this complete logic.
+Replace it entirely with this if needed:
+
+const handleSortJuggle = async () => {
+  setIsJuggleSolving(true);
+  setShowJuggleResults(false);
+  
+  // Rotating processing messages
+  const messages = [
+    'Untangling the family juggle…',
+    'Working out who goes where.',
+    'Finding the least painful version.',
+    'Checking if anyone gets a breather.',
+  ];
+  let msgIndex = 0;
+  const msgInterval = setInterval(() => {
+    msgIndex = (msgIndex + 1) % messages.length;
+    setProcessingMessage(messages[msgIndex]);
+  }, 2500);
+
+  try {
+    // Build the prompt from current data
+    const adults = familyMembers.filter(m => 
+      m.role === 'adult' || 
+      m.role === 'Adult/driver' ||
+      m.role === 'Adult'
+    );
+    const children = familyMembers.filter(m => 
+      m.role === 'child' || 
+      m.role === 'Child'
+    );
+
+    // Format adults string
+    const adultsStr = adults.map(a => 
+      `${a.name}, can drive: yes`
+    ).join('\n');
+
+    // Format events string
+    const eventsStr = events.map(e => `
+Child: ${e.personName || e.person || 'unspecified'}
+Activity: ${e.title || e.activity || 'event'}
+Location: ${e.location || 'not specified'}
+Day: ${e.day || 'Saturday'}
+Start: ${e.startTime || e.time || 'not specified'}
+End: ${e.endTime || 'not specified'}
+Assigned adult: unassigned
+Notes: none`).join('\n');
+
+    const prompt = `Available adults:\n${adultsStr}
+    
+Weekend events:\n${eventsStr}
+
+Please solve this schedule.`;
+
+    // Call the juggle API
+    const response = await fetch('/api/juggle', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: prompt }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`API error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    
+    // Handle both wrapped and unwrapped responses
+    const result = data.result || data;
+    
+    setJuggleResult(result);
+    setShowJuggleResults(true);
+    
+    // Save to AsyncStorage
+    await AsyncStorage.setItem(
+      'sortii_last_juggle_result',
+      JSON.stringify(result)
+    );
+
+  } catch (error) {
+    console.error('Juggle solve error:', error);
+    Alert.alert(
+      'That one got complicated.',
+      'Too many moving parts at once. Try again — it usually works second time.',
+      [
+        { text: 'Try again', onPress: handleSortJuggle },
+        { text: 'Not now', style: 'cancel' },
+      ]
+    );
+  } finally {
+    clearInterval(msgInterval);
+    setIsJuggleSolving(false);
+    setProcessingMessage('Untangling the family juggle…');
+  }
+};
+
+════════════════════════════════════════════
+STEP 5 — BUILD A SIMPLE RESULTS SCREEN
+════════════════════════════════════════════
+
+The JuggleResultSheet may be too complex
+to render correctly as a first pass.
+Replace it with a guaranteed-to-work
+simple version that confirms the flow works,
+then we can style it properly after.
+
+SIMPLE RESULTS SCREEN:
+───────────────────────
+
+Replace the existing JuggleResultSheet
+with this simpler Modal-based version:
+
+{juggleResult && (
+  <Modal
+    visible={showJuggleResults}
+    animationType="slide"
+    presentationStyle="pageSheet"
+  >
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
+      
+      {/* Header */}
+      <View style={styles.resultsHeader}>
+        <TouchableOpacity 
+          onPress={() => setShowJuggleResults(false)}
+        >
+          <Text style={styles.resultsBack}>← Family</Text>
+        </TouchableOpacity>
+        <Text style={styles.resultsTitle}>
+          YOUR WEEKEND PLAN
+        </Text>
+        <TouchableOpacity onPress={handleSortJuggle}>
+          <Text style={styles.resultsRetry}>Sort again</Text>
+        </TouchableOpacity>
+      </View>
+
+      <ScrollView style={{ flex: 1 }}
+        contentContainerStyle={{ padding: 16 }}>
+
+        {/* Summary stats */}
+        <View style={styles.summaryGrid}>
+          <View style={styles.summaryBox}>
+            <Text style={styles.summaryNum}>
+              {juggleResult?.weekend_summary?.total_events || 
+               events.length}
+            </Text>
+            <Text style={styles.summaryLabel}>EVENTS</Text>
+          </View>
+          <View style={styles.summaryBox}>
+            <Text style={[styles.summaryNum, 
+              { color: '#2A8F88' }]}>
+              ✓{juggleResult?.weekend_summary
+                ?.conflicts_resolved || 0}
+            </Text>
+            <Text style={styles.summaryLabel}>SORTED</Text>
+          </View>
+          <View style={styles.summaryBox}>
+            <Text style={[styles.summaryNum, 
+              { color: '#E8A838' }]}>
+              ⚠{juggleResult?.weekend_summary
+                ?.tight_windows || 0}
+            </Text>
+            <Text style={styles.summaryLabel}>TIGHT</Text>
+          </View>
+          <View style={styles.summaryBox}>
+            <Text style={[styles.summaryNum, 
+              { color: '#B86557' }]}>
+              !{juggleResult?.weekend_summary
+                ?.impossible_clashes || 0}
+            </Text>
+            <Text style={styles.summaryLabel}>ISSUES</Text>
+          </View>
+        </View>
+
+        {/* THE PLAN table */}
+        <View style={styles.resultsCard}>
+          <Text style={styles.resultsCardLabel}>THE PLAN</Text>
+          <Text style={styles.resultsCardSub}>
+            What's happening. Who's on it.
+          </Text>
+          
+          {/* Table header */}
+          <View style={styles.tableHeader}>
+            <Text style={styles.tableHeaderText}>TIME</Text>
+            <Text style={styles.tableHeaderText}>WHO</Text>
+            <Text style={styles.tableHeaderText}>WHERE</Text>
+          </View>
+
+          {/* Table rows */}
+          {(juggleResult?.adult_plans || [])
+            .flatMap(plan => 
+              (plan.schedule || []).map(item => ({
+                ...item,
+                adult: plan.adult
+              }))
+            )
+            .sort((a, b) => 
+              a.time?.localeCompare(b.time))
+            .map((item, i) => (
+              <View key={i} style={[
+                styles.tableRow,
+                i % 2 === 0 
+                  ? { backgroundColor: '#fff' }
+                  : { backgroundColor: '#FAFAF8' }
+              ]}>
+                <View style={styles.timePill}>
+                  <Text style={styles.timePillText}>
+                    {item.time}
+                  </Text>
+                </View>
+                <Text style={styles.tableWho}>
+                  {item.adult} · {item.child}
+                </Text>
+                <Text style={styles.tableWhere}>
+                  {item.location}
+                </Text>
+              </View>
+            ))
+          }
+        </View>
+
+        {/* Conflicts if any */}
+        {(juggleResult?.conflicts || [])
+          .filter(c => c.severity !== 'comfortable')
+          .length > 0 && (
+          <View style={[styles.resultsCard, 
+            styles.conflictCard]}>
+            <Text style={styles.conflictLabel}>
+              THIS BIT NEEDS A PLAN
+            </Text>
+            {(juggleResult.conflicts || []).map((c, i) => (
+              <View key={i} style={styles.conflictRow}>
+                <Text style={styles.conflictText}>
+                  ⚠ {c.description}
+                </Text>
+                {(c.options || []).map((opt, j) => (
+                  <Text key={j} style={styles.conflictOption}>
+                    · {opt}
+                  </Text>
+                ))}
+              </View>
+            ))}
+          </View>
+        )}
+
+        {/* Worth knowing */}
+        {juggleResult?.smart_note && (
+          <View style={[styles.resultsCard,
+            styles.worthKnowingCard]}>
+            <Text style={styles.worthKnowingLabel}>
+              ✦ WORTH KNOWING
+            </Text>
+            <Text style={styles.worthKnowingText}>
+              {juggleResult.smart_note}
+            </Text>
+          </View>
+        )}
+
+        {/* Share button */}
+        <TouchableOpacity style={styles.shareButton}>
+          <Text style={styles.shareButtonText}>
+            Share full plan
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity 
+          style={styles.differentWeekend}
+          onPress={() => setShowJuggleResults(false)}
+        >
+          <Text style={styles.differentWeekendText}>
+            Different weekend?
+          </Text>
+        </TouchableOpacity>
+
+      </ScrollView>
+    </SafeAreaView>
+  </Modal>
+)}
+
+ADD THESE STYLES:
+─────────────────
+resultsHeader: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  paddingHorizontal: 16,
+  paddingVertical: 14,
+  borderBottomWidth: 1,
+  borderBottomColor: '#F0EDEA',
+},
+resultsBack: {
+  color: '#2A8F88',
+  fontSize: 15,
+  fontWeight: '500',
+},
+resultsTitle: {
+  color: '#5E3A4C',
+  fontSize: 12,
+  fontWeight: '600',
+  letterSpacing: 0.12,
+  textTransform: 'uppercase',
+},
+resultsRetry: {
+  color: '#7A9E9B',
+  fontSize: 14,
+},
+summaryGrid: {
+  flexDirection: 'row',
+  gap: 8,
+  marginBottom: 16,
+},
+summaryBox: {
+  flex: 1,
+  backgroundColor: '#fff',
+  borderRadius: 12,
+  padding: 12,
+  alignItems: 'center',
+  shadowColor: '#000',
+  shadowOffset: { width: 0, height: 2 },
+  shadowOpacity: 0.06,
+  shadowRadius: 8,
+  elevation: 2,
+},
+summaryNum: {
+  fontSize: 24,
+  fontWeight: '700',
+  color: '#2A8F88',
+},
+summaryLabel: {
+  fontSize: 10,
+  color: '#7A9E9B',
+  marginTop: 4,
+  letterSpacing: 0.08,
+},
+resultsCard: {
+  backgroundColor: '#fff',
+  borderRadius: 14,
+  padding: 16,
+  marginBottom: 12,
+  shadowColor: '#000',
+  shadowOffset: { width: 0, height: 2 },
+  shadowOpacity: 0.07,
+  shadowRadius: 12,
+  elevation: 2,
+},
+resultsCardLabel: {
+  color: '#5E3A4C',
+  fontSize: 11,
+  fontWeight: '600',
+  letterSpacing: 0.1,
+  textTransform: 'uppercase',
+  marginBottom: 4,
+},
+resultsCardSub: {
+  color: '#7A9E9B',
+  fontSize: 13,
+  marginBottom: 12,
+},
+tableHeader: {
+  flexDirection: 'row',
+  backgroundColor: '#2A8F88',
+  borderRadius: 8,
+  paddingVertical: 8,
+  paddingHorizontal: 12,
+  marginBottom: 4,
+},
+tableHeaderText: {
+  flex: 1,
+  color: '#fff',
+  fontSize: 11,
+  fontWeight: '600',
+  letterSpacing: 0.08,
+},
+tableRow: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  paddingVertical: 12,
+  paddingHorizontal: 8,
+  borderBottomWidth: 1,
+  borderBottomColor: '#F0EDEA',
+},
+timePill: {
+  backgroundColor: '#5E3A4C',
+  borderRadius: 20,
+  paddingVertical: 3,
+  paddingHorizontal: 8,
+  marginRight: 8,
+},
+timePillText: {
+  color: '#fff',
+  fontSize: 11,
+  fontWeight: '600',
+},
+tableWho: {
+  flex: 1,
+  fontSize: 13,
+  color: '#2B2B2B',
+},
+tableWhere: {
+  flex: 1,
+  fontSize: 13,
+  color: '#7A9E9B',
+  textAlign: 'right',
+},
+conflictCard: {
+  borderLeftWidth: 3,
+  borderLeftColor: '#B86557',
+},
+conflictLabel: {
+  color: '#B86557',
+  fontSize: 11,
+  fontWeight: '600',
+  letterSpacing: 0.1,
+  textTransform: 'uppercase',
+  marginBottom: 12,
+},
+conflictRow: {
+  marginBottom: 12,
+},
+conflictText: {
+  fontSize: 14,
+  fontWeight: '600',
+  color: '#2B2B2B',
+  marginBottom: 6,
+},
+conflictOption: {
+  fontSize: 13,
+  color: '#555',
+  marginLeft: 8,
+  marginBottom: 4,
+},
+worthKnowingCard: {
+  borderLeftWidth: 3,
+  borderLeftColor: '#5E3A4C',
+  backgroundColor: '#F3E8EE',
+},
+worthKnowingLabel: {
+  color: '#5E3A4C',
+  fontSize: 11,
+  fontWeight: '600',
+  letterSpacing: 0.1,
+  textTransform: 'uppercase',
+  marginBottom: 8,
+},
+worthKnowingText: {
+  fontSize: 14,
+  color: '#2B2B2B',
+  lineHeight: 21,
+},
+shareButton: {
+  backgroundColor: '#2A8F88',
+  borderRadius: 12,
+  paddingVertical: 16,
+  alignItems: 'center',
+  marginTop: 8,
+  marginBottom: 8,
+},
+shareButtonText: {
+  color: '#fff',
+  fontSize: 16,
+  fontWeight: '700',
+},
+differentWeekend: {
+  alignItems: 'center',
+  paddingVertical: 16,
+  marginBottom: 32,
+},
+differentWeekendText: {
+  color: '#7A9E9B',
+  fontSize: 14,
+},
+
+════════════════════════════════════════════
+STEP 6 — VERIFY FIELD NAMES
+════════════════════════════════════════════
+
+The handler in Step 4 uses these field
+names to read event data:
+
+e.personName || e.person
+e.title || e.activity
+e.location
+e.day
+e.startTime || e.time
+e.endTime
+
+Open the file where events are stored
+and confirm the actual field names used.
+
+If different, update the handler to
+match the actual field names exactly.
+
+This is a common cause of empty results —
+the engine receives blank event data
+because the field names don't match.
+
+════════════════════════════════════════════
+DO NOT CHANGE
+════════════════════════════════════════════
+
+✓ The juggle API route (/api/juggle)
+✓ The AI model and proxy setup
+✓ All existing Family tab UI
+✓ Family member add/edit flow
+✓ Event entry sheet
+✓ Home tab other cards (Dinner, Money)
+✓ Meals tab
+✓ All navigation structure
+✓ All colour tokens and brand styles

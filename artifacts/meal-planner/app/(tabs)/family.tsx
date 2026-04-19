@@ -5,8 +5,10 @@ import {
   Animated,
   Keyboard,
   KeyboardAvoidingView,
+  Modal,
   Platform,
   Pressable,
+  SafeAreaView,
   ScrollView,
   Share,
   StyleSheet,
@@ -1562,12 +1564,30 @@ export default function FamilyScreen() {
     const adults = state.members.filter((m) => m.role === "adult");
     if (adults.length === 0 || state.events.length === 0) return;
     setIsJuggleSolving(true);
+    setShowJuggleResult(false);
     dismissBanner();
     try {
-      const prompt = buildJugglePrompt(state.members, state.events);
-      const apiBase = process.env.EXPO_PUBLIC_DOMAIN
-        ? `https://${process.env.EXPO_PUBLIC_DOMAIN}`
-        : "http://localhost:8080";
+      // Build prompt using actual field names from FamilyEvent
+      const adultsStr = adults.map((a) => `${a.name}, can drive: yes`).join("\n");
+      const eventsStr = state.events.map((e) => {
+        const involved = e.personIds
+          .map((id) => state.members.find((m) => m.id === id)?.name)
+          .filter(Boolean)
+          .join(", ");
+        return [
+          `Activity: ${e.title}`,
+          `Day: ${e.day}`,
+          `Start: ${e.time || "not specified"}`,
+          `End: ${e.endTime || "not specified"}`,
+          `Location: ${e.location || "not specified"}`,
+          `Who's going: ${involved || "unspecified"}`,
+          `Assigned adult: unassigned`,
+        ].join("\n");
+      }).join("\n---\n");
+      const prompt = `Available adults:\n${adultsStr}\n\nEvents this week:\n${eventsStr}\n\nPlease solve this schedule.`;
+
+      // Web: use root-relative URL (proxied at /api). Native: localhost directly.
+      const apiBase = Platform.OS === "web" ? "" : "http://localhost:8080";
       const res = await fetch(`${apiBase}/api/juggle`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -1575,17 +1595,22 @@ export default function FamilyScreen() {
       });
       if (!res.ok) throw new Error(`API error ${res.status}`);
       const data = await res.json() as { result: Omit<JuggleResult, "solvedAt"> };
-      const full: JuggleResult = { ...data.result, solvedAt: Date.now() };
+      const resultData = data.result ?? (data as unknown as Omit<JuggleResult, "solvedAt">);
+      const full: JuggleResult = { ...resultData, solvedAt: Date.now() };
       await AsyncStorage.setItem(JUGGLE_RESULT_KEY, JSON.stringify(full));
       setJuggleResult(full);
       setIsJuggleSolving(false);
       setShowJuggleResult(true);
-    } catch {
+    } catch (err) {
+      console.error("Juggle solve error:", err);
       setIsJuggleSolving(false);
       Alert.alert(
-        "Couldn't reach the solver",
-        "Check your connection and try again.",
-        [{ text: "OK" }]
+        "That one got complicated.",
+        "Too many moving parts at once. Try again — it usually works second time.",
+        [
+          { text: "Try again", onPress: handleSortJuggle },
+          { text: "Not now", style: "cancel" },
+        ]
       );
     }
   }
@@ -1802,16 +1827,156 @@ export default function FamilyScreen() {
       {/* ── AI juggle processing overlay ── */}
       {isJuggleSolving && <JuggleProcessingOverlay />}
 
-      {/* ── AI juggle results sheet ── */}
-      {showJuggleResult && (
-        <JuggleResultSheet
+      {/* ── AI juggle results modal ── */}
+      {juggleResult && (
+        <Modal
           visible={showJuggleResult}
-          juggle={juggleResult}
-          members={state.members}
-          onClose={() => setShowJuggleResult(false)}
-          onSortAgain={() => { setShowJuggleResult(false); handleSortJuggle(); }}
-          onShare={handleShareJuggle}
-        />
+          animationType="slide"
+          presentationStyle="pageSheet"
+          onRequestClose={() => setShowJuggleResult(false)}
+        >
+          <SafeAreaView style={{ flex: 1, backgroundColor: "#FAFAF8" }}>
+            {/* Header */}
+            <View style={styles.resultsHeader}>
+              <TouchableOpacity onPress={() => setShowJuggleResult(false)}>
+                <Text style={styles.resultsBack}>← Family</Text>
+              </TouchableOpacity>
+              <Text style={styles.resultsTitle}>WEEKEND PLAN</Text>
+              <TouchableOpacity onPress={() => { setShowJuggleResult(false); handleSortJuggle(); }}>
+                <Text style={styles.resultsRetry}>Sort again</Text>
+              </TouchableOpacity>
+            </View>
+
+            <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 16, gap: 12 }}>
+              {/* Status pill */}
+              <View style={[
+                styles.juggleStatusPill,
+                {
+                  backgroundColor:
+                    juggleResult.status === "sorted" ? TEAL + "14"
+                    : juggleResult.status === "tight" ? GOLD + "14"
+                    : "#C0392B14",
+                  borderColor:
+                    juggleResult.status === "sorted" ? TEAL + "40"
+                    : juggleResult.status === "tight" ? GOLD + "40"
+                    : "#C0392B40",
+                },
+              ]}>
+                <Feather
+                  name={
+                    juggleResult.status === "sorted" ? "check-circle"
+                    : juggleResult.status === "tight" ? "clock"
+                    : "alert-triangle"
+                  }
+                  size={14}
+                  color={juggleResult.status === "sorted" ? TEAL : juggleResult.status === "tight" ? GOLD : "#C0392B"}
+                />
+                <Text style={[styles.juggleStatusLabel, {
+                  color: juggleResult.status === "sorted" ? TEAL : juggleResult.status === "tight" ? GOLD : "#C0392B",
+                }]}>
+                  {juggleResult.status === "sorted" ? "Weekend sorted"
+                    : juggleResult.status === "tight" ? "Tight but workable"
+                    : "Some things to sort"}
+                </Text>
+              </View>
+
+              {/* Summary */}
+              <View style={styles.resultsCard}>
+                <Text style={styles.resultsCardLabel}>THE SUMMARY</Text>
+                <Text style={styles.juggleSummaryText}>{juggleResult.summary}</Text>
+              </View>
+
+              {/* Plan */}
+              {juggleResult.plan.length > 0 && (
+                <View style={styles.resultsCard}>
+                  <Text style={styles.resultsCardLabel}>THE PLAN</Text>
+                  <Text style={styles.resultsCardSub}>What's happening. Who's on it.</Text>
+                  {juggleResult.plan.map((item, i) => {
+                    const member = state.members.find((m) => m.name === item.adult);
+                    return (
+                      <View key={i} style={[
+                        styles.tableRow,
+                        { backgroundColor: i % 2 === 0 ? "#fff" : "#FAFAF8" },
+                      ]}>
+                        <View style={[styles.timePill, { backgroundColor: member?.color ?? PLUM }]}>
+                          <Text style={styles.timePillText}>{item.day.slice(0, 3).toUpperCase()}</Text>
+                        </View>
+                        <View style={{ flex: 1 }}>
+                          <Text style={styles.tableWho}>{item.adult}</Text>
+                          <Text style={styles.tableWhere}>{item.duty}</Text>
+                        </View>
+                      </View>
+                    );
+                  })}
+                </View>
+              )}
+
+              {/* Conflicts */}
+              {juggleResult.conflicts.length > 0 && (
+                <View style={[styles.resultsCard, styles.conflictCard]}>
+                  <Text style={styles.conflictLabel}>THIS BIT NEEDS A PLAN</Text>
+                  {juggleResult.conflicts.map((c, i) => (
+                    <View key={i} style={styles.conflictRow}>
+                      <Text style={styles.conflictText}>⚠ {c.description}</Text>
+                    </View>
+                  ))}
+                </View>
+              )}
+
+              {/* Smart note */}
+              {juggleResult.smart_note && (
+                <View style={[styles.resultsCard, styles.worthKnowingCard]}>
+                  <Text style={styles.worthKnowingLabel}>✦ WORTH KNOWING</Text>
+                  <Text style={styles.worthKnowingText}>{juggleResult.smart_note}</Text>
+                </View>
+              )}
+
+              {/* Per-adult shareable lists */}
+              {Object.keys(juggleResult.adult_lists).length > 0 && (
+                <View style={styles.resultsCard}>
+                  <Text style={styles.resultsCardLabel}>SEND EACH PERSON</Text>
+                  {Object.entries(juggleResult.adult_lists).map(([name, duties]) => {
+                    const member = state.members.find((m) => m.name === name);
+                    return (
+                      <TouchableOpacity
+                        key={name}
+                        style={styles.juggleAdultRow}
+                        onPress={() => handleShareJuggle(`Hi ${name} — here's what you're covering this week:\n\n${duties}\n\n— Sent from Sortii.`)}
+                        activeOpacity={0.8}
+                      >
+                        <View style={[styles.planSplitDot, { backgroundColor: member?.color ?? TEAL }]} />
+                        <View style={{ flex: 1 }}>
+                          <Text style={styles.jugglePlanAdult}>{name}'s list</Text>
+                          <Text style={styles.jugglePlanDuty} numberOfLines={2}>{duties}</Text>
+                        </View>
+                        <Feather name="send" size={14} color={TEAL} />
+                      </TouchableOpacity>
+                    );
+                  })}
+                </View>
+              )}
+
+              {/* Share full plan */}
+              <TouchableOpacity
+                style={styles.shareButton}
+                onPress={() => {
+                  const lines = ["Family juggle — sorted.", "", juggleResult.summary];
+                  if (juggleResult.smart_note) lines.push("", `Worth knowing: ${juggleResult.smart_note}`);
+                  handleShareJuggle(lines.join("\n"));
+                }}
+              >
+                <Text style={styles.shareButtonText}>Share full plan</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.differentWeekend}
+                onPress={() => setShowJuggleResult(false)}
+              >
+                <Text style={styles.differentWeekendText}>Close</Text>
+              </TouchableOpacity>
+            </ScrollView>
+          </SafeAreaView>
+        </Modal>
       )}
     </View>
   );
@@ -2273,4 +2438,61 @@ const styles = StyleSheet.create({
   errorText: { fontSize: 13, fontFamily: "Inter_500Medium", color: "#B91C1C" },
   saveBtn: { backgroundColor: TEAL, borderRadius: 14, paddingVertical: 15, alignItems: "center", marginTop: 8 },
   saveBtnText: { fontSize: 15, fontFamily: "Inter_600SemiBold", color: "#fff" },
+
+  // Juggle results modal
+  resultsHeader: {
+    flexDirection: "row", alignItems: "center", justifyContent: "space-between",
+    paddingHorizontal: 16, paddingVertical: 14,
+    borderBottomWidth: 1, borderBottomColor: "#F0EDEA",
+    backgroundColor: "#fff",
+  },
+  resultsBack: { color: TEAL, fontSize: 15, fontFamily: "Inter_500Medium" },
+  resultsTitle: {
+    color: PLUM, fontSize: 11, fontFamily: "Inter_600SemiBold",
+    letterSpacing: 0.12, textTransform: "uppercase",
+  },
+  resultsRetry: { color: TEXT_MUTED, fontSize: 14, fontFamily: "Inter_400Regular" },
+  resultsCard: {
+    backgroundColor: "#fff", borderRadius: 14, padding: 16, marginBottom: 4,
+    ...Platform.select({
+      web: { boxShadow: "0px 2px 12px rgba(0,0,0,0.07)" },
+      default: { shadowColor: "#000", shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.07, shadowRadius: 12, elevation: 2 },
+    }),
+  },
+  resultsCardLabel: {
+    color: PLUM, fontSize: 11, fontFamily: "Inter_600SemiBold",
+    letterSpacing: 0.1, textTransform: "uppercase", marginBottom: 4,
+  },
+  resultsCardSub: { color: TEXT_MUTED, fontSize: 13, fontFamily: "Inter_400Regular", marginBottom: 12 },
+  tableRow: {
+    flexDirection: "row", alignItems: "center",
+    paddingVertical: 10, paddingHorizontal: 4,
+    borderBottomWidth: 1, borderBottomColor: "#F0EDEA",
+  },
+  timePill: {
+    borderRadius: 20, paddingVertical: 3, paddingHorizontal: 8, marginRight: 10,
+  },
+  timePillText: { color: "#fff", fontSize: 11, fontFamily: "Inter_700Bold" },
+  tableWho: { fontSize: 13, fontFamily: "Inter_600SemiBold", color: TEXT, marginBottom: 2 },
+  tableWhere: { fontSize: 12, fontFamily: "Inter_400Regular", color: TEXT_MUTED, lineHeight: 17 },
+  conflictCard: { borderLeftWidth: 3, borderLeftColor: "#B86557" },
+  conflictLabel: {
+    color: "#B86557", fontSize: 11, fontFamily: "Inter_600SemiBold",
+    letterSpacing: 0.1, textTransform: "uppercase", marginBottom: 12,
+  },
+  conflictRow: { marginBottom: 10 },
+  conflictText: { fontSize: 14, fontFamily: "Inter_600SemiBold", color: TEXT },
+  worthKnowingCard: { borderLeftWidth: 3, borderLeftColor: PLUM, backgroundColor: "#F3E8EE" },
+  worthKnowingLabel: {
+    color: PLUM, fontSize: 11, fontFamily: "Inter_600SemiBold",
+    letterSpacing: 0.1, textTransform: "uppercase", marginBottom: 8,
+  },
+  worthKnowingText: { fontSize: 14, fontFamily: "Inter_400Regular", color: TEXT, lineHeight: 21 },
+  shareButton: {
+    backgroundColor: TEAL, borderRadius: 12, paddingVertical: 16,
+    alignItems: "center", marginTop: 8, marginBottom: 4,
+  },
+  shareButtonText: { color: "#fff", fontSize: 16, fontFamily: "Inter_700Bold" },
+  differentWeekend: { alignItems: "center", paddingVertical: 16, marginBottom: 32 },
+  differentWeekendText: { color: TEXT_MUTED, fontSize: 14, fontFamily: "Inter_400Regular" },
 });
