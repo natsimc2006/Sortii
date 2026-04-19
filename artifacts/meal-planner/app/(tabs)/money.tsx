@@ -5,7 +5,6 @@ import React, { useState, useRef, useEffect } from "react";
 import {
   Animated,
   ActivityIndicator,
-  Image,
   Platform,
   ScrollView,
   StyleSheet,
@@ -43,7 +42,6 @@ const PLUM_TINT = "#F3E8EE";
 const PLUM_BORDER = "rgba(94,58,76,0.20)";
 const HERO_BG = "#E6F3F0";
 const PAGE_BG = "#FFFFFF";
-const sortiiLogo = require("@/assets/images/sortii-logo-v2-money.png");
 
 // ─── Quick win confirm messages ───────────────────────────────
 
@@ -770,11 +768,9 @@ export default function MoneyScreen() {
     >
       {/* Header */}
       <View style={styles.pageHeader}>
-        <View style={styles.moneyHeaderRow}>
-          <Image source={sortiiLogo} style={styles.moneyPageLogo} resizeMode="contain" />
-        </View>
+        <Text style={styles.pageTitle}>Money</Text>
         <Text style={styles.pageSubtitle}>
-          A quick look at your week, with a few easy wins if you want them.
+          Here's where your money sits this week.
         </Text>
       </View>
 
@@ -887,16 +883,9 @@ const styles = StyleSheet.create({
 
   // Header
   pageHeader: { gap: 4, marginBottom: 4 },
-  moneyHeaderRow: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    justifyContent: "space-between",
-  },
-  moneyPageLogo: { width: 221, height: 101 },
-  homeBtn: {
-    width: 34, height: 34, borderRadius: 9,
-    backgroundColor: C.chipBg, borderWidth: 1.5, borderColor: C.border,
-    alignItems: "center", justifyContent: "center",
+  pageTitle: {
+    fontSize: 28, fontFamily: "Manrope_700Bold",
+    color: C.text, letterSpacing: -0.5,
   },
   pageSubtitle: {
     fontSize: 14, fontFamily: "Inter_400Regular",

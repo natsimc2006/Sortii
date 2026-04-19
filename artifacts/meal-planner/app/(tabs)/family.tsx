@@ -589,10 +589,7 @@ function JuggleResultsContent({
       {/* ── 3. WHO'S DOING THE RUNNING ── */}
       {adultPlans.length > 0 && (
         <View style={{ gap: 10 }}>
-          <View style={{ gap: 2 }}>
-            <Text style={styles.juggleSectionLabel}>WHO'S DOING THE RUNNING</Text>
-            <Text style={styles.juggleSectionHelper}>Who's got what</Text>
-          </View>
+          <Text style={styles.juggleSectionLabel}>WHO'S GOT WHAT</Text>
           {adultPlans.map((plan) => {
             const member = members.find((m) => m.name === plan.adult);
             return (
@@ -643,7 +640,7 @@ function JuggleResultsContent({
       {conflicts.length > 0 && (
         <View style={styles.juggleConflictCard}>
           <Text style={styles.juggleConflictLabel}>
-            {conflicts.length === 1 ? "ONE THING TO TWEAK" : "A COUPLE OF THINGS TO SORT"}
+            {conflicts.length === 1 ? "HEADS UP" : "HEADS UP"}
           </Text>
           {conflicts.map((c, i) => (
             <View key={i} style={i > 0 ? { marginTop: 12, paddingTop: 12, borderTopWidth: 1, borderTopColor: "#F3E0DC" } : undefined}>
@@ -692,7 +689,7 @@ function JuggleResultsContent({
         activeOpacity={0.8}
       >
         <Feather name="plus" size={14} color={TEAL} />
-        <Text style={styles.resultAddActivityBtnText}>Add another activity</Text>
+        <Text style={styles.resultAddActivityBtnText}>Add something</Text>
       </TouchableOpacity>
 
       </View>{/* end paddingHorizontal wrapper */}
@@ -1821,7 +1818,7 @@ function SortContextCard({
           <View style={styles.sortCardSortedTick}>
             <Feather name="check" size={11} color="#fff" />
           </View>
-          <Text style={styles.sortCardSortedTitle}>Week sorted. You're good.</Text>
+          <Text style={styles.sortCardSortedTitle}>Sorted. Nothing to stress about.</Text>
         </View>
         {sortedDate && (
           <Text style={styles.sortCardSortedDate}>Sorted {sortedDate}</Text>
@@ -1899,12 +1896,12 @@ function NeedHelpPrompt({
     <View style={styles.needHelpCard}>
       <View style={styles.needHelpTop}>
         <Feather name="users" size={13} color={ORANGE} />
-        <Text style={styles.needHelpTitle}>Might need backup here.</Text>
+        <Text style={styles.needHelpTitle}>Worth having a backup.</Text>
       </View>
       <Text style={styles.needHelpSub}>
         {helpers.length > 0
           ? `You have ${helpers.length} helper${helpers.length > 1 ? "s" : ""} on the list.`
-          : "Add people who can help when things get tight."}
+          : "Add someone who could step in if needed."}
       </Text>
       <TouchableOpacity style={styles.needHelpBtn} onPress={onFindHelp} activeOpacity={0.8}>
         <Feather name="user-plus" size={13} color={TEAL} />
@@ -2359,7 +2356,7 @@ export default function FamilyScreen() {
               <View style={styles.repeatNote}>
                 <Feather name="repeat" size={12} color={TEXT_MUTED} />
                 <Text style={styles.repeatNoteText}>
-                  Repeating events carry forward automatically each week.
+                  Regulars carry forward. Nothing to re-enter.
                 </Text>
               </View>
             )}
@@ -2446,7 +2443,7 @@ export default function FamilyScreen() {
             activeOpacity={0.88}
           >
             <Feather name="plus" size={15} color="#fff" />
-            <Text style={styles.sortCtaBtnText}>Add another event</Text>
+            <Text style={styles.sortCtaBtnText}>Add another</Text>
           </TouchableOpacity>
 
           {/* Secondary: Sort / Re-sort — only when events need sorting */}
@@ -2458,7 +2455,7 @@ export default function FamilyScreen() {
             >
               <Feather name="zap" size={14} color={GOLD} />
               <Text style={styles.sortCtaSortBtnText}>
-                {juggleResult ? "Re-sort the week" : "Sort the week"}
+                {juggleResult ? "Re-sort" : "Sort the week"}
               </Text>
             </TouchableOpacity>
           )}
@@ -2471,7 +2468,7 @@ export default function FamilyScreen() {
               activeOpacity={0.7}
             >
               <Feather name="refresh-cw" size={11} color={TEXT_MUTED} />
-              <Text style={styles.sortCtaResortLinkText}>Re-sort week</Text>
+              <Text style={styles.sortCtaResortLinkText}>Re-sort</Text>
             </TouchableOpacity>
           )}
         </View>
@@ -2905,7 +2902,11 @@ const styles = StyleSheet.create({
   juggleScheduleActivity: { fontSize: 14, fontFamily: "Inter_600SemiBold", color: TEXT },
   juggleScheduleChild: { fontSize: 12, fontFamily: "Inter_400Regular", color: TEXT_MUTED },
   juggleScheduleLocation: { fontSize: 12, fontFamily: "Inter_400Regular", color: TEXT_MUTED },
-  juggleFreeWindow: { fontSize: 13, fontFamily: "Inter_400Regular", color: "#4AB88A", fontStyle: "italic" },
+  juggleFreeWindow: {
+    fontSize: 12, fontFamily: "Inter_600SemiBold", color: "#2D7A5A",
+    backgroundColor: "#E0F5EC", paddingHorizontal: 9, paddingVertical: 4,
+    borderRadius: 20, alignSelf: "flex-start" as const, marginTop: 4,
+  },
   juggleAdultSendBtn: {
     borderWidth: 1, borderColor: TEAL, borderRadius: 10,
     paddingVertical: 9, alignItems: "center", marginTop: 4,
@@ -2949,33 +2950,37 @@ const styles = StyleSheet.create({
   jugglePickerPill: { backgroundColor: PLUM + "18", borderRadius: 20, paddingHorizontal: 10, paddingVertical: 4 },
   jugglePickerPillText: { fontSize: 12, fontFamily: "Inter_600SemiBold", color: PLUM },
 
-  // Juggle results — conflicts
+  // Juggle results — conflicts (HEADS UP card)
   juggleConflictCard: {
-    backgroundColor: "#FDF2F0", borderRadius: 14, borderWidth: 1, borderColor: "#EDD5D0",
-    borderLeftWidth: 3, borderLeftColor: "#C0695A", padding: 14, gap: 8,
+    backgroundColor: "#fff", borderRadius: 14, borderWidth: 1, borderColor: "#E8D5D0",
+    borderLeftWidth: 4, borderLeftColor: "#B86557", padding: 14, gap: 8,
+    ...Platform.select({
+      web: { boxShadow: "0px 2px 10px rgba(0,0,0,0.07)" },
+      default: { shadowColor: "#000", shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.07, shadowRadius: 8, elevation: 2 },
+    }),
   },
   juggleConflictLabel: {
-    color: "#B05545", fontSize: 11, fontFamily: "Inter_600SemiBold",
-    textTransform: "uppercase", letterSpacing: 0.1, marginBottom: 4,
+    color: "#B86557", fontSize: 11, fontFamily: "Inter_700Bold",
+    textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 2,
   },
-  juggleConflictDesc: { fontSize: 14, fontFamily: "Inter_600SemiBold", color: TEXT },
-  juggleConflictRec: { fontSize: 13, fontFamily: "Inter_500Medium", color: TEAL, marginTop: 3 },
+  juggleConflictDesc: { fontSize: 14, fontFamily: "Inter_600SemiBold", color: TEXT, lineHeight: 20 },
+  juggleConflictRec: { fontSize: 13, fontFamily: "Inter_500Medium", color: TEAL, marginTop: 4, fontStyle: "italic" },
   juggleConflictOption: { fontSize: 13, fontFamily: "Inter_400Regular", color: TEXT_MUTED, marginTop: 2 },
 
   // Juggle results — worth knowing
   juggleWorthKnowingCard: {
-    backgroundColor: "#F3E8EE", borderRadius: 14, borderWidth: 1, borderColor: PLUM + "30",
-    borderLeftWidth: 3, borderLeftColor: PLUM, padding: 14, gap: 6,
+    backgroundColor: "#FAFAF8", borderRadius: 14, borderWidth: 1, borderColor: PLUM + "22",
+    borderLeftWidth: 4, borderLeftColor: PLUM, padding: 14, gap: 6,
   },
   juggleSubhead: {
     fontSize: 15, fontFamily: "Inter_400Regular", color: TEXT_MUTED,
     fontStyle: "italic", lineHeight: 22, marginBottom: 4,
   },
   juggleWorthKnowingLabel: {
-    color: PLUM, fontSize: 11, fontFamily: "Inter_600SemiBold",
-    textTransform: "uppercase", letterSpacing: 0.1,
+    color: PLUM, fontSize: 11, fontFamily: "Inter_700Bold",
+    textTransform: "uppercase", letterSpacing: 0.8,
   },
-  juggleWorthKnowingText: { fontSize: 14, fontFamily: "Inter_400Regular", color: TEXT, lineHeight: 21 },
+  juggleWorthKnowingText: { fontSize: 15, fontFamily: "Inter_400Regular", color: TEXT, lineHeight: 22 },
 
   // legacy aliases kept for other sheets
   juggleSortAgain: { fontSize: 13, fontFamily: "Inter_600SemiBold", color: TEAL },

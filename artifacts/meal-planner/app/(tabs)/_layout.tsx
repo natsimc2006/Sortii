@@ -305,16 +305,17 @@ export default function TabLayout() {
           }}
         />
         <Tabs.Screen
-          name="more"
+          name="money"
           options={{
-            title: "More",
+            title: "Money",
             tabBarIcon: ({ color, focused }) => (
               <Ionicons
-                name={focused ? "grid" : "grid-outline"}
+                name={focused ? "wallet" : "wallet-outline"}
                 size={21}
                 color={color}
               />
             ),
+            tabBarActiveTintColor: "#D29A22",
           }}
         />
 
@@ -323,7 +324,7 @@ export default function TabLayout() {
         <Tabs.Screen name="recipes"      options={{ href: null }} />
         <Tabs.Screen name="refresh"      options={{ href: null }} />
         <Tabs.Screen name="shopping"     options={{ href: null }} />
-        <Tabs.Screen name="money"        options={{ href: null }} />
+        <Tabs.Screen name="more"         options={{ href: null }} />
         <Tabs.Screen name="saved"        options={{ href: null }} />
         <Tabs.Screen name="preferences"  options={{ href: null }} />
         <Tabs.Screen name="appointments" options={{ href: null }} />

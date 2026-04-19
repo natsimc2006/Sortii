@@ -25,7 +25,7 @@ export function PantryTips({ tips }: Props) {
       >
         <Text style={styles.pillEmoji}>🧄</Text>
         <Text style={styles.pillText}>
-          {tips.length === 1 ? "1 pantry tip" : `${tips.length} pantry tips`} for this week
+          {tips.length === 1 ? "One pantry tip worth knowing" : `${tips.length} pantry tips worth knowing`}
         </Text>
         <Feather name="chevron-down" size={12} color={PLUM} />
       </TouchableOpacity>

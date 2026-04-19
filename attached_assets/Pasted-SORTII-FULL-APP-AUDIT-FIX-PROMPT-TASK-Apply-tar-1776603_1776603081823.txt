@@ -1,0 +1,573 @@
+SORTII — FULL APP AUDIT FIX PROMPT
+════════════════════════════════════════════
+
+TASK
+────
+Apply targeted fixes across multiple screens
+based on a full UX and voice audit.
+Work through each section in order.
+Do not rebuild screens from scratch.
+
+════════════════════════════════════════════
+FIX 1 — BOTTOM NAVIGATION RESTRUCTURE
+════════════════════════════════════════════
+
+CURRENT: Home | Meals | Add(+) | Family | More
+
+PROBLEM: Money is buried inside Meals.
+It is a core Sortii module and has no
+nav presence. Users miss it entirely.
+
+NEW STRUCTURE:
+Home | Meals | Add(+) | Family | Money
+
+Replace "More" tab with "Money" tab.
+Move all "More" tab content (Preferences,
+What's Coming Up, Appointments, Bills,
+Saved meal plans) into the Home screen's
+settings access OR into a settings icon
+in the top-right of the Home screen header.
+
+── MONEY TAB NAV ITEM ────────────────────
+
+Icon: dollar sign or wallet icon
+Label: "Money"
+Color when active: var(--gold) #D29A22
+(matches the Money card colour on Home)
+
+Tapping Money tab opens the Money screen
+directly — the same screen currently
+accessible from within Meals.
+
+── SETTINGS ACCESS (replaces More tab) ───
+
+Add a small settings/gear icon to the
+top-right of the Home screen header,
+next to "Help me sort this" button.
+
+Tapping it opens a bottom sheet:
+Header: "Your setup"
+
+Rows:
+[⚙] Preferences
+    Household, dietary, seasonal
+    → opens Preferences screen
+
+[💰] Money setup
+    Budget, savings goal, breathing room
+    → opens Money setup
+
+[📋] What's Coming Up
+    Everything across all modules
+    → opens timeline view
+
+[📅] Appointments
+    Doctors, school, anything in the diary
+    → opens Appointments
+
+[🧾] Bills
+    Track what's coming up and what's paid
+    → opens Bills
+
+[🔖] Saved meal plans
+    Plans you've kept for later
+    → opens Saved plans
+
+This bottom sheet replaces the More tab.
+Keep it clean — no section headers needed,
+just a simple list with icons and chevrons.
+
+════════════════════════════════════════════
+FIX 2 — HOME SCREEN CLEANUP
+
+
+── "WHAT'S COMING UP" CARD ───────────────
+
+This card currently duplicates what the
+other cards already show.
+
+Replace it with a smarter version:
+Only show "What's Coming Up" when there
+is a cross-module event worth flagging
+— e.g. a family event AND a doctor's
+appointment on the same day, or a big
+bill due on the same week as a heavy
+grocery spend.
+
+If nothing cross-module to flag:
+Hide this card. Let the individual
+cards speak for themselves.
+
+When it does show, the content should
+be a genuine cross-module insight, e.g.:
+"Busy Saturday — football AND a
+doctor's appointment. Juggle sorted ✓"
+
+── HOME SCREEN CARD ORDER ────────────────
+
+Correct order (after cleanup):
+1. Greeting + status line
+2. Tonight's Dinner (always first —
+   most immediate decision removed)
+3. Family (if events this week)
+4. Money (always — core pillar)
+5. Week at a Glance
+6. What's Coming Up (only if cross-
+   module insight exists)
+
+════════════════════════════════════════════
+FIX 3 — MONEY TAB HEADER FIX
+════════════════════════════════════════════
+
+The Money tab currently opens with
+its own Sortii logo lockup:
+[sortii logo]
+"YOUR MONEY... SORTED"
+
+This makes it feel like a separate app.
+The user is already in Sortii — the
+logo should not repeat inside a tab.
+
+REPLACE the logo lockup with:
+
+A simple tab header matching the style
+of the Meals and Family tabs:
+
+"Money"     ← large bold header, left
+"Your week, financially."  ← subtext
+
+Same font, same style, same weight as:
+"Meals" / "Family" headers.
+
+Remove the logo image entirely from
+the Money tab header.
+The brand colour (gold left border on
+the Home card) is sufficient brand signal.
+
+════════════════════════════════════════════
+FIX 4 — MEALS TAB FILTER HIERARCHY
+════════════════════════════════════════════
+
+The filter/preference area is currently:
+- 3 filter chips in a row (people, budget,
+  cost range)
+- "Adjust plan" button
+- Swap savings banner
+- Pantry tip
+
+This is too much happening in one area.
+Simplify the hierarchy:
+
+── NEW FILTER BAR ────────────────────────
+
+Replace the 3 filter chips + Adjust button
+with a single compact row:
+
+[👥 4 people]  [Budget]  [⚙ Adjust]
+
+3 items only. The cost range ($103–$121)
+moves to inside the Adjust sheet —
+it's a result, not a filter control.
+
+"Adjust" pill on the right opens the
+existing Adjust plan sheet.
+
+── DIETARY INDICATOR ─────────────────────
+
+If a household dietary profile exists
+(from the dietary setup feature):
+
+Show a small quiet pill below the
+filter bar:
+"🌱 Vegan plan" or "🌾 Gluten-free"
+or "✓ Kid-friendly lean"
+
+Color: var(--plum-tint) background,
+var(--plum) text, 11px, pill shape.
+
+This is the only place the dietary
+profile is made visible. Tapping it
+opens Preferences → Household profile.
+
+If no dietary profile set:
+Show a very subtle prompt instead:
+"Dietary needs? Set them once →"
+var(--text-muted) 12px underlined link.
+Tapping opens dietary setup.
+
+── SWAP BANNER ───────────────────────────
+
+The "Review swaps → save up to $30"
+banner is working well. Keep it.
+Move it below the filter bar and dietary
+indicator, above the meal list.
+
+── SHOPPING LIST TIP ─────────────────────
+
+Add this one-time tip below the
+swap banner, above the meal list:
+
+┌─────────────────────────────────────┐
+│ 🛒 Your shopping list is ready.     │
+│ All ingredients are already in it   │
+│ — add anything extra you need.      │
+│ [Open shopping list]    [Got it ×]  │
+└─────────────────────────────────────┘
+
+Style:
+background: var(--teal-tint) #E6F3F0
+border: 1px solid rgba(42,143,136,0.2)
+border-radius: 12px
+padding: 12px 16px
+font-size: 13px
+
+"Open shopping list" → teal link,
+opens the Shopping list directly.
+
+"Got it ×" dismisses the tip permanently.
+Store dismissed state in localStorage:
+Key: 'sortii_shopping_tip_dismissed'
+
+Show this tip:
+- Only on first 3 visits to Meals tab
+- Only if a meal plan exists
+- Never again after dismissed
+
+This is the moment users realise the
+shopping list is auto-populated —
+don't bury it, surface it once clearly.
+
+════════════════════════════════════════════
+FIX 5 — VOICE PASS ACROSS ALL SCREENS
+════════════════════════════════════════════
+
+These copy replacements apply globally.
+Find and replace each string exactly.
+
+HOME SCREEN
+───────────
+
+"Surprisingly civilised so far."
+→ Keep — this is great ✓
+
+"3 things on this week."
+→ Keep ✓
+
+"Tap to sort the juggle →"
+→ Keep ✓
+
+MEALS TAB
+─────────
+"7 dinners sorted. Dinner's behaving itself."
+→ Keep — perfect ✓
+
+"Dinner? Handled. Go do literally anything else."
+→ Keep — this is the best line in the app ✓
+
+"Review swaps → save up to $30"
+→ Keep ✓
+
+"1 pantry tip for this week"
+→ "One pantry tip worth knowing"
+   (removes the metric feel)
+
+MONEY TAB
+─────────
+"A quick look at your week, with a few
+easy wins if you want them."
+→ "Here's where your money sits this week."
+   (more direct, less hedge-y)
+
+"quietly sorted this week."
+→ Keep ✓
+
+"Nothing dramatic. Just less waste. Estimated, not exact."
+→ Keep — perfect tone ✓
+
+"A few easy wins (if you want them)"
+→ Keep ✓
+
+"Numbers changed? Easy."
+→ Keep ✓
+
+"Tweak my numbers"
+→ Keep ✓
+
+"Saving for something?"
+→ Keep ✓
+
+FAMILY TAB
+──────────
+"What's on this week? We'll untangle the rest."
+→ Keep ✓
+
+"Week sorted. You're good."
+→ "Sorted. Nothing to stress about."
+
+"Might need backup here."
+→ "Worth having a backup."
+   (less alarming, more practical)
+
+"Add people who can help when things get tight."
+→ "Add someone who could step in if needed."
+
+"Repeating events carry forward automatically each week."
+→ "Regulars carry forward. Nothing to re-enter."
+   (more relief-focused)
+
+"Re-sort week"
+→ "Re-sort"
+   (shorter, cleaner as a button)
+
+FAMILY RESULTS SCREEN
+─────────────────────
+"Sorted. Here's the plan"
+→ Keep ✓
+
+"Sorted. Here's what the week looks like."
+→ Keep ✓
+
+"WHO'S DOING THE RUNNING"
+→ "WHO'S GOT WHAT"
+   (shorter, more conversational)
+
+"Who's got what"
+→ Remove subtext — header is enough
+
+"Afternoon opens up after 12pm."
+→ "Free from 12pm."
+   (shorter — the relief is in the brevity)
+
+"ONE THING TO TWEAK"
+→ "HEADS UP"
+   (warmer, less finger-wagging)
+
+"WORTH KNOWING"
+→ Keep ✓
+
+"+ Add another activity"
+→ "+ Add something"
+   (lighter, lower commitment feel)
+
+ADD MENU SHEET
+──────────────
+"What needs adding?"
+→ Keep ✓
+
+"Pop it in. We'll sort the rest."
+→ Keep ✓
+
+"Plan dinner or lunch for a day"
+→ "Plan dinner for a day"
+   (simpler — lunch isn't built yet)
+
+"Kids, pickups, weekend plans"
+→ Keep ✓
+
+════════════════════════════════════════════
+FIX 6 — FAMILY RESULTS VISUAL UPGRADE
+════════════════════════════════════════════
+
+The "HEADS UP" conflict card and
+"WORTH KNOWING" card need to land
+harder visually. They contain the most
+intelligent output in the app but
+look like afterthoughts.
+
+── HEADS UP CARD (was ONE THING TO TWEAK)
+
+Current: faint red-pink card, standard text.
+Problem: the important info (the conflict
+and the recommendation) doesn't have
+enough visual hierarchy.
+
+UPGRADE:
+
+Card background: white
+Left border: 4px var(--impossible) #B86557
+Border radius: 14px
+Shadow: 0 2px 12px rgba(184,101,87,0.12)
+
+Internal layout:
+┌──────────────────────────────────────┐
+│ ⚠ HEADS UP                           │
+│ [conflict description — bold 15px]   │
+│                                      │
+│ [recommendation — teal, 14px, italic]│
+│                                      │
+│ Options:                             │
+│ · [option 1]                         │
+│ · [option 2]                         │
+│                                      │
+│ [Who can help? →] if contacts exist  │
+└──────────────────────────────────────┘
+
+The recommendation line (currently in
+teal in the screenshot) is the right
+instinct — keep it in teal, make it
+bold, 15px. This is the AI's direct
+advice and should read as the most
+important line in the card.
+
+── WORTH KNOWING CARD ────────────────────
+
+Current: plum-tinted card, good structure.
+
+UPGRADE:
+Add a subtle ✦ sparkle icon before
+the label (already present — keep it).
+Increase the body text to 15px
+(currently feels too small relative
+to the card).
+Add 4px var(--plum) left border.
+Ensure max 3 sentences — if AI returns
+more, truncate at third sentence end.
+
+── PER-ADULT SCHEDULE CARDS ─────────────
+
+These (Mum/Dad cards) are the visual
+highlight of the results screen.
+Small upgrade to make them shine more:
+
+Each adult card:
+- Add a coloured dot before the name
+  matching their family member colour
+  (already present in Family tab —
+  use the same colour system)
+- "Free from [TIME]" line:
+  Change from italic muted text to:
+  background: var(--free-tint) #E8F8F0
+  color: var(--free) #4AB88A
+  border-radius: 20px
+  padding: 4px 12px
+  font-size: 13px
+  font-weight: 500
+  Display as a small pill, not plain text.
+  This makes the free time feel like a
+  reward, not just data.
+
+- "[Adult]'s list →" button:
+  Current: border-only teal, full width.
+  Change to: full width but with a
+  small share icon (✈ or ↗) before
+  the text. This signals it's a
+  send/share action.
+
+── SUMMARY STAT PILLS AT TOP ─────────────
+
+Current: "4 events · 1 tight spot · 1 sorted ✓"
+as pill tags in a row.
+
+These are good but the visual weight
+doesn't communicate urgency properly.
+
+Update colours:
+"X events" pill: teal tint bg, teal text
+"X tight spot" pill: gold tint bg, gold text
+"X sorted ✓" pill: green tint bg, green text
+"X issues" pill: red tint bg, red text
+
+Each pill: border-radius 20px, 
+padding 4px 14px, font-size 13px,
+font-weight 600.
+
+This makes the status instantly readable
+at a glance — the parent knows in one
+scan whether they need to take action.
+
+════════════════════════════════════════════
+FIX 7 — FAMILY TAB MAIN SCREEN CLEANUP
+════════════════════════════════════════════
+
+The Family tab main screen (after events
+are added but before/after sorting)
+currently shows too many cards stacked:
+
+- Stats card (events/weekend/driver)
+- Worth knowing card
+- Who's covering what card
+- Event list
+- "This week sorted" card
+- "Might need backup" card
+- Summary stats card
+- "Last sorted" row
+- Sort button
+- Family members
+
+This is too much. Simplify the hierarchy:
+
+── BEFORE FIRST SORT ─────────────────────
+
+Show:
+1. Family member pills + event list
+2. "Sort the family juggle →" button
+3. Family members management card
+
+Hide everything else until after sort.
+
+── AFTER SORT ────────────────────────────
+
+Replace the "Sort" button area with:
+
+┌─────────────────────────────────────┐
+│ ✓ Sorted. Here's the week.          │
+│ [X] events · [X] adults · Sat       │
+│                                     │
+│ [See the plan →]    [Re-sort]       │
+└─────────────────────────────────────┘
+
+Then below:
+- Event list (showing AI-assigned drivers
+  with ✦ prefix)
+- "Add another event" button
+- Family members card
+
+REMOVE from the main Family tab
+after sort:
+✗ The separate "Worth knowing" card
+  (this lives in the results screen)
+✗ The "Who's covering what" card
+  (redundant — the event list shows this)
+✗ The "Might need backup here" card
+  (surfaces in results screen instead)
+✗ The "5 things this week · 2 adults"
+  summary card (duplicates the sort card)
+
+The main Family tab should be:
+add events → see them in a list → sort.
+Clean. Not a dashboard.
+
+════════════════════════════════════════════
+DO NOT CHANGE
+════════════════════════════════════════════
+
+✓ Meals tab recipe cards and actions
+✓ Meals tab swap logic and shopping list
+✓ Money tab financial calculations
+✓ Money tab savings goal feature
+✓ Family tab event entry sheet
+✓ Family tab add event button and handler
+✓ Family AI sort engine and API call
+✓ Processing overlay rotating text
+✓ All colour variables
+✓ Onboarding flow
+✓ Dietary setup screen (just built)
+✓ Recipe library and filter logic
+✓ All localStorage keys
+
+════════════════════════════════════════════
+BUILD ORDER
+════════════════════════════════════════════
+
+1. Nav restructure (Fix 1) — do this first
+   as everything else depends on nav.
+2. Money tab header fix (Fix 3)
+3. Home screen cleanup (Fix 2)
+4. Meals tab filter hierarchy (Fix 4)
+   including shopping list tip
+5. Voice pass (Fix 5)
+6. Family results visual upgrade (Fix 6)
+7. Family tab main screen cleanup (Fix 7)
+
+Test nav and Money access after step 1
+before proceeding to step 

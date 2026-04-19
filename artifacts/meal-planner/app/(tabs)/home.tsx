@@ -205,7 +205,8 @@ export default function HomeTab() {
   const { money, hasMoneySetup } = useUserWeek();
   const { currencySymbol } = useLocale();
 
-  const [helpVisible, setHelpVisible]   = useState(false);
+  const [helpVisible, setHelpVisible]       = useState(false);
+  const [settingsVisible, setSettingsVisible] = useState(false);
   const [nudge, setNudge]               = useState<Nudge | null>(null);
   const [familyLine, setFamilyLine]     = useState<string>("Nothing on the family radar this week.");
   const [familySub, setFamilySub]       = useState<string>("A rare and peaceful sight.");
@@ -294,25 +295,27 @@ export default function HomeTab() {
               </Text>
               <Text style={styles.greeting}>{greeting}</Text>
             </View>
-            <TouchableOpacity
-              style={styles.helpBtn}
-              onPress={() => setHelpVisible(true)}
-              activeOpacity={0.75}
-            >
-              <Feather name="zap" size={13} color={TEAL} />
-              <Text style={styles.helpBtnText}>Help me sort this</Text>
-            </TouchableOpacity>
+            <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+              <TouchableOpacity
+                style={styles.helpBtn}
+                onPress={() => setHelpVisible(true)}
+                activeOpacity={0.75}
+              >
+                <Feather name="zap" size={13} color={TEAL} />
+                <Text style={styles.helpBtnText}>Help me sort this</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.gearBtn}
+                onPress={() => setSettingsVisible(true)}
+                activeOpacity={0.75}
+              >
+                <Feather name="settings" size={15} color={TEXT_MUTED} />
+              </TouchableOpacity>
+            </View>
           </View>
 
           {/* Weekly summary */}
           <Text style={styles.summary}>{summary}</Text>
-
-          {/* Weekly Glance card — cross-module overview */}
-          <WeeklyGlanceCard
-            items={allItems}
-            bills={allBills}
-            onViewAll={() => router.push("/(tabs)/upcoming")}
-          />
 
           {/* Reminder strip */}
           {reminders.length > 0 && (
@@ -419,7 +422,7 @@ export default function HomeTab() {
             </TouchableOpacity>
           ) : (
             <TouchableOpacity
-              onPress={() => router.push("/(tabs)/more")}
+              onPress={() => router.push("/(tabs)/money")}
               activeOpacity={0.8}
               style={[styles.card, styles.cardNeutral, styles.cardRailGold]}
             >
@@ -481,6 +484,15 @@ export default function HomeTab() {
               })}
             </ScrollView>
           </View>
+
+          {/* What's Coming Up — only when there's a cross-module insight */}
+          {allItems.length > 0 && (
+            <WeeklyGlanceCard
+              items={allItems}
+              bills={allBills}
+              onViewAll={() => router.push("/(tabs)/upcoming")}
+            />
+          )}
 
           {/* F — Appointments preview */}
           {(() => {
@@ -570,6 +582,37 @@ export default function HomeTab() {
           visible={helpVisible}
           onDismiss={() => setHelpVisible(false)}
         />
+
+        {/* Settings sheet */}
+        {settingsVisible && (
+          <Pressable
+            style={styles.settingsOverlay}
+            onPress={() => setSettingsVisible(false)}
+          >
+            <Pressable style={styles.settingsSheet} onPress={() => {}}>
+              <View style={styles.settingsHandle} />
+              <Text style={styles.settingsTitle}>More from Sortii</Text>
+              {[
+                { label: "Dietary preferences", icon: "sliders" as const, route: "/(tabs)/preferences" as const },
+                { label: "Appointments", icon: "calendar" as const, route: "/(tabs)/appointments" as const },
+                { label: "Bills", icon: "credit-card" as const, route: "/(tabs)/bills" as const },
+                { label: "Saved meals", icon: "bookmark" as const, route: "/(tabs)/saved" as const },
+                { label: "What's coming up", icon: "clock" as const, route: "/(tabs)/upcoming" as const },
+              ].map((item) => (
+                <TouchableOpacity
+                  key={item.route}
+                  style={styles.settingsRow}
+                  onPress={() => { setSettingsVisible(false); router.push(item.route as any); }}
+                  activeOpacity={0.75}
+                >
+                  <Feather name={item.icon} size={16} color={TEAL} />
+                  <Text style={styles.settingsRowText}>{item.label}</Text>
+                  <Feather name="chevron-right" size={15} color={TEXT_MUTED} />
+                </TouchableOpacity>
+              ))}
+            </Pressable>
+          </Pressable>
+        )}
       </View>
     </SafeAreaView>
   );
@@ -614,6 +657,54 @@ const styles = StyleSheet.create({
     flexShrink: 0,
   },
   helpBtnText: { fontSize: 12, fontFamily: "Inter_600SemiBold", color: TEAL },
+
+  gearBtn: {
+    width: 32, height: 32, borderRadius: 16,
+    backgroundColor: "#F4F2EE",
+    alignItems: "center", justifyContent: "center",
+    borderWidth: 1, borderColor: BORDER,
+    flexShrink: 0,
+  },
+
+  settingsOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(0,0,0,0.35)",
+    justifyContent: "flex-end",
+    zIndex: 999,
+  },
+  settingsSheet: {
+    backgroundColor: "#fff",
+    borderTopLeftRadius: 22,
+    borderTopRightRadius: 22,
+    paddingTop: 12,
+    paddingHorizontal: 20,
+    paddingBottom: 48,
+    gap: 4,
+    ...Platform.select({
+      web: { boxShadow: "0px -3px 20px rgba(0,0,0,0.10)" },
+      default: {
+        shadowColor: "#000", shadowOffset: { width: 0, height: -3 },
+        shadowOpacity: 0.10, shadowRadius: 12, elevation: 10,
+      },
+    }),
+  },
+  settingsHandle: {
+    width: 36, height: 4, borderRadius: 2,
+    backgroundColor: "#DDD", alignSelf: "center", marginBottom: 16,
+  },
+  settingsTitle: {
+    fontSize: 16, fontFamily: "Inter_600SemiBold",
+    color: TEXT, marginBottom: 8,
+  },
+  settingsRow: {
+    flexDirection: "row", alignItems: "center",
+    gap: 12, paddingVertical: 13,
+    borderBottomWidth: 1, borderBottomColor: BORDER,
+  },
+  settingsRowText: {
+    flex: 1, fontSize: 15,
+    fontFamily: "Inter_400Regular", color: TEXT,
+  },
 
   // Nudge banner
   nudgeBanner: {

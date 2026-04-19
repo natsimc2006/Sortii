@@ -679,19 +679,14 @@ export default function MealsScreen() {
               icon="dollar-sign"
               onPress={() => setActiveChip("budget")}
             />
-            <PlanChip
-              label={estimatedCostBand}
-              icon="shopping-bag"
-              onPress={() => setActiveChip("cost")}
-            />
             <TouchableOpacity
               style={styles.prefBtn}
               onPress={() => handleQuickNav("/(tabs)/preferences")}
               activeOpacity={0.80}
               hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
             >
-              <Feather name="sliders" size={11} color="#fff" />
-              <Text style={styles.prefBtnLabel}>Adjust plan</Text>
+              <Feather name="settings" size={11} color="#fff" />
+              <Text style={styles.prefBtnLabel}>⚙ Adjust</Text>
             </TouchableOpacity>
           </View>
           {preferences.kidFriendly && (
