@@ -1709,6 +1709,71 @@ function SetupReadyStrip({
   );
 }
 
+// ── SortContextCard ────────────────────────────────────────────────────────────
+function SortContextCard({
+  events,
+  juggleResult,
+  isJuggleSolving,
+  onSort,
+  onViewPlan,
+  onReSort,
+}: {
+  events: FamilyEvent[];
+  juggleResult: JuggleResult | null;
+  isJuggleSolving: boolean;
+  onSort: () => void;
+  onViewPlan: () => void;
+  onReSort: () => void;
+}) {
+  const isSorted = !!juggleResult && !isJuggleSolving;
+  const sortedDate = juggleResult?.solvedAt
+    ? new Date(juggleResult.solvedAt).toLocaleDateString("en-AU", {
+        weekday: "short", day: "numeric", month: "short",
+      })
+    : null;
+
+  const microcopy =
+    events.length >= 5 ? "Bit of a juggle here."
+    : events.length >= 3 ? "This week's got a few moving parts."
+    : "Couple of things to line up.";
+
+  if (isSorted) {
+    return (
+      <View style={styles.sortCardSorted}>
+        <View style={styles.sortCardSortedTop}>
+          <Feather name="check-circle" size={14} color={TEAL} />
+          <Text style={styles.sortCardSortedTitle}>Week sorted. You're good.</Text>
+        </View>
+        {sortedDate && (
+          <Text style={styles.sortCardSortedDate}>Sorted {sortedDate}</Text>
+        )}
+        <View style={styles.sortCardSortedLinks}>
+          <TouchableOpacity onPress={onViewPlan} activeOpacity={0.8}>
+            <Text style={styles.sortCardViewLink}>View how it was sorted</Text>
+          </TouchableOpacity>
+          <Text style={styles.sortCardLinkDivider}>·</Text>
+          <TouchableOpacity onPress={onReSort} activeOpacity={0.8}>
+            <Text style={styles.sortCardResortLink}>Re-sort week</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
+  }
+
+  return (
+    <View style={styles.sortCard}>
+      <View style={styles.sortCardLeft}>
+        <Text style={styles.sortCardTitle}>Ready to untangle this week?</Text>
+        <Text style={styles.sortCardSub}>{microcopy}</Text>
+      </View>
+      <TouchableOpacity style={styles.sortCardBtn} onPress={onSort} activeOpacity={0.85}>
+        <Feather name="zap" size={13} color="#fff" />
+        <Text style={styles.sortCardBtnText}>Sort the week</Text>
+      </TouchableOpacity>
+    </View>
+  );
+}
+
 // ── Main screen ────────────────────────────────────────────────────────────────
 export default function FamilyScreen() {
   const insets        = useSafeAreaInsets();
@@ -1995,6 +2060,18 @@ export default function FamilyScreen() {
               </View>
             )}
 
+            {/* Inline Sort card — shown when 2+ events */}
+            {state.events.length >= 2 && (
+              <SortContextCard
+                events={state.events}
+                juggleResult={juggleResult}
+                isJuggleSolving={isJuggleSolving}
+                onSort={handleSortJuggle}
+                onViewPlan={() => setShowJuggleResult(true)}
+                onReSort={() => { setShowJuggleResult(false); handleSortJuggle(); }}
+              />
+            )}
+
             {/* Light setup summary strip */}
             <SetupReadyStrip
               eventCount={state.events.length}
@@ -2037,7 +2114,7 @@ export default function FamilyScreen() {
         )}
       </ScrollView>
 
-      {/* ── Sticky CTA bar — visible once any event exists ── */}
+      {/* ── Sticky CTA bar — "Add another event" is the sole primary action ── */}
       {hasEvents && (
         <View style={[styles.sortCtaBar, { paddingBottom: insets.bottom + 12 }]}>
           <TouchableOpacity
@@ -2048,12 +2125,6 @@ export default function FamilyScreen() {
             <Feather name="plus" size={16} color="#fff" />
             <Text style={styles.sortCtaBtnText}>Add another event</Text>
           </TouchableOpacity>
-          {canSort && (
-            <TouchableOpacity style={styles.sortCtaAddBtn} onPress={handleSortJuggle} activeOpacity={0.8}>
-              <Feather name="zap" size={13} color={TEAL} />
-              <Text style={[styles.sortCtaAddBtnText, { color: TEAL }]}>Re-sort week</Text>
-            </TouchableOpacity>
-          )}
         </View>
       )}
 
@@ -2644,6 +2715,41 @@ const styles = StyleSheet.create({
     borderWidth: 1, borderColor: TEAL + "40",
   },
   setupViewPlanBtnText: { fontSize: 12, fontFamily: "Inter_500Medium", color: TEAL },
+
+  // Sort context card — pre-sort state
+  sortCard: {
+    flexDirection: "row", alignItems: "center", gap: 12,
+    backgroundColor: "#fff",
+    borderRadius: 14, borderWidth: 1, borderColor: GOLD + "44",
+    paddingHorizontal: 16, paddingVertical: 14,
+  },
+  sortCardLeft: { flex: 1, gap: 3 },
+  sortCardTitle: { fontSize: 14, fontFamily: "Inter_600SemiBold", color: TEXT },
+  sortCardSub: { fontSize: 12, fontFamily: "Inter_400Regular", color: TEXT_MUTED, lineHeight: 17 },
+  sortCardBtn: {
+    flexDirection: "row", alignItems: "center", gap: 6,
+    backgroundColor: GOLD, borderRadius: 20,
+    paddingHorizontal: 14, paddingVertical: 9,
+    ...Platform.select({
+      web: { boxShadow: `0px 2px 8px ${GOLD}55` },
+      default: { shadowColor: GOLD, shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.3, shadowRadius: 6, elevation: 4 },
+    }),
+  },
+  sortCardBtnText: { fontSize: 13, fontFamily: "Inter_600SemiBold", color: "#fff" },
+
+  // Sort context card — post-sort state
+  sortCardSorted: {
+    backgroundColor: TEAL_TINT, borderRadius: 14,
+    borderWidth: 1, borderColor: TEAL + "30",
+    paddingHorizontal: 16, paddingVertical: 13, gap: 5,
+  },
+  sortCardSortedTop: { flexDirection: "row", alignItems: "center", gap: 7 },
+  sortCardSortedTitle: { fontSize: 14, fontFamily: "Inter_600SemiBold", color: TEAL },
+  sortCardSortedDate: { fontSize: 11, fontFamily: "Inter_400Regular", color: TEXT_MUTED },
+  sortCardSortedLinks: { flexDirection: "row", alignItems: "center", gap: 8, marginTop: 2 },
+  sortCardViewLink: { fontSize: 12, fontFamily: "Inter_500Medium", color: TEAL },
+  sortCardLinkDivider: { fontSize: 12, color: TEXT_MUTED },
+  sortCardResortLink: { fontSize: 12, fontFamily: "Inter_400Regular", color: TEXT_MUTED },
 
   // Form sheet
   formOverlay: { ...StyleSheet.absoluteFillObject, backgroundColor: "rgba(0,0,0,0.5)" },

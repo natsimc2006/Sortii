@@ -1,0 +1,142 @@
+We need to restore the “Sort / Untangle” action in the Family module.
+
+Important:
+Do not undo the recent CTA cleanup.
+Do not reintroduce multiple competing buttons.
+We are adding back ONE clear, contextual “Sort” action.
+
+--------------------------------------------------
+PROBLEM
+--------------------------------------------------
+
+After adding events, there is currently no clear way for the user to:
+- trigger the sorting / untangling logic
+
+The app currently looks “already sorted” even though the system hasn’t been explicitly triggered.
+
+This removes the feeling of:
+“Sortii helping me figure this out”
+
+--------------------------------------------------
+GOAL
+--------------------------------------------------
+
+Reintroduce a clear but non-intrusive “Sort / Untangle” action.
+
+This should:
+- feel like a helpful next step
+- not compete with "Add another event"
+- only appear when needed
+- reinforce the “decision helper” nature of Sortii
+
+--------------------------------------------------
+WHEN TO SHOW "SORT"
+--------------------------------------------------
+
+Show the Sort action only when:
+
+- there are 2 or more events in the week
+OR
+- events overlap in time
+OR
+- multiple people are assigned across events
+
+If the system has already sorted recently, show a softer state instead.
+
+--------------------------------------------------
+SORT BUTTON DESIGN
+--------------------------------------------------
+
+Do NOT use a large dominant full-width button.
+
+Instead use one of these patterns:
+
+Option A (preferred):
+Inline card-style CTA just above the summary card:
+
+Example:
+
+Card:
+“Ready to untangle this week?”
+Subtext:
+“Couple of moving parts here.”
+Button:
+“Sort the week”
+
+Option B:
+Attach action to the summary card:
+
+Add a button inside:
+“Sort this week →”
+
+--------------------------------------------------
+POST-SORT STATE
+--------------------------------------------------
+
+After sorting is triggered:
+
+- update the summary card
+- show confirmation row:
+
+“✓ Week sorted. You’re good.”
+
+- show small secondary action:
+“View how it was sorted”
+
+- replace Sort button with:
+“Re-sort week” (low emphasis)
+
+--------------------------------------------------
+IMPORTANT BEHAVIOUR
+--------------------------------------------------
+
+Do NOT:
+- auto-sort silently without user awareness
+- remove the feeling of “I triggered this”
+- make Sort the dominant primary CTA over adding events
+
+Hierarchy should be:
+
+1. Add another event (primary)
+2. Sort / Untangle (contextual)
+3. Re-sort (secondary, low emphasis)
+
+--------------------------------------------------
+MICROCOPY STYLE
+--------------------------------------------------
+
+Use tone like:
+
+- “Ready to untangle this?”
+- “Bit of a juggle here.”
+- “Want help sorting this out?”
+- “This week’s got a few moving parts.”
+
+Avoid:
+- “Optimize”
+- “Run algorithm”
+- “Process schedule”
+
+--------------------------------------------------
+LAYOUT PLACEMENT
+--------------------------------------------------
+
+Place Sort CTA:
+
+- below event list
+- above summary card OR inside it
+- ensure it is fully visible above bottom nav
+- do not let it be hidden or clipped
+
+--------------------------------------------------
+SUCCESS CHECK
+--------------------------------------------------
+
+Before finishing, verify:
+
+- after adding multiple events, user sees a clear Sort option
+- Sort does not compete with Add another event
+- after sorting, UI updates to a “sorted” state
+- user can still re-sort if needed
+- the flow feels like:
+  add → sort → feel relief
