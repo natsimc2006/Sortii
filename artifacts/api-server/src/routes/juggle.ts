@@ -1,5 +1,6 @@
 import { Router } from "express";
 import Anthropic from "@anthropic-ai/sdk";
+import { jsonrepair } from "jsonrepair";
 import { logger } from "../lib/logger";
 
 const router = Router();
@@ -37,7 +38,12 @@ DECISION RULES:
 
 TONE: Warm, direct, decisive. Never corporate. Never alarming. Short sentences. Make the call. The parent is tired — give them an answer.
 
-OUTPUT: Return ONLY valid JSON. No text before or after the JSON. Strip any markdown code fences.
+OUTPUT RULES (critical — violation causes a 500 error):
+- Return ONLY valid JSON. Nothing before or after the JSON object.
+- Do NOT wrap in markdown code fences (no \`\`\`json or \`\`\`).
+- ALL string values must be wrapped in double quotes — including event titles, names, locations, and activity names that users typed. Even if an activity name looks odd, quote it.
+- Numbers, booleans (true/false), and null are NOT quoted.
+- Validate mentally: every "key": value pair must have its string value in double quotes.
 
 {
   "weekend_summary": {
@@ -133,8 +139,8 @@ router.post("/juggle", async (req, res) => {
     try {
       // Strip markdown fences if present
       let cleanText = raw.text
-        .replace(/```json\n?/g, "")
-        .replace(/```\n?/g, "")
+        .replace(/```json\s*/g, "")
+        .replace(/```\s*/g, "")
         .trim();
 
       // Find JSON boundaries
@@ -144,9 +150,17 @@ router.post("/juggle", async (req, res) => {
         cleanText = cleanText.slice(start, end + 1);
       }
 
-      parsed = JSON.parse(cleanText);
+      // Try standard parse first; fall back to jsonrepair for minor AI formatting mistakes
+      try {
+        parsed = JSON.parse(cleanText);
+      } catch {
+        logger.warn("juggle: standard JSON.parse failed, attempting jsonrepair");
+        const repaired = jsonrepair(cleanText);
+        parsed = JSON.parse(repaired);
+        logger.info("juggle: jsonrepair succeeded");
+      }
     } catch {
-      logger.error({ text: raw.text }, "juggle: failed to parse AI JSON");
+      logger.error({ text: raw.text }, "juggle: failed to parse AI JSON even after repair");
       res.status(500).json({ error: "AI returned invalid JSON", raw: raw.text });
       return;
     }
