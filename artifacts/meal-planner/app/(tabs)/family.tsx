@@ -1734,8 +1734,8 @@ function SortContextCard({
 
   const microcopy =
     events.length >= 5 ? "Bit of a juggle here."
-    : events.length >= 3 ? "This week's got a few moving parts."
-    : "Couple of things to line up.";
+    : events.length >= 2 ? "This week's got a few moving parts."
+    : "Even one thing is worth planning around.";
 
   if (isSorted) {
     return (
@@ -2060,8 +2060,8 @@ export default function FamilyScreen() {
               </View>
             )}
 
-            {/* Inline Sort card — shown when 2+ events */}
-            {state.events.length >= 2 && (
+            {/* Inline Sort card — shown once any event exists */}
+            {state.events.length >= 1 && (
               <SortContextCard
                 events={state.events}
                 juggleResult={juggleResult}
@@ -2114,9 +2114,10 @@ export default function FamilyScreen() {
         )}
       </ScrollView>
 
-      {/* ── Sticky CTA bar — "Add another event" is the sole primary action ── */}
+      {/* ── Sticky CTA bar ── */}
       {hasEvents && (
         <View style={[styles.sortCtaBar, { paddingBottom: insets.bottom + 12 }]}>
+          {/* Primary: always visible */}
           <TouchableOpacity
             style={styles.sortCtaBtn}
             onPress={openAddEvent}
@@ -2125,6 +2126,19 @@ export default function FamilyScreen() {
             <Feather name="plus" size={16} color="#fff" />
             <Text style={styles.sortCtaBtnText}>Add another event</Text>
           </TouchableOpacity>
+          {/* Secondary: Sort or Re-sort — only when adults exist to run the logic */}
+          {canSort && (
+            <TouchableOpacity
+              style={styles.sortCtaAddBtn}
+              onPress={juggleResult ? () => { setShowJuggleResult(false); handleSortJuggle(); } : handleSortJuggle}
+              activeOpacity={0.8}
+            >
+              <Feather name="zap" size={13} color={juggleResult ? TEXT_MUTED : GOLD} />
+              <Text style={[styles.sortCtaAddBtnText, juggleResult ? {} : { color: GOLD }]}>
+                {juggleResult ? "Re-sort week" : "Sort the week"}
+              </Text>
+            </TouchableOpacity>
+          )}
         </View>
       )}
 

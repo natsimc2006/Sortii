@@ -1,0 +1,144 @@
+We need to restore the original 3-step Family (Juggle) flow behaviour inside the current UI.
+
+Important:
+Do NOT revert the UI to an older version.
+Do NOT remove Appointments, Bills, or What’s Coming Up.
+Do NOT reintroduce multiple competing CTAs.
+
+This is a behavioural fix, not a redesign.
+
+--------------------------------------------------
+CORE FLOW TO RESTORE
+--------------------------------------------------
+
+Family module must follow this clear 3-step experience:
+
+1. Capture → user adds events
+2. Decision → user triggers sort / untangle
+3. Clarity → user sees organised weekly outcome
+
+Right now, step 2 (Decision) is missing.
+
+--------------------------------------------------
+GOAL
+--------------------------------------------------
+
+Reintroduce the “Decision moment” without breaking current layout.
+
+The user must clearly experience:
+“I’ve added things → now help me sort this out”
+
+--------------------------------------------------
+STATE LOGIC REQUIRED
+--------------------------------------------------
+
+Introduce 3 clear states for Family:
+
+STATE 1 — EMPTY
+- no events
+- show:
+  "Add first event"
+
+STATE 2 — UNSORTED (IMPORTANT)
+- 1+ events added
+- sorting has NOT been triggered yet
+
+UI should show:
+- event list
+- primary CTA: "Add another event"
+- secondary CTA (visible): "Sort the week"
+
+Also include light prompt:
+"Ready to untangle this?"
+
+STATE 3 — SORTED
+- sorting has been triggered
+
+UI should show:
+- organised weekly layout (existing logic)
+- confirmation:
+  "✓ Week sorted. You’re good."
+- primary CTA: "Add another event"
+- secondary CTA: "Re-sort week" (low emphasis)
+
+--------------------------------------------------
+CRITICAL RULE
+--------------------------------------------------
+
+Do NOT auto-sort silently.
+
+Sorting must feel user-triggered.
+
+Even if background logic exists, the UI must still show:
+- pre-sort state
+- post-sort state
+
+--------------------------------------------------
+SORT TRIGGER
+--------------------------------------------------
+
+Reconnect the existing sorting engine.
+
+Do NOT rewrite the logic.
+
+Trigger should:
+- call the existing juggle/sort function
+- update UI state to “sorted”
+- refresh the weekly view
+
+--------------------------------------------------
+CTA HIERARCHY
+--------------------------------------------------
+
+Keep clean hierarchy:
+
+Primary:
+"Add another event"
+
+Secondary:
+"Sort the week" (only in unsorted state)
+
+After sorting:
+"Re-sort week" (low emphasis)
+
+Do NOT:
+- make Sort bigger than Add
+- hide Sort completely
+- use multiple large buttons
+
+--------------------------------------------------
+PLACEMENT
+--------------------------------------------------
+
+Sort CTA should be:
+
+- below event list
+- above summary card OR inside it
+- fully visible above bottom nav
+- not floating randomly
+
+--------------------------------------------------
+SUMMARY CARD BEHAVIOUR
+--------------------------------------------------
+
+Update based on state:
+
+Unsorted:
+"Couple of moving parts here."
+
+Sorted:
+"Saturday’s doing a bit much — Mum’s got this one covered."
+
+--------------------------------------------------
+SUCCESS CRITERIA
+--------------------------------------------------
+
+- user adds events → sees "Sort the week"
+- user taps sort → sees updated organised state
+- user can still add more events after sorting
+- user can re-sort if needed
+- flow feels like:
+  add → sort → relief
+
+Do not change the underlying sorting engine.
+Only restore the flow and UI state around it.
