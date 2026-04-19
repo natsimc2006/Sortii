@@ -2,6 +2,7 @@
   "expo": {
     "name": "Sortii - Dinner. Sorted.",
     "slug": "sortiidinnersorted",
+    "owner": "natsimc",
     "version": "1.0.0",
     "platforms": ["ios", "android", "web"],
     "orientation": "portrait",

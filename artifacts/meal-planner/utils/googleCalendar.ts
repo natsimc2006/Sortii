@@ -30,7 +30,10 @@ export async function signInWithGoogle(): Promise<string | null> {
       tokenEndpoint: "https://oauth2.googleapis.com/token",
     };
 
-    const redirectUri = AuthSession.makeRedirectUri({ useProxy: true });
+    const redirectUri = AuthSession.makeRedirectUri({
+      useProxy: true,
+      projectNameForProxy: "@natsimc/sortiidinnersorted",
+    });
 
     const request = new AuthSession.AuthRequest({
       clientId: GOOGLE_CLIENT_ID,
