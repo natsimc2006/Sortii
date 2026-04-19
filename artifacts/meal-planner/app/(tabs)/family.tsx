@@ -1922,8 +1922,8 @@ export default function FamilyScreen() {
   const hasAdults      = state.members.some((m) => m.role === "adult");
   const daysWithEvents = result?.daysWithEvents ?? [];
   const canSort        = hasEvents && hasAdults;
-  // Extra bottom padding when sticky CTA bar is visible
-  const scrollPadBottom = canSort ? 172 : 120;
+  // Extra bottom padding: taller when sticky CTA bar is showing
+  const scrollPadBottom = hasEvents ? 148 : 80;
 
   return (
     <View style={{ flex: 1, backgroundColor: BG }}>
@@ -2037,33 +2037,23 @@ export default function FamilyScreen() {
         )}
       </ScrollView>
 
-      {/* ── Floating add event button (small, top-right when CTA bar is showing) ── */}
-      {!canSort && (
-        <TouchableOpacity
-          style={[styles.fab, { bottom: scrollPadBottom - 48 }]}
-          onPress={openAddEvent}
-          activeOpacity={0.88}
-        >
-          <Feather name="plus" size={18} color="#fff" />
-          <Text style={styles.fabText}>Add event</Text>
-        </TouchableOpacity>
-      )}
-
-      {/* ── Hero sticky CTA bar — "Sort this out" ── */}
-      {canSort && (
+      {/* ── Sticky CTA bar — visible once any event exists ── */}
+      {hasEvents && (
         <View style={[styles.sortCtaBar, { paddingBottom: insets.bottom + 12 }]}>
           <TouchableOpacity
             style={styles.sortCtaBtn}
-            onPress={handleSortJuggle}
+            onPress={openAddEvent}
             activeOpacity={0.88}
           >
-            <Feather name="zap" size={16} color="#fff" />
-            <Text style={styles.sortCtaBtnText}>Sort this out</Text>
+            <Feather name="plus" size={16} color="#fff" />
+            <Text style={styles.sortCtaBtnText}>Add another event</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.sortCtaAddBtn} onPress={openAddEvent} activeOpacity={0.8}>
-            <Feather name="plus" size={13} color={TEXT_MUTED} />
-            <Text style={styles.sortCtaAddBtnText}>Add another event</Text>
-          </TouchableOpacity>
+          {canSort && (
+            <TouchableOpacity style={styles.sortCtaAddBtn} onPress={handleSortJuggle} activeOpacity={0.8}>
+              <Feather name="zap" size={13} color={TEAL} />
+              <Text style={[styles.sortCtaAddBtnText, { color: TEAL }]}>Re-sort week</Text>
+            </TouchableOpacity>
+          )}
         </View>
       )}
 
@@ -2629,10 +2619,10 @@ const styles = StyleSheet.create({
   },
   sortCtaBtn: {
     flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 10,
-    backgroundColor: GOLD, borderRadius: 14, height: 54,
+    backgroundColor: TEAL, borderRadius: 14, height: 54,
     ...Platform.select({
-      web: { boxShadow: `0px 3px 12px ${GOLD}55` },
-      default: { shadowColor: GOLD, shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.3, shadowRadius: 10, elevation: 6 },
+      web: { boxShadow: `0px 3px 12px ${TEAL}55` },
+      default: { shadowColor: TEAL, shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.3, shadowRadius: 10, elevation: 6 },
     }),
   },
   sortCtaBtnText: { fontSize: 17, fontFamily: "Inter_700Bold", color: "#fff", letterSpacing: 0.2 },

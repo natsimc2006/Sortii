@@ -1,0 +1,111 @@
+Tight patch only for the Family / Juggle flow.
+
+Do not touch Meals, Appointments, Bills, What’s Coming Up, or global app styling unless required for this fix.
+Do not redesign the app.
+This is a surgical UX fix.
+
+Problem to fix:
+After adding the first Family event, the flow becomes unclear.
+Users cannot easily tell how to add another event.
+The Family page currently has too many competing CTAs, and at least one CTA is visually too close to or hidden by the bottom nav.
+This has broken the cleaner 3-step Family flow we had before.
+
+We need to restore this exact Family flow:
+
+1. Family landing / overview
+2. Add event
+3. Weekly organised output
+
+--------------------------------------------------
+PATCH GOAL
+--------------------------------------------------
+
+Fix the Family page so that:
+- after the first event is added, the user can clearly add another
+- the main Family CTA is always visible
+- no CTA is hidden behind the bottom nav or iOS safe area
+- the Family page has one clear primary action only
+
+--------------------------------------------------
+PATCH RULES
+--------------------------------------------------
+
+1. On empty Family state:
+- keep one clear CTA only:
+  "Add first event"
+- remove any duplicate floating add button on this state
+
+2. On Family screen once at least 1 event exists:
+- show one primary CTA only:
+  "Add another event"
+- place it above the bottom nav with safe spacing
+- do not let it be clipped, hidden, or half-covered
+- do not use both a floating add button and a sticky bottom CTA at the same time
+
+3. If "Sort this out" / "Sort the week" exists:
+- demote it to secondary action
+- smaller visual weight than "Add another event"
+- if auto-sorting already happens, rename to:
+  "Re-sort week"
+  and make it a secondary button or text action only
+
+4. Keep the Family page focused on:
+- family members
+- weekly events
+- weekly summary
+- add another event
+Do not let it feel like a settings page or dead-end summary page
+
+--------------------------------------------------
+LAYOUT REQUIRED
+--------------------------------------------------
+
+When Family has events, structure screen in this order:
+
+- page title + short support line
+- family members card
+- this week section
+- grouped event cards
+- weekly summary card
+- primary CTA: "Add another event"
+- optional secondary action: "Re-sort week"
+
+Primary CTA must remain visible without relying on the global nav Add button.
+
+--------------------------------------------------
+ADD EVENT SAVE FLOW
+--------------------------------------------------
+
+When user saves an event:
+- close modal/sheet cleanly
+- return to Family weekly view
+- show newly added event in the weekly list
+- keep "Add another event" clearly visible
+- do not trap the user in a state with no obvious next step
+
+Optional microcopy after first save:
+- "One down. Add another if there’s more on."
+Keep this subtle.
+
+--------------------------------------------------
+SAFE AREA / MOBILE FIX
+--------------------------------------------------
+
+Specifically fix mobile layout so:
+- bottom CTA clears sticky nav
+- CTA respects iOS safe area inset
+- no overlap with bottom navigation
+- no half-hidden buttons
+- spacing feels intentional
+
+--------------------------------------------------
+SUCCESS CHECK
+--------------------------------------------------
+
+Before finishing, verify:
+- empty Family state = one CTA only
+- Family with events = one clear primary CTA only
+- after adding first event, user can clearly add another
+- no CTA is hidden behind nav
+- Family flow feels like a clean 3-step journey again
+- no regressions to Family event cards or weekly summary
