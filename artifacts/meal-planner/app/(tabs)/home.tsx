@@ -562,7 +562,7 @@ export default function HomeTab() {
             );
           })()}
 
-          <View style={{ paddingBottom: 32 }} />
+          <View style={{ paddingBottom: 90 }} />
         </ScrollView>
 
         {/* Help me sort this — rendered above scroll */}

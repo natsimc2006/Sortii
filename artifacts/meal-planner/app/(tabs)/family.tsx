@@ -2291,7 +2291,8 @@ export default function FamilyScreen() {
     (i) => i.type === "conflict" || i.type === "tight" || i.type === "child_clash"
   );
   // Taller bottom padding when sort CTA is shown in sticky bar
-  const scrollPadBottom = hasEvents ? (needsSort ? 192 : 160) : 80;
+  const navPad = TAB_BAR_HEIGHT + Math.max(insets.bottom, 0);
+  const scrollPadBottom = hasEvents ? (needsSort ? 160 + navPad : 112 + navPad) : 80;
 
   return (
     <View style={{ flex: 1, backgroundColor: BG }}>
@@ -2437,7 +2438,7 @@ export default function FamilyScreen() {
 
       {/* ── Sticky bar — primary "Add another event" always teal; secondary sort/resort below ── */}
       {hasEvents && (
-        <View style={[styles.sortCtaBar, { paddingBottom: insets.bottom + 12 }]}>
+        <View style={[styles.sortCtaBar, { paddingBottom: TAB_BAR_HEIGHT + Math.max(insets.bottom, 0) + 8 }]}>
           {/* Primary: always teal */}
           <TouchableOpacity
             style={styles.sortCtaBtn}

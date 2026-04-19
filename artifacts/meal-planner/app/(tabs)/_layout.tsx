@@ -157,25 +157,25 @@ function AddTabButton({
     >
       <View
         style={{
-          width: 42,
-          height: 42,
-          borderRadius: 21,
+          width: 38,
+          height: 38,
+          borderRadius: 19,
           backgroundColor: GOLD,
           alignItems: "center",
           justifyContent: "center",
           ...Platform.select({
-            web: { boxShadow: `0px 2px 8px ${GOLD}44` },
+            web: { boxShadow: `0px 2px 6px ${GOLD}38` },
             default: {
               shadowColor: GOLD,
               shadowOffset: { width: 0, height: 2 },
-              shadowOpacity: 0.26,
-              shadowRadius: 6,
-              elevation: 4,
+              shadowOpacity: 0.18,
+              shadowRadius: 5,
+              elevation: 3,
             },
           }),
         }}
       >
-        <Feather name="plus" size={19} color="#fff" />
+        <Feather name="plus" size={17} color="#fff" />
       </View>
       <Text
         style={{

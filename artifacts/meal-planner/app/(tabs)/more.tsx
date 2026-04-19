@@ -146,7 +146,7 @@ export default function MoreScreen() {
           <Text style={styles.footerSub}>Your week, sorted.</Text>
         </View>
 
-        <View style={{ paddingBottom: 32 }} />
+        <View style={{ paddingBottom: 90 }} />
       </ScrollView>
     </SafeAreaView>
   );
