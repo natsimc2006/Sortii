@@ -24,6 +24,7 @@ import { computeFamilyWeek } from "@/utils/familyEngine";
 import { loadAppointments, Appointment } from "@/utils/appointmentStore";
 import { loadBills, computeBillStatus, Bill } from "@/utils/billStore";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { APPLE_CONNECTED_KEY, GOOGLE_CONNECTED_KEY, FAMILY_PUSHED_KEY } from "@/utils/calendarTypes";
 import {
   buildTimelineItems,
   deriveReminders,
@@ -217,6 +218,9 @@ export default function HomeTab() {
   const [allBills,  setAllBills]        = useState<Bill[]>([]);
   const [allItems,  setAllItems]        = useState<TimelineItem[]>([]);
   const [reminders, setReminders]       = useState<ReminderItem[]>([]);
+  const [calAppleConn,  setCalAppleConn]  = useState(false);
+  const [calGoogleConn, setCalGoogleConn] = useState(false);
+  const [calPushedCount, setCalPushedCount] = useState(0);
 
   const todayName    = getTodayName();
   const todayIdx     = DAYS.indexOf(todayName);
@@ -239,14 +243,20 @@ export default function HomeTab() {
 
   useEffect(() => {
     (async () => {
-      const [familyState, nudgeResult, , savedJuggle, appts, bills] = await Promise.all([
+      const [familyState, nudgeResult, , savedJuggle, appts, bills, appleConnRaw, googleConnRaw, pushedRaw] = await Promise.all([
         loadFamilyState(),
         computeNudge(currentPlan, allRecipes),
         recordAppOpen(),
         AsyncStorage.getItem(JUGGLE_RESULT_KEY),
         loadAppointments(),
         loadBills(),
+        AsyncStorage.getItem(APPLE_CONNECTED_KEY),
+        AsyncStorage.getItem(GOOGLE_CONNECTED_KEY),
+        AsyncStorage.getItem(FAMILY_PUSHED_KEY),
       ]);
+      setCalAppleConn(appleConnRaw === "true");
+      setCalGoogleConn(googleConnRaw === "true");
+      if (pushedRaw) { try { setCalPushedCount((JSON.parse(pushedRaw) as unknown[]).length); } catch {} }
       const fr = computeFamilyWeek(familyState);
       setFamilyEventCount(familyState.events.length);
       setFamilyLine(fr.dashboardLine);
@@ -354,7 +364,8 @@ export default function HomeTab() {
           {/* C — Family */}
           {(() => {
             // Determine family card state based on events and AI solve result
-            const hasEvents = familyEventCount > 0;
+            const totalThings = familyEventCount + calPushedCount;
+            const hasEvents = totalThings > 0;
             const hasSolved = !!juggleResult;
             const hasConflicts = hasSolved && juggleResult!.conflicts.length > 0;
             const cardColor =
@@ -367,14 +378,17 @@ export default function HomeTab() {
                 ? `${juggleResult!.conflicts.length} thing${juggleResult!.conflicts.length > 1 ? "s" : ""} need${juggleResult!.conflicts.length === 1 ? "s" : ""} sorting.`
               : hasSolved
                 ? `Weekend sorted. ${juggleResult!.plan.length} ${juggleResult!.plan.length === 1 ? "duty" : "duties"} mapped.`
-              : `${familyEventCount} thing${familyEventCount > 1 ? "s" : ""} on this week.`;
+              : `${totalThings} thing${totalThings > 1 ? "s" : ""} on this week.`;
+            const calBreakdown = !hasSolved && calPushedCount > 0 && familyEventCount > 0
+              ? `${calPushedCount} from your calendar, ${familyEventCount} added.`
+              : null;
             const cardSub =
               !hasEvents  ? familySub
               : hasSolved && hasConflicts
                 ? "Tap to see what needs a plan →"
               : hasSolved
                 ? "Tap to see the plan →"
-              : "Tap to sort the juggle →";
+              : calBreakdown ?? "Tap to sort the juggle →";
 
             return (
               <TouchableOpacity
@@ -592,6 +606,33 @@ export default function HomeTab() {
             <Pressable style={styles.settingsSheet} onPress={() => {}}>
               <View style={styles.settingsHandle} />
               <Text style={styles.settingsTitle}>More from Sortii</Text>
+
+              {/* CALENDARS */}
+              <Text style={styles.settingsSectionLabel}>CALENDARS</Text>
+              <TouchableOpacity
+                style={styles.settingsRow}
+                onPress={() => { setSettingsVisible(false); router.push("/(tabs)/appointments" as any); }}
+                activeOpacity={0.75}
+              >
+                <Text style={{ fontSize: 14 }}>🍎</Text>
+                <Text style={[styles.settingsRowText, calAppleConn && { color: TEAL }]}>
+                  {"iPhone Calendar" + (calAppleConn ? " — Connected ✓" : " — Not connected")}
+                </Text>
+                <Feather name="chevron-right" size={15} color={TEXT_MUTED} />
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.settingsRow}
+                onPress={() => { setSettingsVisible(false); router.push("/(tabs)/appointments" as any); }}
+                activeOpacity={0.75}
+              >
+                <Text style={{ fontSize: 14, color: "#4285F4", fontFamily: "Inter_700Bold" }}>G</Text>
+                <Text style={[styles.settingsRowText, calGoogleConn && { color: TEAL }]}>
+                  {"Google Calendar" + (calGoogleConn ? " — Connected ✓" : " — Not connected")}
+                </Text>
+                <Feather name="chevron-right" size={15} color={TEXT_MUTED} />
+              </TouchableOpacity>
+              <View style={styles.settingsDivider} />
+
               {[
                 { label: "Dietary preferences", icon: "sliders" as const, route: "/(tabs)/preferences" as const },
                 { label: "Appointments", icon: "calendar" as const, route: "/(tabs)/appointments" as const },
@@ -704,6 +745,13 @@ const styles = StyleSheet.create({
   settingsRowText: {
     flex: 1, fontSize: 15,
     fontFamily: "Inter_400Regular", color: TEXT,
+  },
+  settingsSectionLabel: {
+    fontSize: 10, fontFamily: "Inter_600SemiBold", color: TEXT_MUTED,
+    textTransform: "uppercase", letterSpacing: 0.8, marginTop: 8, marginBottom: 2,
+  },
+  settingsDivider: {
+    height: 1, backgroundColor: BORDER, marginVertical: 8,
   },
 
   // Nudge banner

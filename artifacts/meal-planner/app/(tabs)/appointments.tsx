@@ -1,10 +1,16 @@
 import { Feather } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useFocusEffect, useRouter } from "expo-router";
-import React, { useCallback, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   Alert,
+  AppState,
+  AppStateStatus,
   KeyboardAvoidingView,
+  Linking,
+  Modal,
   Platform,
+  RefreshControl,
   ScrollView,
   StyleSheet,
   Switch,
@@ -21,6 +27,34 @@ import {
   loadAppointments,
   saveAppointments,
 } from "@/utils/appointmentStore";
+import { getAppleCalendars, getUpcomingAppleEvents, requestCalendarPermission } from "@/utils/appleCalendar";
+import {
+  APPLE_CALENDAR_IDS_KEY,
+  APPLE_CONNECTED_KEY,
+  AppleCalendarMeta,
+  CACHED_EVENTS_KEY,
+  FAMILY_PUSHED_KEY,
+  GOOGLE_CALENDAR_IDS_KEY,
+  GOOGLE_CONNECTED_KEY,
+  GoogleCalendarMeta,
+  SortiiCalEvent,
+  isNoisyCalendar,
+} from "@/utils/calendarTypes";
+import {
+  getGoogleCalendars,
+  getUpcomingGoogleEvents,
+  getValidGoogleToken,
+  isGoogleConfigured,
+  signInWithGoogle,
+} from "@/utils/googleCalendar";
+import {
+  loadCalendarSettings,
+  pushEventToFamily,
+  removeEventFromFamily,
+  loadFamilyPushedEvents,
+  cacheCalendarEvents,
+  loadCachedCalendarEvents,
+} from "@/utils/appointmentService";
 
 // ── Colour tokens ──────────────────────────────────────────────────────────────
 const TEAL      = "#2A8F88";
@@ -33,6 +67,7 @@ const BORDER    = "#E6E1D7";
 const TEXT      = "#2B2B2B";
 const MUTED     = "#888888";
 const TEAL_TINT = "#E6F3F0";
+const GOOGLE_BLUE = "#4285F4";
 
 // ── Category config ────────────────────────────────────────────────────────────
 const CATEGORIES: { label: string; color: string }[] = [
@@ -102,6 +137,26 @@ function fmt12h(hhmm: string): string {
   return m === 0 ? `${hour}${period}` : `${hour}:${String(m).padStart(2, "0")}${period}`;
 }
 
+function isoToDateStr(iso: string): string {
+  if (!iso) return todayStr();
+  if (iso.length === 10) return iso;
+  return iso.slice(0, 10);
+}
+
+function isoToTimeDisplay(iso: string): string {
+  if (!iso || iso.length === 10) return "All day";
+  const d = new Date(iso);
+  return fmt12h(`${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`);
+}
+
+function timeAgo(d: Date): string {
+  const mins = Math.floor((Date.now() - d.getTime()) / 60000);
+  if (mins < 1) return "just now";
+  if (mins < 60) return `${mins} min ago`;
+  const hrs = Math.floor(mins / 60);
+  return `${hrs}h ago`;
+}
+
 type DateGroup = "today" | "tomorrow" | "this_week" | "later" | "past";
 
 function getGroup(dateStr: string): DateGroup {
@@ -152,13 +207,21 @@ const OVERVIEW_COPY: string[] = [
   "This week has a couple of moving parts.",
   "You're not wildly overbooked. A win.",
 ];
-function pickCopy(items: Appointment[]): string {
+function pickCopy(items: Appointment[], calCount: number): string {
   const upcoming = items.filter((a) => !a.isDone && !a.isCancelled);
-  if (upcoming.length === 0) return "Nothing booked yet. A rare and beautiful sight.";
-  if (upcoming.length === 1) return "One thing on. Easier than it sounds.";
-  if (upcoming.length <= 3)  return "A couple of things on the radar.";
-  if (upcoming.length <= 6)  return "You've got a bit on. All captured though.";
+  const total = upcoming.length + calCount;
+  if (total === 0) return "Nothing booked yet. A rare and beautiful sight.";
+  if (total === 1) return "One thing on. Easier than it sounds.";
+  if (total <= 3)  return "A couple of things on the radar.";
+  if (total <= 6)  return "You've got a bit on. All captured though.";
   return "Quite the social calendar. Stay hydrated.";
+}
+
+// ── Source dot colour ──────────────────────────────────────────────────────────
+function sourceColor(source: SortiiCalEvent["source"]): string {
+  if (source === "apple")  return "#555555";
+  if (source === "google") return GOOGLE_BLUE;
+  return PLUM;
 }
 
 // ── Components ─────────────────────────────────────────────────────────────────
@@ -281,6 +344,172 @@ function ApptCard({ appt, busyPersons, onPress }: ApptCardProps) {
   );
 }
 
+// ── Calendar event card ─────────────────────────────────────────────────────────
+interface CalEventCardProps {
+  event: SortiiCalEvent;
+  isPushed: boolean;
+  onToggle: () => void;
+}
+
+function CalEventCard({ event, isPushed, onToggle }: CalEventCardProps) {
+  const dot = sourceColor(event.source);
+  const timeLabel = event.isAllDay
+    ? "All day"
+    : isoToTimeDisplay(event.startTime);
+
+  return (
+    <View style={styles.calCard}>
+      <View style={{ flexDirection: "row", alignItems: "center", gap: 6, marginBottom: 6 }}>
+        <View style={[styles.sourceDot, { backgroundColor: dot }]} />
+        {event.calendarName ? (
+          <Text style={styles.calendarName} numberOfLines={1}>
+            {event.calendarName}
+            {event.source === "google" ? " · Google" : event.source === "apple" ? " · Apple" : ""}
+          </Text>
+        ) : null}
+      </View>
+      <View style={{ flexDirection: "row", alignItems: "flex-start", gap: 10 }}>
+        <View style={styles.timePill}>
+          <Text style={styles.timePillText}>{timeLabel}</Text>
+        </View>
+        <View style={{ flex: 1, gap: 2 }}>
+          <Text style={styles.calEventTitle} numberOfLines={2}>{event.title}</Text>
+          {event.location ? (
+            <Text style={styles.calEventLocation} numberOfLines={1}>{event.location}</Text>
+          ) : null}
+        </View>
+      </View>
+      <TouchableOpacity onPress={onToggle} activeOpacity={0.8} style={styles.pushRow}>
+        <View style={styles.pushToggleTrack}>
+          <View style={[styles.pushToggleThumb, isPushed && { backgroundColor: PLUM, marginLeft: 14 }]} />
+        </View>
+        <Text style={[styles.pushLabel, isPushed && { color: PLUM }]}>
+          {isPushed ? "✦ In family plan ✓" : "Add to family plan"}
+        </Text>
+      </TouchableOpacity>
+    </View>
+  );
+}
+
+// ── Source status pill ──────────────────────────────────────────────────────────
+interface SourcePillProps {
+  connected: boolean;
+  label: string;
+  icon: string;
+  onPress: () => void;
+}
+function SourcePill({ connected, label, icon, onPress }: SourcePillProps) {
+  return (
+    <TouchableOpacity
+      onPress={onPress}
+      activeOpacity={0.75}
+      style={[styles.sourcePill, connected && { backgroundColor: TEAL_TINT, borderColor: TEAL + "40" }]}
+    >
+      <Text style={styles.sourcePillIcon}>{icon}</Text>
+      <Text style={[styles.sourcePillText, connected && { color: TEAL }]}>
+        {label}{connected ? " ✓" : ""}
+      </Text>
+    </TouchableOpacity>
+  );
+}
+
+// ── Toast ───────────────────────────────────────────────────────────────────────
+function CalToast({ msg, teal }: { msg: string; teal: boolean }) {
+  return (
+    <View style={[styles.toast, teal ? styles.toastTeal : styles.toastMuted]}>
+      <Text style={styles.toastText}>{msg}</Text>
+    </View>
+  );
+}
+
+// ── Calendar selector modal ─────────────────────────────────────────────────────
+interface CalSelectorProps {
+  visible: boolean;
+  title: string;
+  subtitle: string;
+  items: { id: string; label: string; color: string | null; enabled: boolean }[];
+  onToggle: (id: string) => void;
+  onDone: () => void;
+  isLoading?: boolean;
+}
+function CalendarSelectorModal({ visible, title, subtitle, items, onToggle, onDone, isLoading }: CalSelectorProps) {
+  return (
+    <Modal visible={visible} animationType="slide" transparent>
+      <View style={styles.modalOverlay}>
+        <View style={styles.modalSheet}>
+          <View style={styles.modalHandle} />
+          <Text style={styles.modalTitle}>{title}</Text>
+          <Text style={styles.modalSubtitle}>{subtitle}</Text>
+          {isLoading ? (
+            <Text style={[styles.modalSubtitle, { marginTop: 20 }]}>Loading your calendars…</Text>
+          ) : (
+            <ScrollView style={{ maxHeight: 320 }} showsVerticalScrollIndicator={false}>
+              {items.map((item) => (
+                <TouchableOpacity
+                  key={item.id}
+                  onPress={() => onToggle(item.id)}
+                  activeOpacity={0.75}
+                  style={styles.calRow}
+                >
+                  <View style={[styles.calRowDot, { backgroundColor: item.color ?? "#888" }]} />
+                  <Text style={styles.calRowLabel} numberOfLines={1}>{item.label}</Text>
+                  <View style={[styles.calRowToggle, item.enabled && { backgroundColor: TEAL }]}>
+                    <View style={[styles.calRowThumb, item.enabled && { marginLeft: 14 }]} />
+                  </View>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          )}
+          <TouchableOpacity style={styles.modalDoneBtn} onPress={onDone} activeOpacity={0.85}>
+            <Text style={styles.modalDoneBtnText}>Done — connect these calendars</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </Modal>
+  );
+}
+
+// ── Connection cards (empty state) ─────────────────────────────────────────────
+interface ConnectionCardsProps {
+  onConnectApple: () => void;
+  onConnectGoogle: () => void;
+  onManual: () => void;
+}
+function ConnectionCards({ onConnectApple, onConnectGoogle, onManual }: ConnectionCardsProps) {
+  return (
+    <View style={styles.connectionWrap}>
+      <View style={styles.connectionIconWrap}>
+        <Text style={styles.connectionIcon}>📅</Text>
+      </View>
+      <Text style={styles.connectionHeading}>Everything in one place.</Text>
+      <Text style={styles.connectionSub}>
+        Connect your calendars and add anything else — Sortii pulls it all into one view.
+      </Text>
+      <TouchableOpacity style={styles.connCard} onPress={onConnectApple} activeOpacity={0.8}>
+        <View style={{ flex: 1 }}>
+          <Text style={styles.connCardTitle}>🍎  iPhone Calendar</Text>
+          <Text style={styles.connCardSub}>Google, iCloud, school feeds — everything your phone has</Text>
+        </View>
+        <TouchableOpacity style={styles.connBtn} onPress={onConnectApple} activeOpacity={0.8}>
+          <Text style={styles.connBtnText}>Connect</Text>
+        </TouchableOpacity>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.connCard} onPress={onConnectGoogle} activeOpacity={0.8}>
+        <View style={{ flex: 1 }}>
+          <Text style={styles.connCardTitle}><Text style={{ color: GOOGLE_BLUE }}>G</Text>  Google Calendar</Text>
+          <Text style={styles.connCardSub}>Connect directly to your Google account</Text>
+        </View>
+        <TouchableOpacity style={styles.connBtn} onPress={onConnectGoogle} activeOpacity={0.8}>
+          <Text style={styles.connBtnText}>Connect</Text>
+        </TouchableOpacity>
+      </TouchableOpacity>
+      <TouchableOpacity onPress={onManual} activeOpacity={0.7}>
+        <Text style={styles.manualLink}>I'll add things manually →</Text>
+      </TouchableOpacity>
+    </View>
+  );
+}
+
 // ── Main Screen ────────────────────────────────────────────────────────────────
 
 type ApptView = "overview" | "form" | "detail";
@@ -290,6 +519,7 @@ export default function AppointmentsScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
 
+  // ── Manual appointment state ───────────────────────────────────────────────
   const [items,       setItems]       = useState<Appointment[]>([]);
   const [view,        setView]        = useState<ApptView>("overview");
   const [selectedId,  setSelectedId]  = useState<string | null>(null);
@@ -298,13 +528,233 @@ export default function AppointmentsScreen() {
   const [showEndTime, setShowEndTime] = useState(false);
   const [checkInput,  setCheckInput]  = useState("");
 
-  useFocusEffect(useCallback(() => {
-    loadAppointments().then(setItems);
-  }, []));
+  // ── Calendar state ─────────────────────────────────────────────────────────
+  const [calEvents,       setCalEvents]       = useState<SortiiCalEvent[]>([]);
+  const [pushedIds,       setPushedIds]       = useState<Set<string>>(new Set());
+  const [isRefreshing,    setIsRefreshing]    = useState(false);
+  const [lastSynced,      setLastSynced]      = useState<Date | null>(null);
+  const [calToast,        setCalToast]        = useState<{ msg: string; teal: boolean } | null>(null);
+  const [calToastTimer,   setCalToastTimer]   = useState<ReturnType<typeof setTimeout> | null>(null);
+  const [appleConnected,  setAppleConnected]  = useState(false);
+  const [googleConnected, setGoogleConnected] = useState(false);
+
+  // Apple connection flow
+  const [showAppleSelector,  setShowAppleSelector]  = useState(false);
+  const [appleCalendars,     setAppleCalendars]     = useState<AppleCalendarMeta[]>([]);
+  const [selectedAppleCals,  setSelectedAppleCals]  = useState<Map<string, boolean>>(new Map());
+  const [isConnectingApple,  setIsConnectingApple]  = useState(false);
+  const [permDenied,         setPermDenied]         = useState(false);
+
+  // Google connection flow
+  const [showGoogleSelector, setShowGoogleSelector] = useState(false);
+  const [googleCalendars,    setGoogleCalendars]    = useState<GoogleCalendarMeta[]>([]);
+  const [selectedGoogleCals, setSelectedGoogleCals] = useState<Map<string, boolean>>(new Map());
+  const [isConnectingGoogle, setIsConnectingGoogle] = useState(false);
 
   const selected = items.find((a) => a.id === selectedId) ?? null;
 
-  // ── Filtering & grouping ───────────────────────────────────────────────────
+  // ── Load data ──────────────────────────────────────────────────────────────
+  async function loadCalendarData(fromCache = false) {
+    try {
+      const settings = await loadCalendarSettings();
+      setAppleConnected(settings.appleConnected);
+      setGoogleConnected(settings.googleConnected);
+
+      // Load pushed family event IDs
+      const pushed = await loadFamilyPushedEvents();
+      setPushedIds(new Set(pushed.map((e) => e.id)));
+
+      if (fromCache) {
+        const cached = await loadCachedCalendarEvents();
+        if (cached.length > 0) setCalEvents(cached);
+        return;
+      }
+
+      let events: SortiiCalEvent[] = [];
+      let fetchFailed = false;
+
+      if (settings.appleConnected && settings.appleCalendarIds.length > 0) {
+        try {
+          const ae = await getUpcomingAppleEvents(settings.appleCalendarIds);
+          events = [...events, ...ae];
+        } catch { fetchFailed = true; }
+      }
+
+      if (settings.googleConnected) {
+        try {
+          const token = await getValidGoogleToken();
+          if (token && settings.googleCalendarIds.length > 0) {
+            const ge = await getUpcomingGoogleEvents(token, settings.googleCalendarIds);
+            events = [...events, ...ge];
+          }
+        } catch { fetchFailed = true; }
+      }
+
+      if (fetchFailed && events.length === 0) {
+        const cached = await loadCachedCalendarEvents();
+        if (cached.length > 0) setCalEvents(cached);
+        return;
+      }
+
+      const deduped = dedupeEvents(events);
+      setCalEvents(deduped);
+      await cacheCalendarEvents(deduped);
+      setLastSynced(new Date());
+    } catch {}
+  }
+
+  function dedupeEvents(events: SortiiCalEvent[]): SortiiCalEvent[] {
+    const seen = new Set<string>();
+    return events.filter((e) => {
+      const key = `${e.title}_${e.startTime}`;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    }).sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime());
+  }
+
+  async function handleRefresh() {
+    setIsRefreshing(true);
+    await loadAppointments().then(setItems);
+    await loadCalendarData(false);
+    setIsRefreshing(false);
+  }
+
+  useFocusEffect(useCallback(() => {
+    loadAppointments().then(setItems);
+    loadCalendarData(false);
+  }, []));
+
+  // AppState foreground refresh
+  useEffect(() => {
+    const sub = AppState.addEventListener("change", (nextState: AppStateStatus) => {
+      if (nextState === "active") {
+        loadAppointments().then(setItems);
+        loadCalendarData(false);
+      }
+    });
+    return () => sub.remove();
+  }, []);
+
+  // ── Calendar connection: Apple ─────────────────────────────────────────────
+  async function handleConnectApple() {
+    if (Platform.OS === "web") {
+      showToast("iPhone Calendar works in the app. Download Sortii to connect.", false);
+      return;
+    }
+    setIsConnectingApple(true);
+    const status = await requestCalendarPermission();
+    if (status === "granted") {
+      const cals = await getAppleCalendars();
+      const initMap = new Map<string, boolean>();
+      cals.forEach((c) => initMap.set(c.id, !isNoisyCalendar(c.title)));
+      setAppleCalendars(cals);
+      setSelectedAppleCals(initMap);
+      setPermDenied(false);
+      setShowAppleSelector(true);
+    } else if (status === "denied") {
+      setPermDenied(true);
+    } else {
+      showToast("Calendar access not available on this device.", false);
+    }
+    setIsConnectingApple(false);
+  }
+
+  async function handleAppleSelectorDone() {
+    const selectedIds = [...selectedAppleCals.entries()]
+      .filter(([, on]) => on)
+      .map(([id]) => id);
+    await AsyncStorage.setItem(APPLE_CONNECTED_KEY, "true");
+    await AsyncStorage.setItem(APPLE_CALENDAR_IDS_KEY, JSON.stringify(selectedIds));
+    setAppleConnected(true);
+    setShowAppleSelector(false);
+    await loadCalendarData(false);
+    showToast("iPhone Calendar connected ✓", true);
+  }
+
+  // ── Calendar connection: Google ────────────────────────────────────────────
+  async function handleConnectGoogle() {
+    if (!isGoogleConfigured()) {
+      showToast("Google Calendar coming soon — use iPhone Calendar for now.", false);
+      return;
+    }
+    setIsConnectingGoogle(true);
+    try {
+      const token = await signInWithGoogle();
+      if (token) {
+        const cals = await getGoogleCalendars(token);
+        const initMap = new Map<string, boolean>();
+        cals.forEach((c) => initMap.set(c.id, !isNoisyCalendar(c.summary)));
+        setGoogleCalendars(cals);
+        setSelectedGoogleCals(initMap);
+        setShowGoogleSelector(true);
+      } else {
+        showToast("Sign-in cancelled.", false);
+      }
+    } catch {
+      showToast("Couldn't connect to Google Calendar. Try again.", false);
+    }
+    setIsConnectingGoogle(false);
+  }
+
+  async function handleGoogleSelectorDone() {
+    const selectedIds = [...selectedGoogleCals.entries()]
+      .filter(([, on]) => on)
+      .map(([id]) => id);
+    await AsyncStorage.setItem(GOOGLE_CONNECTED_KEY, "true");
+    await AsyncStorage.setItem(GOOGLE_CALENDAR_IDS_KEY, JSON.stringify(selectedIds));
+    setGoogleConnected(true);
+    setShowGoogleSelector(false);
+    await loadCalendarData(false);
+    showToast("Google Calendar connected ✓", true);
+  }
+
+  // ── Family push toggle ─────────────────────────────────────────────────────
+  async function handleFamilyToggle(event: SortiiCalEvent) {
+    const isOn = pushedIds.has(event.id);
+    if (isOn) {
+      await removeEventFromFamily(event.id);
+      setPushedIds((prev) => { const next = new Set(prev); next.delete(event.id); return next; });
+      showToast("Removed from family plan.", false);
+    } else {
+      await pushEventToFamily(event);
+      setPushedIds((prev) => new Set([...prev, event.id]));
+      showToast("Added to this week's family plan ✓", true);
+    }
+  }
+
+  // ── Toast helper ──────────────────────────────────────────────────────────
+  function showToast(msg: string, teal: boolean) {
+    if (calToastTimer) clearTimeout(calToastTimer);
+    setCalToast({ msg, teal });
+    const t = setTimeout(() => setCalToast(null), teal ? 2000 : 1500);
+    setCalToastTimer(t);
+  }
+
+  // ── Saturday bulk add ─────────────────────────────────────────────────────
+  async function handleAddAllSaturday() {
+    const today = new Date();
+    const dayOfWeek = today.getDay();
+    const daysToSaturday = (6 - dayOfWeek + 7) % 7 || 7;
+    const saturdayDate = new Date(today);
+    saturdayDate.setDate(today.getDate() + daysToSaturday);
+    const saturdayStr = saturdayDate.toISOString().slice(0, 10);
+
+    const saturdayEvents = calEvents.filter((e) => isoToDateStr(e.startTime) === saturdayStr);
+    for (const ev of saturdayEvents) {
+      if (!pushedIds.has(ev.id)) {
+        await pushEventToFamily(ev);
+      }
+    }
+    setPushedIds((prev) => {
+      const next = new Set(prev);
+      saturdayEvents.forEach((e) => next.add(e.id));
+      return next;
+    });
+    showToast(`Added all Saturday events to family plan ✓`, true);
+  }
+
+  // ── Filtering & grouping — manual appointments ─────────────────────────────
   const visible = items.filter((a) => {
     if (a.isDone || a.isCancelled) return filter === "all";
     const g = getGroup(a.date);
@@ -314,13 +764,43 @@ export default function AppointmentsScreen() {
     return true;
   }).sort((a, b) => a.date.localeCompare(b.date) || a.startTime.localeCompare(b.startTime));
 
-  const groups: { label: string; key: DateGroup | "done"; items: Appointment[] }[] = [
+  const apptGroups: { label: string; key: DateGroup | "done"; items: Appointment[] }[] = [
     { label: "Today",     key: "today",     items: visible.filter((a) => getGroup(a.date) === "today"     && !a.isDone) },
     { label: "Tomorrow",  key: "tomorrow",  items: visible.filter((a) => getGroup(a.date) === "tomorrow"  && !a.isDone) },
     { label: "This week", key: "this_week", items: visible.filter((a) => getGroup(a.date) === "this_week" && !a.isDone) },
     { label: "Coming up", key: "later",     items: visible.filter((a) => getGroup(a.date) === "later"     && !a.isDone) },
     { label: "Done",      key: "done",      items: visible.filter((a) => a.isDone || getGroup(a.date) === "past") },
   ].filter((g) => g.items.length > 0);
+
+  // ── Calendar event groups ──────────────────────────────────────────────────
+  const upcomingCalEvents = calEvents.filter((e) => {
+    const dateStr = isoToDateStr(e.startTime);
+    const g = getGroup(dateStr);
+    if (filter === "today")  return g === "today";
+    if (filter === "week")   return g === "today" || g === "tomorrow" || g === "this_week";
+    if (filter === "needs_prep") return false;
+    return g !== "past";
+  });
+
+  type CalGroup = { label: string; dateStr: string; items: SortiiCalEvent[] };
+  const calGroupMap = new Map<string, CalGroup>();
+  upcomingCalEvents.forEach((e) => {
+    const dateStr = isoToDateStr(e.startTime);
+    const g = getGroup(dateStr);
+    const label =
+      g === "today"     ? "Today"
+      : g === "tomorrow"  ? "Tomorrow"
+      : g === "this_week" ? formatDateShort(dateStr)
+      : g === "later"     ? formatDateShort(dateStr)
+      : "Earlier";
+    if (!calGroupMap.has(dateStr)) {
+      calGroupMap.set(dateStr, { label, dateStr, items: [] });
+    }
+    calGroupMap.get(dateStr)!.items.push(e);
+  });
+  const calGroups = [...calGroupMap.values()].sort(
+    (a, b) => a.dateStr.localeCompare(b.dateStr)
+  );
 
   // Busy-day detection
   const dayPersonCount: Record<string, Record<string, number>> = {};
@@ -334,10 +814,21 @@ export default function AppointmentsScreen() {
     if (busy.length) busyDayPersons[date] = busy;
   }
 
+  // Saturday bulk suggestion
+  const today2 = new Date();
+  const dayOfWeek2 = today2.getDay();
+  const daysToSat = (6 - dayOfWeek2 + 7) % 7 || 7;
+  const satStr2 = new Date(today2.getFullYear(), today2.getMonth(), today2.getDate() + daysToSat)
+    .toISOString().slice(0, 10);
+  const saturdayCalEvents = calEvents.filter((e) => isoToDateStr(e.startTime) === satStr2);
+  const showSaturdayBulk = saturdayCalEvents.length >= 3;
+
   // Summary counts
   const countToday   = items.filter((a) => !a.isDone && !a.isCancelled && getGroup(a.date) === "today").length;
   const countWeek    = items.filter((a) => !a.isDone && !a.isCancelled && ["today","tomorrow","this_week"].includes(getGroup(a.date))).length;
   const countPrep    = items.filter(needsPrep).length;
+  const anyConnected = appleConnected || googleConnected;
+  const noContent    = apptGroups.length === 0 && calGroups.length === 0;
 
   // ── Handlers ───────────────────────────────────────────────────────────────
   function openAdd() {
@@ -632,7 +1123,7 @@ export default function AppointmentsScreen() {
 
   if (view === "detail" && selected) return (
     <SafeAreaView style={styles.safe}>
-      <ScrollView contentContainerStyle={{ padding: 20, gap: 16, paddingBottom: 100 }}>
+      <ScrollView contentContainerStyle={{ padding: 20, gap: 16, paddingBottom: 100 }} showsVerticalScrollIndicator={false}>
         <View style={styles.detailHeader}>
           <TouchableOpacity onPress={() => setView("overview")} style={styles.backBtn}>
             <Feather name="arrow-left" size={18} color={TEAL} />
@@ -645,9 +1136,7 @@ export default function AppointmentsScreen() {
 
         <View style={[styles.detailPanel, { borderLeftColor: categoryColor(selected.category) }]}>
           <Text style={styles.detailTitle}>{selected.title}</Text>
-          <Text style={styles.detailMeta}>
-            {formatDateFull(selected.date)}
-          </Text>
+          <Text style={styles.detailMeta}>{formatDateFull(selected.date)}</Text>
           <Text style={styles.detailMeta}>
             {fmt12h(selected.startTime)}{selected.endTime ? ` – ${fmt12h(selected.endTime)}` : ""}
           </Text>
@@ -728,6 +1217,59 @@ export default function AppointmentsScreen() {
 
   return (
     <SafeAreaView style={styles.safe}>
+      {/* Apple Calendar Selector */}
+      <CalendarSelectorModal
+        visible={showAppleSelector}
+        title="Which calendars should we include?"
+        subtitle="You can change this anytime in Settings."
+        items={appleCalendars.map((c) => ({
+          id: c.id,
+          label: c.title,
+          color: c.color,
+          enabled: selectedAppleCals.get(c.id) ?? true,
+        }))}
+        onToggle={(id) => setSelectedAppleCals((prev) => {
+          const next = new Map(prev);
+          next.set(id, !next.get(id));
+          return next;
+        })}
+        onDone={handleAppleSelectorDone}
+      />
+
+      {/* Google Calendar Selector */}
+      <CalendarSelectorModal
+        visible={showGoogleSelector}
+        title="Which Google calendars to include?"
+        subtitle="You can change this anytime in Settings."
+        items={googleCalendars.map((c) => ({
+          id: c.id,
+          label: c.summary,
+          color: c.backgroundColor,
+          enabled: selectedGoogleCals.get(c.id) ?? true,
+        }))}
+        onToggle={(id) => setSelectedGoogleCals((prev) => {
+          const next = new Map(prev);
+          next.set(id, !next.get(id));
+          return next;
+        })}
+        onDone={handleGoogleSelectorDone}
+      />
+
+      {/* Permission denied banner */}
+      {permDenied && (
+        <View style={styles.permBanner}>
+          <Text style={styles.permBannerText}>
+            Sortii needs calendar access to pull in your events.
+          </Text>
+          <TouchableOpacity onPress={() => Linking.openSettings()}>
+            <Text style={styles.permBannerLink}>Open Settings</Text>
+          </TouchableOpacity>
+        </View>
+      )}
+
+      {/* Toast */}
+      {calToast && <CalToast msg={calToast.msg} teal={calToast.teal} />}
+
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.push("/(tabs)/more")} style={styles.backBtn}>
@@ -735,27 +1277,51 @@ export default function AppointmentsScreen() {
         </TouchableOpacity>
         <View style={{ flex: 1 }}>
           <Text style={styles.pageTitle}>Appointments</Text>
-          <Text style={styles.pageSub}>{pickCopy(items)}</Text>
+          <Text style={styles.pageSub}>{pickCopy(items, upcomingCalEvents.length)}</Text>
         </View>
       </View>
 
-      {/* Summary chips */}
-      <View style={styles.summaryRow}>
-        <View style={[styles.summaryChip, { backgroundColor: TEAL_TINT }]}>
-          <Text style={[styles.summaryChipNum, { color: TEAL }]}>{countToday}</Text>
-          <Text style={styles.summaryChipLabel}>Today</Text>
-        </View>
-        <View style={[styles.summaryChip, { backgroundColor: "#F3EDF5" }]}>
-          <Text style={[styles.summaryChipNum, { color: PLUM }]}>{countWeek}</Text>
-          <Text style={styles.summaryChipLabel}>This week</Text>
-        </View>
-        {countPrep > 0 && (
-          <View style={[styles.summaryChip, { backgroundColor: ORANGE + "18" }]}>
-            <Text style={[styles.summaryChipNum, { color: ORANGE }]}>{countPrep}</Text>
-            <Text style={styles.summaryChipLabel}>Needs prep</Text>
-          </View>
+      {/* Source status pills */}
+      <View style={styles.sourcePillRow}>
+        <SourcePill
+          connected={appleConnected}
+          label="Apple"
+          icon="🍎"
+          onPress={handleConnectApple}
+        />
+        <SourcePill
+          connected={googleConnected}
+          label="Google"
+          icon="G"
+          onPress={handleConnectGoogle}
+        />
+        <TouchableOpacity style={styles.sourcePill} onPress={openAdd} activeOpacity={0.75}>
+          <Text style={styles.sourcePillText}>+ Add</Text>
+        </TouchableOpacity>
+        {lastSynced && (
+          <Text style={styles.lastSynced}>Updated {timeAgo(lastSynced)}</Text>
         )}
       </View>
+
+      {/* Summary chips — only show if there are manual appointments */}
+      {apptGroups.length > 0 && (
+        <View style={styles.summaryRow}>
+          <View style={[styles.summaryChip, { backgroundColor: TEAL_TINT }]}>
+            <Text style={[styles.summaryChipNum, { color: TEAL }]}>{countToday}</Text>
+            <Text style={styles.summaryChipLabel}>Today</Text>
+          </View>
+          <View style={[styles.summaryChip, { backgroundColor: "#F3EDF5" }]}>
+            <Text style={[styles.summaryChipNum, { color: PLUM }]}>{countWeek}</Text>
+            <Text style={styles.summaryChipLabel}>This week</Text>
+          </View>
+          {countPrep > 0 && (
+            <View style={[styles.summaryChip, { backgroundColor: ORANGE + "18" }]}>
+              <Text style={[styles.summaryChipNum, { color: ORANGE }]}>{countPrep}</Text>
+              <Text style={styles.summaryChipLabel}>Needs prep</Text>
+            </View>
+          )}
+        </View>
+      )}
 
       {/* Filter row */}
       <ScrollView horizontal showsHorizontalScrollIndicator={false}
@@ -773,20 +1339,63 @@ export default function AppointmentsScreen() {
       </ScrollView>
 
       {/* List */}
-      <ScrollView contentContainerStyle={{ padding: 16, gap: 6, paddingBottom: insets.bottom + TAB_BAR_HEIGHT + 90 }}>
-        {groups.length === 0 ? (
+      <ScrollView
+        contentContainerStyle={{ padding: 16, gap: 6, paddingBottom: insets.bottom + TAB_BAR_HEIGHT + 90 }}
+        refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} tintColor={TEAL} />}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Empty state — connection cards when nothing at all */}
+        {!anyConnected && noContent && (
+          <ConnectionCards
+            onConnectApple={handleConnectApple}
+            onConnectGoogle={handleConnectGoogle}
+            onManual={openAdd}
+          />
+        )}
+
+        {/* Offline/cache notice */}
+        {anyConnected && calEvents.length === 0 && !isRefreshing && (
+          <Text style={styles.cacheNotice}>Using your last saved events.</Text>
+        )}
+
+        {/* Saturday bulk suggestion */}
+        {showSaturdayBulk && (
+          <TouchableOpacity style={styles.saturdayBulkBtn} onPress={handleAddAllSaturday} activeOpacity={0.8}>
+            <Text style={styles.saturdayBulkText}>
+              Got a busy Saturday? Add all Saturday events to family plan
+            </Text>
+          </TouchableOpacity>
+        )}
+
+        {/* Calendar event groups */}
+        {calGroups.map((g) => (
+          <View key={g.dateStr} style={{ gap: 6 }}>
+            <Text style={styles.groupLabel}>{g.label.toUpperCase()} — {formatDateShort(g.dateStr)}</Text>
+            {g.items.map((e) => (
+              <CalEventCard
+                key={e.id}
+                event={e}
+                isPushed={pushedIds.has(e.id)}
+                onToggle={() => handleFamilyToggle(e)}
+              />
+            ))}
+          </View>
+        ))}
+
+        {/* Manual appointment groups */}
+        {apptGroups.length === 0 && calGroups.length === 0 && anyConnected ? (
           <View style={styles.emptyState}>
             <Feather name="calendar" size={36} color={BORDER} />
-            <Text style={styles.emptyTitle}>Nothing booked yet.</Text>
+            <Text style={styles.emptyTitle}>Nothing in the next two weeks.</Text>
             <Text style={styles.emptySubtitle}>A rare and beautiful sight.</Text>
             <TouchableOpacity style={styles.emptyBtn} onPress={openAdd} activeOpacity={0.8}>
-              <Text style={styles.emptyBtnText}>Add first appointment</Text>
+              <Text style={styles.emptyBtnText}>Add appointment</Text>
             </TouchableOpacity>
           </View>
         ) : (
-          groups.map((g) => (
+          apptGroups.map((g) => (
             <View key={g.key} style={{ gap: 6 }}>
-              <Text style={styles.groupLabel}>{g.label.toUpperCase()}</Text>
+              <Text style={[styles.groupLabel, { color: MUTED }]}>ADDED — {g.label.toUpperCase()}</Text>
               {g.items.map((a) => (
                 <ApptCard
                   key={a.id}
@@ -831,8 +1440,22 @@ const styles = StyleSheet.create({
   },
   editBtnText: { fontSize: 13, fontFamily: "Inter_600SemiBold", color: TEAL },
 
+  // Source pills
+  sourcePillRow: {
+    flexDirection: "row", alignItems: "center", gap: 8,
+    paddingHorizontal: 16, paddingVertical: 8, flexWrap: "wrap",
+  },
+  sourcePill: {
+    flexDirection: "row", alignItems: "center", gap: 4,
+    borderRadius: 20, paddingHorizontal: 12, paddingVertical: 6,
+    backgroundColor: CARD, borderWidth: 1, borderColor: BORDER,
+  },
+  sourcePillIcon: { fontSize: 13 },
+  sourcePillText: { fontSize: 12, fontFamily: "Inter_600SemiBold", color: MUTED },
+  lastSynced: { fontSize: 11, fontFamily: "Inter_400Regular", color: MUTED, marginLeft: 4 },
+
   summaryRow: {
-    flexDirection: "row", gap: 10, paddingHorizontal: 16, paddingVertical: 8,
+    flexDirection: "row", gap: 10, paddingHorizontal: 16, paddingVertical: 4,
   },
   summaryChip: {
     flex: 1, borderRadius: 12, paddingVertical: 10, alignItems: "center", gap: 2,
@@ -861,6 +1484,128 @@ const styles = StyleSheet.create({
   apptMeta: { fontSize: 12, fontFamily: "Inter_400Regular", color: MUTED },
   apptLocation: { fontSize: 12, fontFamily: "Inter_400Regular", color: MUTED, marginTop: 1 },
   apptBusy: { fontSize: 12, fontFamily: "Inter_400Regular", color: GOLD, fontStyle: "italic", marginTop: 3 },
+
+  // Calendar event card
+  calCard: {
+    backgroundColor: CARD, borderRadius: 14, borderWidth: 1, borderColor: BORDER, padding: 14,
+  },
+  sourceDot: { width: 8, height: 8, borderRadius: 4 },
+  calendarName: { fontSize: 11, fontFamily: "Inter_400Regular", color: MUTED, flex: 1 },
+  timePill: {
+    backgroundColor: PLUM, borderRadius: 20, paddingHorizontal: 10, paddingVertical: 4,
+    alignSelf: "flex-start", marginTop: 2,
+  },
+  timePillText: { color: "#fff", fontSize: 11, fontFamily: "Inter_600SemiBold" },
+  calEventTitle: { fontSize: 15, fontFamily: "Inter_600SemiBold", color: TEXT },
+  calEventLocation: { fontSize: 12, fontFamily: "Inter_400Regular", color: MUTED, marginTop: 2 },
+  pushRow: {
+    flexDirection: "row", alignItems: "center", gap: 8,
+    marginTop: 10, paddingTop: 10, borderTopWidth: 1, borderTopColor: "#F0EBE3",
+  },
+  pushToggleTrack: {
+    width: 34, height: 20, borderRadius: 10,
+    backgroundColor: BORDER, justifyContent: "center", paddingHorizontal: 3,
+  },
+  pushToggleThumb: {
+    width: 14, height: 14, borderRadius: 7, backgroundColor: "#fff",
+    ...Platform.select({
+      web: { boxShadow: "0px 1px 3px rgba(0,0,0,0.2)" },
+      default: { shadowColor: "#000", shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.2, shadowRadius: 2 },
+    }),
+  },
+  pushLabel: { fontSize: 12, fontFamily: "Inter_500Medium", color: MUTED, flex: 1 },
+
+  // Toast
+  toast: {
+    position: "absolute", bottom: 90, left: 20, right: 20, zIndex: 100,
+    borderRadius: 12, padding: 12, alignItems: "center",
+    ...Platform.select({
+      web: { boxShadow: "0px 4px 14px rgba(0,0,0,0.15)" },
+      default: { shadowColor: "#000", shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.15, shadowRadius: 10, elevation: 8 },
+    }),
+  },
+  toastTeal: { backgroundColor: TEAL },
+  toastMuted: { backgroundColor: "#555" },
+  toastText: { color: "#fff", fontSize: 14, fontFamily: "Inter_600SemiBold" },
+
+  // Connection empty state
+  connectionWrap: { alignItems: "center", paddingTop: 24, gap: 12, paddingHorizontal: 4 },
+  connectionIconWrap: {
+    width: 72, height: 72, borderRadius: 18, backgroundColor: TEAL_TINT,
+    alignItems: "center", justifyContent: "center",
+  },
+  connectionIcon: { fontSize: 36 },
+  connectionHeading: { fontSize: 22, fontFamily: "Manrope_700Bold", color: TEXT, textAlign: "center" },
+  connectionSub: { fontSize: 15, fontFamily: "Inter_400Regular", color: MUTED, textAlign: "center", lineHeight: 22 },
+  connCard: {
+    flexDirection: "row", alignItems: "center",
+    backgroundColor: CARD, borderRadius: 14, borderWidth: 1, borderColor: BORDER,
+    padding: 16, gap: 12, width: "100%",
+  },
+  connCardTitle: { fontSize: 15, fontFamily: "Inter_600SemiBold", color: TEXT, marginBottom: 3 },
+  connCardSub: { fontSize: 12, fontFamily: "Inter_400Regular", color: MUTED, lineHeight: 18 },
+  connBtn: {
+    backgroundColor: TEAL, borderRadius: 20, paddingHorizontal: 14, paddingVertical: 8,
+  },
+  connBtnText: { color: "#fff", fontSize: 13, fontFamily: "Inter_600SemiBold" },
+  manualLink: { fontSize: 14, fontFamily: "Inter_500Medium", color: TEAL, marginTop: 4 },
+
+  // Calendar selector modal
+  modalOverlay: { flex: 1, backgroundColor: "rgba(0,0,0,0.35)", justifyContent: "flex-end" },
+  modalSheet: {
+    backgroundColor: CARD, borderTopLeftRadius: 22, borderTopRightRadius: 22,
+    padding: 20, paddingBottom: 40,
+    ...Platform.select({
+      web: { boxShadow: "0px -4px 20px rgba(0,0,0,0.12)" },
+      default: { shadowColor: "#000", shadowOffset: { width: 0, height: -4 }, shadowOpacity: 0.12, shadowRadius: 20 },
+    }),
+  },
+  modalHandle: {
+    width: 36, height: 4, borderRadius: 2, backgroundColor: BORDER,
+    alignSelf: "center", marginBottom: 16,
+  },
+  modalTitle: { fontSize: 18, fontFamily: "Manrope_700Bold", color: TEXT, marginBottom: 4 },
+  modalSubtitle: { fontSize: 13, fontFamily: "Inter_400Regular", color: MUTED, marginBottom: 16 },
+  calRow: {
+    flexDirection: "row", alignItems: "center", gap: 12,
+    paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: "#F5F0EB",
+  },
+  calRowDot: { width: 12, height: 12, borderRadius: 6 },
+  calRowLabel: { flex: 1, fontSize: 15, fontFamily: "Inter_500Medium", color: TEXT },
+  calRowToggle: {
+    width: 34, height: 20, borderRadius: 10,
+    backgroundColor: BORDER, justifyContent: "center", paddingHorizontal: 3,
+  },
+  calRowThumb: {
+    width: 14, height: 14, borderRadius: 7, backgroundColor: "#fff",
+  },
+  modalDoneBtn: {
+    marginTop: 20, backgroundColor: TEAL, borderRadius: 14, paddingVertical: 14, alignItems: "center",
+  },
+  modalDoneBtnText: { color: "#fff", fontSize: 16, fontFamily: "Inter_700Bold" },
+
+  // Permission denied banner
+  permBanner: {
+    backgroundColor: "#FFF5E6", borderBottomWidth: 1, borderBottomColor: "#F5D6A0",
+    padding: 12, flexDirection: "row", gap: 12, alignItems: "center",
+  },
+  permBannerText: { flex: 1, fontSize: 13, fontFamily: "Inter_400Regular", color: "#8B5E00" },
+  permBannerLink: { fontSize: 13, fontFamily: "Inter_600SemiBold", color: TEAL },
+
+  // Cache notice
+  cacheNotice: {
+    fontSize: 12, fontFamily: "Inter_400Regular", color: MUTED,
+    fontStyle: "italic", textAlign: "center", paddingVertical: 8,
+  },
+
+  // Saturday bulk
+  saturdayBulkBtn: {
+    borderWidth: 1.5, borderColor: TEAL, borderRadius: 14, paddingVertical: 12,
+    paddingHorizontal: 16, alignItems: "center", backgroundColor: TEAL_TINT,
+  },
+  saturdayBulkText: {
+    fontSize: 14, fontFamily: "Inter_600SemiBold", color: TEAL, textAlign: "center",
+  },
 
   emptyState: { alignItems: "center", paddingTop: 60, gap: 10 },
   emptyTitle: { fontSize: 18, fontFamily: "Inter_600SemiBold", color: TEXT },

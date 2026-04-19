@@ -38,6 +38,8 @@ import {
 import { loadFamilyState, saveFamilyState } from "@/utils/familyStore";
 import { buildJugglePrompt } from "@/utils/buildJugglePrompt";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { SortiiCalEvent, FAMILY_PUSHED_KEY } from "@/utils/calendarTypes";
+import { loadFamilyPushedEvents, removeEventFromFamily } from "@/utils/appointmentService";
 
 // ── Brand tokens ───────────────────────────────────────────────────────────────
 const TEAL         = "#2A8F88";
@@ -2027,6 +2029,7 @@ export default function FamilyScreen() {
   const [isSorted, setIsSorted]               = useState(false);
   const [helpers, setHelpers]                 = useState<FamilyHelper[]>([]);
   const [showHelpers, setShowHelpers]         = useState(false);
+  const [pushedCalEvents, setPushedCalEvents] = useState<SortiiCalEvent[]>([]);
 
   // Compute a map from eventId → AI-assigned adult name (including swaps)
   const juggleDriverMap = React.useMemo(() => {
@@ -2056,6 +2059,10 @@ export default function FamilyScreen() {
     if (savedHelpers) {
       try { setHelpers(JSON.parse(savedHelpers)); } catch {}
     }
+    try {
+      const pushed = await loadFamilyPushedEvents();
+      setPushedCalEvents(pushed);
+    } catch {}
     setLoading(false);
   }, []);
 
@@ -2159,15 +2166,16 @@ export default function FamilyScreen() {
 
   async function handleSortJuggle() {
     const adults = state.members.filter((m) => m.role === "adult");
-    if (adults.length === 0 || state.events.length === 0) return;
+    if (adults.length === 0 || (state.events.length === 0 && pushedCalEvents.length === 0)) return;
 
-    console.log("[Sortii] Sort triggered — adults:", adults.length, "events:", state.events.length);
+    console.log("[Sortii] Sort triggered — adults:", adults.length, "events:", state.events.length, "cal:", pushedCalEvents.length);
     setSortError(null);
     setFamilyStep("sorting");
     dismissBanner();
 
     try {
       // Build prompt using actual field names from FamilyEvent
+      const DAY_NAMES = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
       const adultsStr = adults.map((a) => `${a.name}, can drive: yes`).join("\n");
       const eventsStr = state.events.map((e) => {
         const involved = e.personIds
@@ -2185,7 +2193,27 @@ export default function FamilyScreen() {
           `Assigned adult: unassigned`,
         ].join("\n");
       }).join("\n---\n");
-      const prompt = `Available adults:\n${adultsStr}\n\nEvents this week:\n${eventsStr}\n\nPlease solve this schedule.`;
+
+      // Include pushed calendar events
+      const calStr = pushedCalEvents.map((e) => {
+        const day = DAY_NAMES[new Date(e.startTime).getDay()] ?? "Monday";
+        const startT = e.isAllDay ? "All day" : new Date(e.startTime).toLocaleTimeString("en-AU", { hour: "2-digit", minute: "2-digit" });
+        const endT = e.endTime && !e.isAllDay ? new Date(e.endTime).toLocaleTimeString("en-AU", { hour: "2-digit", minute: "2-digit" }) : "not specified";
+        return [
+          `EventID: ${e.id}`,
+          `Activity: ${e.title}`,
+          `Day: ${day}`,
+          `Start: ${startT}`,
+          `End: ${endT}`,
+          `Location: ${e.location || "not specified"}`,
+          `Who's going: unspecified`,
+          `Assigned adult: unassigned`,
+          `Source: ${e.calendarName || e.source} calendar`,
+        ].join("\n");
+      }).join("\n---\n");
+
+      const fullEventsStr = [eventsStr, calStr].filter(Boolean).join("\n---\n");
+      const prompt = `Available adults:\n${adultsStr}\n\nEvents this week:\n${fullEventsStr}\n\nPlease solve this schedule.`;
 
       console.log("[Sortii] Loading state entered — calling API");
       // Web: use root-relative URL (proxied at /api). Native: localhost directly.
@@ -2277,7 +2305,7 @@ export default function FamilyScreen() {
     );
   }
 
-  const hasEvents          = state.events.length > 0;
+  const hasEvents          = state.events.length > 0 || pushedCalEvents.length > 0;
   const hasMembers         = state.members.length > 0;
   const hasAdults          = state.members.some((m) => m.role === "adult");
   const daysWithEvents     = result?.daysWithEvents ?? [];
@@ -2349,6 +2377,41 @@ export default function FamilyScreen() {
                   juggleDriverMap={juggleDriverMap}
                 />
               ))}
+              {/* Pushed calendar events */}
+              {pushedCalEvents.length > 0 && (
+                <View style={{ gap: 8, marginTop: 4 }}>
+                  {pushedCalEvents.map((e) => {
+                    const timeLabel = e.isAllDay
+                      ? "All day"
+                      : new Date(e.startTime).toLocaleTimeString("en-AU", { hour: "2-digit", minute: "2-digit" });
+                    return (
+                      <View key={e.id} style={styles.calPushedCard}>
+                        <View style={{ flexDirection: "row", alignItems: "center", gap: 8, flex: 1 }}>
+                          <View style={styles.calPushedTimePill}>
+                            <Text style={styles.calPushedTimeText}>{timeLabel}</Text>
+                          </View>
+                          <Text>📅</Text>
+                          <View style={{ flex: 1 }}>
+                            <Text style={styles.calPushedTitle} numberOfLines={1}>{e.title}</Text>
+                            {e.calendarName ? (
+                              <Text style={styles.calPushedSource}>{e.calendarName}</Text>
+                            ) : null}
+                          </View>
+                        </View>
+                        <TouchableOpacity
+                          onPress={async () => {
+                            await removeEventFromFamily(e.id);
+                            setPushedCalEvents((prev) => prev.filter((x) => x.id !== e.id));
+                          }}
+                          activeOpacity={0.7}
+                        >
+                          <Text style={styles.calPushedRemove}>↩ Remove</Text>
+                        </TouchableOpacity>
+                      </View>
+                    );
+                  })}
+                </View>
+              )}
             </View>
 
             {/* Recurring note */}
@@ -2988,6 +3051,23 @@ const styles = StyleSheet.create({
   // Repeat note
   repeatNote: { flexDirection: "row", alignItems: "center", gap: 7, paddingVertical: 4 },
   repeatNoteText: { fontSize: 12, fontFamily: "Inter_400Regular", color: TEXT_MUTED, fontStyle: "italic" },
+
+  // Pushed calendar event cards in THIS WEEK
+  calPushedCard: {
+    flexDirection: "row", alignItems: "center", gap: 10,
+    backgroundColor: CARD_BG, borderRadius: 12,
+    borderWidth: 1, borderColor: BORDER, padding: 12,
+  },
+  calPushedTimePill: {
+    backgroundColor: TEAL_TINT, borderRadius: 20,
+    paddingHorizontal: 8, paddingVertical: 3,
+  },
+  calPushedTimeText: {
+    fontSize: 11, fontFamily: "Inter_600SemiBold", color: TEAL,
+  },
+  calPushedTitle: { fontSize: 14, fontFamily: "Inter_600SemiBold", color: TEXT },
+  calPushedSource: { fontSize: 11, fontFamily: "Inter_400Regular", color: TEXT_MUTED },
+  calPushedRemove: { fontSize: 12, fontFamily: "Inter_500Medium", color: TEXT_MUTED },
 
   // FAB
   fab: {

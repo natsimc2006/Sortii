@@ -1,0 +1,927 @@
+════════════════════════════════════════════
+SORTII — CALENDAR INTEGRATION
+APPLE + GOOGLE + FAMILY PUSH
+════════════════════════════════════════════
+
+TASK
+────
+Build calendar integration for the
+Appointments section of Sortii.
+
+Three sources of truth:
+1. Apple native calendar (expo-calendar)
+2. Google Calendar (OAuth API)
+3. Manual entry (already exists)
+
+One output:
+A unified Appointments view showing
+all events from all sources, with a
+toggle to push selected events into
+the Family juggle layer.
+
+Build in this exact order:
+Step 1 → Apple calendar
+Step 2 → Google Calendar
+Step 3 → Unified view + Family push toggle
+Step 4 → Connection management
+
+════════════════════════════════════════════
+BEFORE STARTING — DEPENDENCY CHECK
+════════════════════════════════════════════
+
+Check if expo-calendar is already
+installed in the project.
+
+Run: npx expo install expo-calendar
+
+Check if the following are in app.json
+under ios.infoPlist:
+- NSCalendarsUsageDescription
+- NSRemindersUsageDescription
+
+If missing, add:
+"NSCalendarsUsageDescription": 
+  "Sortii reads your calendar to pull 
+   events into your family plan.",
+"NSRemindersUsageDescription":
+  "Sortii can add reminders for your
+   family events."
+
+Also check android permissions in
+app.json for:
+READ_CALENDAR
+WRITE_CALENDAR
+
+Add if missing.
+
+For Google Calendar, check if these
+packages are installed:
+- expo-auth-session
+- expo-web-browser
+
+Run: npx expo install expo-auth-session expo-web-browser
+
+If any installs fail, note which and
+proceed with what works.
+
+════════════════════════════════════════════
+STEP 1 — APPLE NATIVE CALENDAR
+════════════════════════════════════════════
+
+This is the highest-value integration.
+iOS consolidates ALL the user's connected
+calendars (Google, iCloud, work Exchange,
+school subscriptions) into the native
+Calendar app. One permission request
+reads everything.
+
+── CREATE: /utils/appleCalendar.ts ───────
+
+import * as Calendar from 'expo-calendar';
+
+export async function requestCalendarPermission(): 
+  Promise<boolean> {
+  const { status } = await 
+    Calendar.requestCalendarPermissionsAsync();
+  return status === 'granted';
+}
+
+export async function getAppleCalendars(): 
+  Promise<Calendar.Calendar[]> {
+  const calendars = await 
+    Calendar.getCalendarsAsync(
+      Calendar.EntityTypes.EVENT
+    );
+  return calendars;
+}
+
+export async function getAppleEventsForRange(
+  startDate: Date,
+  endDate: Date,
+  calendarIds?: string[]
+): Promise<SortiiEvent[]> {
+  
+  // If no specific calendars, get all
+  let ids = calendarIds;
+  if (!ids || ids.length === 0) {
+    const cals = await getAppleCalendars();
+    ids = cals.map(c => c.id);
+  }
+
+  const events = await 
+    Calendar.getEventsAsync(
+      ids,
+      startDate,
+      endDate
+    );
+
+  // Map to Sortii event format
+  return events.map(e => ({
+    id: `apple_${e.id}`,
+    source: 'apple',
+    title: e.title || 'Untitled event',
+    startTime: e.startDate,
+    endTime: e.endDate,
+    location: e.location || null,
+    notes: e.notes || null,
+    calendarName: e.calendar?.title || null,
+    calendarColor: e.calendar?.color || null,
+    isAllDay: e.allDay || false,
+    pushToFamily: false,
+    addedToFamilyJuggle: false,
+  }));
+}
+
+// Get events for current week + next 2 weeks
+export async function getUpcomingAppleEvents(
+  calendarIds?: string[]
+): Promise<SortiiEvent[]> {
+  const now = new Date();
+  const twoWeeksOut = new Date();
+  twoWeeksOut.setDate(now.getDate() + 14);
+  
+  return getAppleEventsForRange(
+    now,
+    twoWeeksOut,
+    calendarIds
+  );
+}
+
+── SORTII EVENT TYPE ─────────────────────
+
+Create or update /types/SortiiEvent.ts:
+
+export interface SortiiEvent {
+  id: string;
+  source: 'apple' | 'google' | 'manual';
+  title: string;
+  startTime: string | Date;
+  endTime: string | Date | null;
+  location: string | null;
+  notes: string | null;
+  calendarName: string | null;
+  calendarColor: string | null;
+  isAllDay: boolean;
+  pushToFamily: boolean;
+  addedToFamilyJuggle: boolean;
+  // Manual entry extras
+  involvedPeople?: string[];
+  driver?: string | null;
+  repeat?: string;
+}
+
+── APPLE CALENDAR SELECTOR ───────────────
+
+After permission is granted, let the
+user choose which calendars to include.
+Some people have work calendars they
+don't want mixing into family planning.
+
+Show a list of all found calendars:
+
+Each row:
+[Coloured dot] [Calendar name]  [Toggle]
+e.g.
+[🔴] Work — Google             [ON/OFF]
+[🔵] Family                    [ON/OFF]
+[🟢] School — Compass          [ON/OFF]
+
+Toggle default: ON for all.
+User can turn off calendars they don't
+want Sortii to read.
+
+Store selected calendar IDs:
+localStorage key: 'sortii_apple_calendar_ids'
+Value: array of calendar ID strings.
+
+════════════════════════════════════════════
+STEP 2 — GOOGLE CALENDAR (OAUTH)
+════════════════════════════════════════════
+
+Google Calendar OAuth lets Sortii read
+events directly from Google, useful for:
+- Android users (no Apple calendar)
+- Users whose primary calendar is Google
+- Shared family Google Calendars
+
+── GOOGLE CLOUD SETUP (manual step) ─────
+
+IMPORTANT: Before this code will work,
+you need to set up a Google Cloud project.
+This is a one-time manual step:
+
+1. Go to console.cloud.google.com
+2. Create project: "Sortii"
+3. Enable: Google Calendar API
+4. Create OAuth 2.0 credentials:
+   Type: iOS (for Expo)
+   Bundle ID: your app bundle ID
+5. Add to Replit Secrets:
+   GOOGLE_CLIENT_ID = [your client ID]
+   GOOGLE_IOS_CLIENT_ID = [iOS client ID]
+
+Note in the code where these are needed.
+If secrets are not yet set, use placeholder
+strings and add a console warning.
+
+── CREATE: /utils/googleCalendar.ts ──────
+
+import * as AuthSession from 'expo-auth-session';
+import * as WebBrowser from 'expo-web-browser';
+
+WebBrowser.maybeCompleteAuthSession();
+
+const GOOGLE_CLIENT_ID = 
+  process.env.GOOGLE_CLIENT_ID || 
+  'GOOGLE_CLIENT_ID_NOT_SET';
+
+const SCOPES = [
+  'https://www.googleapis.com/auth/calendar.readonly',
+  'https://www.googleapis.com/auth/userinfo.email',
+];
+
+export async function signInWithGoogle(): 
+  Promise<string | null> {
+  
+  const discovery = {
+    authorizationEndpoint: 
+      'https://accounts.google.com/o/oauth2/v2/auth',
+    tokenEndpoint: 
+      'https://oauth2.googleapis.com/token',
+  };
+
+  const redirectUri = 
+    AuthSession.makeRedirectUri({ 
+      useProxy: true 
+    });
+
+  const request = new AuthSession.AuthRequest({
+    clientId: GOOGLE_CLIENT_ID,
+    scopes: SCOPES,
+    redirectUri,
+    responseType: 
+      AuthSession.ResponseType.Token,
+  });
+
+  const result = await request.promptAsync(
+    discovery
+  );
+
+  if (result.type === 'success') {
+    const token = result.params.access_token;
+    // Store token
+    await AsyncStorage.setItem(
+      'sortii_google_token', 
+      token
+    );
+    return token;
+  }
+  
+  return null;
+}
+
+export async function getGoogleCalendars(
+  token: string
+): Promise<GoogleCalendar[]> {
+  const response = await fetch(
+    'https://www.googleapis.com/calendar/v3/users/me/calendarList',
+    {
+      headers: { 
+        Authorization: `Bearer ${token}` 
+      }
+    }
+  );
+  
+  if (!response.ok) {
+    throw new Error('Google Calendar auth failed');
+  }
+  
+  const data = await response.json();
+  return data.items || [];
+}
+
+export async function getGoogleEventsForRange(
+  token: string,
+  startDate: Date,
+  endDate: Date,
+  calendarIds: string[]
+): Promise<SortiiEvent[]> {
+  
+  const allEvents: SortiiEvent[] = [];
+  
+  for (const calendarId of calendarIds) {
+    const params = new URLSearchParams({
+      timeMin: startDate.toISOString(),
+      timeMax: endDate.toISOString(),
+      singleEvents: 'true',
+      orderBy: 'startTime',
+      maxResults: '50',
+    });
+
+    const response = await fetch(
+      `https://www.googleapis.com/calendar/v3/calendars/${
+        encodeURIComponent(calendarId)
+      }/events?${params}`,
+      {
+        headers: { 
+          Authorization: `Bearer ${token}` 
+        }
+      }
+    );
+
+    if (!response.ok) continue;
+    
+    const data = await response.json();
+    
+    const events = (data.items || []).map(
+      (e: any) => ({
+        id: `google_${e.id}`,
+        source: 'google' as const,
+        title: e.summary || 'Untitled',
+        startTime: 
+          e.start?.dateTime || 
+          e.start?.date || '',
+        endTime: 
+          e.end?.dateTime || 
+          e.end?.date || null,
+        location: e.location || null,
+        notes: e.description || null,
+        calendarName: calendarId,
+        calendarColor: null,
+        isAllDay: !!e.start?.date && 
+          !e.start?.dateTime,
+        pushToFamily: false,
+        addedToFamilyJuggle: false,
+      })
+    );
+    
+    allEvents.push(...events);
+  }
+  
+  return allEvents.sort((a, b) => 
+    new Date(a.startTime).getTime() - 
+    new Date(b.startTime).getTime()
+  );
+}
+
+export async function getUpcomingGoogleEvents(
+  token: string,
+  calendarIds: string[]
+): Promise<SortiiEvent[]> {
+  const now = new Date();
+  const twoWeeksOut = new Date();
+  twoWeeksOut.setDate(now.getDate() + 14);
+  return getGoogleEventsForRange(
+    token, now, twoWeeksOut, calendarIds
+  );
+}
+
+── TOKEN REFRESH HANDLING ────────────────
+
+Google tokens expire after 1 hour.
+Add this check before any Google API call:
+
+async function getValidGoogleToken(): 
+  Promise<string | null> {
+  const token = await AsyncStorage.getItem(
+    'sortii_google_token'
+  );
+  if (!token) return null;
+  
+  // Test if token is still valid
+  const test = await fetch(
+    'https://www.googleapis.com/oauth2/v1/tokeninfo' +
+    `?access_token=${token}`
+  );
+  
+  if (test.ok) return token;
+  
+  // Token expired — prompt re-auth
+  return null;
+}
+
+If token is null or expired:
+Show a quiet banner in the Appointments tab:
+"Google Calendar needs reconnecting."
+[Reconnect →]
+
+════════════════════════════════════════════
+STEP 3 — UNIFIED APPOINTMENTS VIEW
+════════════════════════════════════════════
+
+── CREATE: /utils/appointmentService.ts ──
+
+Merges events from all three sources
+into a single sorted list.
+
+export async function getAllUpcomingEvents(
+  settings: CalendarSettings
+): Promise<SortiiEvent[]> {
+  
+  const allEvents: SortiiEvent[] = [];
+  
+  // Source 1: Apple calendar
+  if (settings.appleConnected && 
+      settings.appleCalendarIds.length > 0) {
+    try {
+      const appleEvents = 
+        await getUpcomingAppleEvents(
+          settings.appleCalendarIds
+        );
+      allEvents.push(...appleEvents);
+    } catch (e) {
+      console.warn('Apple calendar read failed', e);
+    }
+  }
+  
+  // Source 2: Google Calendar
+  if (settings.googleConnected && 
+      settings.googleToken) {
+    try {
+      const token = 
+        await getValidGoogleToken();
+      if (token) {
+        const googleEvents = 
+          await getUpcomingGoogleEvents(
+            token,
+            settings.googleCalendarIds
+          );
+        allEvents.push(...googleEvents);
+      }
+    } catch (e) {
+      console.warn('Google calendar read failed', e);
+    }
+  }
+  
+  // Source 3: Manual events from AsyncStorage
+  const manualRaw = await AsyncStorage.getItem(
+    'sortii_manual_events'
+  );
+  if (manualRaw) {
+    const manualEvents = JSON.parse(manualRaw);
+    allEvents.push(...manualEvents);
+  }
+  
+  // Deduplicate (same title + same time)
+  const seen = new Set<string>();
+  const deduped = allEvents.filter(e => {
+    const key = `${e.title}_${e.startTime}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+  
+  // Sort by start time
+  return deduped.sort((a, b) => 
+    new Date(a.startTime).getTime() - 
+    new Date(b.startTime).getTime()
+  );
+}
+
+── APPOINTMENTS SCREEN LAYOUT ────────────
+
+Header:
+"Appointments"
+Subtext: "Everything in one place."
+
+Below header — source status pills:
+Show which sources are connected:
+
+[🍎 Apple ✓]  [G Google ✓]  [+ Add]
+
+Each pill:
+Connected: var(--teal-tint) bg, teal text,
+  small checkmark, font-size 12px
+Not connected: white bg, border,
+  muted text — tapping opens connection
+Tapping "+" opens manual entry sheet
+
+── EVENT LIST ────────────────────────────
+
+Group events by day:
+
+TODAY — Sunday 19 Apr
+[Event card]
+[Event card]
+
+TOMORROW — Monday 20 Apr
+[Event card]
+
+THIS SATURDAY
+[Event card]
+
+Each event card:
+┌─────────────────────────────────────┐
+│ [Source dot] [Calendar name - muted]│
+│                                     │
+│ [Time pill]  Event title — bold     │
+│              Location if exists     │
+│                                     │
+│ [👨‍👩‍👧 Add to family plan]  [toggle]  │
+└─────────────────────────────────────┘
+
+Source dot colours:
+Apple: #555 grey (system calendar colour
+  if available, grey as fallback)
+Google: #4285F4 Google blue
+Manual: var(--plum) #5E3A4C
+
+Calendar name (muted, 11px):
+e.g. "Work · Google" or "Family · Apple"
+or "School" for manual
+
+Time pill: same style as Family tab
+(plum background, white text)
+
+All-day events: show "All day" pill
+instead of a time pill.
+
+── THE FAMILY PUSH TOGGLE ────────────────
+
+This is the key feature.
+
+Every event card has a toggle on the
+right side labelled:
+"Add to family plan"
+
+Toggle style:
+OFF state:
+  Label: "Add to family plan"
+  Color: var(--text-muted) 12px
+  Toggle: standard iOS-style off
+  (grey, not filled)
+
+ON state:
+  Label: "In family plan ✓"
+  Color: var(--plum) #5E3A4C 12px
+  Toggle: plum filled
+  A small ✦ appears to left of label
+
+When toggled ON:
+1. Event is flagged: pushToFamily: true
+2. Event is added to the Family tab's
+   event list for the relevant day
+3. It appears in the Family tab with
+   a small 📅 calendar icon to indicate
+   it came from an external calendar
+   (not manually added in Family tab)
+4. It is included in the next
+   "Sort the family juggle" AI call
+5. Store updated event in:
+   AsyncStorage key: 'sortii_family_pushed_events'
+
+When toggled OFF:
+1. Event is removed from Family tab list
+2. Removed from next juggle solve
+3. Remains visible in Appointments tab
+
+VISUAL FEEDBACK ON TOGGLE:
+When user taps to turn ON:
+Brief animation — the ✦ icon pulses once
+Small toast notification at bottom:
+"Added to this week's family plan ✓"
+Teal background, white text, 2 seconds.
+
+When user taps to turn OFF:
+Small toast:
+"Removed from family plan."
+Muted background, 1.5 seconds.
+
+── BULK ACTION ───────────────────────────
+
+Above the event list, when 3+ events
+exist for the weekend, show a
+one-time suggestion:
+
+"Got a busy Saturday? Add everything
+ at once:"
+[Add all Saturday events to family plan]
+
+Teal border-only button, full width.
+Tapping turns ON the family push toggle
+for all Saturday events at once.
+
+Only show this once per week.
+Dismiss after use.
+
+════════════════════════════════════════════
+STEP 4 — CALENDAR CONNECTION SETUP
+════════════════════════════════════════════
+
+This is the first-time setup flow for
+the Appointments tab.
+
+── FIRST VISIT EMPTY STATE ───────────────
+
+When user opens Appointments tab with
+no calendars connected:
+
+Large centred layout:
+
+📅 icon (large, teal tint background,
+  60px, rounded square)
+
+"Everything in one place."
+Bold, 22px, Playfair if available.
+
+"Connect your calendars and add
+ anything else — Sortii pulls it all
+ into one view."
+Muted, 15px, centred.
+
+Then two connection options as cards:
+
+┌─────────────────────────────────────┐
+│ 🍎  iPhone Calendar                 │
+│     Google, iCloud, school feeds    │
+│     — everything your phone has     │
+│                           [Connect] │
+└─────────────────────────────────────┘
+
+┌─────────────────────────────────────┐
+│ G   Google Calendar                 │
+│     Connect directly to your        │
+│     Google account                  │
+│                           [Connect] │
+└─────────────────────────────────────┘
+
+Small text link below both cards:
+"I'll add things manually →"
+Tapping skips to the Appointments view
+with manual entry open.
+
+── APPLE CONNECTION FLOW ─────────────────
+
+Tapping [Connect] on iPhone Calendar:
+
+1. Request calendar permission via
+   expo-calendar
+   
+2. If denied:
+   Show explanation:
+   "Sortii needs calendar access to
+    pull in your events."
+   [Open Settings] link → opens iOS Settings
+   
+3. If granted:
+   Show calendar selector sheet:
+   
+   "Which calendars should we include?"
+   "You can change this anytime."
+   
+   List all found calendars:
+   [●] Personal                    [ON]
+   [●] Work                        [ON]
+   [●] School — Compass            [ON]
+   [●] Family                      [ON]
+   [●] NRL 2026 Fixtures           [OFF by default
+                                    — sport/fixture
+                                    cals are noisy]
+   
+   Detect and default-OFF any calendar
+   with "fixture", "NRL", "AFL", "sport"
+   in the name — these create noise.
+   
+   [Done — connect these calendars]
+   Teal full-width button.
+   
+4. On Done:
+   Save: 'sortii_apple_connected': true
+   Save: 'sortii_apple_calendar_ids': [ids]
+   Refresh event list.
+   Show toast: "iPhone Calendar connected ✓"
+
+── GOOGLE CONNECTION FLOW ────────────────
+
+Tapping [Connect] on Google Calendar:
+
+1. Open Google OAuth via expo-auth-session
+   (WebBrowser opens Google sign-in)
+   
+2. User signs into their Google account
+   and grants calendar read permission.
+   
+3. On success:
+   Fetch list of Google Calendars.
+   Show calendar selector (same style
+   as Apple selector above).
+   
+4. On Done:
+   Save: 'sortii_google_connected': true
+   Save: 'sortii_google_token': token
+   Save: 'sortii_google_calendar_ids': [ids]
+   Refresh event list.
+   Show toast: "Google Calendar connected ✓"
+   
+5. If Google Cloud credentials not set up:
+   Show a calm placeholder message:
+   "Google Calendar coming soon —
+    use iPhone Calendar for now."
+   
+   This prevents a crash if the OAuth
+   credentials aren't configured yet.
+   iPhone Calendar still works
+   independently.
+
+── MANUAL EVENT ENTRY ────────────────────
+
+The existing manual event entry sheet
+(from the Family tab Add Event flow)
+is reused here.
+
+Tapping "+" in the source status pills
+opens the manual entry sheet.
+
+Manually added events from Appointments:
+- Are saved to 'sortii_manual_events'
+- Show with a plum ✦ source dot
+- Show "Manual" as calendar name
+- Have the "Add to family plan" toggle
+  available same as any other event
+
+════════════════════════════════════════════
+STEP 5 — FAMILY TAB INTEGRATION
+════════════════════════════════════════════
+
+Events pushed from Appointments to
+Family plan need to be visible in the
+Family tab and included in the AI solve.
+
+── IN THE FAMILY TAB EVENT LIST ──────────
+
+Events that came from calendar push
+appear in the THIS WEEK event list
+with a small calendar badge:
+
+[10am–11:30am] 📅 Doctor — Morisset
+               Google Calendar
+               [Mum •]  [↩ Remove]
+
+The 📅 icon distinguishes calendar
+events from manually entered Family events.
+
+"↩ Remove" removes from family plan
+but keeps in Appointments tab.
+
+No edit available for pulled calendar
+events — they can only be removed from
+the family layer. Editing happens in
+the source calendar.
+
+── IN THE JUGGLE AI PROMPT ───────────────
+
+When building the juggle prompt in
+handleSortJuggle(), include calendar
+events that have pushToFamily: true:
+
+Add to the events string:
+"[TIME] [Title] — [Location]
+ Source: [calendarName]
+ Assigned adult: unassigned"
+
+The AI treats these identically to
+manually entered family events —
+it assigns an adult, checks for
+conflicts, includes in run sheets.
+
+── HOME SCREEN FAMILY CARD ───────────────
+
+When calendar events have been pushed
+to the family layer:
+
+Update the Family card on Home to reflect:
+
+"3 things on this week.
+ 2 from your calendar, 1 added."
+Subtext: "Tap to sort the juggle →"
+
+This makes the calendar integration
+feel invisible and integrated — the
+home screen just knows about everything.
+
+════════════════════════════════════════════
+STEP 6 — SETTINGS / CONNECTION MANAGEMENT
+════════════════════════════════════════════
+
+In the Settings sheet (top-right of Home)
+add a section above "Preferences":
+
+"CALENDARS"
+
+[🍎 iPhone Calendar — Connected ✓]   [>]
+[G  Google Calendar — Not connected]  [>]
+
+Tapping a connected calendar:
+Shows which calendars are included
+with their ON/OFF toggles.
+"Disconnect" link at bottom in red muted.
+
+Tapping a not-connected calendar:
+Starts the connection flow.
+
+On disconnect:
+"Disconnect iPhone Calendar?"
+"Events you've added manually will
+ stay. Pulled events will be removed."
+[Disconnect] [Cancel]
+
+Clear relevant localStorage keys on
+disconnect.
+
+Refresh Appointments view.
+
+════════════════════════════════════════════
+STEP 7 — REFRESH LOGIC
+════════════════════════════════════════════
+
+Calendar events should stay fresh
+without requiring manual refresh.
+
+Auto-refresh triggers:
+1. App comes to foreground (AppState change)
+2. User opens Appointments tab
+3. User pulls down to refresh
+   (add RefreshControl to ScrollView)
+
+Show a subtle last-synced time:
+"Updated just now" or "Updated 3 min ago"
+var(--text-muted) 11px, below the
+source status pills.
+
+If refresh fails (no internet):
+"Using your last saved events."
+Don't show an error — just use cached.
+
+Cache events in AsyncStorage:
+Key: 'sortii_cached_events'
+Update on every successful fetch.
+Read from cache on failed fetch.
+
+════════════════════════════════════════════
+DO NOT CHANGE
+════════════════════════════════════════════
+
+✓ All existing Family tab logic
+✓ Family tab Add Event sheet
+✓ AI juggle solve engine and API
+✓ Meals tab and recipe logic
+✓ Money tab
+✓ Home screen existing cards
+✓ All colour variables and brand styles
+✓ All existing AsyncStorage keys
+  (new keys are additions, not replacements)
+✓ Existing manual event entry if it exists
+
+════════════════════════════════════════════
+STORAGE KEYS SUMMARY
+════════════════════════════════════════════
+
+New keys added by this build:
+
+'sortii_apple_connected'       boolean
+'sortii_apple_calendar_ids'    string[]
+'sortii_google_connected'      boolean
+'sortii_google_token'          string
+'sortii_google_calendar_ids'   string[]
+'sortii_google_user_email'     string
+'sortii_manual_events'         SortiiEvent[]
+'sortii_cached_events'         SortiiEvent[]
+'sortii_family_pushed_events'  SortiiEvent[]
+
+════════════════════════════════════════════
+TEST SEQUENCE AFTER BUILD
+════════════════════════════════════════════
+
+1. Open Appointments tab fresh.
+   Confirm empty state shows with both
+   connection options.
+
+2. Tap "Connect iPhone Calendar"
+   Confirm permission request fires.
+   Grant permission.
+   Confirm calendar selector shows with
+   all device calendars listed.
+   Select 2 calendars. Tap Done.
+   Confirm events appear grouped by day.
+
+3. Find an event in the list.
+   Tap "Add to family plan" toggle.
+   Confirm it turns plum with ✦.
+   Confirm toast appears.
+   Navigate to Family tab.
+   Confirm event appears with 📅 icon.
+
+4. In Family tab, tap Sort the family juggle.
+   Confirm the pushed calendar event
+   appears in the AI solve output with
+   an adult assigned to it.
+
+5. Return to Appointments tab.
+   Toggle the event OFF.
+   Confirm it disappears from Family tab.
+
+6. Navigate to Settings (gear icon).
+   Confirm "CALENDARS" section shows
+   iPhone Calendar as Connected.
+   Tap it — confirm calendar list with
+   toggles appears.
