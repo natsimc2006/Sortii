@@ -348,7 +348,7 @@ function JuggleProcessingOverlay() {
   );
 }
 
-// ── JuggleResultsContent — full results screen inside the Modal ────────────────
+// ── JuggleResultsContent — full results screen ────────────────────────────────
 function JuggleResultsContent({
   juggleResult,
   members,
@@ -369,14 +369,12 @@ function JuggleResultsContent({
   const conflicts     = juggleResult.conflicts ?? [];
   const allAdultNames = adultPlans.map((p) => p.adult);
 
-  // Swap state: event_id -> overridden adult name (seeded from persisted overrides)
   const [swapAssignments, setSwapAssignments] = useState<Record<string, string>>(
     juggleResult.swapOverrides ?? {}
   );
   const [swappingEventId, setSwappingEventId] = useState<string | null>(null);
   const [swappedFlash, setSwappedFlash]       = useState<string | null>(null);
 
-  // Flat plan table rows sorted by time
   const planRows = adultPlans.flatMap((p) =>
     p.schedule.map((s) => ({
       time:     s.time,
@@ -409,14 +407,8 @@ function JuggleResultsContent({
     setTimeout(() => setSwappedFlash(null), 2000);
   }
 
-  // Status pill
   const impossible = ws.impossible_clashes ?? 0;
   const tight      = ws.tight_windows ?? 0;
-  const statusPill = impossible > 0
-    ? { bg: "#F7E9E8", color: "#B86557", text: `${impossible} thing${impossible > 1 ? "s" : ""} need a plan.` }
-    : tight > 0
-    ? { bg: "#FDF3DC", color: "#E8A838", text: "Manageable — one bit to watch." }
-    : { bg: "#E8F8F0", color: "#2A8F88", text: "That's the lot. ✓" };
 
   function buildShareText() {
     const lines: string[] = ["WEEKEND PLAN", ""];
@@ -438,60 +430,129 @@ function JuggleResultsContent({
     return lines.join("\n");
   }
 
-  // Outcome subheading
-  const subhead = impossible > 0
-    ? "One clash needs a rethink."
+  // Dashboard headline + summary line
+  const dashHeadline = impossible > 0
+    ? "Almost there."
     : tight > 0
-    ? "Manageable — one bit to watch."
-    : conflicts.length === 0 && ws.total_events > 0
-    ? "This mostly works. ✓"
-    : null;
+    ? "Sorted. Here's what the week looks like."
+    : "Sorted. Here's what the week looks like.";
+
+  const dashSummaryLine = (() => {
+    const parts: string[] = [];
+    if (ws.total_events > 0) parts.push(`${ws.total_events} ${ws.total_events === 1 ? "event" : "events"}`);
+    if (impossible > 0)       parts.push(`${impossible} ${impossible === 1 ? "clash" : "clashes"} to sort`);
+    else if (tight > 0)       parts.push(`${tight} tight spot${tight > 1 ? "s" : ""}, manageable`);
+    else                      parts.push("nothing clashing");
+    if (ws.conflicts_resolved > 0 && impossible === 0) parts.push(`${ws.conflicts_resolved} sorted ✓`);
+    return parts.join("  ·  ");
+  })();
+
+  // Chip colour config
+  const dashBg = impossible > 0 ? "#FDF2F0" : tight > 0 ? "#FFFBF0" : "#EDFAF6";
+  const dashAccent = impossible > 0 ? "#C0695A" : tight > 0 ? GOLD : TEAL;
 
   return (
-    <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 16, gap: 16, paddingBottom: 100 }}>
-      {/* ── Unified soft summary panel ── */}
-      <View style={styles.resultSummaryPanel}>
-        <Text style={styles.resultSummaryOutcome}>
-          {subhead ?? "Here's what we found."}
-        </Text>
-        <View style={styles.resultSummaryStatsRow}>
-          <Text style={styles.resultSummaryStatText}>
-            {ws.total_events} {ws.total_events === 1 ? "event" : "events"}
-          </Text>
-          {ws.tight_windows > 0 && (
-            <>
-              <Text style={styles.resultSummaryStatDot}>·</Text>
-              <Text style={[styles.resultSummaryStatText, { color: GOLD }]}>
-                {ws.tight_windows} tight
+    <ScrollView style={{ flex: 1 }} contentContainerStyle={{ gap: 0, paddingBottom: 120 }}>
+      {/* ── 1. Hero dashboard ── */}
+      <View style={[styles.resultDashboard, { backgroundColor: dashBg, borderBottomColor: dashAccent + "22" }]}>
+        {/* Coloured accent bar */}
+        <View style={[styles.resultDashboardBar, { backgroundColor: dashAccent }]} />
+        <View style={styles.resultDashboardBody}>
+          <Text style={styles.resultDashboardHeadline}>{dashHeadline}</Text>
+          <Text style={styles.resultDashboardSub}>{dashSummaryLine}</Text>
+          {/* Stat chips row */}
+          <View style={styles.resultDashboardChips}>
+            <View style={[styles.resultChip, { backgroundColor: TEAL + "18", borderColor: TEAL + "33" }]}>
+              <Text style={[styles.resultChipText, { color: TEAL }]}>
+                {ws.total_events} {ws.total_events === 1 ? "event" : "events"}
               </Text>
-            </>
-          )}
-          {ws.impossible_clashes > 0 && (
-            <>
-              <Text style={styles.resultSummaryStatDot}>·</Text>
-              <Text style={[styles.resultSummaryStatText, { color: "#B86557" }]}>
-                {ws.impossible_clashes} {ws.impossible_clashes === 1 ? "clash" : "clashes"}
-              </Text>
-            </>
-          )}
-          {ws.impossible_clashes === 0 && ws.conflicts_resolved > 0 && (
-            <>
-              <Text style={styles.resultSummaryStatDot}>·</Text>
-              <Text style={[styles.resultSummaryStatText, { color: TEAL }]}>
-                {ws.conflicts_resolved} sorted ✓
-              </Text>
-            </>
-          )}
-          {ws.tight_windows === 0 && ws.impossible_clashes === 0 && (
-            <>
-              <Text style={styles.resultSummaryStatDot}>·</Text>
-              <Text style={[styles.resultSummaryStatText, { color: TEAL }]}>all clear ✓</Text>
-            </>
-          )}
+            </View>
+            {impossible > 0 && (
+              <View style={[styles.resultChip, { backgroundColor: "#F7E9E8", borderColor: "#EDD5D0" }]}>
+                <Text style={[styles.resultChipText, { color: "#C0695A" }]}>
+                  {impossible} {impossible === 1 ? "clash" : "clashes"}
+                </Text>
+              </View>
+            )}
+            {tight > 0 && (
+              <View style={[styles.resultChip, { backgroundColor: GOLD + "18", borderColor: GOLD + "33" }]}>
+                <Text style={[styles.resultChipText, { color: "#A07010" }]}>
+                  {tight} tight {tight === 1 ? "spot" : "spots"}
+                </Text>
+              </View>
+            )}
+            {ws.conflicts_resolved > 0 && impossible === 0 && (
+              <View style={[styles.resultChip, { backgroundColor: TEAL + "18", borderColor: TEAL + "33" }]}>
+                <Text style={[styles.resultChipText, { color: TEAL }]}>
+                  {ws.conflicts_resolved} sorted ✓
+                </Text>
+              </View>
+            )}
+            {impossible === 0 && tight === 0 && (
+              <View style={[styles.resultChip, { backgroundColor: TEAL + "18", borderColor: TEAL + "33" }]}>
+                <Text style={[styles.resultChipText, { color: TEAL }]}>all clear ✓</Text>
+              </View>
+            )}
+          </View>
         </View>
       </View>
 
-      {/* HERE'S THE SPLIT */}
+      <View style={{ paddingHorizontal: 16, gap: 16, paddingTop: 18 }}>
+
+      {/* ── 2. THE PLAN table ── */}
+      {planRows.length > 0 && (
+        <View style={styles.jugglePlanCard}>
+          <Text style={styles.juggleSectionLabel}>THE PLAN</Text>
+          <Text style={styles.jugglePlanSub}>What's happening. Who's on it.</Text>
+          <View style={[styles.jugglePlanRowHeader]}>
+            <Text style={[styles.jugglePlanCellTime, styles.jugglePlanHeaderText]}>TIME</Text>
+            <Text style={[styles.jugglePlanCellWho, styles.jugglePlanHeaderText]}>WHO</Text>
+            <Text style={[styles.jugglePlanCellWhere, styles.jugglePlanHeaderText]}>WHERE</Text>
+          </View>
+          {planRows.map((row, i) => (
+            <View key={i}>
+              <View style={[styles.jugglePlanDataRow, { backgroundColor: i % 2 === 0 ? "#fff" : "#FAFAF8" }]}>
+                <View style={styles.jugglePlanCellTime}>
+                  <View style={styles.juggleTimePill}>
+                    <Text style={styles.juggleTimePillText}>{row.time}</Text>
+                  </View>
+                </View>
+                <View style={[styles.jugglePlanCellWho, { gap: 4 }]}>
+                  <Text style={styles.jugglePlanWhoText}>
+                    {row.adult}{row.child ? ` · ${row.child}` : ""}
+                  </Text>
+                  {swappedFlash === row.event_id ? (
+                    <View style={styles.juggleSwappedPill}>
+                      <Text style={styles.juggleSwappedPillText}>Swapped ✓</Text>
+                    </View>
+                  ) : (
+                    <TouchableOpacity style={styles.juggleSwapPill} onPress={() => handleSwap(row.event_id)} activeOpacity={0.75}>
+                      <Text style={styles.juggleSwapPillText}>⇄ Swap</Text>
+                    </TouchableOpacity>
+                  )}
+                </View>
+                <View style={styles.jugglePlanCellWhere}>
+                  <Text style={styles.jugglePlanWhereText} numberOfLines={2}>
+                    {[row.location, row.activity].filter(Boolean).join(" · ")}
+                  </Text>
+                </View>
+              </View>
+              {swappingEventId === row.event_id && allAdultNames.length >= 3 && (
+                <View style={styles.jugglePickerRow}>
+                  <Text style={styles.jugglePickerLabel}>Swap to:</Text>
+                  {allAdultNames.filter((a) => a !== row.adult).map((a) => (
+                    <TouchableOpacity key={a} style={styles.jugglePickerPill} onPress={() => pickAdult(row.event_id, a)} activeOpacity={0.8}>
+                      <Text style={styles.jugglePickerPillText}>{a}</Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              )}
+            </View>
+          ))}
+        </View>
+      )}
+
+      {/* ── 3. WHO'S DOING THE RUNNING ── */}
       {adultPlans.length > 0 && (
         <View style={{ gap: 10 }}>
           <Text style={styles.juggleSectionLabel}>WHO'S DOING THE RUNNING</Text>
@@ -541,60 +602,7 @@ function JuggleResultsContent({
         </View>
       )}
 
-      {/* THE PLAN table */}
-      {planRows.length > 0 && (
-        <View style={styles.jugglePlanCard}>
-          <Text style={styles.juggleSectionLabel}>THE PLAN</Text>
-          <Text style={styles.jugglePlanSub}>What's happening. Who's on it.</Text>
-          <View style={[styles.jugglePlanRowHeader]}>
-            <Text style={[styles.jugglePlanCellTime, styles.jugglePlanHeaderText]}>TIME</Text>
-            <Text style={[styles.jugglePlanCellWho, styles.jugglePlanHeaderText]}>WHO</Text>
-            <Text style={[styles.jugglePlanCellWhere, styles.jugglePlanHeaderText]}>WHERE</Text>
-          </View>
-          {planRows.map((row, i) => (
-            <View key={i}>
-              <View style={[styles.jugglePlanDataRow, { backgroundColor: i % 2 === 0 ? "#fff" : "#FAFAF8" }]}>
-                <View style={styles.jugglePlanCellTime}>
-                  <View style={styles.juggleTimePill}>
-                    <Text style={styles.juggleTimePillText}>{row.time}</Text>
-                  </View>
-                </View>
-                <View style={[styles.jugglePlanCellWho, { gap: 4 }]}>
-                  <Text style={styles.jugglePlanWhoText}>
-                    {row.adult}{row.child ? ` · ${row.child}` : ""}
-                  </Text>
-                  {swappedFlash === row.event_id ? (
-                    <View style={styles.juggleSwappedPill}>
-                      <Text style={styles.juggleSwappedPillText}>Swapped ✓</Text>
-                    </View>
-                  ) : (
-                    <TouchableOpacity style={styles.juggleSwapPill} onPress={() => handleSwap(row.event_id)} activeOpacity={0.75}>
-                      <Text style={styles.juggleSwapPillText}>⇄ Swap</Text>
-                    </TouchableOpacity>
-                  )}
-                </View>
-                <View style={styles.jugglePlanCellWhere}>
-                  <Text style={styles.jugglePlanWhereText} numberOfLines={2}>
-                    {[row.location, row.activity].filter(Boolean).join(" · ")}
-                  </Text>
-                </View>
-              </View>
-              {/* Inline adult picker for 3+ adults */}
-              {swappingEventId === row.event_id && allAdultNames.length >= 3 && (
-                <View style={styles.jugglePickerRow}>
-                  <Text style={styles.jugglePickerLabel}>Swap to:</Text>
-                  {allAdultNames.filter((a) => a !== row.adult).map((a) => (
-                    <TouchableOpacity key={a} style={styles.jugglePickerPill} onPress={() => pickAdult(row.event_id, a)} activeOpacity={0.8}>
-                      <Text style={styles.jugglePickerPillText}>{a}</Text>
-                    </TouchableOpacity>
-                  ))}
-                </View>
-              )}
-            </View>
-          ))}
-        </View>
-      )}
-
+      {/* ── 4. Tight spot / conflicts ── */}
       {conflicts.length > 0 && (
         <View style={styles.juggleConflictCard}>
           <Text style={styles.juggleConflictLabel}>
@@ -612,7 +620,7 @@ function JuggleResultsContent({
         </View>
       )}
 
-      {/* WORTH KNOWING */}
+      {/* ── 5. Worth knowing ── */}
       {juggleResult.smart_note ? (
         <View style={styles.juggleWorthKnowingCard}>
           <Text style={styles.juggleWorthKnowingLabel}>✦ WORTH KNOWING</Text>
@@ -620,17 +628,27 @@ function JuggleResultsContent({
         </View>
       ) : null}
 
-      {/* Share full plan */}
-      <TouchableOpacity style={styles.shareButton} onPress={() => onShare(buildShareText())} activeOpacity={0.85}>
-        <Text style={styles.shareButtonText}>Share full plan</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.differentWeekend} onPress={onSortAgain}>
-        <Text style={styles.differentWeekendText}>Sort again</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.differentWeekend} onPress={onClose}>
-        <Text style={styles.differentWeekendText}>← Family</Text>
-      </TouchableOpacity>
-      <View style={{ height: 40 }} />
+      {/* ── 6. Actions ── */}
+      <View style={styles.resultActionsRow}>
+        <TouchableOpacity
+          style={styles.resultShareBtn}
+          onPress={() => onShare(buildShareText())}
+          activeOpacity={0.85}
+        >
+          <Feather name="send" size={14} color="#fff" />
+          <Text style={styles.resultShareBtnText}>Share full plan</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.resultSortAgainBtn}
+          onPress={onSortAgain}
+          activeOpacity={0.85}
+        >
+          <Feather name="refresh-cw" size={13} color={TEAL} />
+          <Text style={styles.resultSortAgainBtnText}>Sort again</Text>
+        </TouchableOpacity>
+      </View>
+
+      </View>{/* end paddingHorizontal wrapper */}
     </ScrollView>
   );
 }
@@ -1999,15 +2017,24 @@ export default function FamilyScreen() {
   if (familyStep === "results" && juggleResult) {
     return (
       <SafeAreaView style={{ flex: 1, backgroundColor: "#FAFAF8" }}>
+        {/* Slim nav bar — content weight lives inside the hero dashboard card */}
         <View style={styles.resultsHeader}>
-          <TouchableOpacity onPress={() => setFamilyStep("input")}>
-            <Text style={styles.resultsBack}>← Back</Text>
+          <TouchableOpacity
+            onPress={() => setFamilyStep("input")}
+            style={styles.resultsNavBtn}
+            activeOpacity={0.75}
+          >
+            <Feather name="arrow-left" size={16} color={TEAL} />
+            <Text style={styles.resultsBack}>Family</Text>
           </TouchableOpacity>
-          <View style={{ alignItems: "center", flex: 1 }}>
-            <Text style={styles.resultsTitle}>Here's the plan</Text>
-          </View>
-          <TouchableOpacity onPress={() => handleSortJuggle()}>
-            <Text style={styles.resultsRetry}>Sort again</Text>
+          <Text style={styles.resultsTitle}>Week sorted</Text>
+          <TouchableOpacity
+            onPress={() => handleSortJuggle()}
+            style={styles.resultsNavBtn}
+            activeOpacity={0.75}
+          >
+            <Feather name="refresh-cw" size={13} color={TEXT_MUTED} />
+            <Text style={styles.resultsRetry}>Re-sort</Text>
           </TouchableOpacity>
         </View>
         <JuggleResultsContent
@@ -2117,7 +2144,7 @@ export default function FamilyScreen() {
               eventCount={state.events.length}
               adultCount={state.members.filter((m) => m.role === "adult").length}
               lastSolvedAt={juggleResult?.solvedAt ?? null}
-              onViewLastPlan={() => setShowJuggleResult(true)}
+              onViewLastPlan={() => setFamilyStep("results")}
             />
           </>
         ) : hasMembers ? (
@@ -2888,17 +2915,108 @@ const styles = StyleSheet.create({
   saveBtnText: { fontSize: 15, fontFamily: "Inter_600SemiBold", color: "#fff" },
 
   // Juggle results modal
+  // Results page — hero dashboard
+  resultDashboard: {
+    borderBottomWidth: 1,
+    overflow: "hidden",
+  },
+  resultDashboardBar: {
+    height: 4,
+    width: "100%",
+  },
+  resultDashboardBody: {
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    paddingBottom: 22,
+    gap: 8,
+  },
+  resultDashboardHeadline: {
+    fontSize: 24,
+    fontFamily: "Manrope_700Bold",
+    color: TEXT,
+    letterSpacing: -0.5,
+    lineHeight: 30,
+  },
+  resultDashboardSub: {
+    fontSize: 14,
+    fontFamily: "Inter_400Regular",
+    color: TEXT_MUTED,
+    lineHeight: 20,
+  },
+  resultDashboardChips: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 6,
+    marginTop: 4,
+  },
+  resultChip: {
+    borderRadius: 20,
+    borderWidth: 1,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+  },
+  resultChipText: {
+    fontSize: 12,
+    fontFamily: "Inter_600SemiBold",
+  },
+
+  // Results page — action row
+  resultActionsRow: {
+    flexDirection: "row",
+    gap: 10,
+    paddingTop: 4,
+    paddingBottom: 8,
+  },
+  resultShareBtn: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 7,
+    backgroundColor: TEAL,
+    borderRadius: 14,
+    paddingVertical: 14,
+    ...Platform.select({
+      web: { boxShadow: `0px 2px 10px ${TEAL}44` },
+      default: { shadowColor: TEAL, shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.25, shadowRadius: 8, elevation: 4 },
+    }),
+  },
+  resultShareBtnText: { fontSize: 14, fontFamily: "Inter_600SemiBold", color: "#fff" },
+  resultSortAgainBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 6,
+    backgroundColor: "#fff",
+    borderRadius: 14,
+    paddingVertical: 14,
+    paddingHorizontal: 18,
+    borderWidth: 1,
+    borderColor: TEAL + "44",
+  },
+  resultSortAgainBtnText: { fontSize: 14, fontFamily: "Inter_600SemiBold", color: TEAL },
+
+  // Results nav bar
+  resultsNavBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    paddingHorizontal: 4,
+    paddingVertical: 4,
+    minWidth: 70,
+  },
   resultsHeader: {
     flexDirection: "row", alignItems: "center", justifyContent: "space-between",
     paddingHorizontal: 16, paddingVertical: 14,
     borderBottomWidth: 1, borderBottomColor: "#F0EDEA",
     backgroundColor: "#fff",
   },
-  resultsBack: { color: TEAL, fontSize: 15, fontFamily: "Inter_500Medium" },
+  resultsBack: { color: TEAL, fontSize: 14, fontFamily: "Inter_500Medium" },
   resultsTitle: {
-    color: TEXT, fontSize: 16, fontFamily: "Manrope_700Bold", letterSpacing: -0.2,
+    color: TEXT, fontSize: 15, fontFamily: "Manrope_700Bold", letterSpacing: -0.2,
+    flex: 1, textAlign: "center",
   },
-  resultsRetry: { color: TEXT_MUTED, fontSize: 14, fontFamily: "Inter_400Regular" },
+  resultsRetry: { color: TEXT_MUTED, fontSize: 13, fontFamily: "Inter_400Regular" },
   resultsCard: {
     backgroundColor: "#fff", borderRadius: 14, padding: 16, marginBottom: 4,
     ...Platform.select({

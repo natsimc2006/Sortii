@@ -1,0 +1,86 @@
+Please refine the Family / Juggle flow again. The core sorting is now working, but the screen hierarchy and flow still need to be corrected.
+
+Current issues:
+1. After sorting, the app does not land directly on the final results page. Instead, it returns to the Family screen and shows a “Week sorted / see how it was sorted” status card. The user then has to tap again to view the actual sorted plan.
+2. Once sorted, the Family screen has lost the natural ability to keep adding more activities easily.
+3. The final results page has drifted away from the Sortii style/colour system, especially in the top dashboard/summary area.
+4. On the final results page, the section order feels wrong. “The plan” should come before “Who’s doing the running”.
+
+Please make the following changes:
+
+A. Restore the intended flow
+- Sorting should move through:
+  1. Input screen
+  2. Loading screen
+  3. Final results page
+- After sorting completes, go directly to the final results page automatically.
+- Do not stop on the Family screen with a status card as the primary outcome.
+- The “Week sorted / see how it was sorted” card can still exist as a lightweight status reference when the user later returns to the Family page, but it should not interrupt the main flow.
+
+B. Keep Family page useful after sorting
+- On the Family input page, preserve a clear way to continue adding/editing activities even after a sort has been run.
+- Do not let the sorted status area overpower the page or push the event-building flow into the background.
+- The Family page should still feel like the place to build and edit the week.
+- Keep “Add another activity/event” accessible and visually clear.
+
+C. Reorder the final results page
+Change the order to:
+1. Top dashboard / summary
+2. The plan
+3. Who’s doing the running
+4. Tight spot / one thing to tweak
+5. Worth knowing
+6. Share full plan / sort again actions
+
+Reason:
+Users want the solved overview first, then the individual breakdowns.
+
+D. Restore the Sortii style on the final page
+The final page has lost the softer, more intentional visual language we had established.
+
+Please restyle the results page so it feels consistent with the rest of Sortii:
+- soft white / cream base
+- gentle coloured dashboard cards
+- calm teal + mustard + plum accents used intentionally
+- clearer card spacing and section rhythm
+- top summary/dashboard should feel designed, not generic
+
+E. Improve the top dashboard on the final page
+The top area should feel like the visual anchor of the whole solution.
+It should have stronger polish and clearer hierarchy.
+
+Suggested content pattern:
+- main headline, something like:
+  “Here’s the plan”
+  or
+  “Sorted. Here’s what the week looks like.”
+- short summary line:
+  “4 events, 1 tight spot, manageable with one thing to watch.”
+- then compact chips / stats beneath
+
+This top summary should carry the colour/style concept we had previously discussed, rather than looking plain or disconnected.
+
+F. Keep navigation clear
+- The final results page should still have:
+  - Back to Family
+  - Sort again
+  - Share full plan
+- But the layout should feel calmer and more intentional.
+- Avoid large dead white gaps near the bottom.
+
+Important constraints:
+- Do not remove the existing sorting logic.
+- Do not remove the current results content.
+- This is a hierarchy, styling, and flow polish pass.
+- Preserve mobile-first behaviour and make sure nothing important is hidden behind the bottom nav.
+- Keep the Sortii tone: calm, capable, lightly reassuring, with a touch of warmth.
+
+Success outcome:
+- User adds activities on the Family page
+- taps sort
+- sees loading
+- lands directly on the final sorted page
+- sees a polished dashboard first
+- sees “The plan” before “Who’s doing the running”
+- can still go back to Family and easily add/edit more activities
+- overall result feels cohesive and deliberately designed
