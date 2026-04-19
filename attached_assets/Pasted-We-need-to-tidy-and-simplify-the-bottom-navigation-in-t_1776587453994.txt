@@ -1,0 +1,201 @@
+We need to tidy and simplify the bottom navigation in the existing Sortii app.
+
+Important:
+Do not redesign the whole app.
+Do not change the core module logic.
+Do not break Meals, Family/Juggle, Appointments, Bills, or What’s Coming Up.
+This is a navigation and button hierarchy cleanup only.
+
+Goal:
+Make the bottom nav feel cleaner, more consistent, and less confusing.
+Right now there is too much competition between:
+- the bottom nav Add button
+- local page CTAs like Add event / Add another event
+- sort / re-sort actions
+- module entry points
+
+The app should feel calm and obvious, not crowded.
+
+--------------------------------------------------
+BOTTOM NAV GOALS
+--------------------------------------------------
+
+Keep the bottom nav to 5 items only:
+- Home
+- Meals
+- Add
+- Family
+- More
+
+Do not add more tabs.
+
+The bottom nav should:
+- stay visually clean
+- be consistent across screens
+- not visually overpower page-level actions
+- not clash with sticky local CTAs
+- respect iOS safe area
+- never cover important page buttons or content
+
+--------------------------------------------------
+VISUAL CLEANUP
+--------------------------------------------------
+
+Refine the bottom nav styling so it feels lighter and tidier:
+
+- reduce visual heaviness of the center Add button slightly
+- keep Add prominent, but not so dominant that it fights every screen CTA
+- make spacing between icons/labels feel even
+- align icon sizing and label spacing consistently
+- ensure selected tab state is clear but understated
+- keep Sortii brand styling and colour palette
+
+The Add button should still feel like a global quick-add action, but not like the only important action on every screen.
+
+--------------------------------------------------
+HIERARCHY RULES
+--------------------------------------------------
+
+Clarify action hierarchy throughout the app:
+
+1. Bottom nav Add button = global quick add across modules
+2. Local page CTA = primary action for that specific screen
+3. Sort / Re-sort / secondary actions = contextual only
+
+Examples:
+- On Family screen, "Add another event" should be the local primary action
+- On Appointments screen, "Add first appointment" or "Add appointment" should be the local primary action
+- On Bills screen, "Add first bill" or "Add bill" should be the local primary action
+- Bottom nav Add should remain available, but should not visually compete with the page’s main button
+
+--------------------------------------------------
+SAFE AREA / OVERLAP FIX
+--------------------------------------------------
+
+This is critical:
+
+Make sure the bottom nav never causes:
+- local CTA buttons to hide behind it
+- sticky action bars to be clipped
+- content at the bottom of lists/cards to be obscured
+
+Add proper bottom safe-area padding on all screens that use:
+- sticky buttons
+- floating CTAs
+- bottom action bars
+- scrollable lists
+
+Any screen with a bottom CTA must account for:
+- nav height
+- iOS safe area inset
+
+--------------------------------------------------
+GLOBAL ADD BEHAVIOUR
+--------------------------------------------------
+
+Tapping the center Add button should open a clean universal quick-add menu or sheet.
+
+This quick-add should be simple and match Sortii tone.
+
+Options can include:
+- Add meal item or plan item if relevant
+- Add family event
+- Add appointment
+- Add bill
+
+Keep it tidy and fast.
+Do not make this screen cluttered.
+Use plain-English labels.
+
+Example heading:
+“What needs adding?”
+
+Example subtext:
+“Pop it in. We’ll sort the rest.”
+
+--------------------------------------------------
+LOCAL CTA PROTECTION
+--------------------------------------------------
+
+When a screen already has a strong local CTA, do not let the nav Add button visually dominate it.
+
+Examples:
+- Family page: local CTA = Add another event
+- Appointments page: local CTA = Add appointment
+- Bills page: local CTA = Add bill
+
+The user should understand:
+- page CTA = best next step here
+- nav Add = universal shortcut
+
+--------------------------------------------------
+SCREEN-SPECIFIC CLEANUP
+--------------------------------------------------
+
+Home:
+- bottom nav should feel balanced and not too loud
+- page cards remain the focus
+
+Meals:
+- keep local controls and weekly flow as priority
+- nav should not overpower Adjust plan or module actions
+
+Family:
+- ensure Add another event CTA is fully visible above nav
+- ensure Re-sort week stays secondary
+- nav Add can remain but must not confuse the Family flow
+
+Appointments:
+- ensure Add first appointment / Add appointment remains clear
+- nav should not crowd empty-state CTA
+
+Bills:
+- ensure Add first bill / Add bill remains clear
+- nav should not crowd empty-state CTA
+
+More:
+- nav should feel neat and settled, not oversized
+
+--------------------------------------------------
+CONSISTENCY RULES
+--------------------------------------------------
+
+Across all tabs:
+- same nav height
+- same active/inactive behaviour
+- same safe area handling
+- same icon alignment
+- same spacing rhythm
+- no tab-specific visual drift
+
+If the current Add button is too large or too close to sticky page CTAs, reduce its footprint slightly while keeping it recognisable.
+
+--------------------------------------------------
+TONE / FEEL
+--------------------------------------------------
+
+The nav should feel:
+- calm
+- polished
+- easy
+- intentional
+
+Not:
+- busy
+- app-builder generic
+- oversized
+- fighting the page
+
+--------------------------------------------------
+SUCCESS CHECK
+--------------------------------------------------
+
+Before finishing, verify:
+
+- bottom nav is visually tidier
+- center Add still works as global quick add
+- local CTAs remain the main action on each page
+- no sticky CTA is hidden behind nav
+- iOS safe area is handled properly
+- navigation feels cleaner and more premium
+- the app feels simpler, not busier

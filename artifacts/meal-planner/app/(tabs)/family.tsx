@@ -58,6 +58,38 @@ const DAY_ABBR: Record<DayOfWeek, string> = {
 };
 
 const JUGGLE_RESULT_KEY = "@sortii_juggle_result_v1";
+const HELPERS_KEY       = "@sortii_helpers_v1";
+
+// ── Family helpers ─────────────────────────────────────────────────────────────
+export interface FamilyHelper {
+  id: string;
+  name: string;
+  contact?: string;
+}
+
+// ── Travel timing helper ───────────────────────────────────────────────────────
+function timeToMinsLocal(hhmm: string): number {
+  if (!hhmm) return 0;
+  const [hStr, mStr] = hhmm.split(":");
+  return (parseInt(hStr ?? "0") || 0) * 60 + (parseInt(mStr ?? "0") || 0);
+}
+
+function getTravelHint(
+  a: FamilyEvent,
+  b: FamilyEvent,
+  juggleDriverMap: Map<string, string>,
+): string | null {
+  const dA = juggleDriverMap.get(a.id);
+  const dB = juggleDriverMap.get(b.id);
+  if (!dA || dA !== dB) return null;
+  if (!a.location || !b.location) return null;
+  if (a.location.trim().toLowerCase() === b.location.trim().toLowerCase()) return null;
+  const aEnd = a.endTime ? timeToMinsLocal(a.endTime) : timeToMinsLocal(a.time) + 60;
+  const gap  = timeToMinsLocal(b.time) - aEnd;
+  if (gap < 0 || gap > 45) return null;
+  if (gap <= 15) return `Tight run for ${dA} between here and ${b.location} 👀`;
+  return `~${gap} mins between these for ${dA} — should be fine.`;
+}
 
 // ── Juggle AI result types ─────────────────────────────────────────────────────
 export interface JuggleEventItem {
@@ -1105,15 +1137,26 @@ function DaySection({
         </View>
       </View>
       <View style={styles.daySectionEvents}>
-        {events.map((ev) => (
-          <EventCard
-            key={ev.id}
-            event={ev}
-            members={members}
-            onEdit={() => onEditEvent(ev)}
-            onDelete={() => onDeleteEvent(ev.id)}
-            aiDriver={juggleDriverMap?.get(ev.id)}
-          />
+        {events.map((ev, idx) => (
+          <React.Fragment key={ev.id}>
+            <EventCard
+              event={ev}
+              members={members}
+              onEdit={() => onEditEvent(ev)}
+              onDelete={() => onDeleteEvent(ev.id)}
+              aiDriver={juggleDriverMap?.get(ev.id)}
+            />
+            {juggleDriverMap && idx < events.length - 1 && (() => {
+              const hint = getTravelHint(ev, events[idx + 1]!, juggleDriverMap);
+              if (!hint) return null;
+              return (
+                <View style={styles.travelHintRow}>
+                  <Feather name="navigation" size={11} color={ORANGE} />
+                  <Text style={styles.travelHintText}>{hint}</Text>
+                </View>
+              );
+            })()}
+          </React.Fragment>
         ))}
       </View>
     </View>
@@ -1745,6 +1788,7 @@ function SetupReadyStrip({
 function SortContextCard({
   events,
   juggleResult,
+  isSorted,
   sortError,
   onSort,
   onViewPlan,
@@ -1752,12 +1796,13 @@ function SortContextCard({
 }: {
   events: FamilyEvent[];
   juggleResult: JuggleResult | null;
+  isSorted: boolean;
   sortError: string | null;
   onSort: () => void;
   onViewPlan: () => void;
   onReSort: () => void;
 }) {
-  const isSorted = !!juggleResult;
+  const hasSortedResult = !!juggleResult;
   const sortedDate = juggleResult?.solvedAt
     ? new Date(juggleResult.solvedAt).toLocaleDateString("en-AU", {
         weekday: "short", day: "numeric", month: "short",
@@ -1769,7 +1814,7 @@ function SortContextCard({
     : events.length >= 2 ? "This week's got a few moving parts."
     : "Even one thing is worth planning around.";
 
-  if (isSorted) {
+  if (hasSortedResult && isSorted) {
     return (
       <View style={styles.sortCardSorted}>
         <View style={styles.sortCardSortedTop}>
@@ -1791,6 +1836,31 @@ function SortContextCard({
             <Text style={styles.sortCardResortBtnText}>Re-sort</Text>
           </TouchableOpacity>
         </View>
+      </View>
+    );
+  }
+
+  if (hasSortedResult && !isSorted && events.length >= 2) {
+    return (
+      <View style={styles.staleSortCard}>
+        <View style={styles.staleSortTop}>
+          <View style={styles.staleSortDot} />
+          <Text style={styles.staleSortTitle}>Week's shifted a bit.</Text>
+        </View>
+        <Text style={styles.staleSortSub}>Want me to re-sort this?</Text>
+        {sortError ? (
+          <View style={styles.sortCardError}>
+            <Feather name="alert-circle" size={13} color="#C04040" />
+            <Text style={styles.sortCardErrorText}>{sortError}</Text>
+          </View>
+        ) : null}
+        <TouchableOpacity style={styles.staleSortBtn} onPress={onSort} activeOpacity={0.85}>
+          <Feather name="refresh-cw" size={14} color="#fff" />
+          <Text style={styles.staleSortBtnText}>Re-sort the week</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={onViewPlan} activeOpacity={0.7} style={styles.staleSortViewLink}>
+          <Text style={styles.staleSortViewLinkText}>View last plan instead →</Text>
+        </TouchableOpacity>
       </View>
     );
   }
@@ -1817,6 +1887,124 @@ function SortContextCard({
   );
 }
 
+// ── NeedHelpPrompt ─────────────────────────────────────────────────────────────
+function NeedHelpPrompt({
+  helpers,
+  onFindHelp,
+}: {
+  helpers: FamilyHelper[];
+  onFindHelp: () => void;
+}) {
+  return (
+    <View style={styles.needHelpCard}>
+      <View style={styles.needHelpTop}>
+        <Feather name="users" size={13} color={ORANGE} />
+        <Text style={styles.needHelpTitle}>Might need backup here.</Text>
+      </View>
+      <Text style={styles.needHelpSub}>
+        {helpers.length > 0
+          ? `You have ${helpers.length} helper${helpers.length > 1 ? "s" : ""} on the list.`
+          : "Add people who can help when things get tight."}
+      </Text>
+      <TouchableOpacity style={styles.needHelpBtn} onPress={onFindHelp} activeOpacity={0.8}>
+        <Feather name="user-plus" size={13} color={TEAL} />
+        <Text style={styles.needHelpBtnText}>
+          {helpers.length > 0 ? "View helpers" : "Add a helper"}
+        </Text>
+      </TouchableOpacity>
+    </View>
+  );
+}
+
+// ── HelperSection ──────────────────────────────────────────────────────────────
+function HelperSection({
+  helpers,
+  onAdd,
+  onRemove,
+}: {
+  helpers: FamilyHelper[];
+  onAdd: (name: string, contact?: string) => void;
+  onRemove: (id: string) => void;
+}) {
+  const [name, setName]       = useState("");
+  const [contact, setContact] = useState("");
+  const [adding, setAdding]   = useState(false);
+
+  function handleAdd() {
+    const trimmed = name.trim();
+    if (!trimmed) return;
+    onAdd(trimmed, contact.trim() || undefined);
+    setName(""); setContact(""); setAdding(false);
+  }
+
+  return (
+    <View style={styles.helperSection}>
+      <View style={styles.helperSectionHeader}>
+        <Feather name="users" size={13} color={TEAL} />
+        <Text style={styles.helperSectionTitle}>Helpers</Text>
+      </View>
+      <Text style={styles.helperSectionSub}>
+        People who can step in when you need a hand.
+      </Text>
+      {helpers.map((h) => (
+        <View key={h.id} style={styles.helperRow}>
+          <View style={styles.helperDot} />
+          <View style={{ flex: 1 }}>
+            <Text style={styles.helperName}>{h.name}</Text>
+            {h.contact ? <Text style={styles.helperContact}>{h.contact}</Text> : null}
+          </View>
+          <TouchableOpacity
+            onPress={() => onRemove(h.id)}
+            activeOpacity={0.7}
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+          >
+            <Feather name="x" size={13} color="#ccc" />
+          </TouchableOpacity>
+        </View>
+      ))}
+      {adding ? (
+        <View style={styles.helperAddForm}>
+          <TextInput
+            style={styles.helperInput}
+            value={name}
+            onChangeText={setName}
+            placeholder="Name"
+            placeholderTextColor="#bbb"
+            returnKeyType="next"
+            autoFocus
+          />
+          <TextInput
+            style={styles.helperInput}
+            value={contact}
+            onChangeText={setContact}
+            placeholder="Phone (optional)"
+            placeholderTextColor="#bbb"
+            returnKeyType="done"
+            onSubmitEditing={handleAdd}
+          />
+          <View style={{ flexDirection: "row", gap: 8 }}>
+            <TouchableOpacity style={styles.helperConfirmBtn} onPress={handleAdd} activeOpacity={0.8}>
+              <Text style={styles.helperConfirmBtnText}>Add</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => setAdding(false)} activeOpacity={0.7}>
+              <Feather name="x" size={16} color={TEXT_MUTED} />
+            </TouchableOpacity>
+          </View>
+        </View>
+      ) : (
+        <TouchableOpacity
+          style={styles.helperAddBtn}
+          onPress={() => setAdding(true)}
+          activeOpacity={0.8}
+        >
+          <Feather name="plus" size={13} color={TEAL} />
+          <Text style={styles.helperAddBtnText}>Add helper</Text>
+        </TouchableOpacity>
+      )}
+    </View>
+  );
+}
+
 // ── Main screen ────────────────────────────────────────────────────────────────
 export default function FamilyScreen() {
   const insets        = useSafeAreaInsets();
@@ -1839,6 +2027,9 @@ export default function FamilyScreen() {
   const [familyStep, setFamilyStep]           = useState<"input" | "sorting" | "results">("input");
   const [juggleResult, setJuggleResult]       = useState<JuggleResult | null>(null);
   const [sortError, setSortError]             = useState<string | null>(null);
+  const [isSorted, setIsSorted]               = useState(false);
+  const [helpers, setHelpers]                 = useState<FamilyHelper[]>([]);
+  const [showHelpers, setShowHelpers]         = useState(false);
 
   // Compute a map from eventId → AI-assigned adult name (including swaps)
   const juggleDriverMap = React.useMemo(() => {
@@ -1855,14 +2046,18 @@ export default function FamilyScreen() {
   }, [juggleResult]);
 
   const load = useCallback(async () => {
-    const [s, savedJuggle] = await Promise.all([
+    const [s, savedJuggle, savedHelpers] = await Promise.all([
       loadFamilyState(),
       AsyncStorage.getItem(JUGGLE_RESULT_KEY),
+      AsyncStorage.getItem(HELPERS_KEY),
     ]);
     setState(s);
     setResult(computeFamilyWeek(s));
     if (savedJuggle) {
-      try { setJuggleResult(JSON.parse(savedJuggle)); } catch {}
+      try { setJuggleResult(JSON.parse(savedJuggle)); setIsSorted(true); } catch {}
+    }
+    if (savedHelpers) {
+      try { setHelpers(JSON.parse(savedHelpers)); } catch {}
     }
     setLoading(false);
   }, []);
@@ -1912,6 +2107,7 @@ export default function FamilyScreen() {
     setShowForm(false);
     setEditingEvent(null);
     await persistState(next);
+    setIsSorted(false);
     const bannerType: BannerType =
       wasEditing ? "edited" : prevCount === 0 ? "first" : "subsequent";
     showBanner(bannerType, draft.title);
@@ -1925,6 +2121,7 @@ export default function FamilyScreen() {
         style: "destructive",
         onPress: async () => {
           await persistState({ ...state, events: state.events.filter((e) => e.id !== id) });
+          setIsSorted(false);
         },
       },
     ]);
@@ -2009,6 +2206,7 @@ export default function FamilyScreen() {
       console.log("[Sortii] Sort completed — results payload created, events in result:", full.events?.length);
       await AsyncStorage.setItem(JUGGLE_RESULT_KEY, JSON.stringify(full));
       setJuggleResult(full);
+      setIsSorted(true);
       setFamilyStep("results");
       console.log("[Sortii] Results screen activated");
     } catch (err) {
@@ -2020,6 +2218,19 @@ export default function FamilyScreen() {
 
   async function handleShareJuggle(text: string) {
     try { await Share.share({ message: text }); } catch {}
+  }
+
+  async function handleAddHelper(name: string, contact?: string) {
+    const next: FamilyHelper[] = [...helpers, { id: Date.now().toString(), name, contact }];
+    setHelpers(next);
+    await AsyncStorage.setItem(HELPERS_KEY, JSON.stringify(next));
+    setShowHelpers(true);
+  }
+
+  async function handleRemoveHelper(id: string) {
+    const next = helpers.filter((h) => h.id !== id);
+    setHelpers(next);
+    await AsyncStorage.setItem(HELPERS_KEY, JSON.stringify(next));
   }
 
   if (loading) return <View style={{ flex: 1, backgroundColor: BG }} />;
@@ -2069,14 +2280,18 @@ export default function FamilyScreen() {
     );
   }
 
-  const hasEvents      = state.events.length > 0;
-  const hasMembers     = state.members.length > 0;
-  const hasAdults      = state.members.some((m) => m.role === "adult");
-  const daysWithEvents = result?.daysWithEvents ?? [];
-  const canSort        = hasEvents && hasAdults;
-  const isUnsorted     = hasEvents && !juggleResult;
-  // Extra bottom padding: taller when sort CTA is also shown in sticky bar
-  const scrollPadBottom = hasEvents ? (isUnsorted && canSort ? 192 : 160) : 80;
+  const hasEvents          = state.events.length > 0;
+  const hasMembers         = state.members.length > 0;
+  const hasAdults          = state.members.some((m) => m.role === "adult");
+  const daysWithEvents     = result?.daysWithEvents ?? [];
+  const canSort            = hasEvents && hasAdults;
+  // needsSort: true when there's something to sort and either no prior result, or events changed since last sort
+  const needsSort          = canSort && (!juggleResult || !isSorted);
+  const hasTightOrConflict = (result?.insights ?? []).some(
+    (i) => i.type === "conflict" || i.type === "tight" || i.type === "child_clash"
+  );
+  // Taller bottom padding when sort CTA is shown in sticky bar
+  const scrollPadBottom = hasEvents ? (needsSort ? 192 : 160) : 80;
 
   return (
     <View style={{ flex: 1, backgroundColor: BG }}>
@@ -2148,15 +2363,33 @@ export default function FamilyScreen() {
               </View>
             )}
 
-            {/* Inline Sort hero card — shown once any event exists */}
+            {/* Inline Sort / re-sort card */}
             {state.events.length >= 1 && (
               <SortContextCard
                 events={state.events}
                 juggleResult={juggleResult}
+                isSorted={isSorted}
                 sortError={sortError}
                 onSort={handleSortJuggle}
                 onViewPlan={() => setFamilyStep("results")}
                 onReSort={() => handleSortJuggle()}
+              />
+            )}
+
+            {/* Need backup prompt — when tight/conflict insights exist */}
+            {hasTightOrConflict && (
+              <NeedHelpPrompt
+                helpers={helpers}
+                onFindHelp={() => setShowHelpers(true)}
+              />
+            )}
+
+            {/* Helper list — shown when user taps "Find help" */}
+            {showHelpers && (
+              <HelperSection
+                helpers={helpers}
+                onAdd={handleAddHelper}
+                onRemove={handleRemoveHelper}
               />
             )}
 
@@ -2215,20 +2448,22 @@ export default function FamilyScreen() {
             <Text style={styles.sortCtaBtnText}>Add another event</Text>
           </TouchableOpacity>
 
-          {/* Secondary: Sort the week — only when unsorted and adults exist */}
-          {isUnsorted && canSort && (
+          {/* Secondary: Sort / Re-sort — only when events need sorting */}
+          {needsSort && (
             <TouchableOpacity
               style={styles.sortCtaSortBtn}
               onPress={() => handleSortJuggle()}
               activeOpacity={0.85}
             >
               <Feather name="zap" size={14} color={GOLD} />
-              <Text style={styles.sortCtaSortBtnText}>Sort the week</Text>
+              <Text style={styles.sortCtaSortBtnText}>
+                {juggleResult ? "Re-sort the week" : "Sort the week"}
+              </Text>
             </TouchableOpacity>
           )}
 
-          {/* Re-sort — low emphasis when already sorted */}
-          {juggleResult && (
+          {/* Re-sort link — low emphasis when already sorted and nothing changed */}
+          {juggleResult && isSorted && (
             <TouchableOpacity
               style={styles.sortCtaResortLink}
               onPress={() => handleSortJuggle()}
@@ -2811,6 +3046,96 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
   },
   sortCtaResortLinkText: { fontSize: 12, fontFamily: "Inter_400Regular", color: TEXT_MUTED },
+
+  // Travel hint row (between events in DaySection)
+  travelHintRow: {
+    flexDirection: "row", alignItems: "center", gap: 6,
+    paddingHorizontal: 12, paddingVertical: 6,
+    backgroundColor: ORANGE + "0D", borderRadius: 8,
+    marginVertical: 2,
+  },
+  travelHintText: { flex: 1, fontSize: 11, fontFamily: "Inter_400Regular", color: ORANGE, lineHeight: 16 },
+
+  // Stale sort card (juggleResult exists but isSorted=false after event change)
+  staleSortCard: {
+    backgroundColor: "#FFFBF0", borderRadius: 16,
+    borderWidth: 1, borderColor: GOLD + "55",
+    paddingHorizontal: 18, paddingVertical: 18, gap: 10,
+    ...Platform.select({
+      web: { boxShadow: `0px 3px 16px ${GOLD}22` },
+      default: { shadowColor: GOLD, shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.15, shadowRadius: 12, elevation: 4 },
+    }),
+  },
+  staleSortTop: { flexDirection: "row", alignItems: "center", gap: 8 },
+  staleSortDot: {
+    width: 10, height: 10, borderRadius: 5,
+    backgroundColor: GOLD, marginTop: 1,
+  },
+  staleSortTitle: { fontSize: 17, fontFamily: "Manrope_700Bold", color: TEXT, letterSpacing: -0.2 },
+  staleSortSub: { fontSize: 13, fontFamily: "Inter_400Regular", color: TEXT_MUTED, lineHeight: 19 },
+  staleSortBtn: {
+    flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8,
+    backgroundColor: GOLD, borderRadius: 13, height: 50,
+    ...Platform.select({
+      web: { boxShadow: `0px 3px 10px ${GOLD}55` },
+      default: { shadowColor: GOLD, shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.3, shadowRadius: 8, elevation: 5 },
+    }),
+  },
+  staleSortBtnText: { fontSize: 15, fontFamily: "Inter_700Bold", color: "#fff" },
+  staleSortViewLink: { alignSelf: "flex-start", paddingVertical: 2 },
+  staleSortViewLinkText: { fontSize: 12, fontFamily: "Inter_400Regular", color: TEXT_MUTED },
+
+  // Need-help prompt card
+  needHelpCard: {
+    backgroundColor: ORANGE + "0F", borderRadius: 14,
+    borderWidth: 1, borderColor: ORANGE + "33",
+    paddingHorizontal: 16, paddingVertical: 14, gap: 8,
+  },
+  needHelpTop: { flexDirection: "row", alignItems: "center", gap: 7 },
+  needHelpTitle: { fontSize: 14, fontFamily: "Inter_600SemiBold", color: TEXT },
+  needHelpSub: { fontSize: 12, fontFamily: "Inter_400Regular", color: TEXT_MUTED, lineHeight: 17 },
+  needHelpBtn: {
+    flexDirection: "row", alignItems: "center", gap: 6,
+    backgroundColor: "#fff", borderRadius: 10,
+    paddingHorizontal: 12, paddingVertical: 8,
+    alignSelf: "flex-start",
+    borderWidth: 1, borderColor: TEAL + "44",
+  },
+  needHelpBtnText: { fontSize: 12, fontFamily: "Inter_500Medium", color: TEAL },
+
+  // Helpers section
+  helperSection: {
+    backgroundColor: TEAL_TINT, borderRadius: 14,
+    borderWidth: 1, borderColor: TEAL + "30",
+    paddingHorizontal: 16, paddingVertical: 14, gap: 10,
+  },
+  helperSectionHeader: { flexDirection: "row", alignItems: "center", gap: 7 },
+  helperSectionTitle: { fontSize: 14, fontFamily: "Inter_700Bold", color: TEXT },
+  helperSectionSub: { fontSize: 12, fontFamily: "Inter_400Regular", color: TEXT_MUTED, lineHeight: 17 },
+  helperRow: {
+    flexDirection: "row", alignItems: "center", gap: 10,
+    paddingVertical: 6,
+    borderBottomWidth: 1, borderBottomColor: TEAL + "18",
+  },
+  helperDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: TEAL },
+  helperName: { fontSize: 13, fontFamily: "Inter_600SemiBold", color: TEXT },
+  helperContact: { fontSize: 11, fontFamily: "Inter_400Regular", color: TEXT_MUTED },
+  helperAddForm: { gap: 8 },
+  helperInput: {
+    backgroundColor: "#fff", borderRadius: 10, borderWidth: 1, borderColor: BORDER,
+    paddingHorizontal: 12, paddingVertical: 9,
+    fontSize: 14, fontFamily: "Inter_400Regular", color: TEXT,
+  },
+  helperConfirmBtn: {
+    backgroundColor: TEAL, borderRadius: 10,
+    paddingHorizontal: 16, paddingVertical: 8,
+  },
+  helperConfirmBtnText: { fontSize: 13, fontFamily: "Inter_600SemiBold", color: "#fff" },
+  helperAddBtn: {
+    flexDirection: "row", alignItems: "center", gap: 6,
+    paddingVertical: 4, alignSelf: "flex-start",
+  },
+  helperAddBtnText: { fontSize: 13, fontFamily: "Inter_500Medium", color: TEAL },
 
   // Inline unsorted prompt strip (replaces big SortCard pre-sort)
   sortPromptStrip: {

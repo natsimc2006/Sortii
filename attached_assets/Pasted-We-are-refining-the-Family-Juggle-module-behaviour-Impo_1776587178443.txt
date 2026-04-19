@@ -1,0 +1,125 @@
+We are refining the Family (Juggle) module behaviour.
+
+Important:
+Do NOT rewrite the existing sorting engine.
+Do NOT remove current UI structure.
+This is a behaviour + visibility enhancement.
+
+--------------------------------------------------
+1. ADD SORT STATE
+--------------------------------------------------
+
+Introduce state:
+
+isSorted (boolean)
+
+Rules:
+- adding event → isSorted = false
+- editing event → isSorted = false
+- deleting event → isSorted = false
+- running sort → isSorted = true
+
+--------------------------------------------------
+2. SHOW RE-SORT PROMPT
+--------------------------------------------------
+
+If isSorted = false AND events >= 2:
+
+Show prominent inline card:
+
+Title:
+“Week’s shifted a bit.”
+
+Subtext:
+“Want me to re-sort this?”
+
+Button:
+“Re-sort the week”
+
+This should appear:
+- below event list
+- above summary card
+- fully visible above bottom nav
+
+If isSorted = true:
+- hide this card
+- show subtle confirmation:
+“✓ Week sorted”
+
+--------------------------------------------------
+3. FIX CTA VISIBILITY
+--------------------------------------------------
+
+Ensure "Add another event" button:
+
+- is not hidden behind bottom nav
+- respects iOS safe area
+- has sufficient bottom padding
+
+Do not allow partial visibility.
+
+--------------------------------------------------
+4. SURFACE TRAVEL LOGIC
+--------------------------------------------------
+
+Use existing travel logic from engine.
+
+If:
+- same person has consecutive events
+- AND locations differ
+
+Show helper line in event card:
+
+Examples:
+“~30 mins between these — should be fine”
+or
+“Tight run between these 👀”
+
+Do NOT show for all events.
+Only show when relevant.
+
+--------------------------------------------------
+5. ADD HELPER / CARPOOL SYSTEM (LIGHT VERSION)
+--------------------------------------------------
+
+Add simple helper list under Family:
+
+Helpers:
+- name
+- optional contact
+
+No complex UI required.
+
+When:
+- overlapping events
+OR
+- tight travel detected
+
+Show inline prompt:
+
+“Might need backup here”
+
+CTA:
+“Find help”
+
+Tapping opens helper list.
+
+--------------------------------------------------
+6. DO NOT BREAK EXISTING LOGIC
+--------------------------------------------------
+
+- Keep sorting engine unchanged
+- Only trigger it via UI
+- Only surface its outputs better
+
+--------------------------------------------------
+SUCCESS CHECK
+--------------------------------------------------
+
+- adding event triggers “Re-sort” prompt
+- sort updates state and UI
+- CTA is always visible
+- travel insights appear where relevant
+- helper prompt appears when useful
+- experience feels:
+  input → prompt → relief
