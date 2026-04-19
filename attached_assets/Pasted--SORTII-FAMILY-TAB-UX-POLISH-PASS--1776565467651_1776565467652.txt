@@ -1,0 +1,386 @@
+════════════════════════════════════════════
+SORTII FAMILY TAB — UX POLISH PASS
+════════════════════════════════════════════
+
+TASK
+────
+Three targeted UX fixes.
+Do not rebuild screens or change logic.
+Apply each fix in order.
+
+════════════════════════════════════════════
+FIX 1 — TIME INPUT: BACK TO TAP CHIPS
+════════════════════════════════════════════
+
+The time selector currently shows as a
+scrollable horizontal list of hour chips
+taking up a full row of screen space.
+
+This was correct in an earlier build.
+Something changed it back to a list.
+
+REQUIRED BEHAVIOUR
+──────────────────
+Tapping the Start time field or End time
+field opens a bottom sheet with a grid
+of time options — it does NOT show
+inline chips on the main form.
+
+The form should show:
+- Start time field (tappable, shows
+  selected time or placeholder)
+- End time field (tappable, shows
+  selected time or placeholder)
+
+Both as standard input-style fields,
+same height and style as other fields.
+
+BOTTOM SHEET TIME PICKER
+─────────────────────────
+Opens when either time field is tapped.
+Slides up from bottom of screen.
+
+Header: "What time?" bold 16px. 
+"Done" button top right in teal.
+
+Grid layout — 4 columns:
+
+7:00 AM   7:30 AM   8:00 AM   8:30 AM
+9:00 AM   9:30 AM   10:00 AM  10:30 AM
+11:00 AM  11:30 AM  12:00 PM  12:30 PM
+1:00 PM   1:30 PM   2:00 PM   2:30 PM
+3:00 PM   3:30 PM   4:00 PM   4:30 PM
+5:00 PM   5:30 PM   6:00 PM   6:30 PM
+
+Each cell:
+Height: 44px minimum
+Font: 14px
+Unselected: white bg, #EDE9E3 border,
+  #2B2B2B text
+Selected: #2A8F88 bg, white text,
+  font-weight 600
+Border radius: 8px
+Margin: 4px
+
+When Start time is selected and End time
+sheet opens, visually suggest the next
+two slots (1 hour later) with a subtle
+amber tint — but do not auto-select.
+
+Tapping Done or tapping outside closes
+the sheet and shows selected time in
+the field.
+
+REMOVE from the Add Event form:
+✗ The inline horizontal scrolling
+  time chip row
+✗ Any visible time options shown
+  directly on the form before tapping
+✗ The "or type: 3:30pm" text input
+  (the grid covers all needed times)
+
+The form should be clean and compact —
+time is selected via the sheet only.
+
+════════════════════════════════════════════
+FIX 2 — CTA BUTTONS ABOVE BOTTOM NAV
+════════════════════════════════════════════
+
+Several buttons are being obscured by
+the bottom navigation bar.
+
+This affects:
+- "Add event ✓" button in the Add Event sheet
+- "Sort the family juggle →" button on
+  the Family tab main screen
+- Any buttons at the bottom of the
+  results Modal
+
+ROOT CAUSE
+──────────
+Bottom nav bar is approximately 80px tall
+on iPhone. Buttons need enough bottom
+padding to clear it.
+
+FIXES
+─────
+
+For the Add Event sheet footer:
+The sheet is a bottom sheet Modal.
+The "Add event ✓" button sits in a
+sticky footer outside the ScrollView.
+
+Update footer padding:
+paddingBottom: 34 + 80 = use
+  paddingBottom: Platform.OS === 'ios'
+    ? 34  (SafeAreaView handles the rest)
+    : 16
+
+Wrap the entire sheet content in
+SafeAreaView with edges={['bottom']}
+to ensure the footer clears the home
+indicator and nav bar.
+
+For the Family tab main screen:
+The "Sort the family juggle →" button
+and content below it needs bottom padding
+so it is never hidden behind the nav bar.
+
+Add to the main ScrollView:
+contentContainerStyle={{
+  paddingBottom: 120
+}}
+
+This gives 120px of breathing room at
+the bottom — enough to clear the nav
+bar on all iPhone sizes including
+those with home indicators.
+
+For the results Modal:
+Add to the results ScrollView:
+contentContainerStyle={{
+  paddingBottom: 100,
+  padding: 16
+}}
+
+Also wrap the results Modal in
+SafeAreaView with edges={['bottom']}.
+
+GENERAL RULE going forward:
+Any full-screen Modal or bottom sheet
+must use SafeAreaView with bottom edge.
+Any ScrollView that reaches the bottom
+of the screen must have
+paddingBottom of at least 100.
+
+════════════════════════════════════════════
+FIX 3 — REMOVE MANUAL DRIVER ALLOCATION
+════════════════════════════════════════════
+
+Currently the Add Event sheet asks the
+user "WHO'S DRIVING?" and they manually
+pick Mum or Dad.
+
+This should be removed from input.
+The AI solver assigns drivers.
+The user can swap assignments in the
+results screen after sorting.
+
+REMOVE FROM ADD EVENT SHEET
+────────────────────────────
+Remove the "WHO'S DRIVING?" section
+entirely from the Add Event sheet.
+
+This includes:
+✗ "WHO'S DRIVING?" label
+✗ "No driver" pill
+✗ "Mum" pill with arrow icon
+✗ "Dad" pill with arrow icon
+✗ Any state variable tracking
+  the selected driver in the form
+
+The event object still needs a driver
+field for storage — but set it to null
+by default. The AI will assign it.
+
+const newEvent = {
+  ...existingFields,
+  driver: null,  // assigned by AI solver
+};
+
+KEEP in the Add Event sheet:
+✓ "WHO'S INVOLVED?" — this stays.
+  It tells the AI which child needs
+  to be taken to this event.
+  This is different from who drives.
+
+UPDATE THE PROMPT BUILDER
+─────────────────────────
+In buildJugglePrompt() or equivalent:
+
+When building the events string for
+the API, remove any reference to
+"Assigned adult: [name]" from individual
+events (since users no longer set this).
+
+Instead send all events as:
+"Assigned adult: unassigned"
+
+The adults list still tells the AI
+who is available and can drive.
+
+The AI then assigns adults to events
+based on availability and conflict
+resolution — this is the core value.
+
+UPDATE THE FAMILY TAB EVENT DISPLAY
+────────────────────────────────────
+Currently the event cards on the Family
+tab main screen show:
+"⬆ Mum · Weekly"
+(the driver arrow icon + name)
+
+This was set manually by the user.
+Now that driver is set by AI, update
+this display:
+
+BEFORE AI SOLVE:
+Show just the child name pill and
+repeat badge. No driver shown yet.
+Example:
+[Tom] [🔁 Weekly]
+
+AFTER AI SOLVE:
+Show the AI-assigned driver in teal
+with a small ✦ prefix to signal
+it was AI-assigned:
+"✦ Mum" in teal + [Tom] + [🔁 Weekly]
+
+This makes it clear the assignment
+came from the solver, not manual entry.
+
+UPDATE THE RESULTS SCREEN SWAP
+────────────────────────────────
+The swap functionality in the results
+screen becomes the primary place to
+change driver assignments.
+
+In THE PLAN table, each row shows:
+TIME | WHO + [⇄ Swap] | WHERE
+
+The [⇄ Swap] pill is how the user
+overrides AI assignments.
+
+Ensure the Swap interaction works:
+
+On tap with 2 adults available:
+Swap the assigned adult on that row.
+Update the event's stored driver.
+Show "Swapped ✓" briefly in green.
+Update the Family tab event display
+to show the new assignment with ✦.
+
+On tap with 3+ adults:
+Show small inline picker:
+[Mum] [Dad] [Gran]
+as tappable pills below that row.
+Tap to assign. Closes automatically.
+
+════════════════════════════════════════════
+ADDITIONAL SMALL UX FIXES
+════════════════════════════════════════════
+
+These are minor but worth doing in
+the same pass:
+
+1. END TIME INPUT
+The end time field currently shows "12"
+as a raw number when a time is being
+entered (visible in screenshots).
+
+Fix: End time field should use the
+same bottom sheet time picker as
+Start time, not a free text input.
+Remove the free text end time field.
+Both start and end use the grid picker.
+
+2. "WHO'S COVERING WHAT" CARD
+Currently shows only Mum on Saturday.
+This is populated by the local engine
+before AI solve.
+
+After AI solve completes successfully,
+update this card to show AI assignments:
+"Who's covering what — sorted by Sortii"
+List each adult with their day badges.
+If Dad is assigned to events too,
+he should appear here.
+
+3. "1 EVENT WITH NO DRIVER ASSIGNED YET"
+This warning appears on the stats card.
+Since drivers are now AI-assigned,
+remove this message from the local
+engine display.
+Replace with:
+"Tap Sort to assign drivers →"
+color: var(--text-muted) italic 12px
+Only show before first AI solve.
+After solve, hide entirely.
+
+4. CARPOOL CONTACT FIELD IN ADD EVENT
+The "CARPOOL CONTACT (OPTIONAL)" field
+in the Add Event sheet shows a single
+text input for "Name or phone number."
+
+This is fine but should be clearer.
+Update the label to:
+"BACKUP CONTACT (OPTIONAL)"
+Placeholder: "e.g. Sarah — 0412 345 678"
+Hint below field in muted text:
+"Someone who could help if needed.
+ They'll appear in conflict suggestions."
+
+════════════════════════════════════════════
+DO NOT CHANGE
+════════════════════════════════════════════
+
+✓ Event entry sheet all other fields
+✓ "WHAT'S ON?" title input
+✓ "WHICH DAY?" day selector pills
+✓ "WHO'S INVOLVED?" family member pills
+✓ "DOES THIS REPEAT?" frequency options
+✓ "NOTES (OPTIONAL)" text area
+✓ "Add event ✓" button logic and save handler
+✓ Family tab main screen layout and copy
+✓ "Sort the family juggle →" button handler
+✓ Processing overlay and rotating copy
+✓ AI system prompt (fixed in previous pass)
+✓ Results screen output sections
+✓ Home tab
+✓ Meals tab
+✓ All navigation structure
+✓ All colour tokens and brand styles
+✓ LocalStorage/AsyncStorage keys
+
+════════════════════════════════════════════
+TEST SEQUENCE AFTER BUILD
+════════════════════════════════════════════
+
+1. Open Add Event sheet.
+   Confirm "WHO'S DRIVING?" is gone.
+   Confirm time fields are compact —
+   no inline chip rows visible.
+   Tap Start time field.
+   Confirm bottom sheet grid appears.
+   Select 10:00 AM.
+   Confirm field shows "10:00 AM".
+   Tap End time.
+   Confirm grid appears with amber
+   suggestion on 11:00 AM.
+
+2. Add the event.
+   Confirm "Add event ✓" button is
+   fully visible above bottom nav bar.
+   Confirm it does not overlap with
+   the navigation bar.
+
+3. Add 3 overlapping Saturday events
+   with no drivers set.
+   Tap "Sort the family juggle →"
+   Confirm it is fully visible above
+   bottom nav bar before tapping.
+   Confirm processing overlay appears.
+   Confirm results show AI-assigned
+   drivers in THE PLAN table.
+
+4. In results screen, tap ⇄ Swap on
+   any row.
+   Confirm assignment swaps.
+   Return to Family tab.
+   Confirm event card now shows new
+   AI assignment with ✦ prefix.
+
+5. Scroll to bottom of results screen.
+   Confirm "Share full plan" button
+   and "← Family" link are both
+   fully visible above bottom nav.

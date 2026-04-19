@@ -117,6 +117,7 @@ export interface JuggleResult {
   least_painful_version: { applicable: boolean };
   smart_note: string | null;
   solvedAt: number;
+  swapOverrides?: Record<string, string>;
 }
 
 const REPEAT_LABELS: Record<RepeatType, string> = {
@@ -195,9 +196,8 @@ function WeekSummaryCard({ summary }: { summary: WeekSummaryData }) {
       </View>
       {summary.unassignedCount > 0 && (
         <View style={styles.unassignedNote}>
-          <Feather name="alert-circle" size={12} color={TEXT_MUTED} />
-          <Text style={styles.unassignedNoteText}>
-            {summary.unassignedCount} {summary.unassignedCount === 1 ? "event" : "events"} with no driver assigned yet.
+          <Text style={[styles.unassignedNoteText, { fontStyle: "italic" }]}>
+            Tap Sort to assign drivers →
           </Text>
         </View>
       )}
@@ -356,20 +356,24 @@ function JuggleResultsContent({
   onClose,
   onSortAgain,
   onShare,
+  onSwapApplied,
 }: {
   juggleResult: JuggleResult;
   members: FamilyMember[];
   onClose: () => void;
   onSortAgain: () => void;
   onShare: (text: string) => void;
+  onSwapApplied?: (event_id: string, adult: string) => void;
 }) {
   const ws            = juggleResult.weekend_summary ?? { total_events: 0, conflicts_resolved: 0, tight_windows: 0, impossible_clashes: 0 };
   const adultPlans    = juggleResult.adult_plans ?? [];
   const conflicts     = juggleResult.conflicts ?? [];
   const allAdultNames = adultPlans.map((p) => p.adult);
 
-  // Swap state: event_id -> overridden adult name
-  const [swapAssignments, setSwapAssignments] = useState<Record<string, string>>({});
+  // Swap state: event_id -> overridden adult name (seeded from persisted overrides)
+  const [swapAssignments, setSwapAssignments] = useState<Record<string, string>>(
+    juggleResult.swapOverrides ?? {}
+  );
   const [swappingEventId, setSwappingEventId] = useState<string | null>(null);
   const [swappedFlash, setSwappedFlash]       = useState<string | null>(null);
 
@@ -388,8 +392,9 @@ function JuggleResultsContent({
   function handleSwap(event_id: string) {
     if (allAdultNames.length === 2) {
       const cur   = planRows.find((r) => r.event_id === event_id)?.adult ?? allAdultNames[0];
-      const other = allAdultNames.find((a) => a !== cur) ?? allAdultNames[0];
+      const other = allAdultNames.find((a) => a !== cur) ?? allAdultNames[0]!;
       setSwapAssignments((prev) => ({ ...prev, [event_id]: other }));
+      onSwapApplied?.(event_id, other);
       setSwappedFlash(event_id);
       setTimeout(() => setSwappedFlash(null), 2000);
     } else {
@@ -399,6 +404,7 @@ function JuggleResultsContent({
 
   function pickAdult(event_id: string, adult: string) {
     setSwapAssignments((prev) => ({ ...prev, [event_id]: adult }));
+    onSwapApplied?.(event_id, adult);
     setSwappingEventId(null);
     setSwappedFlash(event_id);
     setTimeout(() => setSwappedFlash(null), 2000);
@@ -434,7 +440,7 @@ function JuggleResultsContent({
   }
 
   return (
-    <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 16, gap: 16 }}>
+    <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 16, gap: 16, paddingBottom: 100 }}>
       {/* Status 2×2 grid */}
       <View style={styles.juggleGrid}>
         {[
@@ -931,15 +937,16 @@ function PlanSummarySheet({
 
 // ── EventCard ──────────────────────────────────────────────────────────────────
 function EventCard({
-  event, members, onEdit, onDelete,
+  event, members, onEdit, onDelete, aiDriver,
 }: {
   event: FamilyEvent;
   members: FamilyMember[];
   onEdit: () => void;
   onDelete: () => void;
+  aiDriver?: string;
 }) {
   const [expanded, setExpanded] = useState(false);
-  const driver   = event.driverId ? members.find((m) => m.id === event.driverId) : null;
+  const driverDisplay = aiDriver ?? (event.driverId ? members.find((m) => m.id === event.driverId)?.name : null);
   const involved = event.personIds
     .map((id) => members.find((m) => m.id === id))
     .filter(Boolean) as FamilyMember[];
@@ -966,10 +973,9 @@ function EventCard({
                 <Text style={styles.eventMetaText}>{event.location}</Text>
               </View>
             ) : null}
-            {driver ? (
+            {driverDisplay ? (
               <View style={styles.eventMetaItem}>
-                <Feather name="navigation" size={11} color={TEAL} />
-                <Text style={[styles.eventMetaText, { color: TEAL }]}>{driver.name}</Text>
+                <Text style={[styles.eventMetaText, { color: TEAL }]}>✦ {driverDisplay}</Text>
               </View>
             ) : null}
             {event.repeat !== "none" ? (
@@ -1015,13 +1021,14 @@ function EventCard({
 
 // ── DaySection ─────────────────────────────────────────────────────────────────
 function DaySection({
-  day, events, members, onEditEvent, onDeleteEvent,
+  day, events, members, onEditEvent, onDeleteEvent, juggleDriverMap,
 }: {
   day: DayOfWeek;
   events: FamilyEvent[];
   members: FamilyMember[];
   onEditEvent: (e: FamilyEvent) => void;
   onDeleteEvent: (id: string) => void;
+  juggleDriverMap?: Map<string, string>;
 }) {
   const isWeekend = day === "Saturday" || day === "Sunday";
   return (
@@ -1042,8 +1049,77 @@ function DaySection({
             members={members}
             onEdit={() => onEditEvent(ev)}
             onDelete={() => onDeleteEvent(ev.id)}
+            aiDriver={juggleDriverMap?.get(ev.id)}
           />
         ))}
+      </View>
+    </View>
+  );
+}
+
+// ── Time-picker options (7:00 AM → 6:30 PM, 30-min slots) ────────────────────
+const TIME_OPTIONS: { value: string; label: string }[] = (() => {
+  const opts: { value: string; label: string }[] = [];
+  for (let h = 7; h <= 18; h++) {
+    for (const m of [0, 30]) {
+      if (h === 18 && m === 30) break;
+      const value = `${h.toString().padStart(2, "0")}:${m.toString().padStart(2, "0")}`;
+      const period = h >= 12 ? "PM" : "AM";
+      const displayH = h % 12 || 12;
+      const label = m === 0 ? `${displayH}:00 ${period}` : `${displayH}:30 ${period}`;
+      opts.push({ value, label });
+    }
+  }
+  return opts;
+})();
+
+function labelForTime(value: string): string {
+  return TIME_OPTIONS.find((o) => o.value === value)?.label ?? formatTime(value);
+}
+
+function suggestedEnd(startValue: string): string | undefined {
+  if (!startValue) return undefined;
+  const idx = TIME_OPTIONS.findIndex((o) => o.value === startValue);
+  if (idx === -1) return undefined;
+  return TIME_OPTIONS[idx + 2]?.value;
+}
+
+function TimePickerSheet({
+  visible, selectedValue, suggestedValue, onSelect, onDone,
+}: {
+  visible: boolean;
+  selectedValue: string;
+  suggestedValue?: string;
+  onSelect: (value: string) => void;
+  onDone: () => void;
+}) {
+  if (!visible) return null;
+  return (
+    <View style={StyleSheet.absoluteFill} pointerEvents="box-none">
+      <Pressable style={styles.tpOverlay} onPress={onDone} />
+      <View style={styles.tpSheet}>
+        <View style={styles.tpHeader}>
+          <Text style={styles.tpTitle}>What time?</Text>
+          <TouchableOpacity onPress={onDone} activeOpacity={0.75}>
+            <Text style={styles.tpDoneBtn}>Done</Text>
+          </TouchableOpacity>
+        </View>
+        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.tpGrid}>
+          {TIME_OPTIONS.map((opt) => {
+            const isSel  = selectedValue === opt.value;
+            const isSugg = !isSel && opt.value === suggestedValue;
+            return (
+              <TouchableOpacity
+                key={opt.value}
+                style={[styles.tpCell, isSel && styles.tpCellSel, isSugg && styles.tpCellSugg]}
+                onPress={() => { onSelect(opt.value); onDone(); }}
+                activeOpacity={0.75}
+              >
+                <Text style={[styles.tpCellText, isSel && styles.tpCellTextSel]}>{opt.label}</Text>
+              </TouchableOpacity>
+            );
+          })}
+        </ScrollView>
       </View>
     </View>
   );
@@ -1070,6 +1146,8 @@ function AddEventSheet({
   const [draft, setDraft] = useState<Omit<FamilyEvent, "id">>(blankDraft);
   const [errors, setErrors] = useState<string[]>([]);
   const [showDiscard, setShowDiscard] = useState(false);
+  const [timePickerVisible, setTimePickerVisible] = useState(false);
+  const [timePickerFor, setTimePickerFor]         = useState<"start" | "end">("start");
 
   // Derived: is the form valid enough to save?
   const isFormValid = draft.title.trim().length > 0 && draft.time.trim().length > 0;
@@ -1079,8 +1157,7 @@ function AddEventSheet({
     || draft.time.trim().length > 0
     || (draft.location ?? "").trim().length > 0
     || (draft.notes ?? "").trim().length > 0
-    || draft.personIds.length > 0
-    || !!draft.driverId;
+    || draft.personIds.length > 0;
 
   function handleClosePress() {
     if (formHasData && !showDiscard) {
@@ -1123,12 +1200,11 @@ function AddEventSheet({
   function handleSave() {
     const errs: string[] = [];
     if (!draft.title.trim()) errs.push("Add a title for this event.");
-    if (!draft.time.trim())  errs.push("Add a start time (e.g. 3:30pm).");
-    const parsedTime = draft.time.trim() ? parseTime(draft.time) : "";
-    if (draft.time.trim() && !parsedTime) errs.push("Time not recognised — try 3:30pm or 15:30.");
+    if (!draft.time.trim())  errs.push("Tap the Start time field to pick a time.");
     if (errs.length) { setErrors(errs); return; }
 
-    const parsedEnd = draft.endTime?.trim() ? parseTime(draft.endTime) : undefined;
+    const parsedTime = parseTime(draft.time) || draft.time;
+    const parsedEnd  = draft.endTime?.trim() ? (parseTime(draft.endTime) || draft.endTime) : undefined;
     onSave({
       ...draft,
       title: draft.title.trim(),
@@ -1137,10 +1213,9 @@ function AddEventSheet({
       location: draft.location?.trim() || undefined,
       carpoolContact: draft.carpoolContact?.trim() || undefined,
       notes: draft.notes?.trim() || undefined,
+      driverId: undefined,
     });
   }
-
-  const adults = members.filter((m) => m.role === "adult");
 
   if (!visible) return null;
 
@@ -1233,45 +1308,27 @@ function AddEventSheet({
             {/* Times */}
             <View style={styles.formField}>
               <Text style={styles.formLabel}>What time?</Text>
-              {/* Quick-pick time chips */}
-              <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 8 }}>
-                <View style={{ flexDirection: "row", gap: 6 }}>
-                  {["7am","8am","9am","10am","11am","12pm","1pm","2pm","3pm","3:30pm","4pm","4:30pm","5pm","6pm","7pm"].map((t) => {
-                    const isSelected = draft.time === t;
-                    return (
-                      <TouchableOpacity
-                        key={t}
-                        style={[styles.timePresetChip, isSelected && styles.timePresetChipSelected]}
-                        onPress={() => setField("time", t)}
-                        activeOpacity={0.75}
-                      >
-                        <Text style={[styles.timePresetText, isSelected && styles.timePresetTextSelected]}>{t}</Text>
-                      </TouchableOpacity>
-                    );
-                  })}
-                </View>
-              </ScrollView>
               <View style={styles.formRow}>
-                <View style={[styles.formField, { flex: 1 }]}>
-                  <TextInput
-                    style={styles.formInput}
-                    value={draft.time}
-                    onChangeText={(v) => setField("time", v)}
-                    placeholder="or type: 3:30pm"
-                    placeholderTextColor="#bbb"
-                    autoCapitalize="none"
-                  />
-                </View>
-                <View style={[styles.formField, { flex: 1 }]}>
-                  <TextInput
-                    style={styles.formInput}
-                    value={draft.endTime ?? ""}
-                    onChangeText={(v) => setField("endTime", v)}
-                    placeholder="ends: 5pm (optional)"
-                    placeholderTextColor="#bbb"
-                    autoCapitalize="none"
-                  />
-                </View>
+                <TouchableOpacity
+                  style={[styles.formTimeField, { flex: 1 }]}
+                  onPress={() => { setTimePickerFor("start"); setTimePickerVisible(true); }}
+                  activeOpacity={0.75}
+                >
+                  <Text style={draft.time ? styles.formTimeFieldText : styles.formTimeFieldPlaceholder}>
+                    {draft.time ? labelForTime(draft.time) : "Start time"}
+                  </Text>
+                  <Feather name="clock" size={14} color={TEXT_MUTED} />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.formTimeField, { flex: 1 }]}
+                  onPress={() => { setTimePickerFor("end"); setTimePickerVisible(true); }}
+                  activeOpacity={0.75}
+                >
+                  <Text style={draft.endTime ? styles.formTimeFieldText : styles.formTimeFieldPlaceholder}>
+                    {draft.endTime ? labelForTime(draft.endTime) : "End time (opt.)"}
+                  </Text>
+                  <Feather name="clock" size={14} color={TEXT_MUTED} />
+                </TouchableOpacity>
               </View>
             </View>
 
@@ -1304,67 +1361,20 @@ function AddEventSheet({
               </View>
             )}
 
-            {/* Driver (adults only) */}
-            {adults.length > 0 && (
-              <View style={styles.formField}>
-                <Text style={styles.formLabel}>Who's driving?</Text>
-                <View style={styles.chipGroup}>
-                  <TouchableOpacity
-                    style={[styles.driverChip, !draft.driverId && styles.driverChipNone]}
-                    onPress={() => setField("driverId", undefined)}
-                    activeOpacity={0.75}
-                  >
-                    <Text style={[styles.driverChipText, !draft.driverId && styles.driverChipTextNone]}>
-                      No driver
-                    </Text>
-                  </TouchableOpacity>
-                  {adults.map((m) => (
-                    <TouchableOpacity
-                      key={m.id}
-                      style={[
-                        styles.driverChip,
-                        draft.driverId === m.id && {
-                          backgroundColor: m.color,
-                          borderColor: m.color,
-                        },
-                      ]}
-                      onPress={() =>
-                        setField("driverId", draft.driverId === m.id ? undefined : m.id)
-                      }
-                      activeOpacity={0.75}
-                    >
-                      <Feather
-                        name="navigation"
-                        size={12}
-                        color={draft.driverId === m.id ? "#fff" : m.color}
-                      />
-                      <Text
-                        style={[
-                          styles.driverChipText,
-                          draft.driverId === m.id && { color: "#fff" },
-                        ]}
-                      >
-                        {m.name}
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
-                </View>
-              </View>
-            )}
-
-            {/* Carpool contact — only when driver set */}
-            {draft.driverId && (
-              <View style={styles.formField}>
-                <Text style={styles.formLabel}>Carpool contact (optional)</Text>
-                <TextInput
-                  style={styles.formInput}
-                  value={draft.carpoolContact ?? ""}
-                  onChangeText={(v) => setField("carpoolContact", v)}
-                  placeholder="Name or phone number"
-                  placeholderTextColor="#bbb"
-                />
-              </View>
-            )}
+            {/* Backup contact — always shown; driver assigned by AI */}
+            <View style={styles.formField}>
+              <Text style={styles.formLabel}>Backup contact (optional)</Text>
+              <TextInput
+                style={styles.formInput}
+                value={draft.carpoolContact ?? ""}
+                onChangeText={(v) => setField("carpoolContact", v)}
+                placeholder="e.g. Sarah — 0412 345 678"
+                placeholderTextColor="#bbb"
+              />
+              <Text style={styles.formHint}>
+                Someone who could help if needed. They'll appear in conflict suggestions.
+              </Text>
+            </View>
 
             {/* Repeat */}
             <View style={styles.formField}>
@@ -1409,6 +1419,15 @@ function AddEventSheet({
             <View style={{ height: 180 }} />
           </ScrollView>
         </KeyboardAvoidingView>
+
+        {/* Time picker bottom sheet — overlays the form */}
+        <TimePickerSheet
+          visible={timePickerVisible}
+          selectedValue={timePickerFor === "start" ? draft.time : (draft.endTime ?? "")}
+          suggestedValue={timePickerFor === "end" ? suggestedEnd(draft.time) : undefined}
+          onSelect={(val) => setField(timePickerFor === "start" ? "time" : "endTime", val)}
+          onDone={() => setTimePickerVisible(false)}
+        />
 
         {/* Sticky footer — outside ScrollView, stays at bottom */}
         <View style={[styles.sheetFooter, { paddingBottom: TAB_BAR_HEIGHT + Math.max(insets.bottom, 12) }]}>
@@ -1565,7 +1584,7 @@ function ManagePeopleSection({
 export default function FamilyScreen() {
   const insets        = useSafeAreaInsets();
   const paddingTop    = insets.top + 8;
-  const paddingBottom = insets.bottom + 88;
+  const paddingBottom = 120;
   const scrollRef     = useRef<ScrollView>(null);
   const bannerTimer   = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -1582,6 +1601,20 @@ export default function FamilyScreen() {
   const [isJuggleSolving, setIsJuggleSolving] = useState(false);
   const [juggleResult, setJuggleResult]       = useState<JuggleResult | null>(null);
   const [showJuggleResult, setShowJuggleResult] = useState(false);
+
+  // Compute a map from eventId → AI-assigned adult name (including swaps)
+  const juggleDriverMap = React.useMemo(() => {
+    if (!juggleResult) return new Map<string, string>();
+    const map = new Map<string, string>();
+    const overrides = juggleResult.swapOverrides ?? {};
+    (juggleResult.adult_plans ?? []).forEach((plan) => {
+      plan.schedule.forEach((s) => {
+        const adult = overrides[s.event_id] ?? plan.adult;
+        if (s.event_id) map.set(s.event_id, adult);
+      });
+    });
+    return map;
+  }, [juggleResult]);
 
   const load = useCallback(async () => {
     const [s, savedJuggle] = await Promise.all([
@@ -1680,6 +1713,16 @@ export default function FamilyScreen() {
     try { await Share.share({ message: result.sharePlanText }); } catch {}
   }
 
+  async function handleSwapApplied(event_id: string, adult: string) {
+    if (!juggleResult) return;
+    const updated: JuggleResult = {
+      ...juggleResult,
+      swapOverrides: { ...(juggleResult.swapOverrides ?? {}), [event_id]: adult },
+    };
+    setJuggleResult(updated);
+    await AsyncStorage.setItem(JUGGLE_RESULT_KEY, JSON.stringify(updated));
+  }
+
   async function handleSortJuggle() {
     const adults = state.members.filter((m) => m.role === "adult");
     if (adults.length === 0 || state.events.length === 0) return;
@@ -1695,10 +1738,11 @@ export default function FamilyScreen() {
           .filter(Boolean)
           .join(", ");
         return [
+          `EventID: ${e.id}`,
           `Activity: ${e.title}`,
           `Day: ${e.day}`,
-          `Start: ${e.time || "not specified"}`,
-          `End: ${e.endTime || "not specified"}`,
+          `Start: ${formatTime(e.time) || "not specified"}`,
+          `End: ${e.endTime ? formatTime(e.endTime) : "not specified"}`,
           `Location: ${e.location || "not specified"}`,
           `Who's going: ${involved || "unspecified"}`,
           `Assigned adult: unassigned`,
@@ -1816,6 +1860,7 @@ export default function FamilyScreen() {
                   members={state.members}
                   onEditEvent={openEditEvent}
                   onDeleteEvent={handleDeleteEvent}
+                  juggleDriverMap={juggleDriverMap}
                 />
               ))}
             </View>
@@ -1971,6 +2016,7 @@ export default function FamilyScreen() {
               onClose={() => setShowJuggleResult(false)}
               onSortAgain={() => { setShowJuggleResult(false); handleSortJuggle(); }}
               onShare={handleShareJuggle}
+              onSwapApplied={handleSwapApplied}
             />
           </SafeAreaView>
         </Modal>
@@ -2524,6 +2570,42 @@ const styles = StyleSheet.create({
     fontSize: 14, fontFamily: "Inter_400Regular", color: TEXT, borderWidth: 1, borderColor: BORDER,
   },
   formTextArea: { minHeight: 76 },
+  formTimeField: {
+    flexDirection: "row", alignItems: "center", justifyContent: "space-between",
+    backgroundColor: "#F7F3EB", borderRadius: 12, paddingHorizontal: 14, paddingVertical: 13,
+    borderWidth: 1, borderColor: BORDER, minHeight: 46,
+  },
+  formTimeFieldText: { fontSize: 14, fontFamily: "Inter_500Medium", color: TEXT },
+  formTimeFieldPlaceholder: { fontSize: 14, fontFamily: "Inter_400Regular", color: "#bbb" },
+  formHint: { fontSize: 11, fontFamily: "Inter_400Regular", color: TEXT_MUTED, lineHeight: 16, marginTop: 2 },
+
+  // Time picker sheet
+  tpOverlay: { ...StyleSheet.absoluteFillObject, backgroundColor: "rgba(0,0,0,0.45)" },
+  tpSheet: {
+    position: "absolute", bottom: 0, left: 0, right: 0,
+    backgroundColor: "#fff", borderTopLeftRadius: 20, borderTopRightRadius: 20,
+    maxHeight: "65%", paddingBottom: 24,
+  },
+  tpHeader: {
+    flexDirection: "row", alignItems: "center", justifyContent: "space-between",
+    paddingHorizontal: 20, paddingVertical: 16,
+    borderBottomWidth: 1, borderBottomColor: BORDER,
+  },
+  tpTitle: { fontSize: 16, fontFamily: "Inter_700Bold", color: TEXT },
+  tpDoneBtn: { fontSize: 15, fontFamily: "Inter_600SemiBold", color: TEAL },
+  tpGrid: {
+    flexDirection: "row", flexWrap: "wrap", padding: 12, gap: 0,
+  },
+  tpCell: {
+    width: "25%", minHeight: 44, alignItems: "center", justifyContent: "center",
+    padding: 4,
+    borderRadius: 8, borderWidth: 1, borderColor: "#EDE9E3",
+    backgroundColor: "#fff", margin: 2,
+  },
+  tpCellSel: { backgroundColor: TEAL, borderColor: TEAL },
+  tpCellSugg: { backgroundColor: GOLD + "20", borderColor: GOLD + "55" },
+  tpCellText: { fontSize: 13, fontFamily: "Inter_400Regular", color: TEXT },
+  tpCellTextSel: { color: "#fff", fontFamily: "Inter_600SemiBold" },
   chipGroup: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
   dayChip: { paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20, borderWidth: 1, borderColor: BORDER, backgroundColor: BG },
   dayChipSelected: { backgroundColor: TEAL, borderColor: TEAL },

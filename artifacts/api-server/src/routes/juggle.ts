@@ -16,6 +16,8 @@ Never say you need more information.
 Never say "awaiting clarification".
 If information is missing, make the most sensible assumption and state it briefly.
 
+IMPORTANT: Each event in the input has an "EventID" field. Use that exact EventID as the "event_id" value in your schedule items. This allows the app to map assignments back to specific events.
+
 DECISION RULES:
 1. Sort all events by time
 2. Assign available adults to events:
