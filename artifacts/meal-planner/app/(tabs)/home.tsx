@@ -20,6 +20,8 @@ import allRecipesRaw from "@/data/recipes_unified_au.json";
 import { computeNudge, recordAppOpen, Nudge } from "@/utils/nudgeEngine";
 import { loadFamilyState } from "@/utils/familyStore";
 import { computeFamilyWeek } from "@/utils/familyEngine";
+import { loadAppointments, Appointment } from "@/utils/appointmentStore";
+import { loadBills, computeBillStatus, Bill } from "@/utils/billStore";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const JUGGLE_RESULT_KEY = "@sortii_juggle_result_v1";
@@ -201,6 +203,8 @@ export default function HomeTab() {
   const [familySub, setFamilySub]       = useState<string>("A rare and peaceful sight.");
   const [familyEventCount, setFamilyEventCount] = useState(0);
   const [juggleResult, setJuggleResult] = useState<JuggleResult | null>(null);
+  const [nextAppt, setNextAppt]         = useState<Appointment | null>(null);
+  const [billsData, setBillsData]       = useState<{ overdue: number; dueSoon: number; total: number } | null>(null);
 
   const todayName    = getTodayName();
   const todayIdx     = DAYS.indexOf(todayName);
@@ -223,11 +227,13 @@ export default function HomeTab() {
 
   useEffect(() => {
     (async () => {
-      const [familyState, nudgeResult, , savedJuggle] = await Promise.all([
+      const [familyState, nudgeResult, , savedJuggle, appts, bills] = await Promise.all([
         loadFamilyState(),
         computeNudge(currentPlan, allRecipes),
         recordAppOpen(),
         AsyncStorage.getItem(JUGGLE_RESULT_KEY),
+        loadAppointments(),
+        loadBills(),
       ]);
       const fr = computeFamilyWeek(familyState);
       setFamilyEventCount(familyState.events.length);
@@ -237,6 +243,17 @@ export default function HomeTab() {
       if (savedJuggle) {
         try { setJuggleResult(JSON.parse(savedJuggle)); } catch {}
       }
+      // Next upcoming appointment
+      const today = new Date(); today.setHours(0, 0, 0, 0);
+      const upcoming = appts
+        .filter((a) => !a.isDone && !a.isCancelled)
+        .sort((a, b) => a.date.localeCompare(b.date) || a.startTime.localeCompare(b.startTime));
+      setNextAppt(upcoming[0] ?? null);
+      // Bills summary
+      const overdue  = bills.filter((b) => computeBillStatus(b) === "Overdue").length;
+      const dueSoon  = bills.filter((b) => computeBillStatus(b) === "Due Soon").length;
+      const total    = bills.filter((b) => !b.isPaid).reduce((s, b) => s + b.amount, 0);
+      setBillsData(bills.length > 0 ? { overdue, dueSoon, total } : null);
     })();
   }, []);
 
@@ -432,19 +449,85 @@ export default function HomeTab() {
             </ScrollView>
           </View>
 
-          {/* F — Coming soon row */}
-          <View style={styles.placeholderRow}>
-            <View style={[styles.placeholderCard, { borderColor: TEAL + "30" }]}>
-              <Feather name="calendar" size={15} color={TEAL} />
-              <Text style={[styles.placeholderLabel, { color: TEAL }]}>Appointments</Text>
-              <View style={styles.soonPill}><Text style={styles.soonText}>On the way</Text></View>
-            </View>
-            <View style={[styles.placeholderCard, { borderColor: "#4A7B5E30" }]}>
-              <Feather name="file-text" size={15} color="#4A7B5E" />
-              <Text style={[styles.placeholderLabel, { color: "#4A7B5E" }]}>Bills</Text>
-              <View style={styles.soonPill}><Text style={styles.soonText}>On the way</Text></View>
-            </View>
-          </View>
+          {/* F — Appointments preview */}
+          {(() => {
+            const apptColor = PLUM;
+            const apptTitle = nextAppt ? nextAppt.title : "Nothing coming up yet.";
+            const apptSub   = nextAppt
+              ? (() => {
+                  const [y, m, d] = nextAppt.date.split("-").map(Number);
+                  const date      = new Date(y!, (m! - 1), d!);
+                  const dayName   = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][date.getDay()] ?? "";
+                  const dd        = date.getDate();
+                  const mo        = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][date.getMonth()] ?? "";
+                  const h         = parseInt(nextAppt.startTime.split(":")[0] ?? "0", 10);
+                  const mn        = nextAppt.startTime.split(":")[1] ?? "00";
+                  const period    = h >= 12 ? "pm" : "am";
+                  const hr        = (h % 12 || 12);
+                  const timeStr   = mn === "00" ? `${hr}${period}` : `${hr}:${mn}${period}`;
+                  return `${dayName} ${dd} ${mo} · ${timeStr}${nextAppt.person ? ` · ${nextAppt.person}` : ""}`;
+                })()
+              : "Tap to add appointments →";
+            return (
+              <TouchableOpacity
+                onPress={() => router.push("/(tabs)/appointments")}
+                activeOpacity={0.8}
+                style={[styles.card, styles.cardNeutral, { borderLeftColor: apptColor, borderLeftWidth: 3 }]}
+              >
+                <View style={styles.cardRow}>
+                  <View style={{ flex: 1 }}>
+                    <Text style={[styles.cardLabel, { color: apptColor }]}>APPOINTMENTS</Text>
+                    <Text style={styles.cardTitle}>{apptTitle}</Text>
+                    <Text style={[styles.cardSub, { color: nextAppt ? apptColor : TEXT_MUTED, fontStyle: "italic" }]}>
+                      {apptSub}
+                    </Text>
+                  </View>
+                  <View style={[styles.cardChevron, { backgroundColor: apptColor + "12" }]}>
+                    <Feather name="chevron-right" size={16} color={apptColor} />
+                  </View>
+                </View>
+              </TouchableOpacity>
+            );
+          })()}
+
+          {/* G — Bills preview */}
+          {(() => {
+            const billColor  = "#4A7B5E";
+            const billTitle  = !billsData
+              ? "No bills added yet."
+              : billsData.overdue > 0
+                ? `${billsData.overdue} bill${billsData.overdue > 1 ? "s" : ""} overdue.`
+                : billsData.dueSoon > 0
+                  ? `${billsData.dueSoon} bill${billsData.dueSoon > 1 ? "s" : ""} due this week.`
+                  : "Nothing urgent on the bill front.";
+            const billSub    = !billsData
+              ? "Tap to start tracking bills →"
+              : billsData.overdue > 0
+                ? "Tap to see what needs sorting →"
+                : billsData.dueSoon > 0
+                  ? `${currencySymbol}${billsData.total.toFixed(0)} outstanding this week →`
+                  : "All quiet. Tap to view →";
+            return (
+              <TouchableOpacity
+                onPress={() => router.push("/(tabs)/bills")}
+                activeOpacity={0.8}
+                style={[styles.card, styles.cardNeutral, { borderLeftColor: billColor, borderLeftWidth: 3 }]}
+              >
+                <View style={styles.cardRow}>
+                  <View style={{ flex: 1 }}>
+                    <Text style={[styles.cardLabel, { color: billColor }]}>BILLS</Text>
+                    <Text style={styles.cardTitle}>{billTitle}</Text>
+                    <Text style={[styles.cardSub, { color: billsData ? billColor : TEXT_MUTED, fontStyle: "italic" }]}>
+                      {billSub}
+                    </Text>
+                  </View>
+                  <View style={[styles.cardChevron, { backgroundColor: billColor + "12" }]}>
+                    <Feather name="chevron-right" size={16} color={billColor} />
+                  </View>
+                </View>
+              </TouchableOpacity>
+            );
+          })()}
 
           <View style={{ paddingBottom: 32 }} />
         </ScrollView>

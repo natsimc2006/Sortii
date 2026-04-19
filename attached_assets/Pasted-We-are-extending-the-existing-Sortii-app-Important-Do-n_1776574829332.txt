@@ -1,0 +1,403 @@
+We are extending the existing Sortii app.
+
+Important:
+Do not rebuild the app from scratch.
+Do not remove or break any existing smart logic already working in Meals or Juggle.
+We are adding two new modules only:
+1. Appointments
+2. Bills
+
+The app should continue to feel like Sortii:
+- calm
+- clear
+- supportive
+- lightly cheeky in microcopy only
+- never cluttered
+- never overly corporate
+- never productivity-bro or overly “efficient”
+- built to reduce mental load, not create more admin
+
+Design and UX rules:
+- Keep white or very soft warm-white background
+- Use the existing Sortii palette and styling system
+- Maintain soft cards, gentle borders, tidy spacing, clean hierarchy
+- Continue the existing Sortii tone of voice
+- Use accent colour sparingly for CTA buttons, key highlights and status chips
+- Keep flows simple and obvious
+- No hidden actions behind confusing icons
+- Any primary CTA must be clearly visible and not blocked by sticky nav or footer
+- Each screen should answer: what do I do next?
+
+--------------------------------------------------
+MODULE 1: APPOINTMENTS
+--------------------------------------------------
+
+Goal:
+Create a lightweight appointment organiser for family/admin life.
+This is not a full calendar replacement.
+It should help users quickly capture appointments, see what is coming up, and understand who is involved.
+
+Appointments should support:
+- title / appointment name
+- category
+- date
+- time
+- end time optional
+- person involved
+- location
+- suburb
+- notes
+- optional prep checklist
+- optional reminder toggle
+- optional recurring toggle
+- status
+
+Suggested categories:
+- Medical
+- School
+- Kids activity
+- Personal
+- Work
+- Beauty
+- Vet
+- Other
+
+Suggested status states:
+- Upcoming
+- Needs prep
+- Done
+- Cancelled
+
+Each appointment record should support:
+- id
+- title
+- category
+- date
+- startTime
+- endTime optional
+- person
+- locationName
+- suburb
+- notes
+- checklist array
+- reminderEnabled boolean
+- recurringType optional
+- status
+- createdAt
+- updatedAt
+
+Appointments UX flow:
+1. Tap Appointments module
+2. See simple overview screen
+3. User can:
+   - Add appointment
+   - View upcoming appointments
+   - Filter by person or category
+   - Mark done
+   - Open detail view
+
+Appointments overview screen should include:
+- top summary panel with calm friendly copy, for example:
+  “A few things on the radar.”
+  “This week has a couple of moving parts.”
+  “You’re not wildly overbooked. A win.”
+- summary chips:
+  - Today
+  - This week
+  - Needs prep
+- upcoming cards in date order
+- clear floating or anchored Add Appointment CTA
+- quick filter row for All / Today / Week / Person
+
+Appointment card should show:
+- title
+- day/date/time
+- person involved
+- category chip
+- suburb/location if entered
+- small “Needs prep” label if checklist exists and incomplete
+
+Appointment detail screen should show:
+- full appointment details
+- checklist if any
+- notes
+- mark as done
+- edit button
+- delete button
+
+Add/Edit Appointment form:
+Keep it simple and grouped:
+Section 1: Basics
+- title
+- category
+- person
+- date
+- time
+- optional end time
+
+Section 2: Place
+- location name
+- suburb
+
+Section 3: Useful extras
+- notes
+- prep checklist
+- reminder on/off
+- recurring on/off
+
+Smart logic for Appointments:
+- If checklist has unfinished items, surface “Needs prep”
+- If appointment is within 24 hours and reminder is enabled, flag it as “Coming up”
+- Group items into:
+  - Today
+  - Tomorrow
+  - This week
+  - Later
+- If multiple appointments exist on same day for same person, surface a gentle heads-up:
+  “Bit of a juggle for [person] that day.”
+- If suburb/location is entered and existing travel-time logic already exists in app architecture, design appointments data shape so travel logic can be plugged in later without rework
+- Do not fake travel calculations if not yet fully integrated, but structure for future compatibility
+
+Appointment microcopy:
+Use light, dry, supportive wording like:
+- “A future-you favour.”
+- “One less thing to keep in your head.”
+- “This one’s creeping up.”
+- “A tiny bit of admin, now saving chaos later.”
+
+But keep this subtle, not everywhere.
+
+--------------------------------------------------
+MODULE 2: BILLS
+--------------------------------------------------
+
+Goal:
+Create a simple bill and one-off expense organiser.
+This is not full accounting.
+It is meant to help users track what is coming up, what has been paid, and what might need attention.
+
+Bills should support two types:
+1. Recurring bills
+2. One-off expenses
+
+Suggested bill categories:
+- Home
+- Utilities
+- School
+- Kids
+- Medical
+- Car
+- Insurance
+- Subscriptions
+- Personal
+- Other
+
+Suggested status states:
+- Upcoming
+- Due soon
+- Paid
+- Overdue
+- Optional / Can wait
+
+Each bill record should support:
+- id
+- title
+- category
+- amount
+- dueDate
+- recurrenceType optional
+- billType (recurring or oneOff)
+- assignedTo optional
+- notes optional
+- essentialLevel
+- status
+- isPaid boolean
+- paidDate optional
+- createdAt
+- updatedAt
+
+Suggested essentialLevel values:
+- Essential
+- Flexible
+- Can wait
+
+Bills UX flow:
+1. Tap Bills module
+2. See clean overview
+3. User can:
+   - Add bill
+   - Mark paid
+   - Filter by due soon / overdue / paid / category
+   - View upcoming total
+   - View one-off expenses separately if needed
+
+Bills overview screen should include:
+- top summary panel with gentle useful overview, for example:
+  “A few bills are lining up.”
+  “Nothing too feral this week.”
+  “A couple need your attention.”
+- summary cards or chips:
+  - Due this week total
+  - Overdue count
+  - Paid this month
+- list grouped by:
+  - Overdue
+  - Due soon
+  - Later
+  - Paid
+
+Bill card should show:
+- title
+- amount
+- due date
+- category chip
+- status chip
+- optional essential/flexible label
+- mark paid action
+
+Bill detail screen should show:
+- full details
+- recurring info if relevant
+- notes
+- status
+- paid toggle
+- edit
+- delete
+
+Add/Edit Bill form:
+Section 1: Basics
+- title
+- amount
+- category
+- due date
+- bill type
+
+Section 2: Extra logic
+- recurring frequency if recurring
+- assigned person optional
+- essential level
+- notes
+
+Smart logic for Bills:
+- Auto-calculate status based on due date and paid state:
+  - Paid if marked paid
+  - Overdue if due date passed and unpaid
+  - Due soon if due within next 7 days
+  - Upcoming otherwise
+- Show totals for unpaid bills due in next 7 days
+- Show overdue count clearly
+- Show one-off expenses separately from recurring if helpful
+- If user marks recurring bill as paid, do not delete it:
+  create next due occurrence based on recurrence logic or update next due date cleanly
+- Support recurrence options:
+  - Weekly
+  - Fortnightly
+  - Monthly
+  - Quarterly
+  - Yearly
+- Keep recurrence logic reliable and simple
+
+Optional supportive insight layer:
+If essentialLevel is “Can wait”, user can see that in a softer chip like:
+- “Could be nudged”
+- “Not screaming yet”
+But do not make financial recommendations beyond simple categorisation.
+
+Do not:
+- shame the user
+- use harsh red-heavy finance dashboard energy
+- make it feel like bookkeeping software
+
+--------------------------------------------------
+DASHBOARD / WHOLE-APP INTEGRATION
+--------------------------------------------------
+
+Add these modules into the existing Sortii home/dashboard cleanly.
+
+Home screen should now allow access to:
+- Meals
+- Juggle
+- Appointments
+- Bills
+
+If the app already has a home summary/dashboard, add simple preview snippets:
+- Appointments: next upcoming appointment
+- Bills: next due bill or overdue count
+
+Example home preview text:
+- “Next up: Dentist Tuesday 3:30”
+- “2 bills due this week”
+- “One bill is giving slight side-eye”
+
+Keep preview cards visually consistent with existing module cards.
+
+--------------------------------------------------
+DATA / STATE / ARCHITECTURE
+--------------------------------------------------
+
+Requirements:
+- Add proper data models/types for appointments and bills
+- Use the same state management pattern already used in current app where possible
+- Keep components modular and reusable
+- Avoid duplicated code between modules
+- Create reusable:
+  - summary panel component
+  - card list item component
+  - status chip component
+  - empty state component
+  - add/edit form layout if sensible
+
+Need empty states:
+Appointments empty state:
+- Friendly message
+- Clear Add Appointment CTA
+Example:
+“Nothing booked yet. A rare and beautiful sight.”
+
+Bills empty state:
+- Friendly message
+- Clear Add Bill CTA
+Example:
+“No bills here yet. Let’s not celebrate too early.”
+
+--------------------------------------------------
+IMPORTANT UX FIXES
+--------------------------------------------------
+
+Please ensure:
+- Primary action buttons are always visible
+- No CTA is hidden under sticky nav/footer
+- Add button placement is obvious and consistent
+- Labels are plain English and easy to understand
+- “Who’s involved” style labels should be made clearer if used, for example:
+  - Person
+  - For
+  - Assigned to
+- No confusing icon-only actions without labels
+- Any summary insight based on time must use human-readable logic, not raw minute values from midnight
+  Example:
+  do not display logic like “600 mins from 00:00”
+  instead display “Starts at 10:00 AM” or “Mid-morning”
+
+--------------------------------------------------
+OUTPUT REQUIRED
+--------------------------------------------------
+
+Implement:
+1. Appointments module
+2. Bills module
+3. Dashboard/home integration
+4. Clean, visible CTA placement
+5. Smart but simple status logic
+6. Sortii-aligned tone and styling
+
+Do not just scaffold placeholder screens.
+Build working flows with usable state, forms, list views, detail views, filtering, and logic.
+
+Before finishing, sanity check:
+- nothing overlaps bottom nav
+- buttons are visible
+- statuses calculate correctly
+- recurring bills behave properly
+- appointments sort correctly by upcoming date/time
+- tone feels like Sortii, not generic admin software

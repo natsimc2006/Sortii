@@ -53,23 +53,21 @@ export default function MoreScreen() {
       ],
     },
     {
-      title: "Coming soon",
+      title: "Organised life",
       items: [
         {
           icon: "calendar",
           color: PLUM,
           label: "Appointments",
-          sub: "Manage your schedule in Sortii",
-          badge: "Soon",
-          onPress: () => {},
+          sub: "Doctors, school, anything in the diary",
+          onPress: () => router.push("/(tabs)/appointments"),
         },
         {
           icon: "file-text",
           color: "#4A7B5E",
           label: "Bills",
-          sub: "Track recurring costs",
-          badge: "Soon",
-          onPress: () => {},
+          sub: "Track what's coming up and what's paid",
+          onPress: () => router.push("/(tabs)/bills"),
         },
       ],
     },

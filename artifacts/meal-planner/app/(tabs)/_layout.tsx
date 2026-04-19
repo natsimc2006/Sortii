@@ -70,17 +70,21 @@ function QuickAddSheet({
       icon: "clock",
       color: PLUM,
       label: "Add appointment",
-      sub: "Coming soon",
-      disabled: true,
-      onPress: () => {},
+      sub: "Doctors, school, anything",
+      onPress: () => {
+        onClose();
+        router.push("/(tabs)/appointments");
+      },
     },
     {
       icon: "file-text",
       color: GREEN,
       label: "Add bill",
-      sub: "Coming soon",
-      disabled: true,
-      onPress: () => {},
+      sub: "Track what's coming up",
+      onPress: () => {
+        onClose();
+        router.push("/(tabs)/bills");
+      },
     },
     {
       icon: "edit-3",
@@ -344,14 +348,16 @@ export default function TabLayout() {
         />
 
         {/* ── Hidden (still accessible via router.push) ── */}
-        <Tabs.Screen name="planner"     options={{ href: null }} />
-        <Tabs.Screen name="recipes"     options={{ href: null }} />
-        <Tabs.Screen name="refresh"     options={{ href: null }} />
-        <Tabs.Screen name="shopping"    options={{ href: null }} />
-        <Tabs.Screen name="money"       options={{ href: null }} />
-        <Tabs.Screen name="saved"       options={{ href: null }} />
-        <Tabs.Screen name="preferences" options={{ href: null }} />
-        <Tabs.Screen name="index"       options={{ href: null }} />
+        <Tabs.Screen name="planner"      options={{ href: null }} />
+        <Tabs.Screen name="recipes"      options={{ href: null }} />
+        <Tabs.Screen name="refresh"      options={{ href: null }} />
+        <Tabs.Screen name="shopping"     options={{ href: null }} />
+        <Tabs.Screen name="money"        options={{ href: null }} />
+        <Tabs.Screen name="saved"        options={{ href: null }} />
+        <Tabs.Screen name="preferences"  options={{ href: null }} />
+        <Tabs.Screen name="appointments" options={{ href: null }} />
+        <Tabs.Screen name="bills"        options={{ href: null }} />
+        <Tabs.Screen name="index"        options={{ href: null }} />
       </Tabs>
 
       {/* Quick Add overlay — rendered above the tab bar */}
