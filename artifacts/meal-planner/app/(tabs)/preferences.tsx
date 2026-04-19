@@ -343,6 +343,25 @@ export default function PreferencesScreen() {
           </View>
         </View>
 
+        <TouchableOpacity
+          onPress={() => router.push("/(tabs)/household-profile")}
+          activeOpacity={0.75}
+          style={[styles.profileRow, { backgroundColor: C.card, borderColor: C.cardBorder }]}
+        >
+          <View style={styles.profileRowLeft}>
+            <View style={[styles.profileRowIcon, { backgroundColor: C.tealTint }]}>
+              <Feather name="users" size={16} color={C.primary} />
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text style={[styles.profileRowTitle, { color: C.text }]}>Household profile</Text>
+              <Text style={[styles.profileRowSub, { color: C.textMuted }]}>
+                Dietary needs, kids, swaps
+              </Text>
+            </View>
+          </View>
+          <Feather name="chevron-right" size={18} color={C.textMuted} />
+        </TouchableOpacity>
+
         <TierSection
           title="Quick Setup"
           helper="Set the basics for your weekly plan."
@@ -962,6 +981,51 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "flex-start",
     marginBottom: 8,
+  },
+  profileRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    borderRadius: 14,
+    borderWidth: 1.5,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    marginBottom: 12,
+    gap: 10,
+    ...Platform.select({
+      web: { boxShadow: "0px 1px 6px rgba(0,0,0,0.07)" },
+      default: {
+        shadowColor: "#1A1A1A",
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.07,
+        shadowRadius: 6,
+        elevation: 2,
+      },
+    }),
+  },
+  profileRowLeft: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+  },
+  profileRowIcon: {
+    width: 36,
+    height: 36,
+    borderRadius: 10,
+    alignItems: "center",
+    justifyContent: "center",
+    flexShrink: 0,
+  },
+  profileRowTitle: {
+    fontSize: 15,
+    fontFamily: "Inter_600SemiBold",
+    lineHeight: 20,
+  },
+  profileRowSub: {
+    fontSize: 12,
+    fontFamily: "Inter_400Regular",
+    lineHeight: 17,
+    marginTop: 1,
   },
   prefHeroHeading: {
     fontSize: 22,

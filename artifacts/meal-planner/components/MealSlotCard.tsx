@@ -14,6 +14,12 @@ import Colors from "@/constants/Colors";
 import { Recipe, getPrepStyleLabel } from "@/constants/recipes";
 import { getCurrentAustralianSeason, isRecipeSeasonal } from "@/utils/seasonUtils";
 import { toImageSource, useRecipeImage } from "@/hooks/useRecipeImage";
+import {
+  HouseholdProfile,
+  getDietaryPills,
+  getSwapBadge,
+  DietaryPill,
+} from "@/utils/householdProfile";
 
 const C = Colors.light;
 
@@ -47,6 +53,8 @@ interface MealSlotCardProps {
   onAutoFill?: () => void;
   seasonalMode?: boolean;
   kidFriendlyFilter?: boolean;
+  householdProfile?: HouseholdProfile;
+  onSwapBadgePress?: (need: string) => void;
 }
 
 export function MealSlotCard({
@@ -62,6 +70,8 @@ export function MealSlotCard({
   onAutoFill,
   seasonalMode = false,
   kidFriendlyFilter = false,
+  householdProfile,
+  onSwapBadgePress,
 }: MealSlotCardProps) {
   const [imgError, setImgError] = useState(false);
   const imgSrc = useRecipeImage(recipe?.id ?? "", recipe?.name ?? "", recipe?.imageUrl);
@@ -81,6 +91,12 @@ export function MealSlotCard({
       : false;
   const showKidBadge = kidFriendlyFilter && recipe != null && (recipe.kidFriendlyScore ?? 0) === 2;
   const slotLabel = slot === "lunch" ? "LUNCH" : "DINNER";
+  const dietaryPills: DietaryPill[] = householdProfile && recipe
+    ? getDietaryPills(recipe, householdProfile)
+    : [];
+  const swapBadge = householdProfile && recipe && onSwapBadgePress
+    ? getSwapBadge(recipe, householdProfile)
+    : null;
 
   const handleRemove = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -283,6 +299,13 @@ export function MealSlotCard({
                 </Text>
               </View>
             )}
+            {dietaryPills.map((pill) => (
+              <View key={pill.label} style={[styles.dietaryPill, { backgroundColor: pill.bg }]}>
+                <Text style={[styles.dietaryPillText, { color: pill.color }]}>
+                  {pill.emoji} {pill.label}
+                </Text>
+              </View>
+            ))}
           </View>
         </View>
 
@@ -290,6 +313,21 @@ export function MealSlotCard({
           <Feather name="chevron-right" size={14} color={C.textMuted} style={styles.chevron} />
         )}
       </TouchableOpacity>
+
+      {swapBadge && onSwapBadgePress && (
+        <TouchableOpacity
+          onPress={() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            onSwapBadgePress(swapBadge.need);
+          }}
+          activeOpacity={0.75}
+          style={[styles.swapBadgeRow, { backgroundColor: "#F3E8EE" }]}
+        >
+          <Text style={[styles.swapBadgeText, { color: "#5E3A4C" }]}>
+            {swapBadge.label}
+          </Text>
+        </TouchableOpacity>
+      )}
     </View>
   );
 }
@@ -465,5 +503,27 @@ const styles = StyleSheet.create({
   chevron: {
     flexShrink: 0,
     marginLeft: 2,
+  },
+  dietaryPill: {
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 6,
+  },
+  dietaryPillText: {
+    fontSize: 10,
+    fontFamily: "Inter_600SemiBold",
+    letterSpacing: 0.2,
+  },
+  swapBadgeRow: {
+    alignSelf: "flex-start",
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 8,
+    marginTop: 4,
+  },
+  swapBadgeText: {
+    fontSize: 11,
+    fontFamily: "Inter_600SemiBold",
+    letterSpacing: 0.1,
   },
 });

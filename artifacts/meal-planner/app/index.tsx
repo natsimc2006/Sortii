@@ -30,6 +30,11 @@ import {
   WeeklyMode,
   updateOnboardingState,
 } from "@/utils/onboardingState";
+import {
+  DietaryNeed,
+  KidSituation,
+  saveHouseholdProfile,
+} from "@/utils/householdProfile";
 
 const C = Colors.light;
 const sortiiLogo = require("@/assets/images/sortii-logo-v2-landing.png");
@@ -42,7 +47,7 @@ const ROTATING_MESSAGES = [
   "Almost there…",
 ];
 
-const MEAL_SETUP_STEPS = 6;
+const MEAL_SETUP_STEPS = 7;
 
 type OnboardingStep = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
 
@@ -173,7 +178,7 @@ function PillChip({
 
 export default function OnboardingScreen() {
   const router = useRouter();
-  const { setPreferences, setIsOnboarded, isOnboarded, isContextLoaded, autoGeneratePlan } = usePlanner();
+  const { setPreferences, setIsOnboarded, isOnboarded, isContextLoaded, autoGeneratePlan, reloadHouseholdProfile } = usePlanner();
   const { currencySymbol } = useLocale();
   const {
     setWeeklyMode: setContextWeeklyMode,
@@ -193,6 +198,8 @@ export default function OnboardingScreen() {
   const [mealsPerWeek, setMealsPerWeek] = useState<3 | 5 | 7>(5);
   const [dietType, setDietType] = useState<PlanPreferences["dietType"]>("no-preference");
   const [exclusions, setExclusions] = useState<string[]>([]);
+  const [dietaryNeeds, setDietaryNeeds] = useState<DietaryNeed[]>([]);
+  const [kidSituation, setKidSituation] = useState<KidSituation>("same");
 
   const [generatingMsg, setGeneratingMsg] = useState(ROTATING_MESSAGES[0]);
   const [generatingDone, setGeneratingDone] = useState(false);
@@ -255,6 +262,15 @@ export default function OnboardingScreen() {
       weekendOverrides: { ...DEFAULT_WEEKEND_OVERRIDES },
     };
     isInGeneratingFlow.current = true;
+    if (dietaryNeeds.length > 0 || kidSituation !== "same") {
+      await saveHouseholdProfile({
+        dietary_needs: dietaryNeeds,
+        kids_situation: kidSituation,
+        setup_complete: true,
+        setup_date: new Date().toISOString(),
+      });
+      await reloadHouseholdProfile();
+    }
     await setPreferences(newPrefs);
     await setIsOnboarded(true);
     await updateOnboardingState({ hasMealsSetup: true, scope, weeklyMode });
@@ -270,9 +286,10 @@ export default function OnboardingScreen() {
     if (step === 1) { setStep(0); return; }
     if (step === 2) { setStep(1); return; }
     if (step === 3) { setStep(2); return; }
-    if (step === 10) { setStep(8); return; }
+    if (step === 9) { setStep(8); return; }
+    if (step === 10) { setStep(9); return; }
     // Step 12 is the post-generation money bridge — go back to meal filters
-    if (step === 12) { setStep(8); return; }
+    if (step === 12) { setStep(9); return; }
     setStep((s) => (s - 1) as OnboardingStep);
   };
 
@@ -289,7 +306,7 @@ export default function OnboardingScreen() {
       setStep(3);
       return;
     }
-    if (step === 8) {
+    if (step === 9) {
       if (scope === "both") {
         setStep(10);
         return;
@@ -354,7 +371,7 @@ export default function OnboardingScreen() {
   const logoWidth = Math.min(Math.round(windowWidth * 0.936), 442);
   const logoHeight = Math.round(logoWidth / 2.176);
 
-  const mealStep = step >= 3 && step <= 8 ? step - 2 : 0;
+  const mealStep = step >= 3 && step <= 9 ? step - 2 : 0;
 
   if (step === 11) {
     return (
@@ -727,10 +744,10 @@ export default function OnboardingScreen() {
         >
           <Feather name="arrow-left" size={18} color={C.primary} />
         </TouchableOpacity>
-        {step >= 3 && step <= 8 && (
+        {step >= 3 && step <= 9 && (
           <ProgressDots current={mealStep} total={MEAL_SETUP_STEPS} />
         )}
-        {step >= 3 && step <= 8 && (
+        {step >= 3 && step <= 9 && (
           <Text style={[styles.stepCounter, { color: C.textMuted }]}>
             {mealStep} of {MEAL_SETUP_STEPS}
           </Text>
@@ -987,6 +1004,67 @@ export default function OnboardingScreen() {
               )}
             </>
           )}
+
+          {step === 9 && (
+            <>
+              <Text style={[styles.stepHeadline, { color: C.text }]}>
+                Anyone eating differently?
+              </Text>
+              <Text style={[styles.stepHelper, { color: C.textSecondary }]}>
+                We'll quietly flag meals that work — and suggest easy swaps for those that don't.
+              </Text>
+              <View style={styles.sectionLabel}>
+                <Text style={[styles.sectionLabelText, { color: C.textSecondary }]}>Dietary needs</Text>
+              </View>
+              <View style={styles.optionList}>
+                {(["vegan", "vegetarian", "gluten-free", "dairy-free"] as DietaryNeed[]).map((need) => {
+                  const labels: Record<DietaryNeed, string> = {
+                    vegan: "🌱  Vegan",
+                    vegetarian: "🥚  Vegetarian",
+                    "gluten-free": "🌾  Gluten-free",
+                    "dairy-free": "🥛  Dairy-free",
+                  };
+                  const active = dietaryNeeds.includes(need);
+                  return (
+                    <OptionCard
+                      key={need}
+                      label={labels[need]}
+                      selected={active}
+                      onPress={() => {
+                        Haptics.selectionAsync();
+                        setDietaryNeeds((prev) =>
+                          prev.includes(need) ? prev.filter((n) => n !== need) : [...prev, need]
+                        );
+                      }}
+                    />
+                  );
+                })}
+              </View>
+              <View style={[styles.sectionLabel, { marginTop: 20 }]}>
+                <Text style={[styles.sectionLabelText, { color: C.textSecondary }]}>Kids at the table?</Text>
+              </View>
+              <View style={styles.optionList}>
+                <OptionCard
+                  label="Same as everyone"
+                  sub="No special meals needed."
+                  selected={kidSituation === "same"}
+                  onPress={() => { Haptics.selectionAsync(); setKidSituation("same"); }}
+                />
+                <OptionCard
+                  label="Lean kid-friendly"
+                  sub="Favour simpler meals the kids will actually eat."
+                  selected={kidSituation === "simpler"}
+                  onPress={() => { Haptics.selectionAsync(); setKidSituation("simpler"); }}
+                />
+                <OptionCard
+                  label="Separate kids' meals"
+                  sub="You handle theirs — we'll plan yours."
+                  selected={kidSituation === "separate"}
+                  onPress={() => { Haptics.selectionAsync(); setKidSituation("separate"); }}
+                />
+              </View>
+            </>
+          )}
         </View>
       </ScrollView>
 
@@ -996,19 +1074,13 @@ export default function OnboardingScreen() {
             <TouchableOpacity
               onPress={() => {
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-                if (scope === "both") {
-                  setStep(10);
-                } else {
-                  startGenerating();
-                }
+                setStep(9);
               }}
               activeOpacity={0.85}
               style={[styles.primaryCta, { backgroundColor: C.gold }]}
             >
-              <Text style={styles.primaryCtaText}>
-                {scope === "both" ? "Next — money setup" : "Sort my week"}
-              </Text>
-              <Feather name={scope === "both" ? "arrow-right" : "zap"} size={18} color="#fff" />
+              <Text style={styles.primaryCtaText}>Next</Text>
+              <Feather name="arrow-right" size={18} color="#fff" />
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => {
@@ -1022,18 +1094,38 @@ export default function OnboardingScreen() {
               <Feather name="sliders" size={15} color={C.secondaryActionText} />
             </TouchableOpacity>
             <TouchableOpacity
-              onPress={() => {
-                Haptics.selectionAsync();
-                if (scope === "both") {
-                  setStep(10);
-                } else {
-                  startGenerating();
-                }
-              }}
+              onPress={() => { Haptics.selectionAsync(); setStep(9); }}
               style={styles.skipBtn}
             >
               <Text style={[styles.skipText, { color: C.textMuted }]}>
                 Skip — no exclusions
+              </Text>
+            </TouchableOpacity>
+          </>
+        ) : step === 9 ? (
+          <>
+            <TouchableOpacity
+              onPress={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                goNext();
+              }}
+              activeOpacity={0.85}
+              style={[styles.primaryCta, { backgroundColor: C.gold }]}
+            >
+              <Text style={styles.primaryCtaText}>
+                {scope === "both" ? "Next — money setup" : "Sort my week"}
+              </Text>
+              <Feather name={scope === "both" ? "arrow-right" : "zap"} size={18} color="#fff" />
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => {
+                Haptics.selectionAsync();
+                startGenerating();
+              }}
+              style={styles.skipBtn}
+            >
+              <Text style={[styles.skipText, { color: C.textMuted }]}>
+                Skip for now
               </Text>
             </TouchableOpacity>
           </>
@@ -1252,6 +1344,15 @@ const styles = StyleSheet.create({
   optionalHint: {
     fontSize: 13,
     fontFamily: "Inter_400Regular",
+  },
+  sectionLabel: {
+    marginBottom: 8,
+  },
+  sectionLabelText: {
+    fontSize: 12,
+    fontFamily: "Inter_600SemiBold",
+    textTransform: "uppercase",
+    letterSpacing: 0.6,
   },
   transitionCenter: {
     flex: 1,

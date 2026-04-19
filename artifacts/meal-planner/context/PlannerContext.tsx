@@ -24,6 +24,12 @@ import {
   pickRecipes,
 } from "@/constants/recipes";
 import { useLocale } from "@/context/LocaleContext";
+import {
+  HouseholdProfile,
+  DEFAULT_HOUSEHOLD_PROFILE,
+  getHouseholdProfile,
+  isCompatibleWithNeeds,
+} from "@/utils/householdProfile";
 
 export interface SavedPlan {
   id: string;
@@ -59,6 +65,8 @@ interface PlannerContextType {
   hiddenRecipes: string[];
   hideRecipe: (id: string) => void;
   planHasLimitedVariety: boolean;
+  householdProfile: HouseholdProfile;
+  reloadHouseholdProfile: () => Promise<void>;
 }
 
 const PlannerContext = createContext<PlannerContextType | null>(null);
@@ -126,6 +134,12 @@ export function PlannerProvider({ children }: { children: React.ReactNode }) {
   const [preferencesDirty, setPreferencesDirtyState] = useState(false);
   const [hiddenRecipes, setHiddenRecipes] = useState<string[]>([]);
   const [planHasLimitedVariety, setPlanHasLimitedVariety] = useState(false);
+  const [householdProfile, setHouseholdProfile] = useState<HouseholdProfile>(DEFAULT_HOUSEHOLD_PROFILE);
+
+  const reloadHouseholdProfile = useCallback(async () => {
+    const profile = await getHouseholdProfile();
+    setHouseholdProfile(profile);
+  }, []);
 
   useEffect(() => {
     (async () => {
@@ -149,6 +163,8 @@ export function PlannerProvider({ children }: { children: React.ReactNode }) {
         if (planStr) setCurrentPlanState(JSON.parse(planStr));
         if (onbStr === "true") setIsOnboardedState(true);
         if (hiddenStr) setHiddenRecipes(JSON.parse(hiddenStr));
+        const loadedProfile = await getHouseholdProfile();
+        setHouseholdProfile(loadedProfile);
       } catch (_) {} finally {
         setIsContextLoaded(true);
       }
@@ -323,6 +339,13 @@ export function PlannerProvider({ children }: { children: React.ReactNode }) {
         else if (kfScore === 1) score += 3;
       }
 
+      // Household profile — simpler kid situation leans toward kid-friendly even without hard filter
+      if (householdProfile.kids_situation === "simpler" && !p.kidFriendly) {
+        const kfScore = r.kidFriendlyScore ?? getKidFriendlyScore(r);
+        if (kfScore === 2) score += 6;
+        else if (kfScore === 1) score += 2;
+      }
+
       return score;
     };
 
@@ -338,7 +361,14 @@ export function PlannerProvider({ children }: { children: React.ReactNode }) {
       // Leave days beyond active set as empty — user adds manually
       if (!daysToFill.has(entry.day)) return entry;
 
-      const pool = filterRecipes(p, entry.slot, entry.day, hiddenRecipes, appRecipes);
+      const rawPool = filterRecipes(p, entry.slot, entry.day, hiddenRecipes, appRecipes);
+      let pool = rawPool;
+      if (householdProfile.dietary_needs.length > 0) {
+        const dietFiltered = rawPool.filter((r) =>
+          isCompatibleWithNeeds(r, householdProfile.dietary_needs)
+        );
+        if (dietFiltered.length >= 3) pool = dietFiltered;
+      }
 
       // Score all candidates with small random tie-breaker for variety
       const scored = pool
@@ -384,7 +414,7 @@ export function PlannerProvider({ children }: { children: React.ReactNode }) {
     setPlanHasLimitedVariety(hadToRepeat);
     setCurrentPlan(generated);
     setPreferencesDirtyState(false);
-  }, [preferences, currentPlan, hiddenRecipes, appRecipes, setCurrentPlan]);
+  }, [preferences, currentPlan, hiddenRecipes, appRecipes, setCurrentPlan, householdProfile]);
 
   const clearPlan = useCallback(() => {
     setCurrentPlan(buildEmptyPlan(preferences));
@@ -501,6 +531,8 @@ export function PlannerProvider({ children }: { children: React.ReactNode }) {
         hiddenRecipes,
         hideRecipe,
         planHasLimitedVariety,
+        householdProfile,
+        reloadHouseholdProfile,
       }}
     >
       {children}

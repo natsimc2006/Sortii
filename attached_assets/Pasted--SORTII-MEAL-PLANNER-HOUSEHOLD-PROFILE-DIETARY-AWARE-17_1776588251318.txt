@@ -1,0 +1,749 @@
+════════════════════════════════════════════
+SORTII MEAL PLANNER — HOUSEHOLD PROFILE
++ DIETARY AWARENESS SYSTEM
+════════════════════════════════════════════
+
+TASK
+────
+Add a one-time household dietary profile
+to the meal planner. This profile is set
+once, remembered forever, and silently
+shapes every weekly plan generated.
+
+The user should never have to think about
+it again after setup.
+
+This is NOT a filter system the user
+manages weekly. It is invisible household
+intelligence — set once, works quietly.
+
+North star check before every decision:
+Does this remove a decision?
+Does it feel like relief, not a tool?
+Is the intelligence invisible?
+
+════════════════════════════════════════════
+PART 1 — WHERE IT FITS IN ONBOARDING
+════════════════════════════════════════════
+
+The household profile is captured during
+first-time onboarding as question 4,
+after the existing 3 questions
+(people count, hard no's, budget).
+
+Sortii onboarding rule: max 3 required
+questions → plan immediately.
+
+The dietary question is OPTIONAL and
+presented as a gentle offer, not a
+required step.
+
+After the existing 3 questions and
+before the plan generates, show:
+
+── DIETARY SETUP SCREEN ──────────────────
+
+Background: var(--bg) #F7F3EB warm cream
+Card: white, shadow, border-radius 16px
+
+Header:
+"One more thing — optional."
+Font: Playfair Display, 22px, bold
+Color: var(--text) #2B2B2B
+
+Subtext below header:
+"Tell us about your household and we'll
+quietly work around it every week."
+Color: var(--text-muted), 15px
+
+─── SECTION A: Dietary needs ─────────────
+
+Label: "Any dietary needs?"
+Font: 11px uppercase, var(--plum) #5E3A4C
+
+Multi-select pills — user can tap
+one or more:
+
+[🌱 Vegan]
+[🥚 Vegetarian]
+[🌾 Gluten-free]
+[🥛 Dairy-free]
+[🚫 None of these]
+
+Pill style unselected:
+  background: white
+  border: 1px solid var(--border) #E6E1D7
+  color: var(--text)
+  border-radius: 20px
+  padding: 8px 16px
+  font-size: 14px
+
+Pill style selected:
+  background: var(--plum) #5E3A4C
+  color: white
+  border: none
+  font-weight: 600
+
+Tapping "None of these" deselects all others.
+Tapping any other option deselects
+"None of these".
+
+─── SECTION B: Kids at the table ─────────
+
+Label: "Do kids eat with the family?"
+Font: 11px uppercase, var(--plum)
+
+Three options as full-width toggle rows:
+
+[👨‍👩‍👧‍👦 Yes — everyone eats the same]
+[🍝 Usually — but they need simpler meals]  
+[🍽 No — kids eat separately]
+
+Row style unselected:
+  background: var(--surface) #F0F7F6
+  border: 1px solid var(--border)
+  border-radius: 12px
+  padding: 14px 16px
+  font-size: 15px
+
+Row style selected:
+  background: var(--brand-tint) #E6F3F0
+  border: 1.5px solid var(--brand) #2A8F88
+  border-radius: 12px
+  font-weight: 600
+  color: var(--brand)
+
+Default: "Yes — everyone eats the same"
+
+─── SKIP OPTION ──────────────────────────
+
+Below the two sections:
+
+Small muted text link:
+"Skip for now — you can set this later"
+color: var(--text-muted)
+font-size: 13px
+text-align: center
+
+Tapping skip proceeds to plan generation
+with no dietary profile saved.
+
+─── CTA BUTTON ───────────────────────────
+
+Below skip link:
+Full-width teal button:
+"Looks good — sort my dinners →"
+background: var(--brand) #2A8F88
+color: white, bold, 16px, 50px height
+
+════════════════════════════════════════════
+PART 2 — STORAGE
+════════════════════════════════════════════
+
+Store the household profile in localStorage.
+Key: 'sortii_household_profile'
+
+Value structure:
+{
+  "dietary_needs": [
+    "vegan" | "vegetarian" | 
+    "gluten-free" | "dairy-free"
+  ],
+  "kids_situation": 
+    "same" | "simpler" | "separate",
+  "setup_complete": true,
+  "setup_date": "ISO date string"
+}
+
+If user skips:
+{
+  "dietary_needs": [],
+  "kids_situation": "same",
+  "setup_complete": false,
+  "setup_date": null
+}
+
+ON APP LOAD
+───────────
+Check for 'sortii_household_profile'.
+If setup_complete is true:
+  Skip the dietary setup screen entirely.
+  Apply profile silently on every plan.
+
+If setup_complete is false OR key missing:
+  Show setup screen on first onboarding only.
+  Never show it again unless user accesses
+  it from settings.
+
+════════════════════════════════════════════
+PART 3 — PLAN GENERATION LOGIC
+════════════════════════════════════════════
+
+When generating a weekly plan, read
+the household profile and apply the
+following logic silently.
+
+── A: DIETARY NEEDS FILTERING ────────────
+
+Read 'sortii_household_profile'.dietary_needs.
+
+For each dietary need selected, filter
+the recipe library as follows:
+
+VEGAN:
+  Include only recipes tagged:
+  dietary: includes "vegan"
+  OR recipes where all ingredients have
+  no animal products.
+  
+  If insufficient vegan recipes exist
+  for the week (fewer than 7):
+  Fill remaining slots with vegetarian
+  recipes. Never use meat/dairy recipes.
+
+VEGETARIAN:
+  Include only recipes tagged:
+  dietary: includes "vegetarian" OR "vegan"
+  Exclude all meat and fish recipes.
+  
+  If insufficient vegetarian recipes:
+  This should not happen given recipe
+  library size, but if it does:
+  Surface the empty state copy:
+  "You've made this tricky 😅
+   Try loosening a filter."
+
+GLUTEN-FREE:
+  Include only recipes tagged:
+  dietary: includes "gluten-free"
+  OR recipes with no gluten ingredients
+  (flour, pasta, bread, soy sauce,
+  barley, rye, wheat)
+
+DAIRY-FREE:
+  Include only recipes tagged:
+  dietary: includes "dairy-free"
+  OR recipes with no dairy ingredients
+  (milk, cream, butter, cheese, yoghurt)
+
+COMBINED (e.g. vegan + gluten-free):
+  Apply all filters — recipe must pass
+  all selected dietary criteria.
+  If insufficient recipes, show:
+  "Your dietary combination is quite
+   specific — loosening one filter
+   will give you more variety."
+
+NONE SELECTED:
+  No filtering by dietary need.
+  All recipes available as normal.
+
+── B: KIDS SITUATION WEIGHTING ───────────
+
+Read 'sortii_household_profile'.kids_situation.
+
+Use the existing kidFriendlyScore (0/1/2)
+from kidFriendlyRules.ts for weighting.
+
+"same" (everyone eats the same):
+  No change to existing logic.
+  Kid-friendly score not used unless
+  user has also toggled the kid-friendly
+  filter manually.
+
+"simpler" (kids need simpler meals):
+  Apply a weighting bias toward
+  higher kidFriendlyScore recipes.
+  
+  Target distribution for the week:
+  - 4-5 meals: kidFriendlyScore = 2
+  - 1-2 meals: kidFriendlyScore = 1
+  - 0 meals: kidFriendlyScore = 0
+  
+  This is a BIAS not a hard filter —
+  adults still get variety, but the
+  majority of the week is kid-accessible.
+  
+  Do NOT hide adult-leaning recipes
+  entirely. Do not show only kid food.
+  The intelligent balance is the point.
+
+"separate" (kids eat separately):
+  No filtering by kid score.
+  Generate the adult plan as normal.
+  Add a small note to the week header:
+  "Plan is for adults — kids eating
+   separately this week."
+  Color: var(--text-muted) italic 13px.
+  No other changes.
+
+── C: INTERACTION BETWEEN FILTERS ────────
+
+If user has BOTH dietary needs AND
+kids_situation = "simpler":
+
+Apply dietary filtering first.
+Then apply kid-friendly weighting
+within the filtered set.
+
+Example: vegetarian household with
+kids needing simpler meals → bias
+toward vegetarian + kid-friendly recipes.
+
+This combination works well as
+vegetarian kid food (pasta, pizza,
+frittata, quesadillas) is naturally
+well-represented.
+
+════════════════════════════════════════════
+PART 4 — RECIPE CARD MODIFICATIONS
+════════════════════════════════════════════
+
+On each recipe card in the planner,
+show quiet dietary indicators and
+modification notes where relevant.
+
+── DIETARY MATCH INDICATORS ──────────────
+
+If the recipe matches a household
+dietary need, show a small pill on
+the recipe card:
+
+Position: top-right corner of card,
+or below recipe name inline.
+
+Pill examples:
+"🌱 Vegan" — plum tint bg, plum text
+"🥚 Vegetarian" — plum tint bg, plum text
+"🌾 Gluten-free" — teal tint bg, teal text
+"🥛 Dairy-free" — teal tint bg, teal text
+"✓ Kid-friendly" — teal tint bg, teal text
+  (only if kidFriendlyScore = 2)
+
+Pill style:
+  font-size: 11px
+  padding: 3px 10px
+  border-radius: 20px
+  font-weight: 500
+
+Show a maximum of 2 pills per card.
+If more than 2 apply, show the two
+most relevant to the household profile.
+Intelligence invisible — don't clutter.
+
+── MODIFICATION NOTES ────────────────────
+
+This is the key feature for mixed
+households — one vegan in a family
+of meat-eaters.
+
+When a recipe is in the plan and it
+does NOT fully match a dietary need
+but CAN be adapted, show a quiet
+modification note on the card.
+
+Trigger: household has vegan/vegetarian
+need BUT the recipe contains meat or dairy.
+
+Instead of excluding the recipe,
+show it with a modification badge:
+
+Small plum pill on the card:
+"Make it vegan →"
+OR "Veggie swap →"
+OR "Dairy-free swap →"
+
+Background: var(--plum-tint) #F3E8EE
+Color: var(--plum) #5E3A4C
+Font: 11px, font-weight 500
+
+Tapping the pill opens a small
+bottom sheet showing the swap:
+
+──────────────────────────────────────
+SWAP SHEET CONTENT:
+
+Header: "Make it [dietary need]"
+e.g. "Make it vegan"
+
+Recipe name as subtext.
+
+Then the specific swap:
+"For this meal:"
+[Original ingredient] → [Swap ingredient]
+
+Examples:
+
+Chicken → chickpeas or firm tofu
+Beef mince → lentils or plant-based mince
+Bacon → smoked tempeh or skip
+Milk → oat milk or almond milk
+Cream → coconut cream
+Butter → olive oil or vegan butter
+Cheese → nutritional yeast or vegan cheese
+Parmesan → vegan parmesan or skip
+
+Shopping note below swap:
+"Add [swap ingredient] to your shopping list"
+Small teal link: "+ Add to list"
+Tapping adds the swap ingredient and
+removes the original from the shopping
+list for that recipe.
+
+Close button: "Got it"
+──────────────────────────────────────
+
+MODIFICATION SWAP RULES
+─────────────────────────
+Create a new file:
+/constants/dietarySwaps.ts
+
+Export a DIETARY_SWAPS array:
+
+export const DIETARY_SWAPS = [
+  {
+    originalKeywords: [
+      'chicken breast', 'chicken thigh',
+      'chicken mince', 'chicken'
+    ],
+    veganSwap: 'chickpeas or firm tofu',
+    vegetarianSwap: 'chickpeas or halloumi',
+    savingNote: null,
+  },
+  {
+    originalKeywords: [
+      'beef mince', 'ground beef', 'mince'
+    ],
+    veganSwap: 'lentils or plant-based mince',
+    vegetarianSwap: 'lentils or mushroom mince',
+    savingNote: 'Lentils cost about $1.50 less per serve',
+  },
+  {
+    originalKeywords: ['bacon', 'pancetta'],
+    veganSwap: 'smoked tempeh or skip',
+    vegetarianSwap: 'skip or add extra cheese',
+    savingNote: null,
+  },
+  {
+    originalKeywords: [
+      'milk', 'full cream milk', 'skim milk'
+    ],
+    veganSwap: 'oat milk or soy milk',
+    dairyFreeSwap: 'oat milk or almond milk',
+    savingNote: null,
+  },
+  {
+    originalKeywords: [
+      'thickened cream', 'double cream',
+      'heavy cream', 'cream'
+    ],
+    veganSwap: 'coconut cream',
+    dairyFreeSwap: 'coconut cream',
+    savingNote: null,
+  },
+  {
+    originalKeywords: ['butter'],
+    veganSwap: 'olive oil or vegan butter',
+    dairyFreeSwap: 'olive oil or dairy-free spread',
+    savingNote: null,
+  },
+  {
+    originalKeywords: [
+      'parmesan', 'cheddar', 'mozzarella',
+      'feta', 'ricotta', 'cream cheese',
+      'cheese'
+    ],
+    veganSwap: 'nutritional yeast or vegan cheese',
+    dairyFreeSwap: 'dairy-free cheese or skip',
+    savingNote: null,
+  },
+  {
+    originalKeywords: [
+      'yoghurt', 'greek yoghurt', 'sour cream'
+    ],
+    veganSwap: 'coconut yoghurt',
+    dairyFreeSwap: 'coconut yoghurt or dairy-free sour cream',
+    savingNote: null,
+  },
+  {
+    originalKeywords: ['egg', 'eggs'],
+    veganSwap: 'flax egg (1 tbsp ground flaxseed + 3 tbsp water)',
+    vegetarianSwap: null,
+    savingNote: null,
+  },
+  {
+    originalKeywords: [
+      'soy sauce', 'tamari'
+    ],
+    glutenFreeSwap: 'tamari (gluten-free soy sauce)',
+    savingNote: null,
+  },
+  {
+    originalKeywords: [
+      'pasta', 'spaghetti', 'penne',
+      'fettuccine', 'linguine'
+    ],
+    glutenFreeSwap: 'gluten-free pasta',
+    savingNote: 'Gluten-free pasta costs ~$1 more per pack',
+  },
+  {
+    originalKeywords: ['flour', 'plain flour', 'self-raising flour'],
+    glutenFreeSwap: 'gluten-free flour blend',
+    savingNote: null,
+  },
+  {
+    originalKeywords: ['breadcrumbs', 'panko'],
+    glutenFreeSwap: 'gluten-free breadcrumbs or almond meal',
+    savingNote: null,
+  },
+  {
+    originalKeywords: ['bread', 'sourdough', 'wrap', 'tortilla'],
+    glutenFreeSwap: 'gluten-free bread or corn tortillas',
+    savingNote: null,
+  },
+];
+
+── SWAP MATCHING FUNCTION ────────────────
+
+Create function:
+
+getDietarySwapForIngredient(
+  ingredient: string,
+  dietaryNeed: string
+): string | null
+
+- Takes an ingredient name and a dietary need
+- Checks DIETARY_SWAPS for a keyword match
+- Returns the appropriate swap string
+- Returns null if no swap exists or needed
+
+── WHEN TO SHOW MODIFICATION vs EXCLUDE ──
+
+SHOW modification note (not exclude) when:
+- Recipe is mostly compatible but has
+  1-2 adaptable ingredients
+- The swap is simple (one ingredient)
+- The meal format works for the dietary need
+
+EXCLUDE the recipe entirely when:
+- The core of the meal IS the ingredient
+  (e.g. a beef stir fry for a vegan —
+  the swap changes it completely)
+- Multiple core ingredients need swapping
+- No reasonable swap exists
+
+HEURISTIC:
+If more than 2 ingredients need swapping
+to meet the dietary requirement →
+exclude the recipe.
+If 1-2 ingredients need swapping →
+show with modification note.
+
+════════════════════════════════════════════
+PART 5 — SETTINGS ACCESS
+════════════════════════════════════════════
+
+The household profile should be
+accessible from settings so the user
+can update it without re-onboarding.
+
+In the existing settings/preferences
+area of the app, add a new row:
+
+"🏠 Household profile"
+Subtext: "Dietary needs and family setup"
+Right arrow chevron.
+
+Tapping opens the same dietary setup
+screen from Part 1, but pre-populated
+with current saved values.
+
+"Save changes" button at the bottom
+(replaces the onboarding CTA button).
+
+Changes save immediately to localStorage
+and apply to the next plan generated.
+
+Show a small confirmation after saving:
+"Saved. We'll factor this in next week. ✓"
+Toast notification, teal, 2.5 seconds.
+
+════════════════════════════════════════════
+PART 6 — PLAN HEADER INDICATORS
+════════════════════════════════════════════
+
+When a household profile is active,
+show a quiet one-line indicator at
+the top of the weekly planner view,
+below the week header.
+
+This replaces any existing filter
+indicator text.
+
+Examples:
+
+Vegan household:
+"🌱 Vegan-friendly week"
+Color: var(--plum) italic 13px
+
+Vegetarian + kid-friendly bias:
+"🥚 Vegetarian · kid-friendly lean this week"
+
+Gluten-free:
+"🌾 Gluten-free week"
+
+No dietary needs, kids simpler:
+"✓ Kid-friendly lean this week"
+
+No profile or all defaults:
+[No indicator shown — clean header]
+
+This is the only place the profile
+is made visible. Everywhere else
+it works silently.
+
+════════════════════════════════════════════
+PART 7 — ADD DIETARY TAGS TO RECIPE LIBRARY
+════════════════════════════════════════════
+
+The plan generation filtering in Part 3
+requires recipes to have dietary tags.
+
+Audit both recipe files:
+- recipes_unified_au.json
+- recipes_uk_clean.json
+
+Add a "dietary" array field to each recipe.
+Possible values: "vegan", "vegetarian",
+"gluten-free", "dairy-free"
+
+A recipe can have multiple tags.
+Example:
+"dietary": ["vegan", "gluten-free"]
+
+TAGGING RULES:
+──────────────
+
+Tag as "vegan" if:
+- No meat, fish, eggs, dairy, honey
+- All ingredients are plant-based
+
+Tag as "vegetarian" if:
+- No meat or fish
+- May contain eggs or dairy
+
+Tag as "gluten-free" if:
+- No wheat, barley, rye, regular flour,
+  regular pasta, regular bread,
+  regular soy sauce, regular breadcrumbs
+
+Tag as "dairy-free" if:
+- No milk, cream, butter, cheese,
+  yoghurt, sour cream, cream cheese
+
+Tag with empty array [] if none apply.
+
+After tagging, report:
+- How many recipes are vegan
+- How many are vegetarian (including vegan)
+- How many are gluten-free
+- How many are dairy-free
+- How many have no dietary tags
+
+If fewer than 14 vegan recipes exist
+(enough for 2 weeks):
+Flag this as a gap — do not add
+recipes now, just flag for future
+recipe library expansion.
+
+════════════════════════════════════════════
+DO NOT CHANGE
+════════════════════════════════════════════
+
+✓ Existing 3 onboarding questions
+  (people count, hard no's, budget)
+✓ kidFriendlyRules.ts scoring logic
+✓ swapRules.ts existing ingredient swaps
+✓ Existing kid-friendly filter toggle
+  (this still works as a manual override
+  on top of the household profile)
+✓ UK/AU locale detection and recipe routing
+✓ Shopping list generation logic
+✓ Money/budget tab
+✓ All existing colour variables
+✓ Recipe card existing layout
+  (add indicators without restructuring)
+✓ Returning user flow and weekly reset
+✓ Hard no's filter (dietary profile
+  works alongside hard no's,
+  not instead of them)
+
+════════════════════════════════════════════
+BUILD ORDER
+════════════════════════════════════════════
+
+Build in this exact order to avoid
+breaking existing functionality:
+
+1. Create dietarySwaps.ts constants file
+2. Add dietary tags to recipe library
+   (Part 7 — data work first)
+3. Create household profile storage
+   and setup screen (Parts 1 + 2)
+4. Wire profile into plan generation
+   filtering (Part 3)
+5. Add recipe card indicators and
+   modification notes (Part 4)
+6. Add settings access (Part 5)
+7. Add plan header indicators (Part 6)
+
+Test after each step before proceeding
+to the next.
+
+════════════════════════════════════════════
+TEST SEQUENCE AFTER FULL BUILD
+════════════════════════════════════════════
+
+1. Clear localStorage. Open app.
+   Complete onboarding to dietary screen.
+   Select "Vegan" + "Usually simpler meals".
+   Tap "Looks good — sort my dinners →"
+   Confirm plan generates with only
+   vegan recipes.
+   Confirm plan header shows:
+   "🌱 Vegan · kid-friendly lean this week"
+
+2. Check recipe cards. Confirm no
+   non-vegan recipes appear.
+   Confirm vegan pill shows on cards.
+
+3. Generate a plan with no dietary profile.
+   Confirm a meat-containing recipe appears.
+   Now go to Settings → Household profile.
+   Select "Dairy-free".
+   Save. Regenerate plan.
+   Confirm dairy-free plan generates.
+   Confirm dairy-containing recipes either
+   disappear or show "Dairy-free swap →" pill.
+
+4. Tap "Dairy-free swap →" on a recipe.
+   Confirm swap sheet opens showing
+   specific ingredient replacement.
+   Tap "+ Add to list".
+   Confirm shopping list updates with
+   swap ingredient, original removed.
+
+5. Select "Vegetarian" + "Kids eat separately".
+   Generate plan. Confirm vegetarian meals.
+   Confirm header shows:
+   "Plan is for adults — kids eating
+    separately this week."
+   Confirm no kid-friendly weighting applied.
+
+6. Open Settings → Household profile.
+   Confirm current selections are
+   pre-populated correctly.
+   Change selections.
+   Tap Save changes.
+   Confirm toast: "Saved. We'll factor
+   this in next week. ✓"
