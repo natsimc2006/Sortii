@@ -1,0 +1,244 @@
+════════════════════════════════════════════
+SORTII — ADD EVENT SHEET: SAVE BUTTON FIX
+════════════════════════════════════════════
+
+TASK
+────
+The Add Event sheet is missing a save button.
+Users can fill in all fields but cannot
+confirm or save the event.
+This is the only thing to fix in this prompt.
+
+════════════════════════════════════════════
+STEP 1 — FIND THE SHEET
+════════════════════════════════════════════
+
+Open the file that renders the Add Event
+bottom sheet. It contains the fields:
+- "WHAT'S ON?"
+- "WHICH DAY?"
+- "WHAT TIME?"
+- "LOCATION (OPTIONAL)"
+- "WHO'S INVOLVED?"
+- "WHO'S DRIVING?"
+- "DOES THIS REPEAT?"
+- "NOTES (OPTIONAL)"
+
+Find the bottom of this sheet's content —
+after the NOTES field — and confirm
+whether a save/add button exists.
+
+If no button exists, add it now per below.
+
+════════════════════════════════════════════
+STEP 2 — ADD THE SAVE BUTTON
+════════════════════════════════════════════
+
+Add a sticky footer to the bottom of the
+Add Event sheet containing one button.
+
+The footer must be OUTSIDE the ScrollView
+so it stays fixed at the bottom of the
+sheet even when the user has scrolled.
+
+SHEET STRUCTURE SHOULD BE:
+───────────────────────────
+
+<BottomSheet or Modal>
+  
+  {/* Header row */}
+  <View style={sheetHeader}>
+    <Text>Add event</Text>
+    <TouchableOpacity onPress={onClose}>
+      <Text>×</Text>
+    </TouchableOpacity>
+  </View>
+
+  {/* Scrollable fields */}
+  <ScrollView>
+    {/* all existing fields */}
+    {/* WHAT'S ON, DAY, TIME, LOCATION, */}
+    {/* WHO'S INVOLVED, WHO'S DRIVING,  */}
+    {/* DOES THIS REPEAT, NOTES         */}
+    
+    {/* Bottom padding so last field    */}
+    {/* is not hidden behind button     */}
+    <View style={{ height: 100 }} />
+  </ScrollView>
+
+  {/* STICKY FOOTER — outside ScrollView */}
+  <View style={styles.sheetFooter}>
+    <TouchableOpacity
+      style={[
+        styles.saveButton,
+        !isFormValid && styles.saveButtonDisabled
+      ]}
+      onPress={handleSaveEvent}
+      disabled={!isFormValid}
+      activeOpacity={0.85}
+    >
+      <Text style={styles.saveButtonText}>
+        Add event ✓
+      </Text>
+    </TouchableOpacity>
+  </View>
+
+</BottomSheet or Modal>
+
+FOOTER STYLES:
+──────────────
+sheetFooter: {
+  paddingHorizontal: 16,
+  paddingVertical: 12,
+  paddingBottom: 28,
+  backgroundColor: '#FFFFFF',
+  borderTopWidth: 1,
+  borderTopColor: '#F0EDEA',
+},
+saveButton: {
+  backgroundColor: '#2A8F88',
+  borderRadius: 12,
+  paddingVertical: 16,
+  alignItems: 'center',
+  width: '100%',
+},
+saveButtonDisabled: {
+  backgroundColor: '#B8D8D6',
+  opacity: 0.6,
+},
+saveButtonText: {
+  color: '#FFFFFF',
+  fontSize: 16,
+  fontWeight: '700',
+  letterSpacing: 0.2,
+},
+
+════════════════════════════════════════════
+STEP 3 — VALIDATION LOGIC
+════════════════════════════════════════════
+
+The save button is disabled (greyed out)
+until the minimum required fields are filled.
+
+isFormValid is true when ALL of these exist:
+- title / activity field is not empty
+- at least one day is selected
+- at least one time is selected OR
+  the manual time field has a value
+
+Everything else (location, who's involved,
+who's driving, repeat, notes) is optional
+and does not block saving.
+
+Show a subtle validation hint below the
+button when disabled:
+
+{!isFormValid && (
+  <Text style={styles.validationHint}>
+    Just need a name, day and time.
+  </Text>
+)}
+
+validationHint: {
+  textAlign: 'center',
+  color: '#7A9E9B',
+  fontSize: 12,
+  marginTop: 8,
+},
+
+════════════════════════════════════════════
+STEP 4 — THE SAVE HANDLER
+════════════════════════════════════════════
+
+The handleSaveEvent function must:
+
+1. Build an event object from all
+   current form state values:
+
+const newEvent = {
+  id: Date.now().toString(),
+  title: titleValue,
+  day: selectedDay,
+  startTime: selectedTime || manualTimeValue,
+  endTime: endTimeValue || null,
+  location: locationValue || null,
+  involvedPeople: selectedPeople || [],
+  driver: selectedDriver || null,
+  repeat: selectedRepeat || 'one-off',
+  notes: notesValue || null,
+  createdAt: new Date().toISOString(),
+};
+
+2. Add this event to the events array
+   in whatever state management or
+   storage system the Family tab uses
+   (AsyncStorage, Context, useState —
+   use whichever is already in place).
+
+3. Close the sheet.
+
+4. Show a brief success toast or
+   confirmation on the Family tab:
+
+After sheet closes, show a small toast
+notification at the bottom of the screen:
+
+"Event added. ✓"
+
+Toast style:
+- Background: #2A8F88 teal
+- White text, 14px, bold
+- Border radius: 20px
+- Padding: 10px 20px
+- Centred horizontally
+- Appears for 2.5 seconds then fades
+- Sits above the bottom navigation bar
+
+5. After saving, if the event has a day
+   of Saturday or Sunday, also show the
+   "Sort the family juggle →" button on
+   the Family tab main screen
+   (this button should already exist from
+   the previous build — just ensure it
+   appears after the first weekend event
+   is added).
+
+════════════════════════════════════════════
+STEP 5 — FIX THE CLOSE BUTTON BEHAVIOUR
+════════════════════════════════════════════
+
+Currently the × button closes the sheet
+and discards all entered data silently.
+
+Update the × button behaviour:
+
+IF the form has any data entered:
+  Show an inline confirmation:
+  "Discard this event?"
+  [Yes, discard] [Keep editing]
+  
+  Both as small text links below the
+  header — not a blocking modal.
+
+IF the form is completely empty:
+  Close immediately, no confirmation.
+
+This prevents accidental data loss when
+a parent has spent time filling in details.
+
+════════════════════════════════════════════
+DO NOT CHANGE
+════════════════════════════════════════════
+
+✓ All existing form fields and their logic
+✓ Field styling and layout
+✓ Day selector pills
+✓ Time selector pills
+✓ WHO'S INVOLVED pills (family members)
+✓ WHO'S DRIVING selector
+✓ DOES THIS REPEAT options
+✓ All Family tab screen content
+✓ Home tab
+✓ Meals tab
+✓ Navigation structure
+✓ All colour tokens

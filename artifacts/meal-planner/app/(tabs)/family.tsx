@@ -1001,6 +1001,27 @@ function AddEventSheet({
 
   const [draft, setDraft] = useState<Omit<FamilyEvent, "id">>(blankDraft);
   const [errors, setErrors] = useState<string[]>([]);
+  const [showDiscard, setShowDiscard] = useState(false);
+
+  // Derived: is the form valid enough to save?
+  const isFormValid = draft.title.trim().length > 0 && draft.time.trim().length > 0;
+
+  // Derived: does the form have any data entered?
+  const formHasData = draft.title.trim().length > 0
+    || draft.time.trim().length > 0
+    || (draft.location ?? "").trim().length > 0
+    || (draft.notes ?? "").trim().length > 0
+    || draft.personIds.length > 0
+    || !!draft.driverId;
+
+  function handleClosePress() {
+    if (formHasData && !showDiscard) {
+      setShowDiscard(true);
+    } else {
+      setShowDiscard(false);
+      onClose();
+    }
+  }
 
   useEffect(() => {
     if (visible) {
@@ -1064,7 +1085,7 @@ function AddEventSheet({
       <Animated.View
         style={[
           styles.formSheet,
-          { transform: [{ translateY: slideY }], paddingBottom: insets.bottom + 16 },
+          { transform: [{ translateY: slideY }] },
         ]}
       >
         <View style={styles.sheetHandle} />
@@ -1072,10 +1093,25 @@ function AddEventSheet({
           <Text style={styles.sheetTitle}>
             {initialDraft?.id ? "Edit event" : "Add event"}
           </Text>
-          <TouchableOpacity onPress={onClose} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+          <TouchableOpacity onPress={handleClosePress} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
             <Feather name="x" size={18} color={TEXT_MUTED} />
           </TouchableOpacity>
         </View>
+
+        {/* Discard confirmation — inline, no blocking modal */}
+        {showDiscard && (
+          <View style={styles.discardConfirm}>
+            <Text style={styles.discardConfirmText}>Discard this event?</Text>
+            <View style={styles.discardConfirmBtns}>
+              <TouchableOpacity onPress={() => { setShowDiscard(false); onClose(); }}>
+                <Text style={styles.discardConfirmYes}>Yes, discard</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => setShowDiscard(false)}>
+                <Text style={styles.discardConfirmNo}>Keep editing</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        )}
 
         <KeyboardAvoidingView
           behavior={Platform.OS === "ios" ? "padding" : undefined}
@@ -1300,12 +1336,28 @@ function AddEventSheet({
                 textAlignVertical="top"
               />
             </View>
+
+            {/* Bottom spacer so last field isn't hidden behind sticky footer */}
+            <View style={{ height: 100 }} />
           </ScrollView>
         </KeyboardAvoidingView>
 
-        <TouchableOpacity style={styles.saveBtn} onPress={handleSave} activeOpacity={0.85}>
-          <Text style={styles.saveBtnText}>Save event</Text>
-        </TouchableOpacity>
+        {/* Sticky footer — outside ScrollView, stays at bottom */}
+        <View style={[styles.sheetFooter, { paddingBottom: Math.max(insets.bottom, 12) }]}>
+          <TouchableOpacity
+            style={[styles.saveButton, !isFormValid && styles.saveButtonDisabled]}
+            onPress={handleSave}
+            disabled={!isFormValid}
+            activeOpacity={0.85}
+          >
+            <Text style={styles.saveButtonText}>
+              {initialDraft?.id ? "Save changes ✓" : "Add event ✓"}
+            </Text>
+          </TouchableOpacity>
+          {!isFormValid && (
+            <Text style={styles.validationHint}>Just need a name, day and time.</Text>
+          )}
+        </View>
       </Animated.View>
     </View>
   );
@@ -2391,9 +2443,10 @@ const styles = StyleSheet.create({
   // Form sheet
   formOverlay: { ...StyleSheet.absoluteFillObject, backgroundColor: "rgba(0,0,0,0.5)" },
   formSheet: {
-    position: "absolute", left: 0, right: 0, bottom: 0, maxHeight: "92%",
+    position: "absolute", left: 0, right: 0, bottom: 0, height: "92%",
     backgroundColor: "#fff", borderTopLeftRadius: 24, borderTopRightRadius: 24,
     paddingTop: 12, paddingHorizontal: 20,
+    flexDirection: "column",
     ...Platform.select({
       web: { boxShadow: "0px -6px 30px rgba(0,0,0,0.14)" },
       default: {
@@ -2402,6 +2455,30 @@ const styles = StyleSheet.create({
       },
     }),
   },
+
+  // Discard confirmation
+  discardConfirm: {
+    backgroundColor: "#FFF8F0", borderRadius: 10, borderWidth: 1, borderColor: GOLD + "40",
+    paddingHorizontal: 14, paddingVertical: 10, marginBottom: 4, gap: 8,
+  },
+  discardConfirmText: { fontSize: 13, fontFamily: "Inter_600SemiBold", color: TEXT },
+  discardConfirmBtns: { flexDirection: "row", gap: 16 },
+  discardConfirmYes: { fontSize: 13, fontFamily: "Inter_600SemiBold", color: "#C0392B" },
+  discardConfirmNo: { fontSize: 13, fontFamily: "Inter_500Medium", color: TEAL },
+
+  // Sticky save footer
+  sheetFooter: {
+    paddingHorizontal: 0, paddingTop: 12,
+    backgroundColor: "#fff",
+    borderTopWidth: 1, borderTopColor: "#F0EDEA",
+  },
+  saveButton: {
+    backgroundColor: TEAL, borderRadius: 12,
+    paddingVertical: 16, alignItems: "center",
+  },
+  saveButtonDisabled: { backgroundColor: "#B8D8D6", opacity: 0.7 },
+  saveButtonText: { color: "#fff", fontSize: 16, fontFamily: "Inter_700Bold", letterSpacing: 0.2 },
+  validationHint: { textAlign: "center", color: TEXT_MUTED, fontSize: 12, fontFamily: "Inter_400Regular", marginTop: 8 },
   sheetHandle: { width: 36, height: 4, borderRadius: 2, backgroundColor: "#E0E0E0", alignSelf: "center", marginBottom: 14 },
   sheetTitleRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 18 },
   sheetTitle: { fontSize: 18, fontFamily: "Inter_700Bold", color: TEXT },
