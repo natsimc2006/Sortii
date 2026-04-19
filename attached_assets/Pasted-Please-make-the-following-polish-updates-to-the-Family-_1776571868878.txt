@@ -1,0 +1,170 @@
+Please make the following polish updates to the Family sorting flow in Sortii. Keep all existing smart logic, assignment logic, travel-time logic, and page structure intact unless noted below. This is a refinement pass, not a rebuild.
+
+Goal:
+Make the output feel more human, calmer, and more intuitive. The current flow is strong, but two areas need fixing:
+1. the “breather” wording/logic feels wrong
+2. the final plan screen needs a softer, more Sortii-style summary treatment at the top
+
+IMPORTANT:
+- Do not remove any existing smart sorting logic
+- Do not remove clash detection, swap actions, travel assumptions, or share actions
+- Keep the Sortii tone: calm, useful, lightly dry, never robotic
+- Keep the UI clean, mobile-first, and visually soft
+- Preserve current navigation and structure unless specified below
+
+-----------------------------------
+1. FIX THE “BREATHER” LOGIC + WORDING
+-----------------------------------
+
+Current issue:
+The UI currently shows wording like:
+“~600 min breather from 00:00”
+This feels strange and breaks the human feel of the product because it is using total free minutes from midnight, not meaningful real-life gaps.
+
+What to change:
+Replace this logic so it no longer calculates or displays a total free-minute count from 00:00.
+
+New behaviour:
+- Calculate meaningful free gaps in the actual schedule
+- Sort the day’s events by time
+- Identify:
+  - gap before first event
+  - gaps between events
+  - gap after last event
+- Surface only human-useful gaps, not abstract total free time
+- If there is a clear stretch after the final event, prefer that
+- If there is a meaningful gap between events, show that instead
+- If there are no meaningful gaps, do not force a “breather” message
+
+New copy direction:
+Use real-world time phrasing, not minute-math.
+
+Preferred examples:
+- “Clear stretch after 12:30pm.”
+- “Afternoon opens up after 12:30pm.”
+- “Quick breather between 11:30am and 12:00pm.”
+- “Bit tight through the middle, then clearer later.”
+
+Rules:
+- Never show wording like “600 min”
+- Never anchor free time to “00:00”
+- Never surface raw calculations to the user
+- Phrase it as a useful natural-language schedule insight
+
+Optional logic guidance:
+- Only show a gap insight if the gap is meaningful enough to matter
+- If the day is compact, show a more honest line such as:
+  - “A little tight through the middle.”
+  - “Not much breathing room between pickups.”
+
+-----------------------------------
+2. SOFTEN THE TOP OF THE FINAL “HERE’S THE PLAN” SCREEN
+-----------------------------------
+
+Current issue:
+The final plan screen is functionally good, but the top section feels a bit stark and loses some of the softer Sortii visual warmth. It needs a more emotionally reassuring summary block at the top.
+
+What to change:
+Redesign the top summary area of the final plan screen so it feels softer and more cohesive.
+
+New desired structure:
+At the top of the page, under the nav bar, create one soft tinted summary panel that contains:
+- the outcome line
+- the key summary metrics
+
+Instead of the current more disconnected feel, combine them into a calm summary block.
+
+Desired layout:
+[soft tinted summary panel]
+- outcome summary line
+  Example:
+  “Manageable. One bit to watch.”
+  or
+  “Mostly sorted. One tight handoff.”
+- a compact row of summary stats
+  Example:
+  “4 events • 1 tight • 0 issues”
+
+Visual direction:
+- Use a very soft sage/green-tinted background consistent with Sortii
+- Keep contrast gentle, not harsh
+- Rounded corners
+- Calm spacing and hierarchy
+- This panel should feel like reassurance first, data second
+
+Styling direction:
+- soft background tint
+- subtle border or no visible border if it looks cleaner
+- keep it premium, minimal, and calm
+- avoid heavy dashboard energy
+
+Please also make sure the summary cards or stats below do not visually compete too hard with this new top summary block.
+
+-----------------------------------
+3. KEEP WARNING/INSIGHT PANELS, BUT SLIGHTLY SOFTEN THEM
+-----------------------------------
+
+Current issue:
+The warning panel is useful, but visually a touch strong compared with the rest of the soft Sortii feel.
+
+What to change:
+Keep the warning and insight cards, but soften them slightly.
+
+Direction:
+- keep clear status distinction
+- preserve coloured left border or category cue
+- slightly soften background fills so they feel less harsh
+- maintain readability and importance
+
+Copy refinement:
+If there is a heading like:
+“This won’t quite work yet”
+consider using slightly softer human language such as:
+- “One thing to tweak”
+- “Almost there, one clash”
+- “This bit needs a nudge”
+
+Do not overdo this if it weakens clarity. Clarity comes first.
+
+-----------------------------------
+4. DO NOT CHANGE THE GOOD PARTS
+-----------------------------------
+
+Please preserve these existing elements:
+- event assignment logic
+- swap buttons
+- issue detection
+- worth knowing insight section
+- share full plan CTA
+- sort again action
+- family flow structure
+- current overall typography and brand feel
+
+This is a polish pass, not a redesign from scratch.
+
+-----------------------------------
+5. DESIGN INTENT
+-----------------------------------
+
+The experience should feel like:
+- less spreadsheet
+- less system maths
+- more calm interpretation
+- more “this helps me think”
+- more human and reassuring
+- still clever underneath, but not showing off the engine
+
+It should feel like the app is quietly reducing mental load.
+
+-----------------------------------
+6. QA CHECK BEFORE FINISHING
+-----------------------------------
+
+Before marking complete, please sense check these scenarios:
+- a day with a large free stretch after the final event
+- a day with one short gap between events
+- a day with almost no breathing room
+- a day with a clash
+- a day with no clash but one “tight” handoff
+
+Make sure the surfaced insight text feels natural in each case and never falls back to raw minute-math or midnight-based phrasing.

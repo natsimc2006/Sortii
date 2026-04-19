@@ -450,29 +450,46 @@ function JuggleResultsContent({
 
   return (
     <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 16, gap: 16, paddingBottom: 100 }}>
-      {/* Subheading */}
-      {subhead ? (
-        <Text style={styles.juggleSubhead}>{subhead}</Text>
-      ) : null}
-
-      {/* Status 2×2 grid */}
-      <View style={styles.juggleGrid}>
-        {[
-          { num: ws.total_events,        label: "Events",  suffix: "" },
-          { num: ws.conflicts_resolved,  label: "Sorted",  suffix: " ✓" },
-          { num: ws.tight_windows,       label: "Tight",   suffix: " ⚠" },
-          { num: ws.impossible_clashes,  label: "Issues",  suffix: " !" },
-        ].map((b) => (
-          <View key={b.label} style={styles.juggleGridBox}>
-            <Text style={styles.juggleGridNum}>{b.num}{b.suffix}</Text>
-            <Text style={styles.juggleGridLabel}>{b.label}</Text>
-          </View>
-        ))}
-      </View>
-
-      {/* Status pill */}
-      <View style={[styles.juggleStatusBanner, { backgroundColor: statusPill.bg }]}>
-        <Text style={[styles.juggleStatusBannerText, { color: statusPill.color }]}>{statusPill.text}</Text>
+      {/* ── Unified soft summary panel ── */}
+      <View style={styles.resultSummaryPanel}>
+        <Text style={styles.resultSummaryOutcome}>
+          {subhead ?? "Here's what we found."}
+        </Text>
+        <View style={styles.resultSummaryStatsRow}>
+          <Text style={styles.resultSummaryStatText}>
+            {ws.total_events} {ws.total_events === 1 ? "event" : "events"}
+          </Text>
+          {ws.tight_windows > 0 && (
+            <>
+              <Text style={styles.resultSummaryStatDot}>·</Text>
+              <Text style={[styles.resultSummaryStatText, { color: GOLD }]}>
+                {ws.tight_windows} tight
+              </Text>
+            </>
+          )}
+          {ws.impossible_clashes > 0 && (
+            <>
+              <Text style={styles.resultSummaryStatDot}>·</Text>
+              <Text style={[styles.resultSummaryStatText, { color: "#B86557" }]}>
+                {ws.impossible_clashes} {ws.impossible_clashes === 1 ? "clash" : "clashes"}
+              </Text>
+            </>
+          )}
+          {ws.impossible_clashes === 0 && ws.conflicts_resolved > 0 && (
+            <>
+              <Text style={styles.resultSummaryStatDot}>·</Text>
+              <Text style={[styles.resultSummaryStatText, { color: TEAL }]}>
+                {ws.conflicts_resolved} sorted ✓
+              </Text>
+            </>
+          )}
+          {ws.tight_windows === 0 && ws.impossible_clashes === 0 && (
+            <>
+              <Text style={styles.resultSummaryStatDot}>·</Text>
+              <Text style={[styles.resultSummaryStatText, { color: TEAL }]}>all clear ✓</Text>
+            </>
+          )}
+        </View>
       </View>
 
       {/* HERE'S THE SPLIT */}
@@ -499,13 +516,12 @@ function JuggleResultsContent({
                     </View>
                   </View>
                 ))}
-                {plan.free_windows.length > 0 && plan.free_windows[0]!.duration_minutes >= 30 && (
-                  <Text style={styles.juggleFreeWindow}>
-                    {plan.free_windows[0]!.is_end_of_day
-                      ? `Free from ${plan.free_windows[0]!.from} — enjoy it.`
-                      : `~${plan.free_windows[0]!.duration_minutes} min breather from ${plan.free_windows[0]!.from}.`}
-                  </Text>
-                )}
+                {(() => {
+                  const insight = buildFreeWindowInsight(plan);
+                  return insight ? (
+                    <Text style={styles.juggleFreeWindow}>{insight}</Text>
+                  ) : null;
+                })()}
                 <TouchableOpacity
                   style={styles.juggleAdultSendBtn}
                   onPress={() => {
@@ -580,10 +596,11 @@ function JuggleResultsContent({
         </View>
       )}
 
-      {/* THIS BIT NEEDS A PLAN */}
       {conflicts.length > 0 && (
         <View style={styles.juggleConflictCard}>
-          <Text style={styles.juggleConflictLabel}>THIS WON'T QUITE WORK YET</Text>
+          <Text style={styles.juggleConflictLabel}>
+            {conflicts.length === 1 ? "ONE THING TO TWEAK" : "A COUPLE OF THINGS TO SORT"}
+          </Text>
           {conflicts.map((c, i) => (
             <View key={i} style={i > 0 ? { marginTop: 12, paddingTop: 12, borderTopWidth: 1, borderTopColor: "#F3E0DC" } : undefined}>
               <Text style={styles.juggleConflictDesc}>⚠ {c.description}</Text>
@@ -1069,6 +1086,73 @@ function DaySection({
       </View>
     </View>
   );
+}
+
+// ── Time formatting helper (12h, no padding zeros) ───────────────────────────
+function fmt12h(hhmm: string): string {
+  const parts = hhmm.split(":");
+  const h = parseInt(parts[0] ?? "0", 10);
+  const m = parseInt(parts[1] ?? "0", 10);
+  if (isNaN(h) || isNaN(m)) return hhmm;
+  const period = h >= 12 ? "pm" : "am";
+  const hour = h % 12 || 12;
+  return m === 0 ? `${hour}${period}` : `${hour}:${String(m).padStart(2, "0")}${period}`;
+}
+
+// ── Free-window insight builder ───────────────────────────────────────────────
+// Returns a natural-language schedule insight, or null if nothing worth showing.
+// Never mentions raw minute counts or midnight-anchored times.
+function buildFreeWindowInsight(plan: JuggleAdultPlan): string | null {
+  const schedule = [...plan.schedule].sort((a, b) => a.time.localeCompare(b.time));
+  if (schedule.length === 0) return null;
+
+  // --- Try AI free_windows, but filter out midnight-anchored or suspiciously large ones ---
+  const aiWindows = (plan.free_windows ?? []).filter(
+    (w) => w.from >= "06:00" && w.duration_minutes <= 480
+  );
+
+  // Prefer a clear end-of-day window from AI data
+  const endWin = aiWindows.find((w) => w.is_end_of_day && w.duration_minutes >= 30);
+  if (endWin) return `Clear stretch after ${fmt12h(endWin.from)}.`;
+
+  // Mid-day gap from AI data
+  const midWin = aiWindows.find((w) => !w.is_end_of_day && w.duration_minutes >= 30);
+  if (midWin) {
+    const dur = midWin.duration_minutes;
+    const from = fmt12h(midWin.from);
+    const to   = fmt12h(midWin.to);
+    if (dur >= 75) return `Good window ${from}–${to}.`;
+    return `Quick window ${from}–${to}.`;
+  }
+
+  // --- Fall back: compute from schedule start times ---
+  const last = schedule[schedule.length - 1]!;
+  const [lh, lm] = last.time.split(":").map(Number);
+  if (!isNaN(lh!) && !isNaN(lm!)) {
+    const lastMin = lh! * 60 + lm!;
+    if (lastMin < 960) {
+      // Last event before 4pm — afternoon opens up
+      return schedule.length >= 2
+        ? `Afternoon opens up after ${fmt12h(last.time)}.`
+        : `Clear stretch after ${fmt12h(last.time)}.`;
+    }
+  }
+
+  // Check if events are tightly packed (all gaps < 30 min)
+  if (schedule.length >= 3) {
+    let allTight = true;
+    for (let i = 0; i < schedule.length - 1; i++) {
+      const [ah, am] = schedule[i]!.time.split(":").map(Number);
+      const [bh, bm] = schedule[i + 1]!.time.split(":").map(Number);
+      if (!isNaN(ah!) && !isNaN(bh!)) {
+        const gap = (bh! * 60 + bm!) - (ah! * 60 + am!);
+        if (gap >= 30) { allTight = false; break; }
+      }
+    }
+    if (allTight) return "A little tight through the middle.";
+  }
+
+  return null;
 }
 
 // ── Time-picker options (7:00 AM → 6:30 PM, 30-min slots) ────────────────────
@@ -2396,18 +2480,23 @@ const styles = StyleSheet.create({
   juggleLineText: { fontSize: 16, fontFamily: "Inter_600SemiBold", color: TEXT, textAlign: "center", paddingHorizontal: 40 },
   juggleSubText: { fontSize: 13, fontFamily: "Inter_400Regular", color: TEXT_MUTED, textAlign: "center" },
 
-  // Juggle results — status grid
-  juggleGrid: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
-  juggleGridBox: {
-    flex: 1, minWidth: "45%", backgroundColor: "#fff", borderRadius: 12,
-    borderWidth: 1, borderColor: BORDER, padding: 12, alignItems: "center", gap: 2,
+  // Juggle results — unified soft summary panel (top of results screen)
+  resultSummaryPanel: {
+    backgroundColor: "#EAF6F4", borderRadius: 16, padding: 18, gap: 10,
   },
-  juggleGridNum: { fontSize: 22, fontFamily: "Inter_700Bold", color: TEXT },
-  juggleGridLabel: { fontSize: 11, fontFamily: "Inter_500Medium", color: TEXT_MUTED, textTransform: "uppercase", letterSpacing: 0.6 },
-
-  // Juggle results — status pill
-  juggleStatusBanner: { borderRadius: 20, paddingHorizontal: 16, paddingVertical: 10, alignItems: "center" },
-  juggleStatusBannerText: { fontSize: 14, fontFamily: "Inter_600SemiBold" },
+  resultSummaryOutcome: {
+    fontSize: 20, fontFamily: "Manrope_700Bold", color: TEXT,
+    letterSpacing: -0.3, lineHeight: 26,
+  },
+  resultSummaryStatsRow: {
+    flexDirection: "row", alignItems: "center", gap: 8, flexWrap: "wrap",
+  },
+  resultSummaryStatText: {
+    fontSize: 13, fontFamily: "Inter_500Medium", color: TEXT_MUTED,
+  },
+  resultSummaryStatDot: {
+    fontSize: 13, fontFamily: "Inter_400Regular", color: BORDER,
+  },
 
   // Juggle results — section label
   juggleSectionLabel: {
@@ -2478,11 +2567,11 @@ const styles = StyleSheet.create({
 
   // Juggle results — conflicts
   juggleConflictCard: {
-    backgroundColor: "#fff", borderRadius: 14, borderWidth: 1, borderColor: BORDER,
-    borderLeftWidth: 3, borderLeftColor: "#B86557", padding: 14, gap: 8,
+    backgroundColor: "#FDF2F0", borderRadius: 14, borderWidth: 1, borderColor: "#EDD5D0",
+    borderLeftWidth: 3, borderLeftColor: "#C0695A", padding: 14, gap: 8,
   },
   juggleConflictLabel: {
-    color: "#B86557", fontSize: 11, fontFamily: "Inter_600SemiBold",
+    color: "#B05545", fontSize: 11, fontFamily: "Inter_600SemiBold",
     textTransform: "uppercase", letterSpacing: 0.1, marginBottom: 4,
   },
   juggleConflictDesc: { fontSize: 14, fontFamily: "Inter_600SemiBold", color: TEXT },
