@@ -22,7 +22,7 @@ import { loadFamilyState } from "@/utils/familyStore";
 import { FamilyState } from "@/utils/familyTypes";
 import { computeFamilyWeek } from "@/utils/familyEngine";
 import { loadAppointments, Appointment } from "@/utils/appointmentStore";
-import { loadBills, computeBillStatus, Bill } from "@/utils/billStore";
+import { loadBills, computeBillStatus, Bill, daysUntilDue } from "@/utils/billStore";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { APPLE_CONNECTED_KEY, GOOGLE_CONNECTED_KEY, FAMILY_PUSHED_KEY } from "@/utils/calendarTypes";
 import {
@@ -455,6 +455,45 @@ export default function HomeTab() {
             </TouchableOpacity>
           )}
 
+          {/* D2 — COMING UP: bills due this week */}
+          {(() => {
+            const dueSoon = allBills
+              .filter((b) => !b.isPaid && daysUntilDue(b) >= 0 && daysUntilDue(b) <= 7)
+              .sort((a, b) => a.dueDate.localeCompare(b.dueDate));
+            if (dueSoon.length === 0) return null;
+            const shown = dueSoon.slice(0, 2);
+            const extra = dueSoon.length - 2;
+            return (
+              <View style={{ gap: 6 }}>
+                <Text style={[styles.sectionLabel, { color: GOLD }]}>COMING UP</Text>
+                {shown.map((bill) => {
+                  const days = daysUntilDue(bill);
+                  const dueLabel = days === 0 ? "Due today" : days === 1 ? "Due tomorrow" : `Due in ${days} days`;
+                  const dueColor = days <= 1 ? "#B86557" : days <= 3 ? GOLD : TEXT_MUTED;
+                  return (
+                    <TouchableOpacity
+                      key={bill.id}
+                      onPress={() => router.push("/(tabs)/bills")}
+                      activeOpacity={0.8}
+                      style={styles.comingUpCard}
+                    >
+                      <View style={{ flex: 1 }}>
+                        <Text style={styles.comingUpName} numberOfLines={1}>{bill.title}</Text>
+                        <Text style={[styles.comingUpDue, { color: dueColor }]}>{dueLabel}</Text>
+                      </View>
+                      <Text style={styles.comingUpAmount}>{currencySymbol}{bill.amount.toFixed(0)}</Text>
+                    </TouchableOpacity>
+                  );
+                })}
+                {extra > 0 && (
+                  <TouchableOpacity onPress={() => router.push("/(tabs)/bills")} activeOpacity={0.7}>
+                    <Text style={styles.comingUpMore}>{extra} more →</Text>
+                  </TouchableOpacity>
+                )}
+              </View>
+            );
+          })()}
+
           {/* E — Week at a glance */}
           <View style={styles.weekSection}>
             <Text style={styles.sectionLabel}>WEEK AT A GLANCE</Text>
@@ -828,6 +867,42 @@ const styles = StyleSheet.create({
     letterSpacing: 1.2,
     textTransform: "uppercase",
     color: TEXT_MUTED,
+  },
+  comingUpCard: {
+    borderLeftWidth: 3,
+    borderLeftColor: GOLD,
+    backgroundColor: CARD_BG,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: BORDER,
+    padding: 12,
+    paddingLeft: 14,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+  },
+  comingUpName: {
+    fontSize: 14,
+    fontFamily: "Inter_600SemiBold",
+    color: TEXT,
+    flex: 1,
+  },
+  comingUpDue: {
+    fontSize: 12,
+    fontFamily: "Inter_400Regular",
+    marginTop: 2,
+  },
+  comingUpAmount: {
+    fontSize: 16,
+    fontFamily: "Inter_700Bold",
+    color: TEXT,
+  },
+  comingUpMore: {
+    fontSize: 12,
+    fontFamily: "Inter_500Medium",
+    color: GOLD,
+    textAlign: "right",
+    paddingRight: 2,
   },
   weekStrip: { gap: 6, paddingBottom: 2 },
   dayPill: {

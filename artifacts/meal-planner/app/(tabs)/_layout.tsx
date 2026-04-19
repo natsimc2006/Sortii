@@ -318,6 +318,20 @@ export default function TabLayout() {
             tabBarActiveTintColor: "#D29A22",
           }}
         />
+        <Tabs.Screen
+          name="bills"
+          options={{
+            title: "Bills",
+            tabBarIcon: ({ color, focused }) => (
+              <Ionicons
+                name={focused ? "receipt" : "receipt-outline"}
+                size={21}
+                color={color}
+              />
+            ),
+            tabBarActiveTintColor: TEAL,
+          }}
+        />
 
         {/* ── Hidden (still accessible via router.push) ── */}
         <Tabs.Screen name="planner"      options={{ href: null }} />
@@ -328,7 +342,6 @@ export default function TabLayout() {
         <Tabs.Screen name="saved"        options={{ href: null }} />
         <Tabs.Screen name="preferences"  options={{ href: null }} />
         <Tabs.Screen name="appointments" options={{ href: null }} />
-        <Tabs.Screen name="bills"        options={{ href: null }} />
         <Tabs.Screen name="upcoming"     options={{ href: null }} />
         <Tabs.Screen name="index"           options={{ href: null }} />
         <Tabs.Screen name="household-profile" options={{ href: null }} />

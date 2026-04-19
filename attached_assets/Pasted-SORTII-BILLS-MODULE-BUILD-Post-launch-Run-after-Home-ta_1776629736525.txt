@@ -1,0 +1,276 @@
+SORTII — BILLS MODULE BUILD
+Post-launch. Run after Home tab is confirmed working.
+Do not run this prompt during App Store submission phase.
+
+━━━ CONTEXT ━━━
+Sortii is a React Native / Expo app. It already has:
+- A Home tab (home.tsx) showing today's dinner + money snapshot
+- A Money tab storing weekly income, fixed costs, grocery spend,
+  and a calculated weeklyBreathingRoom value
+- A Planner tab storing the weekly meal plan in AsyncStorage
+- Meal savings tracked as cumulativeSavings or similar
+
+Before writing any code, do the following:
+1. Search the Money screen file for the AsyncStorage key used to
+   store money data. Log it in a comment at the top of your work.
+2. Search the Money screen for how weeklyBreathingRoom is derived
+   (stored value or calculated fresh). Log this too.
+3. Search the Planner or Money screen for how dinner savings /
+   cumulativeSavings is stored. Log the exact key name.
+   If no savings tracking exists yet, note this — do not create
+   savings logic, just design the Bills module to accept a
+   savings value of 0 safely.
+
+Only proceed once you have confirmed all three key names.
+
+━━━ PHASE 1: DATA LAYER ━━━
+Create a new utility file: utils/billsService.ts
+
+It must contain:
+
+1. STORAGE KEY
+   const BILLS_KEY = '@sortii_bills';
+
+2. BILL TYPE
+   export type Bill = {
+     id: string;           // uuid
+     name: string;
+     amount: number;
+     dueDate: string;      // ISO 8601 "YYYY-MM-DD"
+     recurring: boolean;   // repeats monthly
+     canPush: boolean;     // user flagged as deferrable
+     paid: boolean;
+     paidDate: string | null;
+   };
+
+3. FUNCTIONS (all async, all wrapped in try/catch):
+   - getAllBills(): Promise
+   - saveBill(bill: Bill): Promise
+   - updateBill(id: string, updates: Partial): Promise
+   - deleteBill(id: string): Promise
+   - getBillsDueThisWeek(): Promise
+     → returns unpaid bills where daysUntilDue <= 7
+   - getTotalDueThisWeek(): Promise
+     → sum of amounts for bills due this week (unpaid only)
+
+4. DERIVED HELPER (not stored — calculated at runtime):
+   - generateNextRecurringBill(bill: Bill): Bill
+     → takes a paid recurring bill, returns a new Bill object
+        with dueDate incremented by 1 month and paid: false
+     → called automatically when a recurring bill is marked paid
+
+5. SAFETY RULES for all functions:
+   - Never return undefined — return [] or 0 as fallback
+   - If AsyncStorage read fails, return empty state silently
+   - Never mutate the stored array directly — always read,
+     clone, modify, write
+
+━━━ PHASE 2: BILLS SCREEN ━━━
+
+CONFIRM PHASE 1 IS COMPLETE BEFORE STARTING PHASE 2.
+
+Create screens/BillsScreen.tsx
+
+Layout (ScrollView, SafeAreaView, StyleSheet only — no
+external UI libraries):
+
+HEADER
+- Title: "Bills" — fontSize 28, fontWeight 700, color #2B2B2B
+- Subtitle: "What's coming up." — fontSize 14, color #777
+
+SAVINGS MOMENT CARD (conditional)
+Read cumulativeSavings from AsyncStorage using the key
+identified in Phase 1 context check.
+
+Condition: IF cumulativeSavings > 0 AND there is at least one
+upcoming unpaid bill:
+  Find the bill where cumulativeSavings comes closest to covering
+  (prefer the smallest bill amount <= cumulativeSavings, or the
+  smallest bill overall if none are fully covered).
+  
+  Show a teal-tinted card:
+  - Background: #E6F3F0
+  - Border: 1px solid #2A8F88
+  - Border-radius: 12
+  - Padding: 16
+  - Text: "$[cumulativeSavings] saved cooking at home →
+    [covered/nearly covers] your [billName]."
+  - Font: 14px, fontWeight 600, color #257D78
+
+  Logic for copy:
+  - IF cumulativeSavings >= bill.amount: "sorted."
+    Full line: "$X saved cooking at home → [name] sorted."
+  - IF cumulativeSavings >= bill.amount * 0.75: "nearly covers"
+    Full line: "$X saved cooking at home → nearly covers [name]."
+  - ELSE: do not show this card (not meaningful enough)
+
+  Safety: if cumulativeSavings is null/undefined/NaN,
+  suppress this card entirely. Never show "$0" or "$NaN".
+
+UPCOMING BILLS LIST
+Label: "NEXT 14 DAYS" — 10px, uppercase, letterSpacing 0.12,
+color #5E3A4C
+
+For each unpaid bill where daysUntilDue <= 14, show a card:
+- Background: white
+- Border: 1px solid #E6E1D7
+- Border-radius: 12
+- Padding: 16
+- Left section:
+  - Bill name: 16px, fontWeight 600, #2B2B2B
+  - Due label: 12px, color based on urgency:
+    - daysUntilDue === 0: "Due today" — color #B86557, fontWeight 700
+    - daysUntilDue === 1: "Due tomorrow" — color #B86557, fontWeight 700
+    - daysUntilDue <= 3: "Due in X days" — color #D29A22
+    - else: "Due in X days" — color #777
+- Right section:
+  - Amount: 18px, fontWeight 700, #2B2B2B
+  - "Can push?" toggle (if canPush is true, show a small teal
+    pill "Flexible". If false, show nothing.)
+- Bottom row (tappable):
+  - "Mark as paid" — teal text button, 13px
+  - "Delete" — red text button, 13px, only shown on long press
+
+Sorted by dueDate ascending (soonest first).
+
+If no bills due in 14 days:
+Show: "Nothing due this week. A clean run. Enjoy it."
+Color: #777, italic, centered, padding 32.
+
+FURTHER AHEAD section
+Bills where daysUntilDue is 15–60, shown as a simple list:
+- Name + amount + due date in one line
+- No urgency colouring
+- Greyed out, smaller font (13px, color #aaa)
+- Collapsed by default with "X more coming up" expand button
+
+ADD BILL BUTTON (fixed at bottom)
+- Background: #D29A22 (gold)
+- Text: "+ Add a bill" — white, 15px, fontWeight 600
+- Border-radius: 14
+- Margin: 16 horizontal, 24 bottom
+- Navigates to AddBillScreen (see Phase 3)
+
+━━━ PHASE 3: ADD BILL SCREEN ━━━
+
+CONFIRM PHASE 2 IS COMPLETE BEFORE STARTING PHASE 3.
+
+Create screens/AddBillScreen.tsx
+
+Header: "Add a bill." — fontSize 24, fontWeight 700
+Sub: "Quick. No spreadsheets." — fontSize 13, color #777
+
+FIELDS (styled input cards — background #F7F3EB, border #E6E1D7,
+border-radius 8, padding 12 16):
+
+1. What is it?
+   - TextInput, placeholder "e.g. Electricity, Car rego, School fees"
+   - maxLength: 40
+
+2. Amount ($)
+   - Numeric TextInput, keyboardType="decimal-pad"
+   - Prefix: "$" shown inline
+   - Validation: must be > 0 before save is enabled
+
+3. Due date
+   - Date picker or simple day/month text inputs
+   - Default: today's date
+   - Display format: "Thursday 25 Apr"
+
+4. Repeats monthly (toggle)
+   - Default: off
+   - Label: "Repeats monthly"
+   - Sub: "We'll remember it for you."
+   - Toggle: teal when on, #E6E1D7 when off
+
+5. Can this be pushed? (toggle)
+   - Default: off
+   - Label: "Can this be pushed?"
+   - Sub: "Useful if timing is tight."
+
+SAVE BUTTON
+- Label: "Save bill →"
+- Background: #D29A22 — ONLY active when name is filled and
+  amount > 0. Otherwise: background #E6E1D7, text #aaa.
+- On tap: call saveBill() from billsService.ts
+  → generate uuid for id
+  → navigate back to BillsScreen
+  → show brief success toast: "Done. One less thing."
+
+SAFETY RULES:
+- Never save a bill with amount === 0 or NaN
+- Never save a bill with empty name
+- Due date must be today or future — if user enters past date,
+  show inline error: "That one's already gone. Pick a future date."
+
+━━━ PHASE 4: INTEGRATIONS ━━━
+
+CONFIRM PHASES 1–3 ARE COMPLETE BEFORE STARTING PHASE 4.
+
+4A. HOME SCREEN INTEGRATION (home.tsx)
+Add a new section below the Money Snapshot card.
+
+Read bills using getBillsDueThisWeek() from billsService.ts.
+
+IF bills exist:
+  Show a section with label "COMING UP" (10px, uppercase,
+  letterSpacing 0.12, color #D29A22).
+
+  For each bill (max 2 shown, "X more →" link if more exist):
+  Show a compact card:
+  - Border-left: 3px solid #D29A22
+  - Background: white
+  - Border-radius: 10, padding: 12 14
+  - Bill name + amount on one row
+  - Due label below (urgency colour rules same as Phase 2)
+
+  IF cumulativeSavings >= nearestBill.amount * 0.75:
+  Show the savings moment line below the last bill card:
+  "$[X] saved cooking at home → [copy]"
+  Style: 12px, italic, color #2A8F88
+
+IF no bills due this week:
+  Do not show this section. No empty state.
+
+4B. MONEY TAB INTEGRATION
+Find the Money screen. Locate where weeklyBreathingRoom is
+calculated or displayed.
+
+Add a step to the calculation:
+  adjustedBreathingRoom = weeklyBreathingRoom - getTotalDueThisWeek()
+
+Display the adjusted number with a small note beneath:
+  IF bills exist this week:
+  "Includes $[total] in upcoming bills."
+  Font: 11px, color #888
+
+  IF adjustedBreathingRoom < 0:
+  Show the amount in red (#B86557) with note:
+  "Tight week — bills exceed breathing room."
+  Do NOT add any guilt language. Just the fact.
+
+  IF no bills this week:
+  Show weeklyBreathingRoom as normal with no extra note.
+
+4C. TAB BAR (if not already present)
+Add Bills as a tab in the bottom navigation.
+- Icon: Ionicons "receipt-outline" / "receipt"
+- Position: between Money and the last tab
+- Label: "Bills"
+- Active colour: #2A8F88
+
+━━━ SAFETY RULES (ALL PHASES) ━━━
+- Do not modify recipes.json or any recipe data
+- Do not change existing AsyncStorage keys or schemas
+- Do not alter PlannerScreen, RecipesScreen, or AdjustScreen
+- Do not change existing brand colours on any existing screen
+- All monetary values: round to 2 decimal places for display,
+  use raw numbers internally
+- If any AsyncStorage read returns null: treat as empty array
+  or 0 — never crash, never show NaN or undefined
+- If getTotalDueThisWeek() returns 0: do not modify the
+  breathing room display at all
+- Every new screen must use SafeAreaView and handle both iOS
+  and Android safe areas correctly
+- Test that existing Planner and Money tabs still function
+  after all integrations

@@ -60,3 +60,27 @@ export function computeBillStatus(bill: Bill): "Paid" | "Overdue" | "Due Soon" |
   if (diffDays <= 7)  return "Due Soon";
   return "Upcoming";
 }
+
+export function daysUntilDue(bill: Bill): number {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const [y, m, d] = bill.dueDate.split("-").map(Number);
+  const due = new Date(y!, (m! - 1), d!);
+  return Math.floor((due.getTime() - today.getTime()) / 86_400_000);
+}
+
+export async function getBillsDueThisWeek(): Promise<Bill[]> {
+  try {
+    const bills = await loadBills();
+    return bills
+      .filter((b) => !b.isPaid && daysUntilDue(b) >= 0 && daysUntilDue(b) <= 7)
+      .sort((a, b) => a.dueDate.localeCompare(b.dueDate));
+  } catch { return []; }
+}
+
+export async function getTotalDueThisWeek(): Promise<number> {
+  try {
+    const bills = await getBillsDueThisWeek();
+    return bills.reduce((sum, b) => sum + b.amount, 0);
+  } catch { return 0; }
+}

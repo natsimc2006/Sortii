@@ -1,7 +1,7 @@
 import { Feather } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
-import { useRouter } from "expo-router";
-import React, { useState, useRef, useEffect } from "react";
+import { useFocusEffect, useRouter } from "expo-router";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import {
   Animated,
   ActivityIndicator,
@@ -33,6 +33,7 @@ import {
 } from "@/utils/savingsGoalCopy";
 import type { SavingsGoal } from "@/utils/onboardingState";
 import type { Recipe } from "@/constants/recipes";
+import { loadBills, daysUntilDue } from "@/utils/billStore";
 
 const C = Colors.light;
 const TEAL = "#2A8F88";
@@ -651,6 +652,18 @@ export default function MoneyScreen() {
   const [toastMsg, setToastMsg] = useState<string | null>(null);
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  // Bills due this week
+  const [billsTotalThisWeek, setBillsTotalThisWeek] = useState(0);
+  const [billsCountThisWeek, setBillsCountThisWeek] = useState(0);
+
+  useFocusEffect(useCallback(() => {
+    loadBills().then((bills) => {
+      const dueSoon = bills.filter((b) => !b.isPaid && daysUntilDue(b) >= 0 && daysUntilDue(b) <= 7);
+      setBillsCountThisWeek(dueSoon.length);
+      setBillsTotalThisWeek(dueSoon.reduce((s, b) => s + b.amount, 0));
+    }).catch(() => {});
+  }, []));
+
   const showToast = (msg: string) => {
     if (toastTimer.current) clearTimeout(toastTimer.current);
     setToastMsg(msg);
@@ -805,6 +818,30 @@ export default function MoneyScreen() {
               appliedSavingsTotal={appliedSavingsTotal}
             />
           )}
+
+          {/* 2b. Bills impact on breathing room */}
+          {money && billsTotalThisWeek > 0 && (() => {
+            const breathing = result.remaining + appliedSavingsTotal;
+            const adjusted = breathing - billsTotalThisWeek;
+            const isNeg = adjusted < 0;
+            return (
+              <View style={[styles.billsNoteCard, { borderColor: isNeg ? "#B86557" : GOLD }]}>
+                <View style={styles.billsNoteRow}>
+                  <Text style={styles.billsNoteLabel}>
+                    After {billsCountThisWeek} bill{billsCountThisWeek > 1 ? "s" : ""} this week
+                  </Text>
+                  <Text style={[styles.billsNoteAmount, { color: isNeg ? "#B86557" : GOLD }]}>
+                    {isNeg ? `–${formatMoneyRound(Math.abs(adjusted))}` : formatMoneyRound(adjusted)}
+                  </Text>
+                </View>
+                <Text style={[styles.billsNoteSub, { color: isNeg ? "#B86557" : "#888" }]}>
+                  {isNeg
+                    ? "Tight week — bills exceed breathing room."
+                    : `Includes ${formatMoneyRound(billsTotalThisWeek)} in upcoming bills.`}
+                </Text>
+              </View>
+            );
+          })()}
 
           {/* 3. Where groceries are going */}
           {money && (
@@ -1125,6 +1162,35 @@ const styles = StyleSheet.create({
   },
   winsBarAmount: {
     fontSize: 15, fontFamily: "Inter_700Bold", color: TEAL,
+  },
+
+  // Bills note card
+  billsNoteCard: {
+    borderRadius: 12,
+    borderWidth: 1.5,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    backgroundColor: "#FFFCF5",
+    gap: 4,
+  },
+  billsNoteRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  billsNoteLabel: {
+    fontSize: 13,
+    fontFamily: "Inter_500Medium",
+    color: "#555",
+  },
+  billsNoteAmount: {
+    fontSize: 16,
+    fontFamily: "Inter_700Bold",
+  },
+  billsNoteSub: {
+    fontSize: 11,
+    fontFamily: "Inter_400Regular",
+    lineHeight: 16,
   },
 
   // Wins toast
