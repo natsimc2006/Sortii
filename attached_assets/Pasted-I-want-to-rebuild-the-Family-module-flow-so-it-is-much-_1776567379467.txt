@@ -1,0 +1,271 @@
+I want to rebuild the Family module flow so it is much easier for the user to understand and move through, while keeping all of the smart engine logic underneath.
+
+Important
+
+Do NOT remove or simplify the smart logic layer already built.
+
+Keep and continue using:
+
+* estimated travel time based on suburb/location inputs
+* overlap detection
+* tight timing / pressure detection
+* driver assignment and split logic
+* recurring event handling
+* “worth knowing” summary generation
+* recommendation logic
+* best-option / least-painful-plan logic
+
+The goal is NOT to reduce intelligence.
+The goal is to make the journey to the untangled output much clearer.
+
+⸻
+
+New product model
+
+The Family module should work as a simple 3-step journey:
+
+Step 1: Add what’s on
+
+User adds:
+
+* family members
+* who can drive / help
+* events / activities / appointments
+* locations, times, repeat settings
+* optional tricky notes
+
+Step 2: Untangle it
+
+One strong CTA triggers the smart logic.
+
+Step 3: See the plan
+
+The app reveals the organised output:
+
+* who is doing what
+* what works
+* what is tight
+* what does not fit cleanly
+* what Sortii recommends
+
+⸻
+
+1. Separate input state from sorted output state
+
+Right now the Family screen mixes:
+
+* event entry
+* partial summaries
+* plan outputs
+* sort CTA
+
+This is confusing.
+
+Please redesign so that:
+
+Before the user presses the main action
+
+Show only:
+
+* family members entered
+* events entered
+* a simple raw count / light setup summary
+* one strong CTA to run the planner
+
+Do NOT fully surface plan split, “who’s covering what”, conflict recommendations, or final sorted outputs before the user triggers the smart planner.
+
+After the user presses the main action
+
+Reveal the full sorted outputs and planner logic.
+
+⸻
+
+2. Replace the current main CTA with clearer language
+
+Replace “Sort the family juggle” with a clearer, more human primary action.
+
+Preferred CTA text:
+“Sort this out”
+
+Alternative acceptable options:
+
+* “Untangle this week”
+* “Make this work”
+
+Use one consistent primary label across the module.
+
+This CTA should feel like the hero action of the feature.
+
+⸻
+
+3. Rebuild the Family flow into 3 screens / modes
+
+A. Family input screen
+
+Header:
+Family
+Subhead:
+“What’s on this week? We’ll untangle the rest.”
+
+Show:
+
+* Family members card
+* Drivers / helpers if separate
+* Events list
+* Add event action
+* Optional “anything tricky?” notes
+
+Sticky bottom primary CTA:
+Sort this out
+
+Secondary option:
+Add another event
+
+The CTA should only become active once there is enough data to run meaningful planner logic.
+
+⸻
+
+B. Processing / untangling screen
+
+Show a dedicated transition state when the user taps the CTA.
+
+Keep the smart engine, but make the process visible.
+
+Preferred copy:
+“Finding the least painful version.”
+“We’re checking timings, travel, overlaps, and who can cover what.”
+
+Use the existing loading screen pattern if possible.
+
+⸻
+
+C. Sorted plan screen
+
+After the engine runs, show a distinct results screen.
+
+Header:
+“Here’s the plan”
+
+Subheading examples:
+
+* “This is the least painful version we found.”
+* “Manageable, with one bit to watch.”
+* “Mostly sorted. A couple of tight spots.”
+
+Then show:
+
+1. top-level week status
+2. who’s doing the running
+3. the plan by person or by day
+4. “this won’t quite work yet” section if needed
+5. “worth knowing”
+6. share plan / edit / sort again actions
+
+This should feel like the payoff screen.
+
+⸻
+
+4. Keep smart engine behaviour, but reveal it at the right time
+
+Use all existing intelligence, including:
+
+* travel-time estimation from suburb inputs
+* timing pressure between events
+* overlap detection
+* adult / driver coverage logic
+* suggested reallocations
+* “worth knowing” recommendations
+
+But present it after the “Sort this out” step, not mixed into initial setup.
+
+⸻
+
+5. Improve label clarity
+
+Please rename unclear labels:
+
+* “Who’s involved?” → “Who needs to be there?”
+* “Who’s covering what” → “Who’s doing the running”
+* “This bit needs a plan” → “This won’t quite work yet”
+
+Keep “Worth knowing” as-is.
+
+Use plain, human wording throughout.
+
+⸻
+
+6. Make the input screen feel like setup, not output
+
+Before sorting:
+
+* show raw event cards
+* show family members
+* show helpful setup hints
+* do NOT imply the final plan has already been worked out
+
+Example light summary before sorting:
+
+* “4 things this weekend”
+* “2 adults can help”
+* “Ready when you are”
+
+Then the clear CTA:
+Sort this out
+
+⸻
+
+7. Make the results screen feel obviously smarter than the setup screen
+
+After sorting, the user should feel:
+
+* the app has interpreted the week
+* the engine has done work
+* this is now a plan, not just a list of events
+
+Use stronger outcome language:
+
+* “Manageable — one bit to watch.”
+* “This mostly works.”
+* “One clash needs a rethink.”
+* “Two tight windows, but doable.”
+
+⸻
+
+8. Actions on the results screen
+
+Use these clear next actions:
+
+* Share full plan
+* Edit events
+* Sort again
+
+Optional:
+
+* Add another event
+
+But the main output actions should be about using or adjusting the plan.
+
+⸻
+
+9. Keep recurring events and existing logic intact
+
+Repeating events, suburb-based travel estimates, and other engine features must still work exactly as before or better.
+
+The flow is being rebuilt.
+The engine intelligence should remain.
+
+⸻
+
+10. Desired user feeling
+
+The user journey should feel like:
+
+1. I entered the week
+2. I asked Sortii to sort it out
+3. I got a practical, least-painful plan
+
+Not:
+
+1. I entered events
+2. I saw some half-finished summary cards
+3. I guessed what button to press

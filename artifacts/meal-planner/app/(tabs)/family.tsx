@@ -439,8 +439,22 @@ function JuggleResultsContent({
     return lines.join("\n");
   }
 
+  // Outcome subheading
+  const subhead = impossible > 0
+    ? "One clash needs a rethink."
+    : tight > 0
+    ? "Manageable — one bit to watch."
+    : conflicts.length === 0 && ws.total_events > 0
+    ? "This mostly works. ✓"
+    : null;
+
   return (
     <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 16, gap: 16, paddingBottom: 100 }}>
+      {/* Subheading */}
+      {subhead ? (
+        <Text style={styles.juggleSubhead}>{subhead}</Text>
+      ) : null}
+
       {/* Status 2×2 grid */}
       <View style={styles.juggleGrid}>
         {[
@@ -464,7 +478,7 @@ function JuggleResultsContent({
       {/* HERE'S THE SPLIT */}
       {adultPlans.length > 0 && (
         <View style={{ gap: 10 }}>
-          <Text style={styles.juggleSectionLabel}>HERE'S THE SPLIT</Text>
+          <Text style={styles.juggleSectionLabel}>WHO'S DOING THE RUNNING</Text>
           {adultPlans.map((plan) => {
             const member = members.find((m) => m.name === plan.adult);
             return (
@@ -569,7 +583,7 @@ function JuggleResultsContent({
       {/* THIS BIT NEEDS A PLAN */}
       {conflicts.length > 0 && (
         <View style={styles.juggleConflictCard}>
-          <Text style={styles.juggleConflictLabel}>THIS BIT NEEDS A PLAN</Text>
+          <Text style={styles.juggleConflictLabel}>THIS WON'T QUITE WORK YET</Text>
           {conflicts.map((c, i) => (
             <View key={i} style={i > 0 ? { marginTop: 12, paddingTop: 12, borderTopWidth: 1, borderTopColor: "#F3E0DC" } : undefined}>
               <Text style={styles.juggleConflictDesc}>⚠ {c.description}</Text>
@@ -1347,7 +1361,7 @@ function AddEventSheet({
             {/* Who's involved */}
             {members.length > 0 && (
               <View style={styles.formField}>
-                <Text style={styles.formLabel}>Who's involved?</Text>
+                <Text style={styles.formLabel}>Who needs to be there?</Text>
                 <View style={styles.chipGroup}>
                   {members.map((m) => (
                     <MemberChip
@@ -1580,6 +1594,37 @@ function ManagePeopleSection({
   );
 }
 
+// ── SetupReadyStrip ────────────────────────────────────────────────────────────
+function SetupReadyStrip({
+  eventCount, adultCount, lastSolvedAt, onViewLastPlan,
+}: {
+  eventCount: number;
+  adultCount: number;
+  lastSolvedAt: number | null;
+  onViewLastPlan: () => void;
+}) {
+  const parts = [
+    `${eventCount} ${eventCount === 1 ? "thing" : "things"} this week`,
+    adultCount > 0 ? `${adultCount} ${adultCount === 1 ? "adult" : "adults"} can help` : null,
+    "Ready when you are.",
+  ].filter(Boolean);
+
+  return (
+    <View style={styles.setupStrip}>
+      <Text style={styles.setupStripText}>{parts.join("  ·  ")}</Text>
+      {lastSolvedAt ? (
+        <TouchableOpacity onPress={onViewLastPlan} activeOpacity={0.8} style={styles.setupViewPlanBtn}>
+          <Feather name="check-circle" size={12} color={TEAL} />
+          <Text style={styles.setupViewPlanBtnText}>
+            Last sorted {new Date(lastSolvedAt).toLocaleDateString("en-AU", { weekday: "short", day: "numeric", month: "short" })} — view
+          </Text>
+          <Feather name="chevron-right" size={12} color={TEAL} />
+        </TouchableOpacity>
+      ) : null}
+    </View>
+  );
+}
+
 // ── Main screen ────────────────────────────────────────────────────────────────
 export default function FamilyScreen() {
   const insets        = useSafeAreaInsets();
@@ -1643,7 +1688,10 @@ export default function FamilyScreen() {
 
   function openPlanSummary() {
     dismissBanner();
-    setShowPlanSummary(true);
+    if (juggleResult) {
+      setShowJuggleResult(true);
+    }
+    // No juggle result yet — just dismiss banner; events are visible below
   }
 
   function showBanner(type: BannerType, title: string) {
@@ -1787,19 +1835,18 @@ export default function FamilyScreen() {
 
   const hasEvents      = state.events.length > 0;
   const hasMembers     = state.members.length > 0;
-  const insights       = result?.insights ?? [];
-  const weekSummary    = result?.weekSummary;
-  const planSplit      = result?.planSplit ?? new Map();
+  const hasAdults      = state.members.some((m) => m.role === "adult");
   const daysWithEvents = result?.daysWithEvents ?? [];
-  const lightInsight   = result ? getLightInsight(result) : null;
-  const hasInsights    = insights.length > 0;
+  const canSort        = hasEvents && hasAdults;
+  // Extra bottom padding when sticky CTA bar is visible
+  const scrollPadBottom = canSort ? 172 : 120;
 
   return (
     <View style={{ flex: 1, backgroundColor: BG }}>
       <ScrollView
         ref={scrollRef}
         style={{ flex: 1 }}
-        contentContainerStyle={[styles.container, { paddingTop, paddingBottom }]}
+        contentContainerStyle={[styles.container, { paddingTop, paddingBottom: scrollPadBottom }]}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
@@ -1809,9 +1856,9 @@ export default function FamilyScreen() {
             <Text style={styles.pageTitle}>Family</Text>
             <Text style={styles.pageSub}>
               {hasEvents
-                ? (result?.dashboardLine ?? "The moving parts of your week.")
+                ? "What's on this week? We'll untangle the rest."
                 : hasMembers
-                ? "Once you add a couple of things, we'll map the week."
+                ? "Add events as they come up. Sortii will sort the rest."
                 : "Your family's week, in one place."}
             </Text>
           </View>
@@ -1828,28 +1875,17 @@ export default function FamilyScreen() {
           />
         )}
 
-        {/* ══ PLANNER OUTPUTS — lead when events exist ══ */}
+        {/* ── Family members — always at top ── */}
+        <ManagePeopleSection
+          members={state.members}
+          onAdd={handleAddMember}
+          onRemove={handleRemoveMember}
+        />
+
+        {/* ── Events or empty states ── */}
         {hasEvents ? (
           <>
-            {/* 1. Week summary stats */}
-            {weekSummary && <WeekSummaryCard summary={weekSummary} />}
-
-            {/* 2. Worth knowing — always shows something */}
-            {hasInsights ? (
-              <InsightsSection insights={insights} />
-            ) : lightInsight ? (
-              <View style={styles.lightInsightCard}>
-                <Feather name="zap" size={13} color={TEAL} />
-                <Text style={styles.lightInsightText}>{lightInsight}</Text>
-              </View>
-            ) : null}
-
-            {/* 3. Who's covering what — up here, not buried */}
-            {planSplit.size > 0 && (
-              <PlanSplitSection planSplit={planSplit} members={state.members} />
-            )}
-
-            {/* 4. This week — day-by-day events */}
+            {/* Day-by-day events — clean list, no plan outputs pre-sort */}
             <View style={styles.weekSection}>
               <Text style={styles.sectionLabel}>THIS WEEK</Text>
               {daysWithEvents.map((day) => (
@@ -1865,48 +1901,26 @@ export default function FamilyScreen() {
               ))}
             </View>
 
-            {/* 5. "This week, sorted" payoff card */}
-            {result && (
-              <WeekSortedCard
-                result={result}
-                onReview={openPlanSummary}
-                onShare={handleSharePlan}
-                onAddAnother={openAddEvent}
-              />
-            )}
-
-            {/* 6. Sort the family juggle — AI solve button */}
-            {state.members.some((m) => m.role === "adult") && (
-              <View style={styles.juggleSection}>
-                {juggleResult && (
-                  <TouchableOpacity
-                    style={styles.jugglePriorResult}
-                    onPress={() => setShowJuggleResult(true)}
-                    activeOpacity={0.85}
-                  >
-                    <Feather name="check-circle" size={13} color={TEAL} />
-                    <Text style={styles.jugglePriorResultText}>
-                      Last sorted {new Date(juggleResult.solvedAt).toLocaleDateString("en-AU", { weekday: "short", day: "numeric", month: "short" })} — tap to view
-                    </Text>
-                    <Feather name="chevron-right" size={13} color={TEXT_MUTED} />
-                  </TouchableOpacity>
-                )}
-                <TouchableOpacity
-                  style={styles.juggleSolveBtn}
-                  onPress={handleSortJuggle}
-                  activeOpacity={0.88}
-                >
-                  <Feather name="zap" size={16} color="#fff" />
-                  <Text style={styles.juggleSolveBtnText}>Sort the family juggle →</Text>
-                </TouchableOpacity>
-                <Text style={styles.juggleSolveSub}>
-                  AI maps who goes where and flags anything worth knowing.
+            {/* Recurring note */}
+            {state.events.some((e) => e.repeat !== "none") && (
+              <View style={styles.repeatNote}>
+                <Feather name="repeat" size={12} color={TEXT_MUTED} />
+                <Text style={styles.repeatNoteText}>
+                  Repeating events carry forward automatically each week.
                 </Text>
               </View>
             )}
+
+            {/* Light setup summary strip */}
+            <SetupReadyStrip
+              eventCount={state.events.length}
+              adultCount={state.members.filter((m) => m.role === "adult").length}
+              lastSolvedAt={juggleResult?.solvedAt ?? null}
+              onViewLastPlan={() => setShowJuggleResult(true)}
+            />
           </>
         ) : hasMembers ? (
-          /* ── Members exist, no events ── */
+          /* Members exist, no events yet */
           <View style={styles.membersReadyState}>
             <View style={styles.membersReadyChips}>
               {state.members.map((m) => (
@@ -1916,7 +1930,7 @@ export default function FamilyScreen() {
             <Text style={styles.membersReadyTitle}>Everyone's here.</Text>
             <Text style={styles.membersReadySub}>
               Add events as they come up — pickups, activities, anything that needs coordinating.
-              Once you do, we'll map the week for you.
+              Once you do, we'll untangle the week for you.
             </Text>
             <TouchableOpacity
               style={styles.membersReadyCta}
@@ -1928,43 +1942,46 @@ export default function FamilyScreen() {
             </TouchableOpacity>
           </View>
         ) : (
-          /* ── Truly empty ── */
+          /* Truly empty */
           <View style={styles.emptyState}>
             <Feather name="calendar" size={34} color="#D6D2C8" />
-            <Text style={styles.emptyTitle}>Nothing on this week.</Text>
+            <Text style={styles.emptyTitle}>Nothing on yet.</Text>
             <Text style={styles.emptySub}>
-              Add family members, then events as they come up. Sortii will sort the week.
-            </Text>
-          </View>
-        )}
-
-        {/* ── Family members (always at bottom when events exist) ── */}
-        <ManagePeopleSection
-          members={state.members}
-          onAdd={handleAddMember}
-          onRemove={handleRemoveMember}
-        />
-
-        {/* ── Recurring events note ── */}
-        {state.events.some((e) => e.repeat !== "none") && (
-          <View style={styles.repeatNote}>
-            <Feather name="repeat" size={12} color={TEXT_MUTED} />
-            <Text style={styles.repeatNoteText}>
-              Repeating events carry forward automatically each week.
+              Add your family, then events as they come up. Sortii will untangle the rest.
             </Text>
           </View>
         )}
       </ScrollView>
 
-      {/* ── Floating add button ── */}
-      <TouchableOpacity
-        style={[styles.fab, { bottom: paddingBottom - 48 }]}
-        onPress={openAddEvent}
-        activeOpacity={0.88}
-      >
-        <Feather name="plus" size={18} color="#fff" />
-        <Text style={styles.fabText}>Add event</Text>
-      </TouchableOpacity>
+      {/* ── Floating add event button (small, top-right when CTA bar is showing) ── */}
+      {!canSort && (
+        <TouchableOpacity
+          style={[styles.fab, { bottom: scrollPadBottom - 48 }]}
+          onPress={openAddEvent}
+          activeOpacity={0.88}
+        >
+          <Feather name="plus" size={18} color="#fff" />
+          <Text style={styles.fabText}>Add event</Text>
+        </TouchableOpacity>
+      )}
+
+      {/* ── Hero sticky CTA bar — "Sort this out" ── */}
+      {canSort && (
+        <View style={[styles.sortCtaBar, { paddingBottom: insets.bottom + 12 }]}>
+          <TouchableOpacity
+            style={styles.sortCtaBtn}
+            onPress={handleSortJuggle}
+            activeOpacity={0.88}
+          >
+            <Feather name="zap" size={16} color="#fff" />
+            <Text style={styles.sortCtaBtnText}>Sort this out</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.sortCtaAddBtn} onPress={openAddEvent} activeOpacity={0.8}>
+            <Feather name="plus" size={13} color={TEXT_MUTED} />
+            <Text style={styles.sortCtaAddBtnText}>Add another event</Text>
+          </TouchableOpacity>
+        </View>
+      )}
 
       {/* ── Add / Edit form sheet ── */}
       {showForm && (
@@ -1977,22 +1994,10 @@ export default function FamilyScreen() {
         />
       )}
 
-      {/* ── Plan summary review sheet ── */}
-      {showPlanSummary && (
-        <PlanSummarySheet
-          visible={showPlanSummary}
-          result={result}
-          members={state.members}
-          onClose={() => setShowPlanSummary(false)}
-          onShare={handleSharePlan}
-          onAddAnother={() => { setShowPlanSummary(false); openAddEvent(); }}
-        />
-      )}
-
       {/* ── AI juggle processing overlay ── */}
       {isJuggleSolving && <JuggleProcessingOverlay />}
 
-      {/* ── AI juggle results modal ── */}
+      {/* ── AI juggle results — full results screen ── */}
       {juggleResult && (
         <Modal
           visible={showJuggleResult}
@@ -2003,9 +2008,11 @@ export default function FamilyScreen() {
           <SafeAreaView style={{ flex: 1, backgroundColor: "#FAFAF8" }}>
             <View style={styles.resultsHeader}>
               <TouchableOpacity onPress={() => setShowJuggleResult(false)}>
-                <Text style={styles.resultsBack}>← Family</Text>
+                <Text style={styles.resultsBack}>← Back</Text>
               </TouchableOpacity>
-              <Text style={styles.resultsTitle}>WEEKEND PLAN</Text>
+              <View style={{ alignItems: "center", flex: 1 }}>
+                <Text style={styles.resultsTitle}>Here's the plan</Text>
+              </View>
               <TouchableOpacity onPress={() => { setShowJuggleResult(false); handleSortJuggle(); }}>
                 <Text style={styles.resultsRetry}>Sort again</Text>
               </TouchableOpacity>
@@ -2487,6 +2494,10 @@ const styles = StyleSheet.create({
     backgroundColor: "#F3E8EE", borderRadius: 14, borderWidth: 1, borderColor: PLUM + "30",
     borderLeftWidth: 3, borderLeftColor: PLUM, padding: 14, gap: 6,
   },
+  juggleSubhead: {
+    fontSize: 15, fontFamily: "Inter_400Regular", color: TEXT_MUTED,
+    fontStyle: "italic", lineHeight: 22, marginBottom: 4,
+  },
   juggleWorthKnowingLabel: {
     color: PLUM, fontSize: 11, fontFamily: "Inter_600SemiBold",
     textTransform: "uppercase", letterSpacing: 0.1,
@@ -2514,6 +2525,46 @@ const styles = StyleSheet.create({
     }),
   },
   fabText: { fontSize: 14, fontFamily: "Inter_600SemiBold", color: "#fff" },
+
+  // "Sort this out" hero CTA bar
+  sortCtaBar: {
+    position: "absolute", left: 0, right: 0, bottom: 0,
+    backgroundColor: "#fff",
+    borderTopWidth: 1, borderTopColor: BORDER,
+    paddingHorizontal: 20, paddingTop: 14,
+    gap: 8,
+    ...Platform.select({
+      web: { boxShadow: "0px -2px 12px rgba(0,0,0,0.07)" },
+      default: { shadowColor: "#000", shadowOffset: { width: 0, height: -2 }, shadowOpacity: 0.07, shadowRadius: 8, elevation: 8 },
+    }),
+  },
+  sortCtaBtn: {
+    flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 10,
+    backgroundColor: GOLD, borderRadius: 14, height: 54,
+    ...Platform.select({
+      web: { boxShadow: `0px 3px 12px ${GOLD}55` },
+      default: { shadowColor: GOLD, shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.3, shadowRadius: 10, elevation: 6 },
+    }),
+  },
+  sortCtaBtnText: { fontSize: 17, fontFamily: "Inter_700Bold", color: "#fff", letterSpacing: 0.2 },
+  sortCtaAddBtn: {
+    flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 6,
+    paddingVertical: 8,
+  },
+  sortCtaAddBtnText: { fontSize: 13, fontFamily: "Inter_500Medium", color: TEXT_MUTED },
+
+  // Setup ready strip
+  setupStrip: {
+    backgroundColor: TEAL_TINT, borderRadius: 12, borderWidth: 1, borderColor: TEAL + "30",
+    paddingHorizontal: 14, paddingVertical: 12, gap: 8,
+  },
+  setupStripText: { fontSize: 13, fontFamily: "Inter_500Medium", color: TEXT_MUTED, lineHeight: 18 },
+  setupViewPlanBtn: {
+    flexDirection: "row", alignItems: "center", gap: 5, alignSelf: "flex-start",
+    backgroundColor: "#fff", borderRadius: 20, paddingHorizontal: 10, paddingVertical: 5,
+    borderWidth: 1, borderColor: TEAL + "40",
+  },
+  setupViewPlanBtnText: { fontSize: 12, fontFamily: "Inter_500Medium", color: TEAL },
 
   // Form sheet
   formOverlay: { ...StyleSheet.absoluteFillObject, backgroundColor: "rgba(0,0,0,0.5)" },
@@ -2636,8 +2687,7 @@ const styles = StyleSheet.create({
   },
   resultsBack: { color: TEAL, fontSize: 15, fontFamily: "Inter_500Medium" },
   resultsTitle: {
-    color: PLUM, fontSize: 11, fontFamily: "Inter_600SemiBold",
-    letterSpacing: 0.12, textTransform: "uppercase",
+    color: TEXT, fontSize: 16, fontFamily: "Manrope_700Bold", letterSpacing: -0.2,
   },
   resultsRetry: { color: TEXT_MUTED, fontSize: 14, fontFamily: "Inter_400Regular" },
   resultsCard: {
