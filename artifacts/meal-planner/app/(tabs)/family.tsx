@@ -1796,21 +1796,23 @@ function SortContextCard({
   }
 
   return (
-    <View style={styles.sortCard}>
-      <Text style={styles.sortCardTitle}>Ready to untangle this week?</Text>
-      <Text style={styles.sortCardSub}>
-        {subline}{"\n"}We'll work out who goes where, where the squeezes are, and what needs a second pair of hands.
-      </Text>
+    <View style={styles.sortPromptStrip}>
+      <View style={styles.sortPromptInner}>
+        <Feather name="zap" size={13} color={GOLD} />
+        <Text style={styles.sortPromptText}>
+          {events.length >= 5
+            ? "Bit of a juggle here. Ready to untangle?"
+            : events.length >= 2
+            ? "Couple of moving parts. Ready to untangle this week?"
+            : "Even one thing is worth planning around. Want us to sort it?"}
+        </Text>
+      </View>
       {sortError ? (
         <View style={styles.sortCardError}>
           <Feather name="alert-circle" size={13} color="#C04040" />
           <Text style={styles.sortCardErrorText}>{sortError}</Text>
         </View>
       ) : null}
-      <TouchableOpacity style={styles.sortCardBtn} onPress={onSort} activeOpacity={0.85}>
-        <Feather name="zap" size={15} color="#fff" />
-        <Text style={styles.sortCardBtnText}>Sort the week</Text>
-      </TouchableOpacity>
     </View>
   );
 }
@@ -2072,8 +2074,9 @@ export default function FamilyScreen() {
   const hasAdults      = state.members.some((m) => m.role === "adult");
   const daysWithEvents = result?.daysWithEvents ?? [];
   const canSort        = hasEvents && hasAdults;
-  // Extra bottom padding: taller when sticky CTA bar is showing
-  const scrollPadBottom = hasEvents ? 148 : 80;
+  const isUnsorted     = hasEvents && !juggleResult;
+  // Extra bottom padding: taller when sort CTA is also shown in sticky bar
+  const scrollPadBottom = hasEvents ? (isUnsorted && canSort ? 192 : 160) : 80;
 
   return (
     <View style={{ flex: 1, backgroundColor: BG }}>
@@ -2199,23 +2202,42 @@ export default function FamilyScreen() {
         )}
       </ScrollView>
 
-      {/* ── Sticky bar — "Add another event" primary, softer when unsorted so sort hero leads ── */}
+      {/* ── Sticky bar — primary "Add another event" always teal; secondary sort/resort below ── */}
       {hasEvents && (
-        <View style={[
-          styles.sortCtaBar,
-          { paddingBottom: insets.bottom + 12 },
-          !juggleResult && styles.sortCtaBarSoft,
-        ]}>
+        <View style={[styles.sortCtaBar, { paddingBottom: insets.bottom + 12 }]}>
+          {/* Primary: always teal */}
           <TouchableOpacity
-            style={[styles.sortCtaBtn, !juggleResult && styles.sortCtaBtnSoft]}
+            style={styles.sortCtaBtn}
             onPress={openAddEvent}
             activeOpacity={0.88}
           >
-            <Feather name="plus" size={15} color={juggleResult ? "#fff" : TEAL} />
-            <Text style={[styles.sortCtaBtnText, !juggleResult && { color: TEAL }]}>
-              Add another event
-            </Text>
+            <Feather name="plus" size={15} color="#fff" />
+            <Text style={styles.sortCtaBtnText}>Add another event</Text>
           </TouchableOpacity>
+
+          {/* Secondary: Sort the week — only when unsorted and adults exist */}
+          {isUnsorted && canSort && (
+            <TouchableOpacity
+              style={styles.sortCtaSortBtn}
+              onPress={() => handleSortJuggle()}
+              activeOpacity={0.85}
+            >
+              <Feather name="zap" size={14} color={GOLD} />
+              <Text style={styles.sortCtaSortBtnText}>Sort the week</Text>
+            </TouchableOpacity>
+          )}
+
+          {/* Re-sort — low emphasis when already sorted */}
+          {juggleResult && (
+            <TouchableOpacity
+              style={styles.sortCtaResortLink}
+              onPress={() => handleSortJuggle()}
+              activeOpacity={0.7}
+            >
+              <Feather name="refresh-cw" size={11} color={TEXT_MUTED} />
+              <Text style={styles.sortCtaResortLinkText}>Re-sort week</Text>
+            </TouchableOpacity>
+          )}
         </View>
       )}
 
@@ -2774,6 +2796,31 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
   },
   sortCtaAddBtnText: { fontSize: 13, fontFamily: "Inter_500Medium", color: TEXT_MUTED },
+
+  // Sticky bar — Sort the week (secondary, gold outline)
+  sortCtaSortBtn: {
+    flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 7,
+    borderWidth: 1.5, borderColor: GOLD + "66",
+    backgroundColor: "#FFFDF9", borderRadius: 14, height: 46,
+  },
+  sortCtaSortBtnText: { fontSize: 15, fontFamily: "Inter_600SemiBold", color: GOLD },
+
+  // Sticky bar — Re-sort (low-emphasis text link row)
+  sortCtaResortLink: {
+    flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 5,
+    paddingVertical: 4,
+  },
+  sortCtaResortLinkText: { fontSize: 12, fontFamily: "Inter_400Regular", color: TEXT_MUTED },
+
+  // Inline unsorted prompt strip (replaces big SortCard pre-sort)
+  sortPromptStrip: {
+    flexDirection: "column", gap: 8,
+    backgroundColor: "#FFFDF9", borderRadius: 14,
+    borderWidth: 1, borderColor: GOLD + "44",
+    paddingHorizontal: 14, paddingVertical: 12,
+  },
+  sortPromptInner: { flexDirection: "row", alignItems: "flex-start", gap: 8 },
+  sortPromptText: { flex: 1, fontSize: 13, fontFamily: "Inter_400Regular", color: TEXT_MUTED, lineHeight: 19 },
 
   // Setup ready strip
   setupStrip: {
