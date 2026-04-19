@@ -502,8 +502,10 @@ function JuggleResultsContent({
       {/* ── 2. THE PLAN table ── */}
       {planRows.length > 0 && (
         <View style={styles.jugglePlanCard}>
-          <Text style={styles.juggleSectionLabel}>THE PLAN</Text>
-          <Text style={styles.jugglePlanSub}>What's happening. Who's on it.</Text>
+          <View style={{ gap: 2 }}>
+            <Text style={styles.juggleSectionLabel}>THE PLAN</Text>
+            <Text style={styles.jugglePlanSub}>What's happening</Text>
+          </View>
           <View style={[styles.jugglePlanRowHeader]}>
             <Text style={[styles.jugglePlanCellTime, styles.jugglePlanHeaderText]}>TIME</Text>
             <Text style={[styles.jugglePlanCellWho, styles.jugglePlanHeaderText]}>WHO</Text>
@@ -555,7 +557,10 @@ function JuggleResultsContent({
       {/* ── 3. WHO'S DOING THE RUNNING ── */}
       {adultPlans.length > 0 && (
         <View style={{ gap: 10 }}>
-          <Text style={styles.juggleSectionLabel}>WHO'S DOING THE RUNNING</Text>
+          <View style={{ gap: 2 }}>
+            <Text style={styles.juggleSectionLabel}>WHO'S DOING THE RUNNING</Text>
+            <Text style={styles.juggleSectionHelper}>Who's got what</Text>
+          </View>
           {adultPlans.map((plan) => {
             const member = members.find((m) => m.name === plan.adult);
             return (
@@ -647,6 +652,16 @@ function JuggleResultsContent({
           <Text style={styles.resultSortAgainBtnText}>Sort again</Text>
         </TouchableOpacity>
       </View>
+
+      {/* ── Add another activity ── */}
+      <TouchableOpacity
+        style={styles.resultAddActivityBtn}
+        onPress={onClose}
+        activeOpacity={0.8}
+      >
+        <Feather name="plus" size={14} color={TEAL} />
+        <Text style={styles.resultAddActivityBtnText}>Add another activity</Text>
+      </TouchableOpacity>
 
       </View>{/* end paddingHorizontal wrapper */}
     </ScrollView>
@@ -1758,19 +1773,22 @@ function SortContextCard({
     return (
       <View style={styles.sortCardSorted}>
         <View style={styles.sortCardSortedTop}>
-          <Feather name="check-circle" size={14} color={TEAL} />
+          <View style={styles.sortCardSortedTick}>
+            <Feather name="check" size={11} color="#fff" />
+          </View>
           <Text style={styles.sortCardSortedTitle}>Week sorted. You're good.</Text>
         </View>
         {sortedDate && (
           <Text style={styles.sortCardSortedDate}>Sorted {sortedDate}</Text>
         )}
-        <View style={styles.sortCardSortedLinks}>
-          <TouchableOpacity onPress={onViewPlan} activeOpacity={0.8}>
-            <Text style={styles.sortCardViewLink}>View how it was sorted</Text>
+        <View style={styles.sortCardSortedBtns}>
+          <TouchableOpacity style={styles.sortCardSeePlanBtn} onPress={onViewPlan} activeOpacity={0.85}>
+            <Feather name="list" size={13} color="#fff" />
+            <Text style={styles.sortCardSeePlanBtnText}>See the plan →</Text>
           </TouchableOpacity>
-          <Text style={styles.sortCardLinkDivider}>·</Text>
-          <TouchableOpacity onPress={onReSort} activeOpacity={0.8}>
-            <Text style={styles.sortCardResortLink}>Re-sort week</Text>
+          <TouchableOpacity style={styles.sortCardResortBtn} onPress={onReSort} activeOpacity={0.8}>
+            <Feather name="refresh-cw" size={12} color={TEAL} />
+            <Text style={styles.sortCardResortBtnText}>Re-sort</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -2027,7 +2045,7 @@ export default function FamilyScreen() {
             <Feather name="arrow-left" size={16} color={TEAL} />
             <Text style={styles.resultsBack}>Family</Text>
           </TouchableOpacity>
-          <Text style={styles.resultsTitle}>Week sorted</Text>
+          <Text style={styles.resultsTitle}>Sorted. Here's the plan</Text>
           <TouchableOpacity
             onPress={() => handleSortJuggle()}
             style={styles.resultsNavBtn}
@@ -2605,9 +2623,16 @@ const styles = StyleSheet.create({
     textTransform: "uppercase", letterSpacing: 0.1, marginBottom: 2,
   },
 
-  // Juggle results — adult card (HERE'S THE SPLIT)
+  // Section helper text (under section labels)
+  juggleSectionHelper: {
+    fontSize: 12, fontFamily: "Inter_400Regular", color: TEXT_MUTED, fontStyle: "italic",
+  },
+
+  // Juggle results — adult card (WHO'S DOING THE RUNNING)
   juggleAdultCard: {
-    backgroundColor: "#fff", borderRadius: 14, borderWidth: 1, borderColor: BORDER,
+    backgroundColor: "#F2FAF8", borderRadius: 14,
+    borderWidth: 1, borderColor: TEAL + "28",
+    borderLeftWidth: 3, borderLeftColor: TEAL + "66",
     padding: 14, gap: 10,
   },
   juggleAdultCardHeader: { flexDirection: "row", alignItems: "center", gap: 8, marginBottom: 2 },
@@ -2790,17 +2815,37 @@ const styles = StyleSheet.create({
 
   // Sort context card — post-sort state
   sortCardSorted: {
-    backgroundColor: TEAL_TINT, borderRadius: 14,
+    backgroundColor: TEAL_TINT, borderRadius: 16,
     borderWidth: 1, borderColor: TEAL + "30",
-    paddingHorizontal: 16, paddingVertical: 13, gap: 5,
+    paddingHorizontal: 16, paddingVertical: 16, gap: 8,
+    ...Platform.select({
+      web: { boxShadow: `0px 2px 12px ${TEAL}1A` },
+      default: { shadowColor: TEAL, shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.08, shadowRadius: 8, elevation: 2 },
+    }),
   },
-  sortCardSortedTop: { flexDirection: "row", alignItems: "center", gap: 7 },
-  sortCardSortedTitle: { fontSize: 14, fontFamily: "Inter_600SemiBold", color: TEAL },
+  sortCardSortedTop: { flexDirection: "row", alignItems: "center", gap: 8 },
+  sortCardSortedTick: {
+    width: 20, height: 20, borderRadius: 10,
+    backgroundColor: TEAL, alignItems: "center", justifyContent: "center",
+  },
+  sortCardSortedTitle: { fontSize: 14, fontFamily: "Inter_700Bold", color: TEXT, flex: 1 },
   sortCardSortedDate: { fontSize: 11, fontFamily: "Inter_400Regular", color: TEXT_MUTED },
-  sortCardSortedLinks: { flexDirection: "row", alignItems: "center", gap: 8, marginTop: 2 },
-  sortCardViewLink: { fontSize: 12, fontFamily: "Inter_500Medium", color: TEAL },
-  sortCardLinkDivider: { fontSize: 12, color: TEXT_MUTED },
-  sortCardResortLink: { fontSize: 12, fontFamily: "Inter_400Regular", color: TEXT_MUTED },
+  sortCardSortedBtns: { flexDirection: "row", gap: 8, marginTop: 2 },
+  sortCardSeePlanBtn: {
+    flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 6,
+    backgroundColor: TEAL, borderRadius: 12, paddingVertical: 11,
+    ...Platform.select({
+      web: { boxShadow: `0px 2px 8px ${TEAL}44` },
+      default: { shadowColor: TEAL, shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.25, shadowRadius: 6, elevation: 3 },
+    }),
+  },
+  sortCardSeePlanBtnText: { fontSize: 13, fontFamily: "Inter_700Bold", color: "#fff" },
+  sortCardResortBtn: {
+    flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 5,
+    backgroundColor: "#fff", borderRadius: 12, paddingVertical: 11, paddingHorizontal: 14,
+    borderWidth: 1, borderColor: TEAL + "44",
+  },
+  sortCardResortBtnText: { fontSize: 13, fontFamily: "Inter_500Medium", color: TEAL },
 
   // Form sheet
   formOverlay: { ...StyleSheet.absoluteFillObject, backgroundColor: "rgba(0,0,0,0.5)" },
@@ -2995,6 +3040,17 @@ const styles = StyleSheet.create({
     borderColor: TEAL + "44",
   },
   resultSortAgainBtnText: { fontSize: 14, fontFamily: "Inter_600SemiBold", color: TEAL },
+
+  // Results — add activity button
+  resultAddActivityBtn: {
+    flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 7,
+    borderRadius: 14, paddingVertical: 14,
+    borderWidth: 1.5, borderColor: TEAL + "55",
+    borderStyle: "dashed" as const,
+  },
+  resultAddActivityBtnText: {
+    fontSize: 14, fontFamily: "Inter_500Medium", color: TEAL,
+  },
 
   // Results nav bar
   resultsNavBtn: {
