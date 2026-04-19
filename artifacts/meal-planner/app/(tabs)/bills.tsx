@@ -57,6 +57,7 @@ function catColor(cat: string): string {
 
 const RECURRENCE_TYPES: RecurrenceType[] = ["Weekly", "Fortnightly", "Monthly", "Quarterly", "Yearly"];
 const ESSENTIAL_LEVELS: EssentialLevel[] = ["Essential", "Flexible", "Can Wait"];
+const TAB_BAR_HEIGHT = Platform.OS === "web" ? 72 : 58;
 
 // ── Status display ─────────────────────────────────────────────────────────────
 function statusDisplay(bill: Bill): { label: string; color: string } {
@@ -657,7 +658,7 @@ export default function BillsScreen() {
       </ScrollView>
 
       {/* List */}
-      <ScrollView contentContainerStyle={{ padding: 16, gap: 6, paddingBottom: insets.bottom + 100 }}>
+      <ScrollView contentContainerStyle={{ padding: 16, gap: 6, paddingBottom: insets.bottom + TAB_BAR_HEIGHT + 90 }}>
         {groups.length === 0 ? (
           <View style={styles.emptyState}>
             <Feather name="file-text" size={36} color={BORDER} />
@@ -686,7 +687,7 @@ export default function BillsScreen() {
 
       {/* FAB */}
       <TouchableOpacity
-        style={[styles.fab, { bottom: insets.bottom + 20 }]}
+        style={[styles.fab, { bottom: insets.bottom + TAB_BAR_HEIGHT + 14 }]}
         onPress={openAdd}
         activeOpacity={0.85}
       >

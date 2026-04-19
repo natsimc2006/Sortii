@@ -66,6 +66,7 @@ const TIME_SLOTS: string[] = (() => {
 const MONTHS_SHORT = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 const MONTHS_FULL  = ["January","February","March","April","May","June","July","August","September","October","November","December"];
 const DAYS_FULL    = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+const TAB_BAR_HEIGHT = Platform.OS === "web" ? 72 : 58;
 
 function todayStr(): string {
   const n = new Date();
@@ -772,7 +773,7 @@ export default function AppointmentsScreen() {
       </ScrollView>
 
       {/* List */}
-      <ScrollView contentContainerStyle={{ padding: 16, gap: 6, paddingBottom: insets.bottom + 100 }}>
+      <ScrollView contentContainerStyle={{ padding: 16, gap: 6, paddingBottom: insets.bottom + TAB_BAR_HEIGHT + 90 }}>
         {groups.length === 0 ? (
           <View style={styles.emptyState}>
             <Feather name="calendar" size={36} color={BORDER} />
@@ -801,7 +802,7 @@ export default function AppointmentsScreen() {
 
       {/* FAB */}
       <TouchableOpacity
-        style={[styles.fab, { bottom: insets.bottom + 20 }]}
+        style={[styles.fab, { bottom: insets.bottom + TAB_BAR_HEIGHT + 14 }]}
         onPress={openAdd}
         activeOpacity={0.85}
       >

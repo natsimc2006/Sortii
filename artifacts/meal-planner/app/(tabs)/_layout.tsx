@@ -15,19 +15,10 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Colors from "@/constants/Colors";
 
-/**
- * Expo Router: declare 'home' as the canonical initial tab.
- * This is evaluated at module load time by the file-system router.
- */
 export const unstable_settings = {
   initialRouteName: "home",
 };
 
-/**
- * Module-level flag — false on every fresh page load (web) or app launch (native).
- * Ensures the Home redirect fires once per session, regardless of which URL or
- * persisted route the navigator tries to restore.
- */
 let _sessionInitialized = false;
 
 const TEAL = "#2A8F88";
@@ -35,7 +26,7 @@ const GOLD = "#D29A22";
 const PLUM = "#5E3A4C";
 const GREEN = "#4A7B5E";
 
-// ── Quick Add sheet ────────────────────────────────────────────
+// ── Quick Add sheet ─────────────────────────────────────────────
 function QuickAddSheet({
   visible,
   onClose,
@@ -44,6 +35,7 @@ function QuickAddSheet({
   onClose: () => void;
 }) {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
 
   const options = [
     {
@@ -86,14 +78,6 @@ function QuickAddSheet({
         router.push("/(tabs)/bills");
       },
     },
-    {
-      icon: "edit-3",
-      color: "#888",
-      label: "Add note",
-      sub: "Coming soon",
-      disabled: true,
-      onPress: () => {},
-    },
   ];
 
   if (!visible) return null;
@@ -101,43 +85,34 @@ function QuickAddSheet({
   return (
     <Pressable style={styles.overlay} onPress={onClose}>
       <Pressable
-        style={styles.sheet}
+        style={[styles.sheet, { paddingBottom: Math.max(insets.bottom, 20) + 8 }]}
         onPress={(e) => e.stopPropagation()}
       >
         <View style={styles.sheetHandle} />
-        <Text style={styles.sheetTitle}>What's come up?</Text>
-        <Text style={styles.sheetSub}>Quick. No admin, no fuss.</Text>
+        <Text style={styles.sheetTitle}>What needs adding?</Text>
+        <Text style={styles.sheetSub}>Pop it in. We'll sort the rest.</Text>
 
         <View style={styles.sheetOptions}>
-          {options.map(({ icon, color, label, sub, disabled, onPress }) => (
+          {options.map(({ icon, color, label, sub, onPress }) => (
             <TouchableOpacity
               key={label}
-              style={[styles.sheetOption, disabled && styles.sheetOptionDisabled]}
+              style={styles.sheetOption}
               onPress={onPress}
-              activeOpacity={disabled ? 1 : 0.7}
+              activeOpacity={0.72}
             >
               <View
                 style={[
                   styles.sheetOptionIcon,
-                  { backgroundColor: color + "1A" },
+                  { backgroundColor: color + "18" },
                 ]}
               >
-                <Feather name={icon as any} size={18} color={disabled ? "#bbb" : color} />
+                <Feather name={icon as any} size={17} color={color} />
               </View>
               <View style={styles.sheetOptionText}>
-                <Text
-                  style={[
-                    styles.sheetOptionLabel,
-                    disabled && { color: "#bbb" },
-                  ]}
-                >
-                  {label}
-                </Text>
+                <Text style={styles.sheetOptionLabel}>{label}</Text>
                 <Text style={styles.sheetOptionSub}>{sub}</Text>
               </View>
-              {!disabled && (
-                <Feather name="chevron-right" size={16} color="#ddd" />
-              )}
+              <Feather name="chevron-right" size={15} color="#D8D8D8" />
             </TouchableOpacity>
           ))}
         </View>
@@ -150,7 +125,7 @@ function QuickAddSheet({
   );
 }
 
-// ── Add tab button ─────────────────────────────────────────────
+// ── Add tab button ──────────────────────────────────────────────
 function AddTabButton({
   style,
   onPress,
@@ -160,8 +135,8 @@ function AddTabButton({
 }) {
   const insets = useSafeAreaInsets();
   const bottomPad = Platform.OS === "ios"
-    ? Math.max(insets.bottom + 2, 12)
-    : Platform.OS === "web" ? 10 : 6;
+    ? Math.max(insets.bottom + 2, 10)
+    : Platform.OS === "web" ? 9 : 5;
 
   return (
     <TouchableOpacity
@@ -175,32 +150,32 @@ function AddTabButton({
         },
       ]}
       onPress={() => {
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
         onPress();
       }}
       activeOpacity={0.82}
     >
       <View
         style={{
-          width: 46,
-          height: 46,
-          borderRadius: 23,
+          width: 42,
+          height: 42,
+          borderRadius: 21,
           backgroundColor: GOLD,
           alignItems: "center",
           justifyContent: "center",
           ...Platform.select({
-            web: { boxShadow: `0px 3px 10px ${GOLD}55` },
+            web: { boxShadow: `0px 2px 8px ${GOLD}44` },
             default: {
               shadowColor: GOLD,
-              shadowOffset: { width: 0, height: 3 },
-              shadowOpacity: 0.32,
-              shadowRadius: 8,
-              elevation: 5,
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: 0.26,
+              shadowRadius: 6,
+              elevation: 4,
             },
           }),
         }}
       >
-        <Feather name="plus" size={20} color="#fff" />
+        <Feather name="plus" size={19} color="#fff" />
       </View>
       <Text
         style={{
@@ -208,6 +183,7 @@ function AddTabButton({
           color: GOLD,
           fontFamily: "Inter_500Medium",
           marginTop: 3,
+          letterSpacing: 0.1,
         }}
       >
         Add
@@ -216,24 +192,12 @@ function AddTabButton({
   );
 }
 
-// ── Tab layout ─────────────────────────────────────────────────
+// ── Tab layout ──────────────────────────────────────────────────
 export default function TabLayout() {
   const [quickAddVisible, setQuickAddVisible] = useState(false);
   const colorScheme = useColorScheme();
   const router = useRouter();
 
-  /**
-   * On every fresh app open / page reload, redirect to Home.
-   *
-   * Why this works:
-   * - Web: the JS module re-evaluates on each page load, so _sessionInitialized
-   *   is always false at startup — even if the browser URL points to /meals.
-   * - Native: the module evaluates once per app launch, so the redirect fires
-   *   on launch and the flag prevents it from firing again during the session.
-   *
-   * router.replace (not navigate) rewrites history so the user can't
-   * "back" into the non-home route that was restored.
-   */
   useEffect(() => {
     if (!_sessionInitialized) {
       _sessionInitialized = true;
@@ -241,6 +205,7 @@ export default function TabLayout() {
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
   const isDark = colorScheme === "dark";
   const isIOS = Platform.OS === "ios";
   const C = Colors.light;
@@ -251,23 +216,29 @@ export default function TabLayout() {
         initialRouteName="home"
         screenOptions={{
           tabBarActiveTintColor: C.primary,
-          tabBarInactiveTintColor: "#909090",
+          tabBarInactiveTintColor: "#ABABAB",
           headerShown: false,
           tabBarStyle: {
             position: "absolute",
             backgroundColor: isIOS ? "transparent" : isDark ? "#000" : "#fff",
-            borderTopWidth: 1,
-            borderTopColor: isDark ? "#222" : "#E8EDE8",
+            borderTopWidth: StyleSheet.hairlineWidth,
+            borderTopColor: isDark ? "#2A2A2A" : "#E4E0DA",
             elevation: 0,
             height: Platform.OS === "web" ? 72 : undefined,
           },
           tabBarItemStyle: {
-            paddingBottom: Platform.OS === "web" ? 8 : 4,
+            paddingBottom: Platform.OS === "web" ? 6 : 2,
+            paddingTop: Platform.OS === "web" ? 4 : 2,
+          },
+          tabBarLabelStyle: {
+            fontSize: 10,
+            fontFamily: "Inter_500Medium",
+            letterSpacing: 0.1,
           },
           tabBarBackground: () =>
             isIOS ? (
               <BlurView
-                intensity={100}
+                intensity={90}
                 tint={isDark ? "dark" : "light"}
                 style={StyleSheet.absoluteFill}
               />
@@ -289,7 +260,7 @@ export default function TabLayout() {
             tabBarIcon: ({ color, focused }) => (
               <Ionicons
                 name={focused ? "home" : "home-outline"}
-                size={22}
+                size={21}
                 color={color}
               />
             ),
@@ -302,7 +273,7 @@ export default function TabLayout() {
             tabBarIcon: ({ color, focused }) => (
               <Ionicons
                 name={focused ? "restaurant" : "restaurant-outline"}
-                size={22}
+                size={21}
                 color={color}
               />
             ),
@@ -327,7 +298,7 @@ export default function TabLayout() {
             tabBarIcon: ({ color, focused }) => (
               <Ionicons
                 name={focused ? "people" : "people-outline"}
-                size={22}
+                size={21}
                 color={color}
               />
             ),
@@ -340,7 +311,7 @@ export default function TabLayout() {
             tabBarIcon: ({ color, focused }) => (
               <Ionicons
                 name={focused ? "grid" : "grid-outline"}
-                size={22}
+                size={21}
                 color={color}
               />
             ),
@@ -373,88 +344,84 @@ export default function TabLayout() {
 const styles = StyleSheet.create({
   overlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(0,0,0,0.45)",
+    backgroundColor: "rgba(0,0,0,0.4)",
     justifyContent: "flex-end",
     zIndex: 999,
   },
   sheet: {
     backgroundColor: "#fff",
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
+    borderTopLeftRadius: 22,
+    borderTopRightRadius: 22,
     paddingTop: 12,
     paddingHorizontal: 20,
-    paddingBottom: Platform.OS === "ios" ? 40 : 24,
-    gap: 0,
     ...Platform.select({
-      web: { boxShadow: "0px -4px 24px rgba(0,0,0,0.12)" },
+      web: { boxShadow: "0px -3px 20px rgba(0,0,0,0.10)" },
       default: {
         shadowColor: "#000",
-        shadowOffset: { width: 0, height: -3 },
-        shadowOpacity: 0.12,
-        shadowRadius: 16,
+        shadowOffset: { width: 0, height: -2 },
+        shadowOpacity: 0.10,
+        shadowRadius: 14,
         elevation: 20,
       },
     }),
   },
   sheetHandle: {
-    width: 36,
-    height: 4,
+    width: 32,
+    height: 3,
     borderRadius: 2,
-    backgroundColor: "#E0E0E0",
+    backgroundColor: "#DEDAD4",
     alignSelf: "center",
-    marginBottom: 16,
+    marginBottom: 18,
   },
   sheetTitle: {
-    fontSize: 18,
+    fontSize: 17,
     fontFamily: "Inter_700Bold",
     color: "#2B2B2B",
-    marginBottom: 2,
+    marginBottom: 3,
   },
   sheetSub: {
     fontSize: 13,
     fontFamily: "Inter_400Regular",
-    color: "#888",
-    fontStyle: "italic",
-    marginBottom: 16,
+    color: "#AAA",
+    marginBottom: 18,
   },
-  sheetOptions: { gap: 4 },
+  sheetOptions: { gap: 2 },
   sheetOption: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 12,
-    paddingVertical: 11,
-    borderBottomWidth: 1,
-    borderBottomColor: "#F5F5F5",
+    gap: 13,
+    paddingVertical: 12,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: "#F0EDE8",
   },
-  sheetOptionDisabled: { opacity: 0.5 },
   sheetOptionIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 12,
+    width: 38,
+    height: 38,
+    borderRadius: 11,
     alignItems: "center",
     justifyContent: "center",
   },
-  sheetOptionText: { flex: 1, gap: 1 },
+  sheetOptionText: { flex: 1, gap: 2 },
   sheetOptionLabel: {
-    fontSize: 15,
+    fontSize: 14,
     fontFamily: "Inter_600SemiBold",
     color: "#2B2B2B",
   },
   sheetOptionSub: {
-    fontSize: 12,
+    fontSize: 11,
     fontFamily: "Inter_400Regular",
-    color: "#999",
+    color: "#ADADAD",
   },
   sheetCancel: {
-    marginTop: 12,
-    paddingVertical: 14,
+    marginTop: 14,
+    paddingVertical: 13,
     alignItems: "center",
-    backgroundColor: "#F7F3EB",
-    borderRadius: 14,
+    backgroundColor: "#F5F1EB",
+    borderRadius: 13,
   },
   sheetCancelText: {
-    fontSize: 15,
+    fontSize: 14,
     fontFamily: "Inter_600SemiBold",
-    color: "#888",
+    color: "#999",
   },
 });
