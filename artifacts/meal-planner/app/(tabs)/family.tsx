@@ -41,9 +41,10 @@ import { buildJugglePrompt } from "@/utils/buildJugglePrompt";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 // ── Brand tokens ───────────────────────────────────────────────────────────────
-const TEAL       = "#2A8F88";
-const TEAL_TINT  = "#E6F3F0";
-const GOLD       = "#D29A22";
+const TEAL         = "#2A8F88";
+const TEAL_TINT    = "#E6F3F0";
+const GOLD         = "#D29A22";
+const TAB_BAR_HEIGHT = Platform.OS === "web" ? 72 : 58;
 const PLUM       = "#5E3A4C";
 const ORANGE     = "#E07B3A";
 const BG         = "#FFFFFF";
@@ -1337,13 +1338,13 @@ function AddEventSheet({
               />
             </View>
 
-            {/* Bottom spacer so last field isn't hidden behind sticky footer */}
-            <View style={{ height: 100 }} />
+            {/* Bottom spacer so last field can scroll above the sticky footer */}
+            <View style={{ height: 180 }} />
           </ScrollView>
         </KeyboardAvoidingView>
 
         {/* Sticky footer — outside ScrollView, stays at bottom */}
-        <View style={[styles.sheetFooter, { paddingBottom: Math.max(insets.bottom, 12) }]}>
+        <View style={[styles.sheetFooter, { paddingBottom: TAB_BAR_HEIGHT + Math.max(insets.bottom, 12) }]}>
           <TouchableOpacity
             style={[styles.saveButton, !isFormValid && styles.saveButtonDisabled]}
             onPress={handleSave}

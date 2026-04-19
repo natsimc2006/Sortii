@@ -1,0 +1,132 @@
+The Add Event flow is currently broken from a user perspective.
+
+Core issue
+
+There is no clear, consistently visible primary CTA to save an event, and in some cases the CTA is either:
+
+* missing
+* not obvious
+* or being hidden behind the bottom navigation bar
+
+This prevents users from completing event entry, which blocks the entire Family planning flow.
+
+⸻
+
+1. Add a clear primary CTA to the Add Event screen
+
+The Add Event screen MUST always have a visible primary action.
+
+Required:
+
+* Add a fixed primary button at the bottom:
+    “Save event”
+* This must be visually strong (teal filled button)
+* It must always be visible without scrolling
+
+Secondary:
+
+* Optional “Cancel” or close (top right is fine)
+
+⸻
+
+2. Fix bottom CTA positioning (critical)
+
+The “Save event” button must NOT be hidden behind:
+
+* the bottom tab bar
+* iOS safe area
+* any sticky navigation
+
+Implementation requirements:
+
+* Use a fixed bottom CTA container
+* Add proper safe area padding
+
+If using React Native / Expo:
+
+Ensure:
+
+* SafeAreaView or useSafeAreaInsets is applied
+* bottom padding accounts for:
+    * tab bar height
+    * device safe area (iPhone notch devices)
+
+Example behaviour:
+
+* Button sits ABOVE the tab bar
+* Always fully tappable
+* No overlap
+
+⸻
+
+3. Add scroll padding so content is not cut off
+
+The form content should not be hidden behind the CTA.
+
+Required:
+
+* Add bottom padding to ScrollView content:
+    * enough space so last input field can scroll above the CTA
+
+⸻
+
+4. Make the save interaction explicit
+
+When user taps “Save event”:
+
+Required behaviour:
+
+* Event is saved
+* User is returned to Family screen
+* SavedBanner appears (already implemented)
+
+Additionally:
+
+* Scroll to top so summary + planner outputs are visible
+
+⸻
+
+5. Add validation feedback (lightweight)
+
+If required fields are missing:
+
+* disable CTA OR
+* show subtle inline message
+
+But do NOT hide the button completely
+
+⸻
+
+6. Ensure consistent CTA across flows
+
+Anywhere an event can be created or edited:
+
+* the same “Save event” CTA pattern must be used
+* no hidden submission logic
+* no reliance on implicit save
+
+⸻
+
+7. QA checklist (must pass)
+
+Before completing, verify:
+
+* I can always see “Save event” without scrolling
+* The button is never covered by the bottom nav
+* I can tap it easily on all devices
+* After saving, I see confirmation and planner updates
+* No screen exists where I input data but cannot submit it
+
+⸻
+
+Goal
+
+The Add Event flow should feel:
+
+* obvious
+* frictionless
+* impossible to get stuck in
+
+Right now it feels incomplete because the primary action is not clearly accessible.
+
+Fix this before further feature work.
