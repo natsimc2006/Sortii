@@ -1,0 +1,196 @@
+## SORTII — Money Tab Redesign + Savings Goal Feature
+
+You are working on the Sortii app — a React Native/Expo dinner planning app.
+We are updating two things: (1) the Money tab layout, and (2) adding a proper
+Savings Goal feature that connects to the weekly budget data.
+
+Do not change anything outside of the Money tab and its related components.
+Work through each part in order and stop for confirmation between parts.
+
+---
+
+### PART 1: Money Tab Layout Redesign
+
+Redesign the Money tab (MoneyScreen.tsx or equivalent) using the following
+structure. The current layout has equal-weight cards — replace with a clear
+visual hierarchy.
+
+**Layout order (top to bottom):**
+
+**1. Hero card** — teal tint background (#E6F3F0), prominent, full width
+- Large teal (#2A8F88) number: ~$[totalSorted] with label "sorted by Sortii
+  this week"
+- Two line items below in smaller text:
+  "Smarter ingredient choices — $[swapSavings]"
+  "Pantry-friendly meal selection — $[pantryFriendlySavings]"
+- Status pill top-right corner: "On track" / "Tight week" / "Holding steady"
+  — teal pill (#2A8F88 background, white text)
+- Safety rule: if totalSorted is 0, null, or undefined — suppress this card
+  entirely. Do not render $0 or $NaN.
+
+**2. Weekly snapshot** — collapsible card, white background, border #E6E1D7
+- Default state: collapsed for returning users, expanded for first visit
+- Line items when expanded: Income, Fixed costs, Groceries, Eating out,
+  Other spend, Remaining
+- "Remaining" row: label and value both in teal (#2A8F88), bold
+- If discretionary/coffee spend is within 20% of dinner plan cost: show a
+  single inline note inside this card in gold tint (#F6E6BA):
+  "Your coffee spend is close to your dinner plan this week."
+  One line only. No separate card for this.
+- Safety rule: suppress any line item row where value is 0, null, or
+  undefined — do not render "$0" rows.
+
+**3. Where groceries are going** — no card border, minimal
+- Two inline stats side by side:
+  "Estimated grocery spend  $[X]" and "Your dinner plan  $[Y]"
+- If dinner plan cost is under grocery estimate: show a teal ✓ next to
+  dinner plan figure
+- One line of copy below:
+  "[N] of 7 dinners covered. [Under/Over] estimate by $[Z]."
+- Safety rule: if dinner plan cost is 0 or unavailable, suppress this
+  section entirely.
+
+**4. Quick wins** — single collapsible section, plum tint (#F3E8EE) background
+- Title row: 💡 "A few quick wins" — small, plum (#5E3A4C) text
+- Render tips as simple rows with ▸ prefix. No individual card borders.
+- Maximum 3 tips. Source from existing swap/pantry tip logic.
+- If no tips are available, suppress section entirely — no empty state.
+
+**5. Savings goal card** — see Part 2
+
+**6. Update CTA** — bottom of screen, no card wrapper
+- Full-width teal button (#2A8F88), white label: "Update my numbers"
+- Small grey label directly above the button (12px):
+  "Your numbers, your call. Update anytime."
+
+---
+
+When Part 1 is complete, confirm: "Part 1 done — Money tab layout rebuilt."
+Then stop and wait before proceeding to Part 2.
+
+---
+
+### PART 2: Savings Goal Feature
+
+**New data fields** — add to user profile / AsyncStorage:
+
+savingsGoal: {
+  name: string,              // e.g. "Japan" — 20 char max
+  targetAmount: number,
+  currentSaved: number,      // starts at 0 or user-entered
+  weeklyContributions: []    // array of numbers, one per week
+}
+
+---
+
+**Setup flow — 3 inputs only**
+
+Add as an optional final step in the budget setup flow.
+Also accessible from the Money tab via a quiet text link: "Set a savings goal →"
+
+Screen layout:
+- Title: "Saving for something?"
+- Subtext: "We'll factor it in."
+- Skip link top-right: "Skip →"
+
+Input 1: What are you calling it?
+- Free text field, 20 char max
+- Placeholder: "e.g. Trip, New car, Buffer"
+
+Input 2: Target amount?
+- Numeric field, currency formatted
+- Placeholder: $0
+
+Input 3: Already saved anything?
+- Numeric field, currency formatted
+- Placeholder: $0
+- Subtext below: "Leave blank to start from zero."
+
+CTA button: "Set goal →" — gold (#D29A22), full width
+
+---
+
+**Savings logic — calculate these values:**
+
+weeklyDinnerSaving = estimatedEatingOutCost - dinnerPlanCost
+remainingToGoal = targetAmount - currentSaved
+weeksToGoal = remainingToGoal / weeklyDinnerSaving
+progressPercent = (currentSaved / targetAmount) * 100
+
+Each week a new meal plan is confirmed: increment currentSaved by
+weeklyDinnerSaving and append to weeklyContributions array.
+
+Safety rules:
+- If weeklyDinnerSaving is 0 or negative: do not increment, do not render
+  a weekly saving figure
+- If targetAmount is 0: suppress the card
+- Never render NaN, $0/week, or divide-by-zero results — suppress the
+  relevant line instead
+
+---
+
+**Dynamic copy — getSavingsGoalCopy() function**
+
+Return one string based on these conditions, checked in this order:
+
+1. First week set (weeklyContributions.length === 1):
+   "Goal set. Keep this up and you'll hit [name] in ~[weeksToGoal] weeks."
+
+2. Milestone reached (progressPercent crosses 25, 50, or 75):
+   25%: "You're a quarter of the way to [name]. Keep going."
+   50%: "Halfway to [name]. Dinner at home is working."
+   75%: "Nearly there. [name] is close."
+
+3. Ahead of schedule (currentSaved > targetAmount *
+   (weeklyContributions.length / weeksToGoal)):
+   "You're ahead of target. [name] might come sooner than planned."
+
+4. Strong week (weeklyDinnerSaving > average of weeklyContributions * 1.2):
+   "Good week. This one covered [X]% of your [name] fund."
+
+5. Light week (weeklyDinnerSaving < average of weeklyContributions * 0.8):
+   "Tight week — [name] holds steady. Back on track next week."
+
+6. Default (on track):
+   "You're on track for [name]. ~[weeksToGoal] weeks away."
+
+---
+
+**Savings goal card — Money tab component**
+
+Render as a plum tint (#F3E8EE) card. Only render if savingsGoal.name and
+savingsGoal.targetAmount are set and valid.
+
+Layout:
+- Top row: [emoji if name suggests one, otherwise ✦] [name] fund
+  — right side: [progressPercent]% in plum (#5E3A4C)
+- Progress bar: gold (#D29A22) fill on grey track, full width
+- Second row: "$[currentSaved] of $[targetAmount] saved" — small, grey
+- Third row: "This week added ~$[weeklyDinnerSaving]" (teal) |
+  "~[weeksToGoal] weeks to go" (grey)
+- Dynamic copy line: output of getSavingsGoalCopy() — italic, plum, small
+- Bottom text link: "Update goal →"
+
+---
+
+When Part 2 is complete, confirm: "Part 2 done — Savings Goal feature built."
+Then stop and wait.
+
+---
+
+### FINAL CHECK
+
+Once both parts are confirmed, verify:
+1. No $0, $NaN, or null values render anywhere in the Money tab
+2. Hero card is suppressed if totalSorted is empty
+3. Weekly snapshot is collapsed by default for returning users
+4. Savings goal card only renders when a goal is set
+5. getSavingsGoalCopy() returns correct string for all 6 conditions
+6. currentSaved increments correctly each time a weekly plan is confirmed
+7. Setup flow accessible from both budget onboarding and Money tab link
+8. All colours match: teal #2A8F88, gold #D29A22, plum #5E3A4C,
+   teal tint #E6F3F0, plum tint #F3E8EE, gold tint #F6E6BA
+9. Background: white #FFFFFF throughout — no warm cream at screen level
+10. Copy uses Sortii voice — no "successfully", no "please", nothing corporate
+
+Report any issues before closing.

@@ -30,8 +30,8 @@ import {
 const TEAL      = "#2A8F88";
 const GOLD      = "#D29A22";
 const PLUM      = "#5E3A4C";
-const GREEN     = "#4A7B5E";
-const BG        = "#F7F3EB";
+const GREEN     = "#2A8F88";
+const BG        = "#FFFFFF";
 const CARD      = "#FFFFFF";
 const BORDER    = "#E6E1D7";
 const TEXT      = "#2B2B2B";

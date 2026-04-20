@@ -81,9 +81,8 @@ export async function signInWithGoogle(): Promise<string | null> {
     };
 
     const redirectUri = AuthSession.makeRedirectUri({
-      useProxy: true,
-      projectNameForProxy: "@natsimc/sortiidinnersorted",
-    });
+      scheme: "sortiidinnersorted",
+    } as any);
 
     // Log the exact URI so it can be confirmed in Google Cloud Console
     console.log("[Sortii] Google OAuth redirect URI:", redirectUri);

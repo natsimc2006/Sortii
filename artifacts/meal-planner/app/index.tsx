@@ -69,7 +69,7 @@ function ProgressDots({ filled, total }: { filled: number; total: number }) {
       {Array.from({ length: total }).map((_, i) => (
         <View
           key={i}
-          style={[styles.dot, { backgroundColor: i < filled ? TEAL : "#D5D5D5" }]}
+          style={[styles.dot, { backgroundColor: i < filled ? TEAL : "#E6E1D7" }]}
         />
       ))}
     </View>
@@ -353,7 +353,7 @@ export default function OnboardingScreen() {
             <Text style={styles.backLinkText}>← Back</Text>
           </TouchableOpacity>
         )}
-        <ProgressDots filled={step - 1} total={3} />
+        <ProgressDots filled={step} total={3} />
       </View>
 
       {/* ── Body ── */}

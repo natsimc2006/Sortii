@@ -62,7 +62,7 @@ const TEAL      = "#2A8F88";
 const GOLD      = "#D29A22";
 const PLUM      = "#5E3A4C";
 const ORANGE    = "#E07B3A";
-const BG        = "#F7F3EB";
+const BG        = "#FFFFFF";
 const CARD      = "#FFFFFF";
 const BORDER    = "#E6E1D7";
 const TEXT      = "#2B2B2B";
@@ -338,7 +338,7 @@ function ApptCard({ appt, busyPersons, onPress }: ApptCardProps) {
         <View style={{ alignItems: "flex-end", gap: 4 }}>
           <StatusChip label={appt.category} color={color} />
           {prep ? <StatusChip label="Needs prep" color={ORANGE} /> : null}
-          {appt.isDone ? <StatusChip label="Done" color="#4A7B5E" /> : null}
+          {appt.isDone ? <StatusChip label="Done" color="#2A8F88" /> : null}
         </View>
       </View>
     </TouchableOpacity>
@@ -789,13 +789,13 @@ export default function AppointmentsScreen() {
     return true;
   }).sort((a, b) => a.date.localeCompare(b.date) || a.startTime.localeCompare(b.startTime));
 
-  const apptGroups: { label: string; key: DateGroup | "done"; items: Appointment[] }[] = [
-    { label: "Today",     key: "today",     items: visible.filter((a) => getGroup(a.date) === "today"     && !a.isDone) },
-    { label: "Tomorrow",  key: "tomorrow",  items: visible.filter((a) => getGroup(a.date) === "tomorrow"  && !a.isDone) },
-    { label: "This week", key: "this_week", items: visible.filter((a) => getGroup(a.date) === "this_week" && !a.isDone) },
-    { label: "Coming up", key: "later",     items: visible.filter((a) => getGroup(a.date) === "later"     && !a.isDone) },
-    { label: "Done",      key: "done",      items: visible.filter((a) => a.isDone || getGroup(a.date) === "past") },
-  ].filter((g) => g.items.length > 0);
+  const apptGroups = ([
+    { label: "Today",     key: "today"     as DateGroup | "done", items: visible.filter((a) => getGroup(a.date) === "today"     && !a.isDone) },
+    { label: "Tomorrow",  key: "tomorrow"  as DateGroup | "done", items: visible.filter((a) => getGroup(a.date) === "tomorrow"  && !a.isDone) },
+    { label: "This week", key: "this_week" as DateGroup | "done", items: visible.filter((a) => getGroup(a.date) === "this_week" && !a.isDone) },
+    { label: "Coming up", key: "later"     as DateGroup | "done", items: visible.filter((a) => getGroup(a.date) === "later"     && !a.isDone) },
+    { label: "Done",      key: "done"      as DateGroup | "done", items: visible.filter((a) => a.isDone || getGroup(a.date) === "past") },
+  ] as { label: string; key: DateGroup | "done"; items: Appointment[] }[]).filter((g) => g.items.length > 0);
 
   // ── Calendar event groups ──────────────────────────────────────────────────
   const upcomingCalEvents = calEvents.filter((e) => {
@@ -1173,7 +1173,7 @@ export default function AppointmentsScreen() {
         <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
           <StatusChip label={selected.category} color={categoryColor(selected.category)} />
           {needsPrep(selected) && <StatusChip label="Needs prep" color={ORANGE} />}
-          {selected.isDone && <StatusChip label="Done ✓" color="#4A7B5E" />}
+          {selected.isDone && <StatusChip label="Done ✓" color="#2A8F88" />}
           {selected.reminderEnabled && <StatusChip label="Reminder on" color={PLUM} />}
           {selected.recurringEnabled && <StatusChip label="Recurring" color={GOLD} />}
         </View>
@@ -1220,7 +1220,7 @@ export default function AppointmentsScreen() {
           onPress={() => handleMarkDone(selected.id)}
           activeOpacity={0.8}
         >
-          <Text style={[styles.saveBtnText, selected.isDone && { color: "#4A7B5E" }]}>
+          <Text style={[styles.saveBtnText, selected.isDone && { color: "#2A8F88" }]}>
             {selected.isDone ? "Mark as upcoming" : "Mark as done ✓"}
           </Text>
         </TouchableOpacity>

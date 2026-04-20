@@ -2272,7 +2272,7 @@ export default function FamilyScreen() {
   // ── Page 3: Results screen ─────────────────────────────────────────────────
   if (familyStep === "results" && juggleResult) {
     return (
-      <SafeAreaView style={{ flex: 1, backgroundColor: "#FAFAF8" }}>
+      <SafeAreaView style={{ flex: 1, backgroundColor: "#FFFFFF" }}>
         {/* Slim nav bar — content weight lives inside the hero dashboard card */}
         <View style={styles.resultsHeader}>
           <TouchableOpacity

@@ -626,7 +626,7 @@ export default function HomeTab() {
 
           {/* G — Bills preview */}
           {(() => {
-            const billColor  = "#4A7B5E";
+            const billColor  = "#2A8F88";
             const billTitle  = !billsData
               ? "No bills added yet."
               : billsData.overdue > 0

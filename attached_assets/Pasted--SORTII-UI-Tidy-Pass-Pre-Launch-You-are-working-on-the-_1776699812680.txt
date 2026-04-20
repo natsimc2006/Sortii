@@ -1,0 +1,150 @@
+## SORTII — UI Tidy Pass (Pre-Launch)
+
+You are working on the Sortii app (React Native / Expo). This is a tidy-up pass only — no new features, no structural changes beyond what is listed. Work through each phase in order and stop for confirmation before moving to the next.
+
+---
+
+### PHASE 1 — Background colour: white throughout
+
+**Goal:** Standardise all app screen backgrounds to pure white `#FFFFFF`.
+
+The onboarding screens are already white — match that throughout.
+
+**Screens to update:**
+- Home screen
+- Meals screen
+- Family screen
+- Money screen
+- Bills screen
+- Appointments screen
+- "What's Coming Up" screen
+- Any modal or bottom sheet that currently uses the warm cream `#F7F3EB` as a screen-level background
+
+**Rule:** `#F7F3EB` (warm cream) is only permitted as a card/component background, never as the full screen background. Set all `backgroundColor` values at the screen/container level to `#FFFFFF`.
+
+When done, confirm: "Phase 1 complete — backgrounds updated to white."
+
+---
+
+### PHASE 2 — Remove Bills from the bottom navigation bar
+
+**Goal:** The bottom nav should have exactly 5 items: Home, Meals, Add (+), Family, Money. Bills tab must be removed.
+
+**Steps:**
+1. Remove the Bills tab from the bottom navigation component entirely.
+2. The Bills screen itself should remain in the app — it is still accessible via:
+   - The Home screen "Bills" card/section
+   - The Add (+) modal ("Add bill" option)
+3. Do not delete the Bills screen file or its routes — just remove it from the nav bar.
+4. Ensure the remaining 5 nav items are evenly spaced and the Add (+) gold button remains centred.
+
+When done, confirm: "Phase 2 complete — Bills removed from nav, 5-tab nav confirmed."
+
+---
+
+### PHASE 3 — Fix brand colour inconsistencies
+
+**Goal:** All interactive elements must use the correct Sortii brand colours.
+
+**Brand colour reference:**
+- Teal (standard actions): `#2A8F88`
+- Gold (primary CTA): `#D29A22`
+- Plum (smart features): `#5E3A4C`
+- Destructive: `#B86557`
+- White background: `#FFFFFF`
+- Border: `#E6E1D7`
+
+**Fixes required:**
+
+**Bills screen:**
+- "Add first bill" button: change background to teal `#2A8F88`, white label text
+
+**Appointments screen:**
+- "Connect" buttons (iPhone Calendar, Google Calendar): change to teal `#2A8F88` with white label text
+- Review all other interactive elements on this screen and apply correct brand colours
+
+**General sweep:**
+- Search for any button or interactive element using a dark forest green (approximately `#2D6A4F` or similar) and replace with `#2A8F88`
+- Ensure no off-brand greens appear anywhere in the app
+
+When done, confirm: "Phase 3 complete — colour inconsistencies fixed."
+
+---
+
+### PHASE 4 — Fix onboarding progress dots
+
+**Goal:** The step indicator dots must correctly reflect the current step.
+
+**Current bug:** Step 1 shows all three dots unfilled. It should show dot 1 as filled/active.
+
+**Correct behaviour:**
+- Step 1: dot 1 filled (active), dots 2 and 3 unfilled
+- Step 2: dots 1 and 2 filled, dot 3 unfilled
+- Step 3: all three dots filled
+
+**Filled/active dot colour:** `#2A8F88` (teal)
+**Unfilled dot colour:** `#E6E1D7` (border grey)
+
+Check that the dot component is driven by the current step index and that index starts at 1 (not 0) for display purposes.
+
+When done, confirm: "Phase 4 complete — onboarding dots fixed."
+
+---
+
+### PHASE 5 — Fix "What's Coming Up" busyness logic
+
+**Goal:** The "What's Coming Up" screen and its Home screen card must not count meals when assessing how busy the week is.
+
+**Current bug:** 7 meals planned → screen reads "This week's got a bit on. 7 items in the next 7 days." Meals are inflating the busyness count, making a calm week look hectic.
+
+**Fix the item count logic:**
+- The count displayed ("X items in the next 7 days") must only include: appointments, bills due, and family events.
+- Meals should be shown on the screen (they already have their own "Meals" filter tab) but must NOT be included in the total item count or trigger the busyness copy.
+
+**Fix the copy logic on the Home screen card and What's Coming Up header:**
+
+Use this logic (based on non-meal event count only):
+
+| Non-meal events | Header copy |
+|---|---|
+| 0 | "A quiet one. Nice." |
+| 1–2 | "Not much on this week." |
+| 3–5 | "A few things to keep across." |
+| 6+ | "This week's got a bit on." |
+
+**Meals summary line** (keep this, it's useful info, just separate from busyness):
+- If meals are planned: show "7 dinners sorted." as a teal pill/tag — friendly, not alarming.
+- This should read as a positive reassurance, not add to the sense of overwhelm.
+
+**Home screen card ("What's Coming Up"):**
+Apply the same copy logic — the card headline should reflect non-meal busyness only.
+
+When done, confirm: "Phase 5 complete — What's Coming Up logic fixed."
+
+---
+
+### PHASE 6 — Remove "YOUR WEEK... SORTED" tag from splash screen
+
+**Goal:** The splash/loading screen (the one with the Sortii logo and "Done. Your week's sorted.") should show the clean logo mark only — no "YOUR WEEK... SORTED" label/tag overlaid on the logo.
+
+**Steps:**
+- Locate the splash/onboarding entry screen (the first screen with the Sortii logo before "Less to think about.")
+- Remove the coloured "YOUR WEEK... SORTED" badge/tag that appears below the logo
+- The logo should stand clean on its own on the white background
+- "Dinner… Sorted." tagline below the logo is fine to keep if present
+
+When done, confirm: "Phase 6 complete — splash screen cleaned up."
+
+---
+
+### FINAL CHECK
+
+Once all 6 phases are confirmed, do a full pass and verify:
+1. No screen has a cream/warm background at the screen level — all are `#FFFFFF`
+2. Bottom nav has exactly 5 items — no Bills tab
+3. No dark forest green buttons anywhere — all use `#2A8F88`
+4. Onboarding dots increment correctly from step 1
+5. "What's Coming Up" count and copy ignores meals
+6. Splash screen logo is clean with no badge overlay
+
+Report any issues found during the final check before closing.

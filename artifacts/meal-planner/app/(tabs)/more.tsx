@@ -13,7 +13,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 const TEAL = "#2A8F88";
 const GOLD = "#D29A22";
 const PLUM = "#5E3A4C";
-const BG = "#F7F3EB";
+const BG = "#FFFFFF";
 const CARD_BG = "#FFFFFF";
 const BORDER = "#E6E1D7";
 const TEXT = "#2B2B2B";
@@ -71,7 +71,7 @@ export default function MoreScreen() {
         },
         {
           icon: "file-text",
-          color: "#4A7B5E",
+          color: "#2A8F88",
           label: "Bills",
           sub: "Track what's coming up and what's paid",
           onPress: () => router.push("/(tabs)/bills"),

@@ -334,7 +334,7 @@ const SOURCE_FILTERS: Array<{ key: SourceFilter; label: string; color: string }>
   { key: "meal",        label: "Meals",        color: GOLD },
   { key: "juggle",      label: "Juggle",       color: TEAL },
   { key: "appointment", label: "Appointments", color: PLUM },
-  { key: "bill",        label: "Bills",        color: "#4A7B5E" },
+  { key: "bill",        label: "Bills",        color: "#2A8F88" },
 ];
 
 const BUCKET_LABELS: Record<DateBucket, string> = {

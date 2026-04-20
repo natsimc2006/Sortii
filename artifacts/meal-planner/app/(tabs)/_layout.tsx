@@ -24,7 +24,7 @@ let _sessionInitialized = false;
 const TEAL = "#2A8F88";
 const GOLD = "#D29A22";
 const PLUM = "#5E3A4C";
-const GREEN = "#4A7B5E";
+const GREEN = "#2A8F88";
 
 // ── Quick Add sheet ─────────────────────────────────────────────
 function QuickAddSheet({
@@ -318,22 +318,8 @@ export default function TabLayout() {
             tabBarActiveTintColor: "#D29A22",
           }}
         />
-        <Tabs.Screen
-          name="bills"
-          options={{
-            title: "Bills",
-            tabBarIcon: ({ color, focused }) => (
-              <Ionicons
-                name={focused ? "receipt" : "receipt-outline"}
-                size={21}
-                color={color}
-              />
-            ),
-            tabBarActiveTintColor: TEAL,
-          }}
-        />
-
         {/* ── Hidden (still accessible via router.push) ── */}
+        <Tabs.Screen name="bills"        options={{ href: null }} />
         <Tabs.Screen name="planner"      options={{ href: null }} />
         <Tabs.Screen name="recipes"      options={{ href: null }} />
         <Tabs.Screen name="refresh"      options={{ href: null }} />
