@@ -176,7 +176,7 @@ export function RecipeDetailModal({ recipe, onClose }: RecipeDetailModalProps) {
   const { preferences } = usePlanner();
   const [expandedSteps, setExpandedSteps] = useState<Set<number>>(new Set());
   const [heroImgError, setHeroImgError] = useState(false);
-  const heroImgSrc = useRecipeImage(recipe?.id ?? "", recipe?.name ?? "", recipe?.imageUrl);
+  const { src: heroImgSrc, refresh: refreshHeroImage, refreshing: heroRefreshing } = useRecipeImage(recipe?.id ?? "", recipe?.name ?? "", recipe?.imageUrl);
 
   if (!recipe) return null;
 
@@ -235,6 +235,18 @@ export function RecipeDetailModal({ recipe, onClose }: RecipeDetailModalProps) {
                 resizeMode="cover"
                 onError={() => setHeroImgError(true)}
               />
+              {/* Refresh photo button — small floating pill over the image */}
+              <TouchableOpacity
+                onPress={refreshHeroImage}
+                disabled={heroRefreshing}
+                style={styles.refreshPhotoBtn}
+                activeOpacity={0.8}
+              >
+                <Feather name="refresh-cw" size={12} color="#fff" />
+                <Text style={styles.refreshPhotoBtnText}>
+                  {heroRefreshing ? "Refreshing…" : "Refresh photo"}
+                </Text>
+              </TouchableOpacity>
             </View>
           )}
 
@@ -390,6 +402,23 @@ const styles = StyleSheet.create({
   heroImage: {
     width: "100%",
     height: "100%",
+  },
+  refreshPhotoBtn: {
+    position: "absolute",
+    bottom: 10,
+    right: 12,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 5,
+    backgroundColor: "rgba(0,0,0,0.45)",
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 20,
+  },
+  refreshPhotoBtnText: {
+    color: "#fff",
+    fontSize: 11,
+    fontFamily: "Inter_500Medium",
   },
   header: {
     paddingHorizontal: 20,

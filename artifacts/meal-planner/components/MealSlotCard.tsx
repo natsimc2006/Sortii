@@ -74,7 +74,7 @@ export function MealSlotCard({
   onSwapBadgePress,
 }: MealSlotCardProps) {
   const [imgError, setImgError] = useState(false);
-  const imgSrc = useRecipeImage(recipe?.id ?? "", recipe?.name ?? "", recipe?.imageUrl);
+  const { src: imgSrc } = useRecipeImage(recipe?.id ?? "", recipe?.name ?? "", recipe?.imageUrl);
   const imgOpacity = useRef(new Animated.Value(0)).current;
 
   const handleImageLoad = () => {
