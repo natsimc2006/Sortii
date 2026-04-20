@@ -196,6 +196,8 @@ function HeroCard({
   const roundedSwap = Math.round(swapSavings);
   const roundedPantry = Math.round(pantryEfficiency);
 
+  if (total <= 0) return null;
+
   return (
     <View style={styles.heroCard}>
       {/* Status pill top-right */}
@@ -205,35 +207,25 @@ function HeroCard({
       </View>
 
       {/* Big number */}
-      <Text style={styles.heroBigNumber}>~{fmt(total > 0 ? total : 0)}</Text>
-      <Text style={styles.heroLabel}>quietly sorted this week.</Text>
+      <Text style={styles.heroBigNumber}>~{fmt(total)}</Text>
+      <Text style={styles.heroLabel}>sorted by Sortii this week</Text>
 
-      {total > 0 && (
-        <>
-          <View style={styles.heroDivider} />
-          {roundedSwap > 0 && (
-            <View style={styles.heroLineItem}>
-              <Text style={styles.heroLineLabel}>Smarter ingredient swaps</Text>
-              <Text style={styles.heroLineValue}>{fmt(roundedSwap)}</Text>
-            </View>
-          )}
-          {roundedPantry > 0 && (
-            <View style={styles.heroLineItem}>
-              <Text style={styles.heroLineLabel}>Using what you already had</Text>
-              <Text style={styles.heroLineValue}>{fmt(roundedPantry)}</Text>
-            </View>
-          )}
-          <Text style={styles.heroDisclaimer}>
-            Nothing dramatic. Just less waste. Estimated, not exact.
-          </Text>
-        </>
+      <View style={styles.heroDivider} />
+      {roundedSwap > 0 && (
+        <View style={styles.heroLineItem}>
+          <Text style={styles.heroLineLabel}>Smarter ingredient choices</Text>
+          <Text style={styles.heroLineValue}>{fmt(roundedSwap)}</Text>
+        </View>
       )}
-
-      {total <= 0 && (
-        <Text style={styles.heroNoMealsHint}>
-          Add meals to your planner to see your weekly savings.
-        </Text>
+      {roundedPantry > 0 && (
+        <View style={styles.heroLineItem}>
+          <Text style={styles.heroLineLabel}>Pantry-friendly meal selection</Text>
+          <Text style={styles.heroLineValue}>{fmt(roundedPantry)}</Text>
+        </View>
       )}
+      <Text style={styles.heroDisclaimer}>
+        Nothing dramatic. Just less waste. Estimated, not exact.
+      </Text>
     </View>
   );
 }
@@ -248,6 +240,7 @@ function WeeklySnapshotSection({
   hasMealsSetup,
   fmt,
   appliedSavingsTotal,
+  defaultOpen,
 }: {
   money: NonNullable<ReturnType<typeof useUserWeek>["money"]>;
   result: MoneyPageResult;
@@ -256,8 +249,9 @@ function WeeklySnapshotSection({
   hasMealsSetup: boolean;
   fmt: (n: number) => string;
   appliedSavingsTotal: number;
+  defaultOpen?: boolean;
 }) {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(defaultOpen ?? false);
   const { weeklyIncome, fixedWeeklyCosts, groceriesWeekly, eatingOutWeekly, otherWeeklySpend } = money;
   const { weeklyState } = result;
   const remaining = result.remaining + appliedSavingsTotal;
@@ -300,9 +294,8 @@ function WeeklySnapshotSection({
 
           {showCoffeeNote && (
             <View style={styles.coffeeNote}>
-              <Feather name="coffee" size={12} color={GOLD} />
               <Text style={styles.coffeeNoteText}>
-                Your coffee spend ({fmt(Math.round(coffeeSpend))}) is close to your dinner plan ({fmt(Math.round(dinnerPlanCost))}). Interesting.
+                Your coffee spend is close to your dinner plan this week.
               </Text>
             </View>
           )}
@@ -371,27 +364,31 @@ function GroceriesSection({
 }) {
   if (!hasGroceries) return null;
 
-  const underEstimate = hasMealsSetup && dinnerPlanCost > 0 && dinnerPlanCost <= estimatedDinnerSpend;
+  const delta = Math.abs(estimatedDinnerSpend - dinnerPlanCost);
+  const underEst = hasMealsSetup && dinnerPlanCost > 0 && dinnerPlanCost <= estimatedDinnerSpend;
+  const dinnerInsightLine = hasMealsSetup && dinnerPlanCost > 0
+    ? `${numMeals} of 7 dinners covered. ${underEst ? "Under" : "Over"} estimate by ${fmt(delta)}.`
+    : dinnerInsight;
 
   return (
     <View style={styles.groceriesSection}>
-      <Text style={styles.groceriesSectionTitle}>Your usual dinner spend</Text>
+      <Text style={styles.groceriesSectionTitle}>Where groceries are going</Text>
 
       <View style={styles.groceriesStatsRow}>
         <View style={styles.groceriesStat}>
-          <Text style={styles.groceriesStatLabel}>Usual baseline</Text>
+          <Text style={styles.groceriesStatLabel}>Estimated grocery spend</Text>
           <Text style={styles.groceriesStatValue}>{fmt(estimatedDinnerSpend)}</Text>
         </View>
         {hasMealsSetup && dinnerPlanCost > 0 && (
           <>
             <View style={styles.groceriesStatDivider} />
             <View style={styles.groceriesStat}>
-              <Text style={styles.groceriesStatLabel}>This week's plan</Text>
+              <Text style={styles.groceriesStatLabel}>Your dinner plan</Text>
               <View style={styles.groceriesStatValueRow}>
                 <Text style={[styles.groceriesStatValue, { color: TEAL }]}>
                   {fmt(dinnerPlanCost)}
                 </Text>
-                {underEstimate && (
+                {underEst && (
                   <Text style={styles.groceriesTick}> ✓</Text>
                 )}
               </View>
@@ -400,7 +397,7 @@ function GroceriesSection({
         )}
       </View>
 
-      <Text style={styles.groceriesInsight}>{dinnerInsight}</Text>
+      <Text style={styles.groceriesInsight}>{dinnerInsightLine}</Text>
     </View>
   );
 }
@@ -520,14 +517,14 @@ function QuickWinsSection({
         activeOpacity={0.7}
       >
         <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
-          <Text style={styles.quickWinsTitle}>A few easy wins (if you want them)</Text>
+          <Text style={styles.quickWinsTitle}>💡 A few quick wins</Text>
           {appliedCount > 0 && (
             <View style={styles.quickWinsBadge}>
               <Text style={styles.quickWinsBadgeText}>{appliedCount}</Text>
             </View>
           )}
         </View>
-        <Feather name={open ? "chevron-up" : "chevron-down"} size={17} color="#8A6200" />
+        <Feather name={open ? "chevron-up" : "chevron-down"} size={17} color={PLUM} />
       </TouchableOpacity>
 
       {open && (
@@ -595,9 +592,11 @@ function SavingsGoalCard({
 
       {/* This week row */}
       <View style={styles.goalWeekRow}>
-        <Text style={styles.goalWeekLeft}>
-          This week added ~{fmt(Math.round(weeklyDinnerSaving))}
-        </Text>
+        {weeklyDinnerSaving > 0 && (
+          <Text style={styles.goalWeekLeft}>
+            This week added ~{fmt(Math.round(weeklyDinnerSaving))}
+          </Text>
+        )}
         {weeksLeft !== null && weeksLeft > 0 && (
           <Text style={styles.goalWeekRight}>{weeksLeft} weeks to go</Text>
         )}
@@ -662,7 +661,21 @@ export default function MoneyScreen() {
   // Money nudge dismiss state
   const [nudgeHidden, setNudgeHidden] = useState(false);
 
+  // Snapshot default-open for first-time visitors
+  const [snapshotDefaultOpen, setSnapshotDefaultOpen] = useState(false);
+
   useFocusEffect(useCallback(() => {
+    // First-visit snapshot expand tracking
+    AsyncStorage.getItem("sortii_snapshot_seen").then((raw) => {
+      if (!raw) {
+        setSnapshotDefaultOpen(true);
+        AsyncStorage.setItem("sortii_snapshot_seen", "1").catch(() => {});
+      } else {
+        setSnapshotDefaultOpen(false);
+      }
+    }).catch(() => {});
+
+    // Bills due this week
     loadBills().then((bills) => {
       const dueSoon = bills.filter((b) => !b.isPaid && daysUntilDue(b) >= 0 && daysUntilDue(b) <= 7);
       setBillsCountThisWeek(dueSoon.length);
@@ -846,6 +859,7 @@ export default function MoneyScreen() {
               hasMealsSetup={hasMealsSetup}
               fmt={formatMoneyRound}
               appliedSavingsTotal={appliedSavingsTotal}
+              defaultOpen={snapshotDefaultOpen}
             />
           )}
 
@@ -906,24 +920,22 @@ export default function MoneyScreen() {
               onUpdate={goToGoalSetup}
             />
           ) : (
-            <TouchableOpacity onPress={goToGoalSetup} style={styles.addGoalNudge} activeOpacity={0.8}>
-              <Text style={styles.addGoalNudgeTitle}>Saving for something?</Text>
-              <Text style={styles.addGoalNudgeSub}>We'll keep an eye on it quietly.</Text>
-              <Text style={styles.addGoalNudgeCta}>Set a goal (optional)</Text>
+            <TouchableOpacity onPress={goToGoalSetup} activeOpacity={0.7} style={styles.setGoalLink}>
+              <Text style={styles.setGoalLinkText}>Set a savings goal →</Text>
             </TouchableOpacity>
           )}
 
           {/* 6. Update CTA */}
           <View style={styles.updateCtaWrap}>
             <Text style={styles.updateCtaLabel}>
-              Numbers changed? Easy.
+              Your numbers, your call. Update anytime.
             </Text>
             <TouchableOpacity
               onPress={goToMoneySetup}
               activeOpacity={0.85}
               style={styles.updateCtaBtn}
             >
-              <Text style={styles.updateCtaBtnText}>Tweak my numbers</Text>
+              <Text style={styles.updateCtaBtnText}>Update my numbers</Text>
             </TouchableOpacity>
           </View>
         </>
@@ -1053,13 +1065,13 @@ const styles = StyleSheet.create({
     height: 1, backgroundColor: C.border, marginVertical: 6,
   },
   coffeeNote: {
-    flexDirection: "row", alignItems: "flex-start", gap: 6,
     backgroundColor: "#FEF8E7", borderRadius: 8,
     paddingHorizontal: 10, paddingVertical: 8, marginVertical: 4,
+    borderLeftWidth: 2, borderLeftColor: GOLD,
   },
   coffeeNoteText: {
-    flex: 1, fontSize: 12, fontFamily: "Inter_400Regular",
-    color: GOLD, lineHeight: 17, fontStyle: "italic",
+    fontSize: 12, fontFamily: "Inter_400Regular",
+    color: "#8A6200", lineHeight: 17, fontStyle: "italic",
   },
 
   // 3. Groceries section (minimal, no border)
@@ -1094,8 +1106,8 @@ const styles = StyleSheet.create({
 
   // 4. Quick wins
   quickWinsWrap: {
-    borderRadius: 16, backgroundColor: "#FEF3D8",
-    borderWidth: 1.5, borderColor: "rgba(210,154,34,0.30)", overflow: "hidden",
+    borderRadius: 16, backgroundColor: PLUM_TINT,
+    borderWidth: 1.5, borderColor: "rgba(94,58,76,0.18)", overflow: "hidden",
   },
   quickWinsHeader: {
     flexDirection: "row", alignItems: "center",
@@ -1103,20 +1115,20 @@ const styles = StyleSheet.create({
     paddingHorizontal: 18, paddingVertical: 14,
   },
   quickWinsTitle: {
-    fontSize: 15, fontFamily: "Inter_600SemiBold", color: "#8A6200",
+    fontSize: 15, fontFamily: "Inter_600SemiBold", color: PLUM,
   },
   quickWinsBody: {
     paddingHorizontal: 18, paddingBottom: 16, gap: 12,
   },
   quickWinsIntro: {
     fontSize: 13, fontFamily: "Inter_400Regular", fontStyle: "italic",
-    color: "#8A6200", lineHeight: 18, marginBottom: 4,
+    color: PLUM, lineHeight: 18, marginBottom: 4, opacity: 0.75,
   },
   quickWinsRow: {
     flexDirection: "row", alignItems: "flex-start", gap: 8,
   },
   quickWinsArrow: {
-    fontSize: 13, color: "#8A6200", marginTop: 2, fontFamily: "Inter_600SemiBold",
+    fontSize: 13, color: PLUM, marginTop: 2, fontFamily: "Inter_600SemiBold",
   },
   quickWinsContent: { flex: 1, gap: 2 },
   quickWinsLabel: {
@@ -1127,7 +1139,7 @@ const styles = StyleSheet.create({
     color: C.textMuted, lineHeight: 17, fontStyle: "italic",
   },
   quickWinsImpact: {
-    fontSize: 13, fontFamily: "Inter_700Bold", color: "#8A6200",
+    fontSize: 13, fontFamily: "Inter_700Bold", color: PLUM,
   },
   quickWinsCtaRow: {
     flexDirection: "row", alignItems: "center", gap: 10, marginTop: 4,
@@ -1292,21 +1304,13 @@ const styles = StyleSheet.create({
     textDecorationLine: "underline",
   },
 
-  // Add goal nudge (when no goal set)
-  addGoalNudge: {
-    borderRadius: 14, borderWidth: 1.5, borderColor: PLUM_BORDER,
-    borderStyle: "dashed", paddingVertical: 18, paddingHorizontal: 20,
-    alignItems: "center", gap: 4,
+  // Set goal text link (when no goal set)
+  setGoalLink: {
+    alignItems: "center", paddingVertical: 6,
   },
-  addGoalNudgeTitle: {
-    fontSize: 14, fontFamily: "Inter_600SemiBold", color: PLUM,
-  },
-  addGoalNudgeSub: {
-    fontSize: 12, fontFamily: "Inter_400Regular", color: C.textMuted,
-  },
-  addGoalNudgeCta: {
-    fontSize: 13, fontFamily: "Inter_500Medium", color: TEAL,
-    textDecorationLine: "underline", marginTop: 4,
+  setGoalLinkText: {
+    fontSize: 14, fontFamily: "Inter_500Medium", color: TEAL,
+    textDecorationLine: "underline",
   },
   mealsCreditNote: {
     fontSize: 12, fontFamily: "Inter_400Regular", fontStyle: "italic",
