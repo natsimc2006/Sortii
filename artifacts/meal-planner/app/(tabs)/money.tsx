@@ -182,50 +182,27 @@ function StatusPill({ state }: { state: WeeklyState | null }) {
 // ─── 1. Hero Card ────────────────────────────────────────────
 
 function HeroCard({
-  swapSavings,
-  pantryEfficiency,
+  estimatedDinnerSpend,
+  dinnerPlanCost,
   weeklyState,
   fmt,
 }: {
-  swapSavings: number;
-  pantryEfficiency: number;
+  estimatedDinnerSpend: number;
+  dinnerPlanCost: number;
   weeklyState: WeeklyState | null;
   fmt: (n: number) => string;
 }) {
-  const total = Math.round(swapSavings + pantryEfficiency);
-  const roundedSwap = Math.round(swapSavings);
-  const roundedPantry = Math.round(pantryEfficiency);
-
-  if (total <= 0) return null;
+  const total = Math.round(estimatedDinnerSpend - dinnerPlanCost);
+  if (total <= 0 || !isFinite(total)) return null;
 
   return (
     <View style={styles.heroCard}>
-      {/* Status pill top-right */}
       <View style={styles.heroTopRow}>
-        <Text style={styles.heroEyebrow}>This week</Text>
+        <Text style={styles.heroEyebrow}>THIS WEEK</Text>
         <StatusPill state={weeklyState} />
       </View>
-
-      {/* Big number */}
       <Text style={styles.heroBigNumber}>~{fmt(total)}</Text>
-      <Text style={styles.heroLabel}>sorted by Sortii this week</Text>
-
-      <View style={styles.heroDivider} />
-      {roundedSwap > 0 && (
-        <View style={styles.heroLineItem}>
-          <Text style={styles.heroLineLabel}>Smarter ingredient choices</Text>
-          <Text style={styles.heroLineValue}>{fmt(roundedSwap)}</Text>
-        </View>
-      )}
-      {roundedPantry > 0 && (
-        <View style={styles.heroLineItem}>
-          <Text style={styles.heroLineLabel}>Pantry-friendly meal selection</Text>
-          <Text style={styles.heroLineValue}>{fmt(roundedPantry)}</Text>
-        </View>
-      )}
-      <Text style={styles.heroDisclaimer}>
-        Nothing dramatic. Just less waste. Estimated, not exact.
-      </Text>
+      <Text style={styles.heroLabel}>saved this week vs. eating out</Text>
     </View>
   );
 }
@@ -404,79 +381,20 @@ function GroceriesSection({
 
 // ─── 4. Quick Wins — WinRow ───────────────────────────────────
 
-function WinRow({
-  s,
-  fmt,
-  isApplied,
-  onApply,
-  onUndo,
-  hasMealsSetup,
-  onViewMeals,
-}: {
-  s: MoneySuggestion;
-  fmt: (n: number) => string;
-  isApplied: boolean;
-  onApply: () => void;
-  onUndo: () => void;
-  hasMealsSetup: boolean;
-  onViewMeals: () => void;
-}) {
-  const isActionable = !s.isGoalProjection && !s.isMonthlyNudge && s.impactAmount > 0;
-  const ctaLabel = WIN_CTA[s.id] ?? "Try this";
-  const message = confirmMsg(s.id, s.impactAmount, fmt);
-
+function WinRow({ s, fmt }: { s: MoneySuggestion; fmt: (n: number) => string }) {
+  const showAmount = !s.isGoalProjection && !s.isMonthlyNudge && s.impactAmount > 0;
   return (
-    <View style={[styles.quickWinsRow, isApplied && styles.quickWinsRowApplied]}>
-      <Text style={[styles.quickWinsArrow, isApplied && { color: TEAL }]}>
-        {isApplied ? "✓" : "▸"}
-      </Text>
+    <View style={styles.quickWinsRow}>
+      <Text style={styles.quickWinsArrow}>▸</Text>
       <View style={styles.quickWinsContent}>
-        <Text style={[styles.quickWinsLabel, isApplied && styles.quickWinsLabelApplied]}>
-          {s.label}
-        </Text>
-
-        {isApplied ? (
-          <>
-            <Text style={styles.quickWinsConfirm}>{message}</Text>
-            {s.id === "skip_takeaway" && hasMealsSetup && (
-              <TouchableOpacity
-                onPress={onViewMeals}
-                hitSlop={{ top: 4, bottom: 4, left: 4, right: 4 }}
-              >
-                <Text style={styles.quickWinsMealLink}>Your dinners are already sorted →</Text>
-              </TouchableOpacity>
-            )}
-            <TouchableOpacity
-              onPress={() => {
-                Haptics.selectionAsync();
-                onUndo();
-              }}
-              hitSlop={{ top: 6, bottom: 6, left: 8, right: 8 }}
-            >
-              <Text style={styles.quickWinsUndo}>Undo</Text>
-            </TouchableOpacity>
-          </>
-        ) : (
-          <>
-            {s.reason ? <Text style={styles.quickWinsReason}>{s.reason}</Text> : null}
-            {isActionable && (
-              <View style={styles.quickWinsCtaRow}>
-                <Text style={styles.quickWinsImpact}>~{fmt(s.impactAmount)}</Text>
-                <TouchableOpacity
-                  onPress={() => {
-                    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-                    onApply();
-                  }}
-                  style={styles.quickWinsCtaBtn}
-                  activeOpacity={0.78}
-                >
-                  <Text style={styles.quickWinsCtaBtnText}>{ctaLabel}</Text>
-                </TouchableOpacity>
-              </View>
-            )}
-          </>
-        )}
+        <Text style={styles.quickWinsLabel}>{s.label}</Text>
+        {s.reason ? <Text style={styles.quickWinsReason}>{s.reason}</Text> : null}
       </View>
+      {showAmount && (
+        <View style={styles.winAmountPill}>
+          <Text style={styles.winAmountPillText}>~{fmt(s.impactAmount)}</Text>
+        </View>
+      )}
     </View>
   );
 }
@@ -486,25 +404,13 @@ function WinRow({
 function QuickWinsSection({
   suggestions,
   fmt,
-  appliedWins,
-  onApply,
-  onUndo,
-  hasMealsSetup,
-  onViewMeals,
 }: {
   suggestions: MoneySuggestion[];
   fmt: (n: number) => string;
-  appliedWins: Map<string, number>;
-  onApply: (id: string, amount: number) => void;
-  onUndo: (id: string) => void;
-  hasMealsSetup: boolean;
-  onViewMeals: () => void;
 }) {
   const [open, setOpen] = useState(false);
   const tips = suggestions.slice(0, 3);
   if (tips.length === 0) return null;
-
-  const appliedCount = tips.filter((s) => appliedWins.has(s.id)).length;
 
   return (
     <View style={styles.quickWinsWrap}>
@@ -516,31 +422,14 @@ function QuickWinsSection({
         style={styles.quickWinsHeader}
         activeOpacity={0.7}
       >
-        <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
-          <Text style={styles.quickWinsTitle}>💡 A few quick wins</Text>
-          {appliedCount > 0 && (
-            <View style={styles.quickWinsBadge}>
-              <Text style={styles.quickWinsBadgeText}>{appliedCount}</Text>
-            </View>
-          )}
-        </View>
+        <Text style={styles.quickWinsTitle}>💡 A few quick wins</Text>
         <Feather name={open ? "chevron-up" : "chevron-down"} size={17} color={PLUM} />
       </TouchableOpacity>
 
       {open && (
         <View style={styles.quickWinsBody}>
-          <Text style={styles.quickWinsIntro}>If you want to tighten things slightly this week:</Text>
           {tips.map((s) => (
-            <WinRow
-              key={s.id}
-              s={s}
-              fmt={fmt}
-              isApplied={appliedWins.has(s.id)}
-              onApply={() => onApply(s.id, s.impactAmount)}
-              onUndo={() => onUndo(s.id)}
-              hasMealsSetup={hasMealsSetup}
-              onViewMeals={onViewMeals}
-            />
+            <WinRow key={s.id} s={s} fmt={fmt} />
           ))}
         </View>
       )}
@@ -830,24 +719,35 @@ export default function MoneyScreen() {
         </Text>
       </View>
 
+      {/* Quick-access chips */}
+      {hasMoneySetup && (
+        <View style={styles.quickChipsRow}>
+          <TouchableOpacity onPress={goToMoneySetup} style={styles.quickChip} activeOpacity={0.75}>
+            <Text style={styles.quickChipText}>Tweak numbers</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={goToGoalSetup} style={styles.quickChip} activeOpacity={0.75}>
+            <Text style={styles.quickChipText}>Savings goal</Text>
+          </TouchableOpacity>
+        </View>
+      )}
+
       {!hasMoneySetup && !nudgeHidden ? (
         <MoneyEmptyState onSetup={goToMoneySetup} onDismiss={handleNudgeDismiss} />
       ) : (
         <>
           {/* 1. Hero card */}
           <HeroCard
-            swapSavings={swapSavings}
-            pantryEfficiency={pantryEfficiency}
+            estimatedDinnerSpend={result.estimatedDinnerSpend}
+            dinnerPlanCost={dinnerPlanCost}
             weeklyState={result.weeklyState}
             fmt={formatMoneyRound}
           />
-
-          {/* Stacked wins bar */}
-          <StackedWinsBar
-            total={appliedSavingsTotal}
-            count={appliedWins.size}
-            fmt={formatMoneyRound}
-          />
+          {result.estimatedDinnerSpend > 0 && dinnerPlanCost > 0 &&
+            Math.round(result.estimatedDinnerSpend - dinnerPlanCost) > 0 && (
+            <Text style={styles.heroDisclaimer}>
+              Estimated saving vs. your usual spend. Not exact — close enough.
+            </Text>
+          )}
 
           {/* 2. Weekly Snapshot */}
           {money && (
@@ -904,11 +804,6 @@ export default function MoneyScreen() {
           <QuickWinsSection
             suggestions={result.suggestions}
             fmt={formatMoneyRound}
-            appliedWins={appliedWins}
-            onApply={applyWin}
-            onUndo={undoWin}
-            hasMealsSetup={hasMealsSetup}
-            onViewMeals={goToMeals}
           />
 
           {/* 5. Savings goal card */}
@@ -958,6 +853,18 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: PAGE_BG,
+  },
+
+  // Quick-access chips
+  quickChipsRow: {
+    flexDirection: "row", gap: 8, marginTop: -4,
+  },
+  quickChip: {
+    paddingHorizontal: 12, paddingVertical: 6, borderRadius: 20,
+    borderWidth: 1.5, borderColor: TEAL, backgroundColor: "#fff",
+  },
+  quickChipText: {
+    fontSize: 12, fontFamily: "Inter_600SemiBold", color: TEAL,
   },
 
   // Header
@@ -1130,7 +1037,14 @@ const styles = StyleSheet.create({
   quickWinsArrow: {
     fontSize: 13, color: PLUM, marginTop: 2, fontFamily: "Inter_600SemiBold",
   },
-  quickWinsContent: { flex: 1, gap: 2 },
+  quickWinsContent: { flex: 1, gap: 2, marginRight: 8 },
+  winAmountPill: {
+    backgroundColor: TEAL, borderRadius: 12,
+    paddingHorizontal: 8, paddingVertical: 3, alignSelf: "center",
+  },
+  winAmountPillText: {
+    fontSize: 11, fontFamily: "Inter_700Bold", color: "#fff",
+  },
   quickWinsLabel: {
     fontSize: 14, fontFamily: "Inter_500Medium", color: C.text, lineHeight: 20,
   },

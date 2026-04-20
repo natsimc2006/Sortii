@@ -233,27 +233,27 @@ function buildDynamicSuggestions(
   const personalised: MoneySuggestion[] = [];
 
   if (eatingOutWeekly >= 30) {
-    const impact = Math.max(Math.round(eatingOutWeekly * 0.4), 20);
+    const rawImpact = Math.max(Math.round(eatingOutWeekly * 0.4), 30);
+    const impact = Math.min(rawImpact, 45);
     personalised.push({
       id: 'skip_takeaway',
-      label: "You're leaning a bit on takeaway.",
-      reason: "Skipping one this week could ease things nicely.",
+      label: "Skip one takeaway this week — dinners are already sorted.",
+      reason: undefined,
       impactAmount: impact,
       category: 'money',
     });
   }
 
   if (ls.streaming > 15) {
-    const impact = Math.round(ls.streaming * 0.5);
-    if (impact > 0) {
-      personalised.push({
-        id: 'pause_subscription',
-        label: "Subscriptions are quietly stacking up.",
-        reason: "Pausing one for a month wouldn't hurt.",
-        impactAmount: impact,
-        category: 'money',
-      });
-    }
+    const rawImpact = Math.round(ls.streaming * 0.5);
+    const impact = Math.min(rawImpact > 0 ? rawImpact : 15, 25);
+    personalised.push({
+      id: 'pause_subscription',
+      label: "One streaming subscription you're not using — easy to pause.",
+      reason: undefined,
+      impactAmount: impact,
+      category: 'money',
+    });
   }
 
   if (ls.coffee > 12) {

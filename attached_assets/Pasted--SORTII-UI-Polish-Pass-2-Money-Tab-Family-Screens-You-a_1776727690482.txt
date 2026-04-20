@@ -1,0 +1,231 @@
+## SORTII — UI Polish Pass 2: Money Tab + Family Screens
+
+You are working on the Sortii app (React Native / Expo). This is a targeted 
+polish pass only — no new features, no structural changes beyond what is listed.
+
+Work through Step 1 completely and confirm before starting Step 2.
+
+---
+
+## STEP 1 — Money Tab
+
+### 1a. Add quick-access chips below page title
+
+Directly below the "Money" page title and subtitle, add two small pill-shaped 
+chips in a horizontal row:
+
+Chip 1: "Tweak numbers"
+- Style: teal outline (#2A8F88), white fill, teal text, 12px font
+- Action: navigates to the budget setup/edit screen
+
+Chip 2: "Savings goal"
+- Style: teal outline (#2A8F88), white fill, teal text, 12px font  
+- Action: opens savings goal setup if no goal exists, or scrolls to the 
+  savings goal card if one is already set
+
+Chips sit on one row, left-aligned, with 8px gap between them. 8px margin 
+below before the hero card begins.
+
+---
+
+### 1b. Rewrite the hero card — clarify what the number means
+
+The hero card currently has line items ("Smarter ingredient choices", 
+"Pantry-friendly meal selection") inside it. This creates ambiguity about 
+whether the headline figure is already saved or could be saved. Fix this.
+
+Hero card layout (teal tint background #E6F3F0):
+
+Top row:
+- Left: "THIS WEEK" label (10px, uppercase, teal #2A8F88)
+- Right: status pill — "On track" / "Tight week" / "Holding steady" 
+  (teal #2A8F88 background, white text, small rounded pill)
+
+Hero number:
+- "~$[totalSorted]" — large (36px), bold, teal (#2A8F88)
+- Label directly below the number: "saved this week vs. eating out"
+- This figure represents the meal plan cost saving compared to the user's 
+  estimated usual spend (eating out / unplanned dinners). It is NOT the 
+  potential saving from tips.
+
+Remove from inside the hero card:
+- The "Smarter ingredient choices — $X" line item
+- The "Pantry-friendly meal selection — $X" line item
+- The italic disclaimer copy inside the card
+
+Add below the hero card (outside, not inside):
+- Single line in small grey text (12px, #999999):
+  "Estimated saving vs. your usual spend. Not exact — close enough."
+
+Safety rules:
+- If totalSorted is 0, null, or undefined: suppress the hero card entirely
+- Never render ~$0 or ~$NaN
+
+---
+
+### 1c. Fix quick wins — tip amounts and logic
+
+Locate the getSavingsGoalCopy() or equivalent tips logic that populates 
+"A few quick wins." Apply these corrections:
+
+Subscription tip:
+- Cap any displayed saving amount at $25 maximum
+- Copy: "One streaming subscription you're not using — easy to pause."
+- Amount shown: calculate from actual subscription data if available, 
+  otherwise show ~$15. Never show more than $25.
+
+Takeaway tip:
+- Update saving amount range to $30–$45 for a family (one fewer takeaway)
+- Copy: "Skip one takeaway this week — dinners are already sorted."
+- Amount shown: use ~$35 as default if not calculable from data
+
+Arbitrary dollar amounts:
+- Any tip where the saving figure cannot be calculated from real user data 
+  must either show a realistic fixed estimate OR suppress the dollar figure
+- Never show a saving amount over $50 on a single quick wins tip unless 
+  it is directly derived from real data
+
+Remove action buttons ("Give this a go", "Try this") from inside quick wins 
+tips — these add visual noise. Tips should be read-only rows with ▸ prefix 
+and the saving amount as a small teal pill to the right. No teal CTA buttons 
+inside this section.
+
+---
+
+When Step 1 is complete, confirm: "Step 1 done — Money tab updated."
+Then stop and wait before starting Step 2.
+
+---
+
+## STEP 2 — Family Screens
+
+### 2a. Collapse the family members card
+
+The family members list card currently renders fully expanded on every visit, 
+consuming significant screen space for information that rarely changes.
+
+Collapsed state (default after initial setup):
+- Single row: 👥 [Name 1], [Name 2], [Name 3], [Name 4]  "Edit →" right-aligned
+- Light border (#E6E1D7), white background, 12px padding
+- Tapping anywhere on the row expands to the full member list (current design)
+
+Expanded state (on tap, or on first visit before any members added):
+- Current card layout — coloured dot + name + role tag + remove × 
+- "Add another" button visible
+- Collapse handle or "Done" text link at top right to collapse back
+
+Store expanded/collapsed state in component state (not persisted — always 
+starts collapsed on screen mount after setup is complete).
+
+---
+
+### 2b. Make "See the plan" and "Re-sort" sticky
+
+Once a user has at least 1 family event entered, render a sticky action bar 
+pinned above the bottom navigation bar.
+
+Sticky bar layout:
+- White background, top border (#E6E1D7), 12px padding top and bottom
+- Two buttons side by side with 12px gap:
+
+  Button 1: "See the plan →"
+  - Gold background (#D29A22), white text, full flex-1 width
+  - Navigates to the family plan/juggle output screen
+
+  Button 2: "Re-sort ↺"  
+  - White background, teal border (#2A8F88), teal text, full flex-1 width
+  - Triggers re-sort of the current week's events
+
+Show this sticky bar only when familyEvents.length > 0.
+When no events exist, show neither button — empty state only.
+
+Remove the standalone "Add another" and "Re-sort" buttons that currently 
+appear mid-scroll at the bottom of the screen — the sticky bar replaces them.
+Keep the "Add another" action available via the main Add (+) modal instead.
+
+---
+
+### 2c. Fix time chip colours on the family plan screen
+
+On the "Sorted. Here's the plan" screen, all time chips (10:00, 11:00, 
+11:30 etc.) are currently rendered in deep plum (#5E3A4C). Plum is reserved 
+for smart features and system intelligence only — time values are data, 
+not intelligence signals.
+
+Fix time chip styling:
+- Background: #2B2B2B (charcoal)
+- Text: white
+- Border radius: match current pill shape
+- Apply to all time chips on this screen
+
+Colour rules for the rest of this screen — keep these as-is:
+- "HEADS UP" warning cards: red tint (#F7E9E8) background, red (#B86557) 
+  left border — correct, do not change
+- "WORTH KNOWING" card: plum (#5E3A4C) left border, plum tint (#F3E8EE) 
+  background — correct, do not change
+- "Swap" suggestion chips: keep current styling — correct
+- "5 events", "1 tight spot", "2 sorted ✓" summary pills: keep current 
+  styling — correct
+
+Only change: the bare time chips. Charcoal background, white text.
+
+---
+
+### 2d. Appointments screen — apply Sortii brand treatment
+
+The Appointments screen currently looks like a different app. Apply the 
+standard Sortii page treatment:
+
+Page header:
+- Title: "Appointments" — matches the large bold title style used on 
+  Meals, Family, Money, Bills screens
+- Subtitle: "Nothing booked yet. A rare and beautiful sight." — italic, 
+  grey (#999999), 14px (this copy is already correct, just needs correct 
+  styling)
+
+Remove:
+- The large centred calendar emoji (📅) and "Everything in one place." 
+  hero text block — this is a different design language to the rest of the app
+- The floating circular + FAB button (bottom right) — Add modal handles this
+
+Calendar connection cards:
+- Keep the iPhone Calendar and Google Calendar cards
+- Apply standard card styling: white background, #E6E1D7 border, 12px 
+  border radius, 16px padding
+- "Connect" buttons: teal (#2A8F88) background, white text — correct 
+  colour, keep
+- Card subtitle text: grey (#999999), 13px
+
+Below the two cards:
+- Keep "I'll add things manually →" as a teal text link, centred
+
+Filter chips row (All / Today / This week / Needs prep):
+- Keep as-is — correct styling
+
+Source/calendar chips row (Apple / Google / + Add):
+- Keep as-is
+
+When Step 2 is complete, confirm: "Step 2 done — Family and Appointments 
+screens updated."
+
+---
+
+## FINAL CHECK
+
+Once both steps confirmed, verify:
+
+1. Money hero card shows meal plan saving vs eating out — not tip savings
+2. Hero card suppressed if totalSorted is 0 or null
+3. Disclaimer copy sits below hero card, not inside it
+4. Quick wins tips have no CTA buttons — rows only with teal saving pill
+5. Subscription tip capped at $25, takeaway tip at $30–45
+6. "Tweak numbers" and "Savings goal" chips appear below Money page title
+7. Family member card collapses to single summary line after setup
+8. Sticky "See the plan" / "Re-sort" bar appears when events > 0
+9. Time chips on plan screen are charcoal (#2B2B2B), not plum
+10. Plum used only on WORTH KNOWING card — not on time data
+11. Appointments screen matches Sortii page title/subtitle treatment
+12. Large calendar hero block removed from Appointments screen
+13. All backgrounds remain white (#FFFFFF) at screen level
+
+Report any issues before closing.
