@@ -416,8 +416,10 @@ function SourcePill({ connected, label, icon, onPress }: SourcePillProps) {
 
 // ── Toast ───────────────────────────────────────────────────────────────────────
 function CalToast({ msg, teal }: { msg: string; teal: boolean }) {
+  const ins = useSafeAreaInsets();
+  const bottomOffset = ins.bottom + TAB_BAR_HEIGHT + 16;
   return (
-    <View style={[styles.toast, teal ? styles.toastTeal : styles.toastMuted]}>
+    <View style={[styles.toast, teal ? styles.toastTeal : styles.toastMuted, { bottom: bottomOffset }]}>
       <Text style={styles.toastText}>{msg}</Text>
     </View>
   );
@@ -677,16 +679,28 @@ export default function AppointmentsScreen() {
   async function handleConnectGoogle() {
     // OAuth uses auth.expo.io proxy which only works on native — not in a web browser
     if (Platform.OS === "web") {
-      showToast("Google Calendar works in the Sortii app on your phone.", false);
+      Alert.alert(
+        "Google Calendar",
+        "Google Calendar connection works in the Sortii app on your phone. Download the app to connect.",
+        [{ text: "Got it", style: "default" }],
+      );
       return;
     }
     // expo-crypto (needed for PKCE) is not bundled inside the Expo Go preview app
     if ((Constants as any).appOwnership === "expo") {
-      showToast("Google Calendar isn't available in the Expo Go preview — it works in the full app.", false);
+      Alert.alert(
+        "Google Calendar",
+        "Google Calendar sign-in needs the full Sortii app — it can't run inside Expo Go.\n\nIn the meantime, tap \"iPhone Calendar\" to connect the calendars already on your phone.",
+        [{ text: "Got it", style: "default" }],
+      );
       return;
     }
     if (!isGoogleConfigured()) {
-      showToast("Google Calendar coming soon — use iPhone Calendar for now.", false);
+      Alert.alert(
+        "Coming soon",
+        "Google Calendar direct sign-in is coming very soon. For now, your Google calendars may already be available via iPhone Calendar — give that a try!",
+        [{ text: "OK", style: "default" }],
+      );
       return;
     }
     setIsConnectingGoogle(true);
@@ -738,7 +752,7 @@ export default function AppointmentsScreen() {
   function showToast(msg: string, teal: boolean) {
     if (calToastTimer) clearTimeout(calToastTimer);
     setCalToast({ msg, teal });
-    const t = setTimeout(() => setCalToast(null), teal ? 2000 : 1500);
+    const t = setTimeout(() => setCalToast(null), teal ? 2500 : 3000);
     setCalToastTimer(t);
   }
 
@@ -1528,8 +1542,8 @@ const styles = StyleSheet.create({
 
   // Toast
   toast: {
-    position: "absolute", bottom: 90, left: 20, right: 20, zIndex: 100,
-    borderRadius: 12, padding: 12, alignItems: "center",
+    position: "absolute", left: 20, right: 20, zIndex: 200,
+    borderRadius: 12, padding: 14, alignItems: "center",
     ...Platform.select({
       web: { boxShadow: "0px 4px 14px rgba(0,0,0,0.15)" },
       default: { shadowColor: "#000", shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.15, shadowRadius: 10, elevation: 8 },
