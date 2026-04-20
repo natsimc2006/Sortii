@@ -1,4 +1,5 @@
 import { Feather } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Clipboard from "expo-clipboard";
 import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
@@ -91,6 +92,7 @@ export default function ShoppingScreen() {
   const [extraInput, setExtraInput] = useState("");
   const [alreadyExpanded, setAlreadyExpanded] = useState(false);
   const [clearConfirm, setClearConfirm] = useState(false);
+  const [shoppingTipDismissed, setShoppingTipDismissed] = useState(true);
   const [shareOpen, setShareOpen] = useState(false);
   const [shareSubView, setShareSubView] = useState<null | "send">(null);
   const [toast, setToast] = useState<string | null>(null);
@@ -114,6 +116,12 @@ export default function ShoppingScreen() {
   const webRecognitionRef = useRef<any>(null);
   const nativeLoopingRef = useRef(false);
   const lastAddedTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    AsyncStorage.getItem("sortii_shopping_tip_dismissed").then((val) => {
+      setShoppingTipDismissed(val === "true");
+    }).catch(() => {});
+  }, []);
 
   useEffect(() => {
     if (Platform.OS === "web") {
@@ -527,6 +535,32 @@ export default function ShoppingScreen() {
         keyboardShouldPersistTaps="handled"
         contentContainerStyle={[styles.listContent, { paddingBottom: footerH + 20 }]}
       >
+        {/* Shopping tip — first visit banner */}
+        {!shoppingTipDismissed && (
+          <View style={[styles.shoppingTip, { backgroundColor: C.tealTint, borderColor: "rgba(42,143,136,0.2)" }]}>
+            <View style={{ flexDirection: "row", alignItems: "flex-start", justifyContent: "space-between" }}>
+              <View style={{ flex: 1, gap: 4 }}>
+                <Text style={[styles.shoppingTipTitle, { color: C.primary }]}>
+                  Everything's already in here.
+                </Text>
+                <Text style={[styles.shoppingTipSub, { color: C.text }]}>
+                  Your meal ingredients are added automatically — just add anything extra you need.
+                </Text>
+              </View>
+              <TouchableOpacity
+                onPress={async () => {
+                  await AsyncStorage.setItem("sortii_shopping_tip_dismissed", "true");
+                  setShoppingTipDismissed(true);
+                }}
+                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                style={{ marginLeft: 8, marginTop: 2 }}
+              >
+                <Feather name="x" size={16} color={C.textMuted} />
+              </TouchableOpacity>
+            </View>
+          </View>
+        )}
+
         {/* Category sections */}
         {activeCats.map((cat) => (
           <View key={cat} style={styles.section}>
@@ -902,6 +936,22 @@ const styles = StyleSheet.create({
   },
   confirmBtnLabel: { fontSize: 13, fontFamily: "Inter_600SemiBold" },
   listContent: { padding: 16, gap: 24 },
+  shoppingTip: {
+    borderRadius: 12,
+    borderWidth: 1,
+    padding: 14,
+    marginBottom: 4,
+  },
+  shoppingTipTitle: {
+    fontSize: 14,
+    fontFamily: "Inter_600SemiBold",
+    lineHeight: 20,
+  },
+  shoppingTipSub: {
+    fontSize: 13,
+    fontFamily: "Inter_400Regular",
+    lineHeight: 18,
+  },
   section: { gap: 8 },
   catHeader: { flexDirection: "row", alignItems: "center", gap: 8, marginBottom: 2 },
   catEmoji: { fontSize: 18 },

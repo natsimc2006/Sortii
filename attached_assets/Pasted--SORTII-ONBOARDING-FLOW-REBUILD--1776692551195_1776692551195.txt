@@ -1,0 +1,540 @@
+════════════════════════════════════════════
+SORTII — ONBOARDING FLOW REBUILD
+════════════════════════════════════════════
+
+TASK
+────
+Rebuild the new user onboarding flow.
+The existing preference collection logic
+stays — only the screens, copy, and
+flow structure changes.
+
+Returning users are unaffected.
+The gate that determines new vs returning
+user must remain exactly as it is.
+
+Build in this exact order.
+Do not skip steps.
+
+════════════════════════════════════════════
+BEFORE STARTING — AUDIT EXISTING FLOW
+════════════════════════════════════════════
+
+Before changing anything, identify and
+document:
+
+1. Where the "new user" gate lives in code
+   (what flag or localStorage key determines
+   if someone is a new user)
+
+2. What data each current onboarding screen
+   collects and where it is stored
+
+3. Which onboarding screens feed directly
+   into plan generation (these must be
+   preserved — only presentation changes)
+
+4. Where the current landing page component
+   lives (the "what's for dinner" screen)
+
+5. Where the current onboarding step
+   components live
+
+Report this before writing any new code.
+This audit protects existing logic.
+
+════════════════════════════════════════════
+THE NEW FLOW — 5 SCREENS ONLY
+════════════════════════════════════════════
+
+Replace the current onboarding with
+exactly 5 screens. All existing data
+collection logic is preserved — only
+the presentation, copy, and screen
+count changes.
+
+SCREENS OVERVIEW:
+1. The promise (no data collected)
+2. Household size (replaces people screen)
+3. Hard no's (exists already — keep logic)
+4. Dietary needs (exists already — keep logic)
+5. Generating (replaces old loading screen)
+
+Then → straight to Home screen.
+
+NO budget setup screen in onboarding.
+NO number of days screen (default 7).
+NO money setup screen in onboarding.
+These surface contextually after first use.
+
+════════════════════════════════════════════
+SCREEN 1 — THE PROMISE
+════════════════════════════════════════════
+
+This replaces the current "what's for
+dinner" landing page entirely.
+
+Full screen. White background.
+Vertically centred content.
+
+TOP SECTION:
+Sortii logo — use existing logo asset.
+Same lockup used in current landing page.
+
+Below logo, tagline:
+"Less to think about."
+Font: Playfair Display or serif
+Font size: 28px
+Color: var(--text) #2B2B2B
+Text align: centre
+Margin top: 24px
+
+Below tagline, three lines of copy:
+"Dinners sorted."
+"Weekends planned."  
+"Money understood."
+
+Each line:
+Font: DM Sans, 16px
+Color: var(--text-muted)
+Text align: centre
+Line height: 2
+Appear with a subtle fade-in stagger
+(each line fades in 200ms after the
+previous — total animation 600ms)
+
+BOTTOM SECTION:
+Single full-width CTA button:
+"Let's sort it →"
+Background: var(--brand) #2A8F88
+Color: white
+Font: 17px bold
+Height: 54px
+Border radius: 14px
+Margin: 0 24px
+Position: fixed to bottom with
+safe area padding
+
+Below button, very small muted text:
+"Takes about 60 seconds."
+Font: 12px, var(--text-muted)
+Text align: centre
+Margin top: 8px
+
+NO feature list.
+NO bullet points about what the app does.
+NO screenshots or UI previews.
+The copy does all the work.
+
+════════════════════════════════════════════
+SCREEN 2 — HOUSEHOLD SIZE
+════════════════════════════════════════════
+
+This replaces the current people count
+screen. Same data collected, new feel.
+
+Header area (top of screen):
+Progress indicator: 1 of 3
+Style: three small dots, first filled
+teal, others grey. Centred, 8px dots,
+8px gap. Margin top: 16px.
+
+Below progress:
+Step label (small, plum, uppercase 11px):
+"STEP 1"
+
+Main question:
+"How many are you feeding?"
+Font: Playfair Display, 26px, bold
+Color: var(--text)
+Margin top: 12px
+
+Subtext:
+"Most nights — roughly."
+Font: DM Sans, 15px
+Color: var(--text-muted)
+Margin top: 8px
+
+NUMBER SELECTOR:
+Large number picker — not a grid of pills.
+
+A single large number displayed centred:
+"4"
+Font: Playfair Display, 72px, bold
+Color: var(--brand) #2A8F88
+
+Minus button on left: "−"
+Plus button on right: "+"
+Both: 48px circle, border 2px var(--brand),
+var(--brand) text, 24px font.
+Arranged in a row: [−]  [4]  [+]
+
+Range: 1 to 8.
+Default: 4.
+
+Below the number, contextual hint
+that updates as number changes:
+
+1 → "Just you. Easy week."
+2 → "Two people. Sorted."
+3 → "Small crew."
+4 → "Family of four — good size."
+5 → "Five mouths to feed."
+6 → "Feeding a crowd."
+7–8 → "Big household. We've got you."
+
+Hint font: 14px italic, var(--text-muted)
+Centred, updates immediately on change.
+
+BOTTOM:
+Full-width teal button:
+"That's us →"
+Same style as Screen 1 button.
+
+Small back link above button:
+"← Back"
+var(--text-muted), 13px.
+
+Save people count to same storage
+location as existing onboarding.
+
+════════════════════════════════════════════
+SCREEN 3 — HARD NO'S
+════════════════════════════════════════════
+
+Progress indicator: dot 2 of 3 filled.
+Step label: "STEP 2"
+
+Main question:
+"Anything we should never suggest?"
+
+Subtext:
+"Allergies, dislikes, things the kids
+ will absolutely riot over."
+Font: 15px, var(--text-muted)
+
+INPUT:
+Same text input as existing hard no's
+screen — preserve all existing logic.
+
+Style update only:
+- Input field: full width, 120px height
+  (taller than standard — gives space
+  to type multiple items)
+- Placeholder: "e.g. shellfish, mushrooms,
+  anything spicy..."
+- Background: #F8F6F3
+- Border: 1px #EDE9E3
+- Border radius: 12px
+- Font: 15px
+
+Below input, small example chips as
+visual prompts (tappable — tap to add
+to the input):
+
+[Shellfish] [Mushrooms] [Lamb]
+[Spicy food] [Tofu] [Anchovies]
+
+Chip style: white bg, var(--border),
+12px, border-radius 20px, padding 4px 12px.
+Tapping a chip appends that word
+to the input field.
+
+BOTTOM:
+Two options — not one:
+
+Full-width teal button:
+"Got it →"
+
+Below it, text link:
+"Skip — nothing to avoid →"
+Color: var(--text-muted), 13px, centred.
+
+Skipping saves an empty value to
+the same field as existing logic.
+
+════════════════════════════════════════════
+SCREEN 4 — DIETARY NEEDS
+════════════════════════════════════════════
+
+Progress indicator: dot 3 of 3 filled.
+Step label: "STEP 3"
+
+Main question:
+"Any dietary needs in the household?"
+
+Subtext:
+"Set once. We'll handle it quietly
+ every week."
+Font: 15px, var(--text-muted)
+
+OPTIONS:
+Five pills in a wrap layout:
+
+[🌱 Vegan]
+[🥚 Vegetarian]
+[🌾 Gluten-free]
+[🥛 Dairy-free]
+[None of these]
+
+Pill style unselected:
+background: white
+border: 1.5px solid #EDE9E3
+color: var(--text)
+border-radius: 24px
+padding: 12px 20px
+font-size: 15px
+font-weight: 500
+
+Pill style selected:
+background: var(--plum) #5E3A4C
+border: none
+color: white
+font-weight: 600
+
+Multi-select allowed.
+Tapping "None of these" deselects all
+others and selects only itself.
+Tapping any other option deselects
+"None of these."
+
+Save to same storage as existing
+dietary preference logic.
+
+Below pills, muted note:
+"You can update this anytime in
+ your preferences."
+Font: 12px, var(--text-muted), centred.
+
+BOTTOM:
+Full-width teal button:
+"Nearly there →"
+
+Text link below:
+"Skip for now →"
+var(--text-muted), 13px.
+
+════════════════════════════════════════════
+SCREEN 5 — GENERATING
+════════════════════════════════════════════
+
+This replaces the existing loading screen.
+Full screen white. Vertically centred.
+
+TOP:
+Sortii logo mark only (small — 48px)
+Not the full lockup. Just the icon/mark.
+
+ANIMATION:
+Teal circle pulse — same as the
+Family juggle processing animation.
+60px diameter.
+Sits below the logo mark.
+
+ROTATING TEXT:
+Cycles every 2 seconds, fade transition:
+
+Line 1: "Sorting your first week…"
+Line 2: "Finding meals that work for you."
+Line 3: "Building your shopping list."
+Line 4: "Almost there."
+
+Font: 18px bold, var(--text), centred.
+
+Below rotating text, muted subtext
+(static, doesn't rotate):
+"We'll have a plan ready in a moment."
+Font: 14px, var(--text-muted), centred.
+
+This screen shows while the meal plan
+generates using the collected preferences.
+Same generation logic as existing —
+only the visual presentation changes.
+
+When generation completes:
+Navigate to the HOME screen (not the
+Meals tab directly).
+
+The Home screen shows the full Sortii
+dashboard — dinner card, family card,
+money card — for the first time.
+
+════════════════════════════════════════════
+FIRST HOME SCREEN VISIT — CONTEXTUAL TIPS
+════════════════════════════════════════════
+
+When a new user lands on Home for the
+first time after onboarding, show one
+contextual tip card at the top of the
+screen (above the dinner card):
+
+┌─────────────────────────────────────┐
+│ ✓ Your first week is sorted.        │
+│                                     │
+│ Tap Meals to see your dinners —     │
+│ your shopping list is already       │
+│ built and ready.                    │
+│                                     │
+│ [See my meals →]        [Got it ×]  │
+└─────────────────────────────────────┘
+
+Style:
+background: var(--teal-tint) #E6F3F0
+border: 1px solid rgba(42,143,136,0.2)
+border-radius: 14px
+padding: 16px
+margin: 16px 16px 0
+
+"See my meals →" navigates to Meals tab.
+"Got it ×" dismisses permanently.
+
+Store dismissed state:
+localStorage key: 'sortii_welcome_tip_dismissed'
+
+Show this tip ONLY on first home visit.
+Never again after dismissed.
+
+════════════════════════════════════════════
+CONTEXTUAL FEATURE DISCOVERY
+════════════════════════════════════════════
+
+Budget, money setup, and family setup
+surface as contextual prompts AFTER
+the user has seen the app — not in
+onboarding.
+
+These use the existing logic but
+appear as gentle nudges:
+
+── MONEY TAB FIRST VISIT ─────────────────
+
+When user first opens Money tab with
+no budget configured:
+
+Show above the main content:
+
+"Want to see what this week costs?"
+Subtext: "Set a rough budget and we'll
+ keep an eye on it."
+[Set it up →]  [Maybe later]
+
+"Maybe later" dismisses for 7 days then
+shows again once.
+"Set it up" opens the existing budget
+setup flow.
+
+── FAMILY TAB FIRST VISIT ────────────────
+
+When user first opens Family tab
+with no events:
+
+The existing empty state handles this.
+No change needed — it already says
+"Add events as they come up."
+
+── SHOPPING LIST FIRST VISIT ─────────────
+
+On first tap of Shopping in Meals tab:
+
+Show a one-time banner at the top:
+
+"Everything's already in here."
+Subtext: "Your meal ingredients are
+ added automatically — just add
+ anything extra you need."
+
+Dismiss with × — never shows again.
+
+════════════════════════════════════════════
+WHAT TO PRESERVE EXACTLY
+════════════════════════════════════════════
+
+These must not change:
+
+✓ The new vs returning user gate logic
+  (whatever flag/key determines this)
+✓ All data collection — people count,
+  hard no's, dietary needs — must save
+  to exactly the same storage keys
+  as before so existing plan generation
+  logic still works
+✓ Plan generation logic and API calls
+✓ The 7-day default (remove the
+  "number of days" question but ensure
+  7 is set as the default value so
+  nothing breaks downstream)
+✓ Budget level defaults (Standard)
+  Set this as default without asking —
+  user can change in Adjust
+✓ Returning user flow — straight to
+  Home, no onboarding screens shown
+
+════════════════════════════════════════════
+WHAT TO REMOVE
+════════════════════════════════════════════
+
+Remove these screens entirely:
+
+✗ Current "What's for dinner" landing page
+✗ "How many days do you want planned?"
+  screen — hardcode 7 as default
+✗ Budget level selection screen —
+  hardcode Standard as default,
+  surfaces in Adjust after first plan
+✗ Money setup screen in onboarding —
+  moves to contextual prompt on first
+  Money tab visit
+
+════════════════════════════════════════════
+TEST SEQUENCE AFTER BUILD
+════════════════════════════════════════════
+
+1. Clear localStorage completely to
+   simulate a new user.
+   Confirm Screen 1 (The promise) loads.
+   Confirm "What's for dinner" old screen
+   does NOT appear.
+
+2. Tap "Let's sort it →"
+   Confirm Screen 2 (household size) loads
+   with progress dots showing 1 of 3.
+   Change number to 3.
+   Confirm hint updates to "Small crew."
+   Tap "That's us →"
+
+3. Confirm Screen 3 (hard no's) loads
+   with progress dot 2 of 3.
+   Tap "Skip — nothing to avoid →"
+   Confirm it moves forward without error.
+
+4. Confirm Screen 4 (dietary) loads with
+   progress dot 3 of 3.
+   Select "Vegetarian".
+   Tap "Nearly there →"
+
+5. Confirm Screen 5 (generating) loads
+   with rotating text.
+   Confirm it navigates to HOME on complete.
+
+6. Confirm welcome tip card appears on
+   Home above dinner card.
+   Tap "Got it ×"
+   Confirm it dismisses and doesn't
+   return on next app open.
+
+7. Close and reopen app.
+   Confirm it goes straight to Home
+   (returning user) — NOT back to
+   Screen 1.
+
+8. Open Money tab.
+   Confirm budget nudge appears.
+   Confirm existing budget setup flow
+   still works when tapping "Set it up →"
+
+9. Generate a new meal plan.
+   Confirm it uses the people count
+   and dietary preference set in
+   onboarding.
+   Confirm 7-day plan generates
+   (not a different number).

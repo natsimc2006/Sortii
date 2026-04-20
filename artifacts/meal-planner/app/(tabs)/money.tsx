@@ -1,4 +1,5 @@
 import { Feather } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Haptics from "expo-haptics";
 import { useFocusEffect, useRouter } from "expo-router";
 import React, { useState, useRef, useEffect, useCallback } from "react";
@@ -612,25 +613,27 @@ function SavingsGoalCard({
 
 // ─── Empty state ─────────────────────────────────────────────
 
-function MoneyEmptyState({ onSetup, onBack }: { onSetup: () => void; onBack: () => void }) {
+function MoneyEmptyState({ onSetup, onDismiss }: { onSetup: () => void; onDismiss: () => void }) {
   return (
     <View style={styles.emptyState}>
-      <Feather name="dollar-sign" size={40} color={C.border} />
-      <Text style={styles.emptyHeadline}>No numbers yet.</Text>
-      <Text style={styles.emptySub}>
-        Give us rough numbers and we'll do the thinking for you.
-      </Text>
-      <TouchableOpacity
-        onPress={onSetup}
-        activeOpacity={0.85}
-        style={styles.emptyBtn}
-      >
-        <Text style={styles.emptyBtnText}>Add my numbers</Text>
-        <Feather name="arrow-right" size={16} color="#fff" />
-      </TouchableOpacity>
-      <TouchableOpacity onPress={onBack} activeOpacity={0.7} style={styles.emptyBack}>
-        <Text style={styles.emptyBackText}>Maybe later</Text>
-      </TouchableOpacity>
+      <View style={styles.emptyNudgeCard}>
+        <Text style={styles.emptyNudgeHeadline}>Want to see what this week costs?</Text>
+        <Text style={styles.emptyNudgeSub}>
+          Set a rough budget and we'll keep an eye on it.
+        </Text>
+        <View style={styles.emptyNudgeActions}>
+          <TouchableOpacity
+            onPress={onSetup}
+            activeOpacity={0.85}
+            style={styles.emptyNudgeBtn}
+          >
+            <Text style={styles.emptyNudgeBtnText}>Set it up →</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={onDismiss} activeOpacity={0.7} style={styles.emptyNudgeLater}>
+            <Text style={styles.emptyNudgeLaterText}>Maybe later</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
     </View>
   );
 }
@@ -656,11 +659,26 @@ export default function MoneyScreen() {
   const [billsTotalThisWeek, setBillsTotalThisWeek] = useState(0);
   const [billsCountThisWeek, setBillsCountThisWeek] = useState(0);
 
+  // Money nudge dismiss state
+  const [nudgeHidden, setNudgeHidden] = useState(false);
+
   useFocusEffect(useCallback(() => {
     loadBills().then((bills) => {
       const dueSoon = bills.filter((b) => !b.isPaid && daysUntilDue(b) >= 0 && daysUntilDue(b) <= 7);
       setBillsCountThisWeek(dueSoon.length);
       setBillsTotalThisWeek(dueSoon.reduce((s, b) => s + b.amount, 0));
+    }).catch(() => {});
+
+    // Check nudge dismiss state
+    AsyncStorage.getItem("sortii_money_nudge_v1").then((raw) => {
+      if (!raw) { setNudgeHidden(false); return; }
+      try {
+        const { dismissedAt, dismissCount } = JSON.parse(raw) as { dismissedAt: number; dismissCount: number };
+        const daysSince = (Date.now() - dismissedAt) / (1000 * 60 * 60 * 24);
+        if (daysSince < 7) { setNudgeHidden(true); return; }
+        if (dismissCount >= 2) { setNudgeHidden(true); return; }
+        setNudgeHidden(false);
+      } catch { setNudgeHidden(false); }
     }).catch(() => {});
   }, []));
 
@@ -698,6 +716,18 @@ export default function MoneyScreen() {
   const goToMoneySetup = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     router.push("/money-setup");
+  };
+
+  const handleNudgeDismiss = async () => {
+    try {
+      const raw = await AsyncStorage.getItem("sortii_money_nudge_v1");
+      const existing = raw ? JSON.parse(raw) : { dismissCount: 0 };
+      await AsyncStorage.setItem("sortii_money_nudge_v1", JSON.stringify({
+        dismissedAt: Date.now(),
+        dismissCount: (existing.dismissCount ?? 0) + 1,
+      }));
+    } catch {}
+    setNudgeHidden(true);
   };
 
   const goToGoalSetup = () => {
@@ -787,8 +817,8 @@ export default function MoneyScreen() {
         </Text>
       </View>
 
-      {!hasMoneySetup ? (
-        <MoneyEmptyState onSetup={goToMoneySetup} onBack={goBack} />
+      {!hasMoneySetup && !nudgeHidden ? (
+        <MoneyEmptyState onSetup={goToMoneySetup} onDismiss={handleNudgeDismiss} />
       ) : (
         <>
           {/* 1. Hero card */}
@@ -1311,25 +1341,50 @@ const styles = StyleSheet.create({
     alignItems: "center", gap: 12,
     paddingVertical: 32, paddingHorizontal: 16,
   },
-  emptyHeadline: {
-    fontSize: 20, fontFamily: "Manrope_700Bold",
-    color: C.text, textAlign: "center",
+  emptyNudgeCard: {
+    backgroundColor: "#FFFCF5",
+    borderRadius: 16,
+    borderWidth: 1.5,
+    borderColor: "rgba(210,154,34,0.3)",
+    padding: 20,
+    gap: 10,
+    width: "100%",
   },
-  emptySub: {
-    fontSize: 14, fontFamily: "Inter_400Regular",
-    color: C.textSecondary, textAlign: "center", lineHeight: 20,
+  emptyNudgeHeadline: {
+    fontSize: 18,
+    fontFamily: "Manrope_700Bold",
+    color: C.text,
+    lineHeight: 26,
   },
-  emptyBtn: {
-    flexDirection: "row", alignItems: "center", gap: 8,
-    paddingHorizontal: 24, paddingVertical: 14, borderRadius: 14,
-    backgroundColor: GOLD, marginTop: 8,
+  emptyNudgeSub: {
+    fontSize: 14,
+    fontFamily: "Inter_400Regular",
+    color: C.textSecondary,
+    lineHeight: 20,
   },
-  emptyBtnText: {
-    fontSize: 15, fontFamily: "Inter_600SemiBold", color: "#fff",
+  emptyNudgeActions: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 16,
+    marginTop: 4,
   },
-  emptyBack: { alignItems: "center", paddingVertical: 4 },
-  emptyBackText: {
-    fontSize: 13, fontFamily: "Inter_400Regular",
-    color: C.textMuted, textDecorationLine: "underline",
+  emptyNudgeBtn: {
+    backgroundColor: TEAL,
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    borderRadius: 10,
+  },
+  emptyNudgeBtnText: {
+    fontSize: 14,
+    fontFamily: "Inter_600SemiBold",
+    color: "#fff",
+  },
+  emptyNudgeLater: {
+    paddingVertical: 4,
+  },
+  emptyNudgeLaterText: {
+    fontSize: 13,
+    fontFamily: "Inter_400Regular",
+    color: C.textMuted,
   },
 });

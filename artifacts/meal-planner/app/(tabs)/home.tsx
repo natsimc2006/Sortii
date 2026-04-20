@@ -212,10 +212,11 @@ export default function HomeTab() {
   const [familyLine, setFamilyLine]     = useState<string>("Nothing on the family radar this week.");
   const [familySub, setFamilySub]       = useState<string>("A rare and peaceful sight.");
   const [familyEventCount, setFamilyEventCount] = useState(0);
-  const [juggleResult, setJuggleResult] = useState<JuggleResult | null>(null);
-  const [nextAppt, setNextAppt]         = useState<Appointment | null>(null);
-  const [billsData, setBillsData]       = useState<{ overdue: number; dueSoon: number; total: number } | null>(null);
-  const [allBills,  setAllBills]        = useState<Bill[]>([]);
+  const [juggleResult, setJuggleResult]       = useState<JuggleResult | null>(null);
+  const [nextAppt, setNextAppt]               = useState<Appointment | null>(null);
+  const [billsData, setBillsData]             = useState<{ overdue: number; dueSoon: number; total: number } | null>(null);
+  const [allBills,  setAllBills]              = useState<Bill[]>([]);
+  const [welcomeTipDismissed, setWelcomeTipDismissed] = useState(true);
   const [allItems,  setAllItems]        = useState<TimelineItem[]>([]);
   const [reminders, setReminders]       = useState<ReminderItem[]>([]);
   const [calAppleConn,  setCalAppleConn]  = useState(false);
@@ -243,7 +244,7 @@ export default function HomeTab() {
 
   useEffect(() => {
     (async () => {
-      const [familyState, nudgeResult, , savedJuggle, appts, bills, appleConnRaw, googleConnRaw, pushedRaw] = await Promise.all([
+      const [familyState, nudgeResult, , savedJuggle, appts, bills, appleConnRaw, googleConnRaw, pushedRaw, tipDismissed] = await Promise.all([
         loadFamilyState(),
         computeNudge(currentPlan, allRecipes),
         recordAppOpen(),
@@ -253,7 +254,9 @@ export default function HomeTab() {
         AsyncStorage.getItem(APPLE_CONNECTED_KEY),
         AsyncStorage.getItem(GOOGLE_CONNECTED_KEY),
         AsyncStorage.getItem(FAMILY_PUSHED_KEY),
+        AsyncStorage.getItem("sortii_welcome_tip_dismissed"),
       ]);
+      setWelcomeTipDismissed(tipDismissed === "true");
       setCalAppleConn(appleConnRaw === "true");
       setCalGoogleConn(googleConnRaw === "true");
       if (pushedRaw) { try { setCalPushedCount((JSON.parse(pushedRaw) as unknown[]).length); } catch {} }
@@ -335,6 +338,39 @@ export default function HomeTab() {
           {/* Smart nudge banner */}
           {nudge && (
             <NudgeBanner nudge={nudge} onDismiss={() => setNudge(null)} />
+          )}
+
+          {/* Welcome tip — shown once after first onboarding */}
+          {!welcomeTipDismissed && (
+            <View style={styles.welcomeTip}>
+              <View style={styles.welcomeTipTop}>
+                <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
+                  <Feather name="check-circle" size={14} color={TEAL} />
+                  <Text style={styles.welcomeTipTitle}>Your first week is sorted.</Text>
+                </View>
+              </View>
+              <Text style={styles.welcomeTipBody}>
+                Tap Meals to see your dinners — your shopping list is already built and ready.
+              </Text>
+              <View style={styles.welcomeTipActions}>
+                <TouchableOpacity
+                  onPress={() => router.push("/(tabs)/meals")}
+                  style={styles.welcomeTipCta}
+                  activeOpacity={0.8}
+                >
+                  <Text style={styles.welcomeTipCtaText}>See my meals →</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={async () => {
+                    await AsyncStorage.setItem("sortii_welcome_tip_dismissed", "true");
+                    setWelcomeTipDismissed(true);
+                  }}
+                  hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                >
+                  <Text style={styles.welcomeTipDismiss}>Got it ×</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
           )}
 
           {/* B — Tonight's dinner */}
@@ -794,6 +830,52 @@ const styles = StyleSheet.create({
   },
 
   // Nudge banner
+  welcomeTip: {
+    backgroundColor: TEAL_TINT,
+    borderWidth: 1,
+    borderColor: "rgba(42,143,136,0.2)",
+    borderRadius: 14,
+    padding: 16,
+    gap: 8,
+  },
+  welcomeTipTop: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  welcomeTipTitle: {
+    fontSize: 14,
+    fontFamily: "Inter_600SemiBold",
+    color: TEAL,
+  },
+  welcomeTipBody: {
+    fontSize: 14,
+    fontFamily: "Inter_400Regular",
+    color: TEXT,
+    lineHeight: 20,
+  },
+  welcomeTipActions: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginTop: 4,
+  },
+  welcomeTipCta: {
+    paddingVertical: 6,
+    paddingHorizontal: 14,
+    backgroundColor: TEAL,
+    borderRadius: 8,
+  },
+  welcomeTipCtaText: {
+    fontSize: 13,
+    fontFamily: "Inter_600SemiBold",
+    color: "#FFFFFF",
+  },
+  welcomeTipDismiss: {
+    fontSize: 13,
+    fontFamily: "Inter_400Regular",
+    color: TEXT_MUTED,
+  },
   nudgeBanner: {
     flexDirection: "row",
     alignItems: "flex-start",

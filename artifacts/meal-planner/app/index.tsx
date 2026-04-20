@@ -1,185 +1,87 @@
-import { Feather } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   Animated,
   Image,
+  KeyboardAvoidingView,
   Platform,
   ScrollView,
   StyleSheet,
   Text,
+  TextInput,
   TouchableOpacity,
-  useWindowDimensions,
   View,
 } from "react-native";
-
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+
 import Colors from "@/constants/Colors";
-import {
-  DEFAULT_PREFERENCES,
-  DEFAULT_WEEKEND_OVERRIDES,
-  EXCLUSION_OPTIONS,
-  PlanPreferences,
-} from "@/constants/recipes";
+import { DEFAULT_PREFERENCES, DEFAULT_WEEKEND_OVERRIDES, PlanPreferences } from "@/constants/recipes";
 import { usePlanner } from "@/context/PlannerContext";
-import { useLocale } from "@/context/LocaleContext";
 import { useUserWeek } from "@/context/UserWeekContext";
-import {
-  OnboardingScope,
-  WeeklyMode,
-  updateOnboardingState,
-} from "@/utils/onboardingState";
-import {
-  DietaryNeed,
-  KidSituation,
-  saveHouseholdProfile,
-} from "@/utils/householdProfile";
+import { updateOnboardingState } from "@/utils/onboardingState";
+import { DietaryNeed, saveHouseholdProfile } from "@/utils/householdProfile";
 
 const C = Colors.light;
+const TEAL  = "#2A8F88";
+const PLUM  = "#5E3A4C";
+const TEXT  = "#2B2B2B";
+const MUTED = "#888888";
+const BORDER= "#EDE9E3";
+
 const sortiiLogo = require("@/assets/images/sortii-logo-v2-landing.png");
 
 const ROTATING_MESSAGES = [
-  "Sorting your week…",
-  "Balancing budget + time…",
-  "Making sure Tuesday isn't boring…",
-  "Keeping things realistic…",
-  "Almost there…",
+  "Sorting your first week…",
+  "Finding meals that work for you.",
+  "Building your shopping list.",
+  "Almost there.",
 ];
 
-const MEAL_SETUP_STEPS = 7;
+const HOUSEHOLD_HINTS: Record<number, string> = {
+  1: "Just you. Easy week.",
+  2: "Two people. Sorted.",
+  3: "Small crew.",
+  4: "Family of four — good size.",
+  5: "Five mouths to feed.",
+  6: "Feeding a crowd.",
+  7: "Big household. We've got you.",
+  8: "Big household. We've got you.",
+};
 
-type OnboardingStep = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
+const EXCLUSION_CHIPS = [
+  "Shellfish", "Mushrooms", "Lamb", "Spicy food", "Tofu", "Anchovies",
+];
 
-function ProgressDots({ current, total }: { current: number; total: number }) {
+const DIETARY_OPTIONS: { id: DietaryNeed; label: string }[] = [
+  { id: "vegan",       label: "🌱  Vegan" },
+  { id: "vegetarian",  label: "🥚  Vegetarian" },
+  { id: "gluten-free", label: "🌾  Gluten-free" },
+  { id: "dairy-free",  label: "🥛  Dairy-free" },
+];
+
+type Step = 0 | 1 | 2 | 3 | 4;
+
+function ProgressDots({ filled, total }: { filled: number; total: number }) {
   return (
     <View style={styles.progressDots}>
       {Array.from({ length: total }).map((_, i) => (
         <View
           key={i}
-          style={[
-            styles.dot,
-            {
-              backgroundColor: i < current ? C.primary : i === current - 1 ? C.primary : C.border,
-              width: i === current - 1 ? 20 : 8,
-            },
-          ]}
+          style={[styles.dot, { backgroundColor: i < filled ? TEAL : "#D5D5D5" }]}
         />
       ))}
     </View>
   );
 }
 
-function OptionCard({
-  label,
-  sub,
-  selected,
-  onPress,
-}: {
-  label: string;
-  sub?: string;
-  selected: boolean;
-  onPress: () => void;
-}) {
-  return (
-    <TouchableOpacity
-      onPress={onPress}
-      activeOpacity={0.75}
-      style={[
-        styles.optionCard,
-        {
-          borderColor: selected ? C.primary : C.border,
-          backgroundColor: selected ? C.tealTint : C.card,
-        },
-      ]}
-    >
-      <View style={styles.optionCardInner}>
-        <Text style={[styles.optionCardLabel, { color: selected ? C.primary : C.text }]}>
-          {label}
-        </Text>
-        {sub && (
-          <Text style={[styles.optionCardSub, { color: C.textSecondary }]}>{sub}</Text>
-        )}
-      </View>
-      {selected && (
-        <Feather name="check-circle" size={18} color={C.primary} />
-      )}
-    </TouchableOpacity>
-  );
-}
-
-function ScopeCard({
-  label,
-  sub,
-  selected,
-  onPress,
-}: {
-  label: string;
-  sub: string;
-  selected: boolean;
-  onPress: () => void;
-}) {
-  return (
-    <TouchableOpacity
-      onPress={onPress}
-      activeOpacity={0.75}
-      style={[
-        styles.scopeCard,
-        {
-          borderColor: selected ? C.primary : C.border,
-          backgroundColor: selected ? C.tealTint : "#FFFFFF",
-        },
-      ]}
-    >
-      <View style={styles.scopeCardInner}>
-        <Text style={[styles.scopeCardLabel, { color: selected ? C.primary : C.text }]}>
-          {label}
-        </Text>
-        <Text style={[styles.scopeCardSub, { color: selected ? C.primary : C.textSecondary }]}>
-          {sub}
-        </Text>
-      </View>
-      {selected && (
-        <View style={[styles.scopeCheckCircle, { backgroundColor: C.primary }]}>
-          <Feather name="check" size={14} color="#fff" />
-        </View>
-      )}
-    </TouchableOpacity>
-  );
-}
-
-function PillChip({
-  label,
-  active,
-  onPress,
-}: {
-  label: string;
-  active: boolean;
-  onPress: () => void;
-}) {
-  return (
-    <TouchableOpacity
-      onPress={onPress}
-      activeOpacity={0.75}
-      style={[
-        styles.pillChip,
-        {
-          borderColor: active ? C.primary : C.border,
-          backgroundColor: active ? C.tealTint : C.card,
-        },
-      ]}
-    >
-      <Text style={[styles.pillChipText, { color: active ? C.primary : C.textSecondary }]}>
-        {label}
-      </Text>
-    </TouchableOpacity>
-  );
-}
-
 export default function OnboardingScreen() {
   const router = useRouter();
-  const { setPreferences, setIsOnboarded, isOnboarded, isContextLoaded, autoGeneratePlan, reloadHouseholdProfile } = usePlanner();
-  const { currencySymbol } = useLocale();
+  const {
+    setPreferences, setIsOnboarded, isOnboarded, isContextLoaded,
+    autoGeneratePlan, reloadHouseholdProfile,
+  } = usePlanner();
   const {
     setWeeklyMode: setContextWeeklyMode,
     setHasMealsSetup: setContextHasMealsSetup,
@@ -188,34 +90,40 @@ export default function OnboardingScreen() {
     lastUpdatedAt,
   } = useUserWeek();
   const insets = useSafeAreaInsets();
-  const [step, setStep] = useState<OnboardingStep>(0);
 
-  const [scope, setScope] = useState<OnboardingScope>("meals");
-  const [weeklyMode, setWeeklyMode] = useState<WeeklyMode>("balanced");
-  const [planningMode, setPlanningMode] = useState<PlanPreferences["planningMode"]>("auto");
-  const [householdSize, setHouseholdSize] = useState(4);
-  const [budget, setBudget] = useState<PlanPreferences["budgetLevel"]>("standard");
-  const [mealsPerWeek, setMealsPerWeek] = useState<3 | 5 | 7>(5);
-  const [dietType, setDietType] = useState<PlanPreferences["dietType"]>("no-preference");
-  const [exclusions, setExclusions] = useState<string[]>([]);
-  const [dietaryNeeds, setDietaryNeeds] = useState<DietaryNeed[]>([]);
-  const [kidSituation, setKidSituation] = useState<KidSituation>("same");
+  const [step, setStep] = useState<Step>(0);
 
-  const [generatingMsg, setGeneratingMsg] = useState(ROTATING_MESSAGES[0]);
+  // ── Collected data ────────────────────────────────────────────────
+  const [householdSize,  setHouseholdSize]  = useState(4);
+  const [exclusionText,  setExclusionText]  = useState("");
+  const [dietaryNeeds,   setDietaryNeeds]   = useState<DietaryNeed[]>([]);
+  const [noneSelected,   setNoneSelected]   = useState(false);
+
+  // ── Generating state ──────────────────────────────────────────────
+  const [generatingMsg,  setGeneratingMsg]  = useState(ROTATING_MESSAGES[0]);
   const [generatingDone, setGeneratingDone] = useState(false);
-  const fadeAnim = useRef(new Animated.Value(1)).current;
-  const msgIndex = useRef(0);
+  const fadeAnim   = useRef(new Animated.Value(1)).current;
+  const pulseAnim  = useRef(new Animated.Value(1)).current;
+  const msgIndex   = useRef(0);
   const isInGeneratingFlow = useRef(false);
 
+  // ── Screen 1 stagger anims ────────────────────────────────────────
+  const line1 = useRef(new Animated.Value(0)).current;
+  const line2 = useRef(new Animated.Value(0)).current;
+  const line3 = useRef(new Animated.Value(0)).current;
+
+  const paddingBottom = Platform.OS === "web" ? 40 : insets.bottom + 16;
+  const paddingTop    = Platform.OS === "web" ? 60 : insets.top;
+
+  // ── Returning user gate (UNCHANGED logic) ─────────────────────────
   useEffect(() => {
     if (!isContextLoaded || !isWeekLoaded) return;
     if (isInGeneratingFlow.current) return;
     if (isOnboarded) {
-      // Only show returning screen if 7+ days have passed since last plan
       if (lastUpdatedAt) {
         const daysSince = (Date.now() - new Date(lastUpdatedAt).getTime()) / (1000 * 60 * 60 * 24);
         if (daysSince < 7) {
-          router.replace("/(tabs)/planner");
+          router.replace("/(tabs)/home");
           return;
         }
       }
@@ -223,178 +131,198 @@ export default function OnboardingScreen() {
     }
   }, [isContextLoaded, isWeekLoaded, isOnboarded]);
 
+  // ── Screen 1: stagger copy lines ─────────────────────────────────
   useEffect(() => {
-    if (step !== 11) return;
-    let interval: ReturnType<typeof setInterval>;
+    if (step !== 0) return;
+    line1.setValue(0); line2.setValue(0); line3.setValue(0);
+    const t1 = setTimeout(() =>
+      Animated.timing(line1, { toValue: 1, duration: 400, useNativeDriver: true }).start(), 300);
+    const t2 = setTimeout(() =>
+      Animated.timing(line2, { toValue: 1, duration: 400, useNativeDriver: true }).start(), 500);
+    const t3 = setTimeout(() =>
+      Animated.timing(line3, { toValue: 1, duration: 400, useNativeDriver: true }).start(), 700);
+    return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); };
+  }, [step]);
 
+  // ── Screen 5: generating animation ───────────────────────────────
+  useEffect(() => {
+    if (step !== 4) return;
+
+    // Pulse ring
+    const pulse = Animated.loop(
+      Animated.sequence([
+        Animated.timing(pulseAnim, { toValue: 1.18, duration: 800, useNativeDriver: true }),
+        Animated.timing(pulseAnim, { toValue: 1,    duration: 800, useNativeDriver: true }),
+      ])
+    );
+    pulse.start();
+
+    // Rotate text
     const tick = () => {
-      Animated.timing(fadeAnim, { toValue: 0, duration: 200, useNativeDriver: true }).start(() => {
+      Animated.timing(fadeAnim, { toValue: 0, duration: 300, useNativeDriver: true }).start(() => {
         msgIndex.current = (msgIndex.current + 1) % ROTATING_MESSAGES.length;
         setGeneratingMsg(ROTATING_MESSAGES[msgIndex.current]);
-        Animated.timing(fadeAnim, { toValue: 1, duration: 200, useNativeDriver: true }).start();
+        Animated.timing(fadeAnim, { toValue: 1, duration: 300, useNativeDriver: true }).start();
       });
     };
-    interval = setInterval(tick, 700);
+    const interval = setInterval(tick, 2000);
 
     const doneTimer = setTimeout(() => {
       clearInterval(interval);
+      pulse.stop();
       setGeneratingDone(true);
-      setTimeout(() => {
-        setStep(12 as OnboardingStep);
-      }, 900);
-    }, 2500);
+      setTimeout(() => router.replace("/(tabs)/home"), 900);
+    }, 5500);
 
     return () => {
       clearInterval(interval);
       clearTimeout(doneTimer);
+      pulse.stop();
     };
   }, [step]);
 
+  // ── startGenerating — saves all data then transitions ─────────────
   const startGenerating = async () => {
+    const exclusions = exclusionText
+      .split(/,|\n/)
+      .map((s) => s.trim())
+      .filter(Boolean);
+
     const newPrefs: PlanPreferences = {
       ...DEFAULT_PREFERENCES,
-      planningMode,
+      planningMode: "auto",
       householdSize,
-      budgetLevel: budget,
-      mealVariety: mealsPerWeek,
-      dietType,
+      budgetLevel: "standard",
+      mealVariety: 7,
+      dietType: "no-preference",
       exclusions,
       weekendOverrides: { ...DEFAULT_WEEKEND_OVERRIDES },
     };
+
     isInGeneratingFlow.current = true;
-    if (dietaryNeeds.length > 0 || kidSituation !== "same") {
+
+    if (dietaryNeeds.length > 0) {
       await saveHouseholdProfile({
         dietary_needs: dietaryNeeds,
-        kids_situation: kidSituation,
+        kids_situation: "same",
         setup_complete: true,
         setup_date: new Date().toISOString(),
       });
       await reloadHouseholdProfile();
     }
+
     await setPreferences(newPrefs);
     await setIsOnboarded(true);
-    await updateOnboardingState({ hasMealsSetup: true, scope, weeklyMode });
-    setContextWeeklyMode(weeklyMode);
+    await updateOnboardingState({ hasMealsSetup: true, scope: "meals", weeklyMode: "balanced" });
+    setContextWeeklyMode("balanced");
     setContextHasMealsSetup(true);
     updateWeekKey();
     autoGeneratePlan(newPrefs);
-    setStep(11);
+    setStep(4);
   };
 
-  const goBack = () => {
-    if (step === 0) return;
-    if (step === 1) { setStep(0); return; }
-    if (step === 2) { setStep(1); return; }
-    if (step === 3) { setStep(2); return; }
-    if (step === 9) { setStep(8); return; }
-    if (step === 10) { setStep(9); return; }
-    // Step 12 is the post-generation money bridge — go back to meal filters
-    if (step === 12) { setStep(9); return; }
-    setStep((s) => (s - 1) as OnboardingStep);
-  };
-
-  const goNext = async () => {
-    if (step === 0) { setStep(1); return; }
-    if (step === 1) { setStep(2); return; }
-    if (step === 2) {
-      if (scope === "money") {
-        await updateOnboardingState({ scope, weeklyMode });
-        setContextWeeklyMode(weeklyMode);
-        router.replace("/money-setup");
-        return;
-      }
-      setStep(3);
-      return;
-    }
-    if (step === 9) {
-      if (scope === "both") {
-        setStep(10);
-        return;
-      }
-      startGenerating();
-      return;
-    }
-    if (step === 10) {
-      const newPrefs: PlanPreferences = {
-        ...DEFAULT_PREFERENCES,
-        planningMode,
-        householdSize,
-        budgetLevel: budget,
-        mealVariety: mealsPerWeek,
-        dietType,
-        exclusions,
-        weekendOverrides: { ...DEFAULT_WEEKEND_OVERRIDES },
-      };
-      isInGeneratingFlow.current = true;
-      await setPreferences(newPrefs);
-      await setIsOnboarded(true);
-      await updateOnboardingState({ hasMealsSetup: true, scope, weeklyMode });
-      setContextWeeklyMode(weeklyMode);
-      setContextHasMealsSetup(true);
-      updateWeekKey();
-      autoGeneratePlan(newPrefs);
-      router.replace("/money-setup");
-      return;
-    }
-    if (step === 11) return;
-    setStep((s) => (s + 1) as OnboardingStep);
-  };
-
-  const toggleExclusion = (ex: string) => {
+  const toggleDietaryNeed = (id: DietaryNeed) => {
     Haptics.selectionAsync();
-    setExclusions((prev) =>
-      prev.includes(ex) ? prev.filter((e) => e !== ex) : [...prev, ex]
+    setNoneSelected(false);
+    setDietaryNeeds((prev) =>
+      prev.includes(id) ? prev.filter((n) => n !== id) : [...prev, id]
     );
   };
 
-  const goToPreferencesWithSave = async () => {
-    const newPrefs: PlanPreferences = {
-      ...DEFAULT_PREFERENCES,
-      planningMode,
-      householdSize,
-      budgetLevel: budget,
-      mealVariety: mealsPerWeek,
-      dietType,
-      exclusions,
-      weekendOverrides: { ...DEFAULT_WEEKEND_OVERRIDES },
-    };
-    isInGeneratingFlow.current = true;
-    await setPreferences(newPrefs);
-    await setIsOnboarded(true);
-    router.replace("/preferences");
+  const selectNone = () => {
+    Haptics.selectionAsync();
+    setDietaryNeeds([]);
+    setNoneSelected(true);
   };
 
-  const paddingTop = Platform.OS === "web" ? 60 : insets.top;
-  const paddingBottom = Platform.OS === "web" ? 40 : insets.bottom + 24;
-  const { height: windowHeight, width: windowWidth } = useWindowDimensions();
-  // Logo: 93.6% of window width, capped at 442px — maintains aspect ratio (507:233 ≈ 2.176)
-  const logoWidth = Math.min(Math.round(windowWidth * 0.936), 442);
-  const logoHeight = Math.round(logoWidth / 2.176);
+  const appendChip = (chip: string) => {
+    Haptics.selectionAsync();
+    setExclusionText((prev) => {
+      const t = prev.trim();
+      if (!t) return chip;
+      if (t.endsWith(",")) return `${t} ${chip}`;
+      return `${t}, ${chip}`;
+    });
+  };
 
-  const mealStep = step >= 3 && step <= 9 ? step - 2 : 0;
-
-  if (step === 11) {
+  // ═══════════════════════════════════════════════════════════════════
+  // SCREEN 1 — THE PROMISE
+  // ═══════════════════════════════════════════════════════════════════
+  if (step === 0) {
     return (
-      <View style={[styles.screen, { backgroundColor: C.background, paddingTop, paddingBottom }]}>
+      <View style={{ flex: 1, backgroundColor: "#FFFFFF" }}>
+        {/* Vertically centred content */}
+        <View style={[styles.promiseCenter, { paddingTop }]}>
+          <Image
+            source={sortiiLogo}
+            style={styles.promiseLogo}
+            resizeMode="contain"
+          />
+          <Text style={styles.promiseTagline}>Less to think about.</Text>
+          <View style={styles.promiseLines}>
+            {[
+              { text: "Dinners sorted.",     anim: line1 },
+              { text: "Weekends planned.",   anim: line2 },
+              { text: "Money understood.",   anim: line3 },
+            ].map(({ text, anim }) => (
+              <Animated.Text key={text} style={[styles.promiseLine, { opacity: anim }]}>
+                {text}
+              </Animated.Text>
+            ))}
+          </View>
+        </View>
+
+        {/* Fixed bottom CTA */}
+        <View style={[styles.promiseCta, { paddingBottom: paddingBottom + 8 }]}>
+          <TouchableOpacity
+            onPress={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+              setStep(1);
+            }}
+            activeOpacity={0.85}
+            style={styles.primaryBtn}
+          >
+            <Text style={styles.primaryBtnText}>Let's sort it →</Text>
+          </TouchableOpacity>
+          <Text style={styles.promiseSmall}>Takes about 60 seconds.</Text>
+        </View>
+      </View>
+    );
+  }
+
+  // ═══════════════════════════════════════════════════════════════════
+  // SCREEN 5 — GENERATING
+  // ═══════════════════════════════════════════════════════════════════
+  if (step === 4) {
+    return (
+      <View style={[styles.screen, { backgroundColor: "#FFFFFF", paddingTop, paddingBottom }]}>
         <View style={styles.generatingCenter}>
-          {generatingDone ? (
+          {/* Small logo mark */}
+          <Image
+            source={sortiiLogo}
+            style={{ width: 120, height: 55, marginBottom: 28 }}
+            resizeMode="contain"
+          />
+
+          {/* Teal pulse circle */}
+          {!generatingDone ? (
             <>
-              <Feather name="check-circle" size={52} color={C.primary} />
-              <Text style={[styles.generatingDone, { color: C.text }]}>
-                Done. Your week's sorted.
-              </Text>
+              <Animated.View
+                style={[
+                  styles.pulseRing,
+                  { transform: [{ scale: pulseAnim }] },
+                ]}
+              />
+              <View style={styles.pulseCore} />
+              <Animated.Text style={[styles.genMsg, { opacity: fadeAnim, marginTop: 32 }]}>
+                {generatingMsg}
+              </Animated.Text>
+              <Text style={styles.genSub}>We'll have a plan ready in a moment.</Text>
             </>
           ) : (
             <>
-              <View style={[styles.generatingSpinner, { borderColor: C.primary }]} />
-              <Text style={[styles.generatingHeadline, { color: C.text }]}>
-                Alright… give us a sec
-              </Text>
-              <Animated.Text
-                style={[styles.generatingMsg, { color: C.textSecondary, opacity: fadeAnim }]}
-              >
-                {generatingMsg}
-              </Animated.Text>
+              <View style={[styles.pulseCore, { backgroundColor: TEAL }]} />
+              <Text style={[styles.genMsg, { marginTop: 32 }]}>Done. Your week's sorted.</Text>
             </>
           )}
         </View>
@@ -402,1071 +330,488 @@ export default function OnboardingScreen() {
     );
   }
 
-  if (step === 12) {
-    return (
-      <View style={[styles.screen, { backgroundColor: C.background, paddingTop }]}>
-        <TouchableOpacity
-          onPress={goBack}
-          style={[styles.backBtn, { backgroundColor: C.chipBg, alignSelf: "flex-start", marginBottom: 8 }]}
-          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-        >
-          <Feather name="arrow-left" size={18} color={C.primary} />
-        </TouchableOpacity>
-        <View style={styles.generatingCenter}>
-          <View style={[styles.transitionIcon, { backgroundColor: C.tealTint }]}>
-            <Feather name="check" size={36} color={C.primary} />
-          </View>
-          <Text style={[styles.transitionHeadline, { color: C.text }]}>
-            Your week is sorted!
-          </Text>
-          <Text style={[styles.transitionSub, { color: C.textSecondary }]}>
-            Want to see what this means for your budget this week?
-          </Text>
-          <Text style={[styles.transitionHelper, { color: C.textMuted }]}>
-            We can show you how your week looks — food, spending, and what's left.
-          </Text>
-        </View>
-        <View style={[styles.bridgeActions, { paddingBottom: paddingBottom + 8 }]}>
-          <TouchableOpacity
-            onPress={() => {
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-              router.replace("/money-setup");
-            }}
-            activeOpacity={0.85}
-            style={[styles.primaryCta, { backgroundColor: C.gold }]}
-          >
-            <Feather name="dollar-sign" size={18} color="#fff" />
-            <Text style={styles.primaryCtaText}>Set my numbers</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => {
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-              router.replace("/(tabs)/planner");
-            }}
-            activeOpacity={0.7}
-            style={styles.skipBtn}
-          >
-            <Text style={[styles.skipBtnText, { color: C.textMuted }]}>Skip for now</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    );
-  }
-
-  if (step === 0) {
-    const PAGE_BG = C.background;
-    const LANDING_STEPS = [
-      {
-        icon: "sliders" as const,
-        title: "Tell us about your week",
-        desc: "Who you're feeding and what you want to spend. Takes 60 seconds.",
-        color: C.gold,
-        borderColor: C.gold,
-      },
-      {
-        icon: "calendar" as const,
-        title: "Plan your week",
-        desc: "Let Sortii fill the week, or pick a few yourself. Either way, dinner is handled.",
-        color: C.primary,
-        borderColor: C.primary,
-      },
-      {
-        icon: "shopping-cart" as const,
-        title: "Your list, ready to shop",
-        desc: "Your list builds itself. Categorised, consolidated, and ready to share.",
-        color: "#5E3A4C",
-        borderColor: "#5E3A4C",
-      },
-    ];
-    const LANDING_FEATURES: [string, string][] = [
-      ["240+ recipes. Always something new.", "book-open"],
-      ["Every budget. Real prices.", "dollar-sign"],
-      ["Feeds 1 to 10. Scales automatically.", "users"],
-      ["Cook once. Eat twice. Less waste.", "refresh-cw"],
-    ];
-    return (
-      <View style={{ flex: 1, backgroundColor: PAGE_BG }}>
-        <ScrollView
-          style={{ flex: 1 }}
-          contentContainerStyle={{
-            paddingHorizontal: 24,
-            paddingTop: paddingTop + 8,
-            paddingBottom: 200,
-            gap: 24,
-          }}
-          showsVerticalScrollIndicator={false}
-        >
-          {/* Hero */}
-          <View style={{ alignItems: "center", gap: 10 }}>
-            <Image
-              source={sortiiLogo}
-              style={{ width: logoWidth, height: logoHeight }}
-              resizeMode="contain"
-            />
-            <Text style={{
-              fontSize: 28,
-              fontFamily: "Manrope_600SemiBold",
-              textAlign: "center",
-              lineHeight: 36,
-              letterSpacing: -0.3,
-              color: C.text,
-            }}>
-              {"No more\n\u201Cwhat\u2019s for dinner\u201D"}
-            </Text>
-            <Text style={{
-              fontSize: 15,
-              fontFamily: "Inter_400Regular",
-              textAlign: "center",
-              lineHeight: 22,
-              color: C.textSecondary,
-              maxWidth: 300,
-            }}>
-              Sortii plans your week in 60 seconds{"\n"}— meals, budget, shopping list. Sorted.
-            </Text>
-            <Text style={{
-              fontSize: 15,
-              fontFamily: "Inter_500Medium",
-              fontStyle: "italic",
-              textAlign: "center",
-              color: C.primary,
-              lineHeight: 22,
-            }}>
-              Less stress. Fewer takeaways. More evenings back.
-            </Text>
-            <View style={{ width: 36, height: 3, borderRadius: 2, backgroundColor: C.primary, marginTop: 2 }} />
-          </View>
-
-          {/* How it works */}
-          <View style={{ gap: 10 }}>
-            <View style={{ flexDirection: "row", alignItems: "center", gap: 6, marginBottom: 2 }}>
-              <View style={{ width: 7, height: 7, borderRadius: 99, backgroundColor: C.primary }} />
-              <Text style={{
-                fontSize: 11,
-                fontFamily: "Inter_600SemiBold",
-                color: C.primary,
-                letterSpacing: 1.2,
-              }}>
-                HOW IT WORKS
-              </Text>
-            </View>
-            {LANDING_STEPS.map((s, i) => (
-              <View
-                key={i}
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  backgroundColor: "#FFFFFF",
-                  borderRadius: 14,
-                  borderWidth: 1,
-                  borderColor: "#E8E8E8",
-                  borderLeftWidth: 4,
-                  borderLeftColor: s.borderColor,
-                  paddingVertical: 14,
-                  paddingRight: 14,
-                  paddingLeft: 16,
-                  gap: 14,
-                  overflow: "hidden",
-                }}
-              >
-                <View style={{
-                  width: 24,
-                  height: 24,
-                  borderRadius: 12,
-                  backgroundColor: s.color,
-                  alignItems: "center",
-                  justifyContent: "center",
-                  alignSelf: "flex-start",
-                  marginTop: 2,
-                }}>
-                  <Text style={{ color: "#fff", fontSize: 11, fontFamily: "Inter_700Bold" }}>{i + 1}</Text>
-                </View>
-                <View style={{
-                  width: 44,
-                  height: 44,
-                  borderRadius: 12,
-                  backgroundColor: s.color,
-                  alignItems: "center",
-                  justifyContent: "center",
-                  alignSelf: "flex-start",
-                }}>
-                  <Feather name={s.icon} size={22} color="#FFFFFF" />
-                </View>
-                <View style={{ flex: 1, gap: 3 }}>
-                  <Text style={{ fontSize: 15, fontFamily: "Inter_600SemiBold", color: C.text }}>{s.title}</Text>
-                  <Text style={{ fontSize: 13, fontFamily: "Inter_400Regular", color: C.textSecondary, lineHeight: 18 }}>{s.desc}</Text>
-                </View>
-              </View>
-            ))}
-          </View>
-
-          {/* What's included */}
-          <View style={{
-            backgroundColor: "#FFFFFF",
-            borderRadius: 14,
-            borderWidth: 1.5,
-            borderColor: C.primary,
-            paddingHorizontal: 16,
-            paddingTop: 14,
-            paddingBottom: 6,
-          }}>
-            <Text style={{
-              fontSize: 11,
-              fontFamily: "Inter_600SemiBold",
-              color: C.primary,
-              letterSpacing: 1.2,
-              marginBottom: 10,
-            }}>
-              WHAT'S INCLUDED
-            </Text>
-            {LANDING_FEATURES.map(([label, icon], idx) => (
-              <View key={label}>
-                <View style={{ flexDirection: "row", alignItems: "center", gap: 12, paddingVertical: 10 }}>
-                  <View style={{
-                    width: 32,
-                    height: 32,
-                    borderRadius: 8,
-                    backgroundColor: C.tealTint,
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}>
-                    <Feather name={icon as any} size={16} color={C.primary} />
-                  </View>
-                  <Text style={{ flex: 1, fontSize: 14, fontFamily: "Inter_500Medium", color: C.text }}>{label}</Text>
-                </View>
-                {idx < LANDING_FEATURES.length - 1 && (
-                  <View style={{ height: 1, backgroundColor: "#F0F0F0" }} />
-                )}
-              </View>
-            ))}
-          </View>
-        </ScrollView>
-
-        {/* Sticky CTA — absolutely pinned to bottom on all platforms */}
-        <View
-          style={{
-            position: "absolute",
-            bottom: 0,
-            left: 0,
-            right: 0,
-            paddingHorizontal: 20,
-            paddingTop: 12,
-            paddingBottom: paddingBottom + 16,
-            backgroundColor: C.background,
-            borderTopWidth: 1,
-            borderTopColor: "rgba(0,0,0,0.06)",
-          }}
-        >
-          <View style={{
-            backgroundColor: "#FFFFFF",
-            borderRadius: 16,
-            padding: 14,
-            gap: 10,
-            shadowColor: "#000",
-            shadowOpacity: 0.06,
-            shadowOffset: { width: 0, height: -2 },
-            shadowRadius: 8,
-            elevation: 3,
-          }}>
-            <TouchableOpacity
-              onPress={() => {
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-                goNext();
-              }}
-              activeOpacity={0.85}
-              style={[styles.primaryCta, { backgroundColor: C.gold }]}
-            >
-              <Text style={styles.primaryCtaText}>Get started</Text>
-              <Feather name="arrow-right" size={20} color="#fff" />
-            </TouchableOpacity>
-            <Text style={{
-              fontSize: 12,
-              fontFamily: "Inter_400Regular",
-              textAlign: "center",
-              color: C.textMuted,
-            }}>
-              No account required · All data stays on your device
-            </Text>
-          </View>
-        </View>
-      </View>
-    );
-  }
-
-  if (step === 10) {
-    return (
-      <View style={[styles.screen, { backgroundColor: C.background, paddingTop, paddingBottom }]}>
-        <View style={styles.transitionCenter}>
-          <View style={[styles.transitionIcon, { backgroundColor: C.tealTint }]}>
-            <Feather name="check" size={36} color={C.primary} />
-          </View>
-          <Text style={[styles.transitionHeadline, { color: C.text }]}>
-            Nice — dinners sorted.
-          </Text>
-          <Text style={[styles.transitionSub, { color: C.textSecondary }]}>
-            Now let's make sure the numbers line up.
-          </Text>
-        </View>
-        <View style={styles.stepFooter}>
-          <TouchableOpacity
-            onPress={() => {
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-              goNext();
-            }}
-            activeOpacity={0.85}
-            style={[styles.primaryCta, { backgroundColor: C.gold }]}
-          >
-            <Text style={styles.primaryCtaText}>Next</Text>
-            <Feather name="arrow-right" size={18} color="#fff" />
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => {
-              Haptics.selectionAsync();
-              startGenerating();
-            }}
-            style={styles.skipBtn}
-          >
-            <Text style={[styles.skipText, { color: C.textMuted }]}>
-              Skip for now — just meals
-            </Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    );
-  }
+  // ═══════════════════════════════════════════════════════════════════
+  // SCREENS 2–4 — shared shell with header + scroll + footer
+  // ═══════════════════════════════════════════════════════════════════
+  const isScreen2 = step === 1;
+  const isScreen3 = step === 2;
+  const isScreen4 = step === 3;
 
   return (
-    <View style={[styles.screen, { backgroundColor: C.background, paddingTop, paddingBottom }]}>
-      <View style={styles.stepHeader}>
-        <TouchableOpacity
-          onPress={goBack}
-          style={[styles.backBtn, { backgroundColor: C.chipBg }]}
-          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-        >
-          <Feather name="arrow-left" size={18} color={C.primary} />
-        </TouchableOpacity>
-        {step >= 3 && step <= 9 && (
-          <ProgressDots current={mealStep} total={MEAL_SETUP_STEPS} />
+    <KeyboardAvoidingView
+      style={{ flex: 1, backgroundColor: "#FFFFFF" }}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+    >
+      {/* ── Header ── */}
+      <View style={[styles.stepHeader, { paddingTop: paddingTop + 8 }]}>
+        {step > 1 && (
+          <TouchableOpacity
+            onPress={() => setStep((s) => (s - 1) as Step)}
+            style={styles.backLink}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          >
+            <Text style={styles.backLinkText}>← Back</Text>
+          </TouchableOpacity>
         )}
-        {step >= 3 && step <= 9 && (
-          <Text style={[styles.stepCounter, { color: C.textMuted }]}>
-            {mealStep} of {MEAL_SETUP_STEPS}
-          </Text>
-        )}
+        <ProgressDots filled={step - 1} total={3} />
       </View>
 
-      <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
-        <View style={styles.stepBody}>
-          {step === 1 && (
-            <>
-              <Text style={[styles.stepHeadline, { color: C.text }]}>
-                What are we sorting this week?
-              </Text>
-              <Text style={[styles.stepHelper, { color: C.textSecondary }]}>
-                You can always add the other later.
-              </Text>
-              <View style={styles.scopeList}>
-                <ScopeCard
-                  label="🍽  Meals"
-                  sub="Dinner… sorted."
-                  selected={scope === "meals"}
-                  onPress={() => { Haptics.selectionAsync(); setScope("meals"); }}
-                />
-                <ScopeCard
-                  label="💰  Money"
-                  sub="Budget… sorted."
-                  selected={scope === "money"}
-                  onPress={() => { Haptics.selectionAsync(); setScope("money"); }}
-                />
-                <ScopeCard
-                  label="✨  Both"
-                  sub="Whole week… sorted."
-                  selected={scope === "both"}
-                  onPress={() => { Haptics.selectionAsync(); setScope("both"); }}
-                />
-              </View>
-            </>
-          )}
-
-          {step === 2 && (
-            <>
-              <Text style={[styles.stepHeadline, { color: C.text }]}>
-                How do you want this week to feel?
-              </Text>
-              <Text style={[styles.stepHelper, { color: C.textSecondary }]}>
-                We'll shape your meals and spending to match.
-              </Text>
-              <View style={styles.optionList}>
-                <OptionCard
-                  label="Keep it easy"
-                  sub="Quick meals. Low effort. No overthinking."
-                  selected={weeklyMode === "easy"}
-                  onPress={() => { Haptics.selectionAsync(); setWeeklyMode("easy"); }}
-                />
-                <OptionCard
-                  label="Stay on track"
-                  sub="Balanced meals. Sensible spend."
-                  selected={weeklyMode === "balanced"}
-                  onPress={() => { Haptics.selectionAsync(); setWeeklyMode("balanced"); }}
-                />
-                <OptionCard
-                  label="Save where I can"
-                  sub="More budget-friendly choices. Fewer extras."
-                  selected={weeklyMode === "budget"}
-                  onPress={() => { Haptics.selectionAsync(); setWeeklyMode("budget"); }}
-                />
-              </View>
-            </>
-          )}
-
-          {step === 3 && (
-            <>
-              <Text style={[styles.stepHeadline, { color: C.text }]}>
-                How hands-on do you want to be?
-              </Text>
-              <Text style={[styles.stepHelper, { color: C.textSecondary }]}>
-                We've got this — but it's your call.
-              </Text>
-              <View style={styles.optionList}>
-                <OptionCard
-                  label="Auto"
-                  sub="We've got this."
-                  selected={planningMode === "auto"}
-                  onPress={() => { Haptics.selectionAsync(); setPlanningMode("auto"); }}
-                />
-                <OptionCard
-                  label="Mixed"
-                  sub="You pick a few, we'll fill the gaps."
-                  selected={planningMode === "mixed"}
-                  onPress={() => { Haptics.selectionAsync(); setPlanningMode("mixed"); }}
-                />
-                <OptionCard
-                  label="Manual"
-                  sub="All yours."
-                  selected={planningMode === "manual"}
-                  onPress={() => { Haptics.selectionAsync(); setPlanningMode("manual"); }}
-                />
-              </View>
-            </>
-          )}
-
-          {step === 4 && (
-            <>
-              <Text style={[styles.stepHeadline, { color: C.text }]}>
-                How many are we feeding?
-              </Text>
-              <Text style={[styles.stepHelper, { color: C.textSecondary }]}>
-                We'll size everything for you.
-              </Text>
-              <View style={styles.stepperRow}>
-                <TouchableOpacity
-                  onPress={() => { Haptics.selectionAsync(); setHouseholdSize((n) => Math.max(1, n - 1)); }}
-                  style={[styles.stepperBtn, { backgroundColor: C.chipBg }]}
-                >
-                  <Feather name="minus" size={22} color={C.primary} />
-                </TouchableOpacity>
-                <Text style={[styles.stepperValue, { color: C.text }]}>{householdSize}</Text>
-                <TouchableOpacity
-                  onPress={() => { Haptics.selectionAsync(); setHouseholdSize((n) => Math.min(20, n + 1)); }}
-                  style={[styles.stepperBtn, { backgroundColor: C.chipBg }]}
-                >
-                  <Feather name="plus" size={22} color={C.primary} />
-                </TouchableOpacity>
-              </View>
-              <Text style={[styles.stepperLabel, { color: C.textMuted }]}>
-                {householdSize === 1 ? "Just you" : `${householdSize} people`}
-              </Text>
-            </>
-          )}
-
-          {step === 5 && (
-            <>
-              <Text style={[styles.stepHeadline, { color: C.text }]}>
-                What's the budget?
-              </Text>
-              <Text style={[styles.stepHelper, { color: C.textSecondary }]}>
-                No judgement. Just dinner.
-              </Text>
-              <View style={styles.optionList}>
-                <OptionCard
-                  label="Super Budget"
-                  sub={`~${currencySymbol}5 per serve`}
-                  selected={budget === "super-budget"}
-                  onPress={() => { Haptics.selectionAsync(); setBudget("super-budget"); }}
-                />
-                <OptionCard
-                  label="Budget"
-                  sub={`~${currencySymbol}8 per serve`}
-                  selected={budget === "budget"}
-                  onPress={() => { Haptics.selectionAsync(); setBudget("budget"); }}
-                />
-                <OptionCard
-                  label="Standard"
-                  sub={`~${currencySymbol}12 per serve`}
-                  selected={budget === "standard"}
-                  onPress={() => { Haptics.selectionAsync(); setBudget("standard"); }}
-                />
-                <OptionCard
-                  label="Premium"
-                  sub="No limits"
-                  selected={budget === "premium"}
-                  onPress={() => { Haptics.selectionAsync(); setBudget("premium"); }}
-                />
-              </View>
-            </>
-          )}
-
-          {step === 6 && (
-            <>
-              <Text style={[styles.stepHeadline, { color: C.text }]}>
-                How many nights are we sorting?
-              </Text>
-              <Text style={[styles.stepHelper, { color: C.textSecondary }]}>
-                Even three nights is a win.
-              </Text>
-              <View style={styles.optionList}>
-                <OptionCard
-                  label="3 meals"
-                  sub="A few solid nights"
-                  selected={mealsPerWeek === 3}
-                  onPress={() => { Haptics.selectionAsync(); setMealsPerWeek(3); }}
-                />
-                <OptionCard
-                  label="5 meals"
-                  sub="Most of the week"
-                  selected={mealsPerWeek === 5}
-                  onPress={() => { Haptics.selectionAsync(); setMealsPerWeek(5); }}
-                />
-                <OptionCard
-                  label="7 meals"
-                  sub="The full week"
-                  selected={mealsPerWeek === 7}
-                  onPress={() => { Haptics.selectionAsync(); setMealsPerWeek(7); }}
-                />
-              </View>
-            </>
-          )}
-
-          {step === 7 && (
-            <>
-              <Text style={[styles.stepHeadline, { color: C.text }]}>
-                Anything we should avoid?
-              </Text>
-              <Text style={[styles.stepHelper, { color: C.textSecondary }]}>
-                Hard no's only. We'll handle the rest.
-              </Text>
-              <View style={styles.optionList}>
-                <OptionCard
-                  label="No preference"
-                  selected={dietType === "no-preference"}
-                  onPress={() => { Haptics.selectionAsync(); setDietType("no-preference"); }}
-                />
-                <OptionCard
-                  label="Vegetarian"
-                  selected={dietType === "vegetarian"}
-                  onPress={() => { Haptics.selectionAsync(); setDietType("vegetarian"); }}
-                />
-                <OptionCard
-                  label="Vegan"
-                  selected={dietType === "vegan"}
-                  onPress={() => { Haptics.selectionAsync(); setDietType("vegan"); }}
-                />
-                <OptionCard
-                  label="Pescatarian"
-                  selected={dietType === "pescatarian"}
-                  onPress={() => { Haptics.selectionAsync(); setDietType("pescatarian"); }}
-                />
-              </View>
-            </>
-          )}
-
-          {step === 8 && (
-            <>
-              <Text style={[styles.stepHeadline, { color: C.text }]}>
-                Any hard no's?
-              </Text>
-              <Text style={[styles.stepHelper, { color: C.textSecondary }]}>
-                Tap anything to skip it.
-              </Text>
-              <View style={styles.pillGrid}>
-                {EXCLUSION_OPTIONS.map((ex) => (
-                  <PillChip
-                    key={ex}
-                    label={ex}
-                    active={exclusions.includes(ex)}
-                    onPress={() => toggleExclusion(ex)}
-                  />
-                ))}
-              </View>
-              {exclusions.length === 0 && (
-                <Text style={[styles.optionalHint, { color: C.textMuted }]}>
-                  Nothing selected — we'll include everything.
-                </Text>
-              )}
-            </>
-          )}
-
-          {step === 9 && (
-            <>
-              <Text style={[styles.stepHeadline, { color: C.text }]}>
-                Anyone eating differently?
-              </Text>
-              <Text style={[styles.stepHelper, { color: C.textSecondary }]}>
-                We'll quietly flag meals that work — and suggest easy swaps for those that don't.
-              </Text>
-              <View style={styles.sectionLabel}>
-                <Text style={[styles.sectionLabelText, { color: C.textSecondary }]}>Dietary needs</Text>
-              </View>
-              <View style={styles.optionList}>
-                {(["vegan", "vegetarian", "gluten-free", "dairy-free"] as DietaryNeed[]).map((need) => {
-                  const labels: Record<DietaryNeed, string> = {
-                    vegan: "🌱  Vegan",
-                    vegetarian: "🥚  Vegetarian",
-                    "gluten-free": "🌾  Gluten-free",
-                    "dairy-free": "🥛  Dairy-free",
-                  };
-                  const active = dietaryNeeds.includes(need);
-                  return (
-                    <OptionCard
-                      key={need}
-                      label={labels[need]}
-                      selected={active}
-                      onPress={() => {
-                        Haptics.selectionAsync();
-                        setDietaryNeeds((prev) =>
-                          prev.includes(need) ? prev.filter((n) => n !== need) : [...prev, need]
-                        );
-                      }}
-                    />
-                  );
-                })}
-              </View>
-              <View style={[styles.sectionLabel, { marginTop: 20 }]}>
-                <Text style={[styles.sectionLabelText, { color: C.textSecondary }]}>Kids at the table?</Text>
-              </View>
-              <View style={styles.optionList}>
-                <OptionCard
-                  label="Same as everyone"
-                  sub="No special meals needed."
-                  selected={kidSituation === "same"}
-                  onPress={() => { Haptics.selectionAsync(); setKidSituation("same"); }}
-                />
-                <OptionCard
-                  label="Lean kid-friendly"
-                  sub="Favour simpler meals the kids will actually eat."
-                  selected={kidSituation === "simpler"}
-                  onPress={() => { Haptics.selectionAsync(); setKidSituation("simpler"); }}
-                />
-                <OptionCard
-                  label="Separate kids' meals"
-                  sub="You handle theirs — we'll plan yours."
-                  selected={kidSituation === "separate"}
-                  onPress={() => { Haptics.selectionAsync(); setKidSituation("separate"); }}
-                />
-              </View>
-            </>
-          )}
-        </View>
-      </ScrollView>
-
-      <View style={styles.stepFooter}>
-        {step === 8 ? (
+      {/* ── Body ── */}
+      <ScrollView
+        style={{ flex: 1 }}
+        contentContainerStyle={styles.stepBody}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+      >
+        {/* ── SCREEN 2: HOUSEHOLD SIZE ── */}
+        {isScreen2 && (
           <>
-            <TouchableOpacity
-              onPress={() => {
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-                setStep(9);
-              }}
-              activeOpacity={0.85}
-              style={[styles.primaryCta, { backgroundColor: C.gold }]}
-            >
-              <Text style={styles.primaryCtaText}>Next</Text>
-              <Feather name="arrow-right" size={18} color="#fff" />
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => {
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                goToPreferencesWithSave();
-              }}
-              activeOpacity={0.85}
-              style={[styles.secondaryCtaFull, { backgroundColor: C.secondaryActionBg }]}
-            >
-              <Text style={[styles.secondaryCtaText, { color: C.secondaryActionText }]}>More filters</Text>
-              <Feather name="sliders" size={15} color={C.secondaryActionText} />
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => { Haptics.selectionAsync(); setStep(9); }}
-              style={styles.skipBtn}
-            >
-              <Text style={[styles.skipText, { color: C.textMuted }]}>
-                Skip — no exclusions
-              </Text>
-            </TouchableOpacity>
-          </>
-        ) : step === 9 ? (
-          <>
-            <TouchableOpacity
-              onPress={() => {
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-                goNext();
-              }}
-              activeOpacity={0.85}
-              style={[styles.primaryCta, { backgroundColor: C.gold }]}
-            >
-              <Text style={styles.primaryCtaText}>
-                {scope === "both" ? "Next — money setup" : "Sort my week"}
-              </Text>
-              <Feather name={scope === "both" ? "arrow-right" : "zap"} size={18} color="#fff" />
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => {
-                Haptics.selectionAsync();
-                startGenerating();
-              }}
-              style={styles.skipBtn}
-            >
-              <Text style={[styles.skipText, { color: C.textMuted }]}>
-                Skip for now
-              </Text>
-            </TouchableOpacity>
-          </>
-        ) : (
-          <>
-            <TouchableOpacity
-              onPress={() => {
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-                goNext();
-              }}
-              activeOpacity={0.85}
-              style={[styles.primaryCta, { backgroundColor: C.gold }]}
-            >
-              <Text style={styles.primaryCtaText}>Continue</Text>
-              <Feather name="arrow-right" size={18} color="#fff" />
-            </TouchableOpacity>
-            {step === 7 && (
+            <Text style={styles.stepLabel}>STEP 1</Text>
+            <Text style={styles.stepHeadline}>How many are you feeding?</Text>
+            <Text style={styles.stepSub}>Most nights — roughly.</Text>
+
+            <View style={styles.stepperRow}>
               <TouchableOpacity
-                onPress={() => { Haptics.selectionAsync(); goNext(); }}
-                style={styles.skipBtn}
+                onPress={() => { Haptics.selectionAsync(); setHouseholdSize((n) => Math.max(1, n - 1)); }}
+                style={styles.stepperBtn}
+                activeOpacity={0.7}
               >
-                <Text style={[styles.skipText, { color: C.textMuted }]}>
-                  Skip — no preference
+                <Text style={styles.stepperBtnText}>−</Text>
+              </TouchableOpacity>
+
+              <Text style={styles.stepperNum}>{householdSize}</Text>
+
+              <TouchableOpacity
+                onPress={() => { Haptics.selectionAsync(); setHouseholdSize((n) => Math.min(8, n + 1)); }}
+                style={styles.stepperBtn}
+                activeOpacity={0.7}
+              >
+                <Text style={styles.stepperBtnText}>+</Text>
+              </TouchableOpacity>
+            </View>
+
+            <Text style={styles.stepperHint}>
+              {HOUSEHOLD_HINTS[householdSize] ?? "Big household. We've got you."}
+            </Text>
+          </>
+        )}
+
+        {/* ── SCREEN 3: HARD NO'S ── */}
+        {isScreen3 && (
+          <>
+            <Text style={styles.stepLabel}>STEP 2</Text>
+            <Text style={styles.stepHeadline}>Anything we should never suggest?</Text>
+            <Text style={styles.stepSub}>
+              Allergies, dislikes, things the kids will absolutely riot over.
+            </Text>
+
+            <TextInput
+              style={styles.exclusionInput}
+              value={exclusionText}
+              onChangeText={setExclusionText}
+              placeholder="e.g. shellfish, mushrooms, anything spicy..."
+              placeholderTextColor="#BBBBBB"
+              multiline
+              textAlignVertical="top"
+            />
+
+            <View style={styles.chipRow}>
+              {EXCLUSION_CHIPS.map((chip) => (
+                <TouchableOpacity
+                  key={chip}
+                  onPress={() => appendChip(chip)}
+                  style={styles.exclusionChip}
+                  activeOpacity={0.7}
+                >
+                  <Text style={styles.exclusionChipText}>{chip}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </>
+        )}
+
+        {/* ── SCREEN 4: DIETARY NEEDS ── */}
+        {isScreen4 && (
+          <>
+            <Text style={styles.stepLabel}>STEP 3</Text>
+            <Text style={styles.stepHeadline}>Any dietary needs in the household?</Text>
+            <Text style={styles.stepSub}>Set once. We'll handle it quietly every week.</Text>
+
+            <View style={styles.dietaryGrid}>
+              {DIETARY_OPTIONS.map(({ id, label }) => {
+                const active = dietaryNeeds.includes(id);
+                return (
+                  <TouchableOpacity
+                    key={id}
+                    onPress={() => toggleDietaryNeed(id)}
+                    style={[styles.dietaryPill, active && styles.dietaryPillActive]}
+                    activeOpacity={0.75}
+                  >
+                    <Text style={[styles.dietaryPillText, active && styles.dietaryPillTextActive]}>
+                      {label}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
+
+              {/* None of these */}
+              <TouchableOpacity
+                onPress={selectNone}
+                style={[styles.dietaryPill, noneSelected && styles.dietaryPillActive]}
+                activeOpacity={0.75}
+              >
+                <Text style={[styles.dietaryPillText, noneSelected && styles.dietaryPillTextActive]}>
+                  None of these
                 </Text>
               </TouchableOpacity>
-            )}
+            </View>
+
+            <Text style={styles.dietaryNote}>
+              You can update this anytime in your preferences.
+            </Text>
+          </>
+        )}
+      </ScrollView>
+
+      {/* ── Footer ── */}
+      <View style={[styles.stepFooter, { paddingBottom: paddingBottom + 4 }]}>
+        {isScreen2 && (
+          <>
+            <TouchableOpacity
+              onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); setStep(2); }}
+              activeOpacity={0.85}
+              style={styles.primaryBtn}
+            >
+              <Text style={styles.primaryBtnText}>That's us →</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => setStep(0)} style={styles.backLinkFooter}>
+              <Text style={styles.backLinkText}>← Back</Text>
+            </TouchableOpacity>
+          </>
+        )}
+
+        {isScreen3 && (
+          <>
+            <TouchableOpacity
+              onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); setStep(3); }}
+              activeOpacity={0.85}
+              style={styles.primaryBtn}
+            >
+              <Text style={styles.primaryBtnText}>Got it →</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => { setExclusionText(""); setStep(3); }}
+              style={styles.skipLink}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.skipLinkText}>Skip — nothing to avoid →</Text>
+            </TouchableOpacity>
+          </>
+        )}
+
+        {isScreen4 && (
+          <>
+            <TouchableOpacity
+              onPress={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                startGenerating();
+              }}
+              activeOpacity={0.85}
+              style={styles.primaryBtn}
+            >
+              <Text style={styles.primaryBtnText}>Nearly there →</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => { setDietaryNeeds([]); setNoneSelected(false); startGenerating(); }}
+              style={styles.skipLink}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.skipLinkText}>Skip for now →</Text>
+            </TouchableOpacity>
           </>
         )}
       </View>
-    </View>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    paddingHorizontal: 24,
   },
-  welcomeContent: {
+
+  // ── Screen 1: Promise ──────────────────────────────────────────────
+  promiseCenter: {
+    flex: 1,
+    justifyContent: "center",
     alignItems: "center",
-    justifyContent: "flex-start",
-    paddingTop: 20,
-    paddingBottom: 24,
-    gap: 14,
+    paddingHorizontal: 32,
   },
-  logo: {
-    width: 507,
-    height: 233,
-    marginBottom: 4,
+  promiseLogo: {
+    width: 220,
+    height: 100,
   },
-  welcomeHeadline: {
-    fontSize: 22,
-    fontFamily: "Manrope_600SemiBold",
+  promiseTagline: {
+    fontSize: 28,
+    fontFamily: "PlayfairDisplay_700Bold",
     textAlign: "center",
-    lineHeight: 31,
-    letterSpacing: -0.2,
+    color: TEXT,
+    marginTop: 24,
   },
-  welcomeSub: {
+  promiseLines: {
+    marginTop: 20,
+    alignItems: "center",
+  },
+  promiseLine: {
     fontSize: 16,
     fontFamily: "Inter_400Regular",
+    color: MUTED,
     textAlign: "center",
-    lineHeight: 24,
-    maxWidth: 300,
+    lineHeight: 32,
   },
-  welcomeSupport: {
-    fontSize: 15,
-    fontFamily: "Inter_500Medium",
-    fontStyle: "italic",
+  promiseCta: {
+    paddingHorizontal: 24,
+    paddingTop: 12,
+    gap: 0,
+  },
+  promiseSmall: {
+    fontSize: 12,
+    fontFamily: "Inter_400Regular",
+    color: MUTED,
     textAlign: "center",
-    lineHeight: 22,
+    marginTop: 10,
   },
-  welcomeActions: {
+
+  // ── Steps 2–4: shared shell ───────────────────────────────────────
+  stepHeader: {
+    paddingHorizontal: 24,
+    paddingBottom: 4,
+    alignItems: "center",
     gap: 12,
-    paddingBottom: 8,
   },
-  welcomeHelper: {
+  backLink: {
+    alignSelf: "flex-start",
+  },
+  backLinkText: {
     fontSize: 13,
     fontFamily: "Inter_400Regular",
-    textAlign: "center",
-  },
-  stepHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
-    paddingTop: 8,
-    paddingBottom: 20,
-    minHeight: 60,
-  },
-  backBtn: {
-    width: 40,
-    height: 40,
-    borderRadius: 12,
-    alignItems: "center",
-    justifyContent: "center",
+    color: MUTED,
   },
   progressDots: {
-    flex: 1,
     flexDirection: "row",
-    alignItems: "center",
-    gap: 5,
+    gap: 8,
+    justifyContent: "center",
   },
   dot: {
+    width: 8,
     height: 8,
     borderRadius: 4,
-  } as any,
-  stepCounter: {
-    fontSize: 12,
-    fontFamily: "Inter_500Medium",
   },
   stepBody: {
-    gap: 20,
+    paddingHorizontal: 24,
+    paddingTop: 20,
     paddingBottom: 16,
+  },
+  stepLabel: {
+    fontSize: 11,
+    fontFamily: "Inter_600SemiBold",
+    color: PLUM,
+    letterSpacing: 1.2,
+    marginBottom: 8,
   },
   stepHeadline: {
     fontSize: 26,
-    fontFamily: "Inter_700Bold",
+    fontFamily: "PlayfairDisplay_700Bold",
+    color: TEXT,
     lineHeight: 34,
+    marginBottom: 8,
   },
-  stepHelper: {
+  stepSub: {
     fontSize: 15,
     fontFamily: "Inter_400Regular",
-    marginTop: -8,
+    color: MUTED,
+    lineHeight: 22,
+    marginBottom: 28,
   },
-  scopeList: {
-    gap: 12,
+  stepFooter: {
+    paddingHorizontal: 24,
+    paddingTop: 12,
+    gap: 10,
   },
-  scopeCard: {
-    flexDirection: "row",
-    alignItems: "center",
-    padding: 20,
-    borderRadius: 16,
-    borderWidth: 2,
-    gap: 12,
+  backLinkFooter: {
+    alignSelf: "center",
   },
-  scopeCardInner: {
-    flex: 1,
-    gap: 4,
+  skipLink: {
+    alignSelf: "center",
+    paddingVertical: 4,
   },
-  scopeCardLabel: {
-    fontSize: 18,
-    fontFamily: "Inter_700Bold",
-  },
-  scopeCardSub: {
-    fontSize: 14,
+  skipLinkText: {
+    fontSize: 13,
     fontFamily: "Inter_400Regular",
+    color: MUTED,
+    textAlign: "center",
   },
-  scopeCheckCircle: {
-    width: 28,
-    height: 28,
+
+  // ── Primary button ────────────────────────────────────────────────
+  primaryBtn: {
+    backgroundColor: TEAL,
+    height: 54,
     borderRadius: 14,
     alignItems: "center",
     justifyContent: "center",
   },
-  optionList: {
-    gap: 10,
+  primaryBtnText: {
+    fontSize: 17,
+    fontFamily: "Inter_700Bold",
+    color: "#FFFFFF",
   },
-  optionCard: {
-    flexDirection: "row",
-    alignItems: "center",
-    padding: 16,
-    borderRadius: 14,
-    borderWidth: 1.5,
-    gap: 12,
-  },
-  optionCardInner: {
-    flex: 1,
-    gap: 2,
-  },
-  optionCardLabel: {
-    fontSize: 16,
-    fontFamily: "Inter_600SemiBold",
-  },
-  optionCardSub: {
-    fontSize: 13,
-    fontFamily: "Inter_400Regular",
-  },
+
+  // ── Screen 2: Stepper ─────────────────────────────────────────────
   stepperRow: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 20,
-    marginTop: 8,
+    justifyContent: "center",
+    gap: 32,
+    marginVertical: 8,
   },
   stepperBtn: {
-    width: 56,
-    height: 56,
-    borderRadius: 16,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    borderWidth: 2,
+    borderColor: TEAL,
     alignItems: "center",
     justifyContent: "center",
   },
-  stepperValue: {
-    fontSize: 48,
-    fontFamily: "Inter_700Bold",
-    minWidth: 60,
+  stepperBtnText: {
+    fontSize: 24,
+    fontFamily: "Inter_400Regular",
+    color: TEAL,
+    lineHeight: 28,
+  },
+  stepperNum: {
+    fontSize: 72,
+    fontFamily: "PlayfairDisplay_700Bold",
+    color: TEAL,
+    lineHeight: 80,
+    minWidth: 80,
     textAlign: "center",
   },
-  stepperLabel: {
+  stepperHint: {
     fontSize: 14,
     fontFamily: "Inter_400Regular",
-    marginTop: -8,
+    fontStyle: "italic",
+    color: MUTED,
+    textAlign: "center",
+    marginTop: 12,
   },
-  pillGrid: {
+
+  // ── Screen 3: Hard no's ───────────────────────────────────────────
+  exclusionInput: {
+    height: 120,
+    backgroundColor: "#F8F6F3",
+    borderWidth: 1,
+    borderColor: BORDER,
+    borderRadius: 12,
+    paddingHorizontal: 14,
+    paddingTop: 12,
+    paddingBottom: 12,
+    fontSize: 15,
+    fontFamily: "Inter_400Regular",
+    color: TEXT,
+    marginBottom: 16,
+  },
+  chipRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
+  },
+  exclusionChip: {
+    backgroundColor: "#FFFFFF",
+    borderWidth: 1,
+    borderColor: BORDER,
+    borderRadius: 20,
+    paddingVertical: 4,
+    paddingHorizontal: 12,
+  },
+  exclusionChipText: {
+    fontSize: 12,
+    fontFamily: "Inter_400Regular",
+    color: TEXT,
+  },
+
+  // ── Screen 4: Dietary needs ───────────────────────────────────────
+  dietaryGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
     gap: 10,
+    marginBottom: 16,
   },
-  pillChip: {
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderRadius: 24,
+  dietaryPill: {
+    backgroundColor: "#FFFFFF",
     borderWidth: 1.5,
+    borderColor: BORDER,
+    borderRadius: 24,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
   },
-  pillChipText: {
-    fontSize: 14,
-    fontFamily: "Inter_500Medium",
+  dietaryPillActive: {
+    backgroundColor: PLUM,
+    borderColor: PLUM,
   },
-  optionalHint: {
-    fontSize: 13,
-    fontFamily: "Inter_400Regular",
-  },
-  sectionLabel: {
-    marginBottom: 8,
-  },
-  sectionLabelText: {
-    fontSize: 12,
-    fontFamily: "Inter_600SemiBold",
-    textTransform: "uppercase",
-    letterSpacing: 0.6,
-  },
-  transitionCenter: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 20,
-    paddingBottom: 40,
-  },
-  transitionIcon: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 8,
-  },
-  transitionHeadline: {
-    fontSize: 28,
-    fontFamily: "Inter_700Bold",
-    textAlign: "center",
-    lineHeight: 36,
-  },
-  transitionSub: {
-    fontSize: 16,
-    fontFamily: "Inter_400Regular",
-    textAlign: "center",
-    lineHeight: 24,
-    maxWidth: 280,
-  },
-  transitionHelper: {
-    fontSize: 14,
-    fontFamily: "Inter_400Regular",
-    textAlign: "center",
-    lineHeight: 21,
-    maxWidth: 280,
-  },
-  bridgeActions: {
-    gap: 12,
-    paddingHorizontal: 4,
-  },
-  skipBtnText: {
-    fontSize: 14,
-    fontFamily: "Inter_400Regular",
-    textAlign: "center",
-  },
-  stepFooter: {
-    gap: 8,
-    paddingTop: 12,
-  },
-  secondaryCtaFull: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 8,
-    paddingVertical: 16,
-    borderRadius: 18,
-  },
-  secondaryCtaText: {
+  dietaryPillText: {
     fontSize: 15,
+    fontFamily: "Inter_500Medium",
+    color: TEXT,
+  },
+  dietaryPillTextActive: {
+    color: "#FFFFFF",
     fontFamily: "Inter_600SemiBold",
   },
-  primaryCta: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 10,
-    paddingVertical: 18,
-    borderRadius: 18,
-    shadowColor: "#F0AC2E",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.32,
-    shadowRadius: 16,
-    elevation: 6,
-  },
-  primaryCtaText: {
-    fontSize: 17,
-    fontFamily: "Inter_700Bold",
-    color: "#fff",
-  },
-  skipBtn: {
-    alignItems: "center",
-    paddingVertical: 10,
-  },
-  skipText: {
-    fontSize: 13,
+  dietaryNote: {
+    fontSize: 12,
     fontFamily: "Inter_400Regular",
+    color: MUTED,
+    textAlign: "center",
+    marginTop: 8,
   },
+
+  // ── Screen 5: Generating ──────────────────────────────────────────
   generatingCenter: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    gap: 18,
+    paddingHorizontal: 32,
   },
-  generatingSpinner: {
-    width: 52,
-    height: 52,
-    borderRadius: 26,
+  pulseRing: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
     borderWidth: 3,
-    borderTopColor: "transparent",
-  } as any,
-  generatingHeadline: {
-    fontSize: 22,
-    fontFamily: "Inter_700Bold",
-    textAlign: "center",
+    borderColor: TEAL,
+    position: "absolute",
+    opacity: 0.35,
   },
-  generatingMsg: {
-    fontSize: 15,
+  pulseCore: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: `${TEAL}22`,
+    borderWidth: 2,
+    borderColor: TEAL,
+  },
+  genMsg: {
+    fontSize: 18,
+    fontFamily: "Inter_600SemiBold",
+    color: TEXT,
+    textAlign: "center",
+    lineHeight: 26,
+  },
+  genSub: {
+    fontSize: 14,
     fontFamily: "Inter_400Regular",
+    color: MUTED,
     textAlign: "center",
-  },
-  generatingDone: {
-    fontSize: 22,
-    fontFamily: "Inter_700Bold",
-    textAlign: "center",
-    marginTop: 12,
+    marginTop: 10,
   },
 });
