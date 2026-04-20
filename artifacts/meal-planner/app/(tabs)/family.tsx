@@ -1630,6 +1630,8 @@ function ManagePeopleSection({
   onAdd: (name: string, role: "adult" | "child") => void;
   onRemove: (id: string) => void;
 }) {
+  // Collapsed by default once setup is complete; expanded when empty
+  const [expanded, setExpanded] = useState(members.length === 0);
   const [adding, setAdding] = useState(false);
   const [name, setName]     = useState("");
   const [role, setRole]     = useState<"adult" | "child">("child");
@@ -1641,9 +1643,25 @@ function ManagePeopleSection({
     Keyboard.dismiss();
   }
 
-  const hasAdults   = members.some((m) => m.role === "adult");
-  const hasChildren = members.some((m) => m.role === "child");
+  const hasAdults      = members.some((m) => m.role === "adult");
+  const hasChildren    = members.some((m) => m.role === "child");
   const needsAdultHint = hasChildren && !hasAdults;
+
+  // ── Collapsed summary row (when members exist and not expanded)
+  if (members.length > 0 && !expanded) {
+    const names = members.map((m) => m.name).join(", ");
+    return (
+      <TouchableOpacity
+        style={styles.peopleCollapsedRow}
+        onPress={() => setExpanded(true)}
+        activeOpacity={0.8}
+      >
+        <Text style={styles.peopleCollapsedIcon}>👥</Text>
+        <Text style={styles.peopleCollapsedNames} numberOfLines={1}>{names}</Text>
+        <Text style={styles.peopleCollapsedEdit}>Edit →</Text>
+      </TouchableOpacity>
+    );
+  }
 
   return (
     <View style={styles.peopleSection}>
@@ -1651,14 +1669,23 @@ function ManagePeopleSection({
         <Feather name="users" size={14} color={TEXT_MUTED} />
         <Text style={styles.peopleSectionTitle}>Family members</Text>
         {members.length > 0 && !adding && (
-          <TouchableOpacity
-            style={styles.addPersonCtaInline}
-            onPress={() => setAdding(true)}
-            activeOpacity={0.75}
-          >
-            <Feather name="user-plus" size={12} color={TEAL} />
-            <Text style={styles.addPersonCtaInlineText}>Add another</Text>
-          </TouchableOpacity>
+          <>
+            <TouchableOpacity
+              style={styles.addPersonCtaInline}
+              onPress={() => setAdding(true)}
+              activeOpacity={0.75}
+            >
+              <Feather name="user-plus" size={12} color={TEAL} />
+              <Text style={styles.addPersonCtaInlineText}>Add another</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => setExpanded(false)}
+              activeOpacity={0.7}
+              style={{ marginLeft: "auto" }}
+            >
+              <Text style={styles.peopleDoneLink}>Done</Text>
+            </TouchableOpacity>
+          </>
         )}
       </View>
 
@@ -2496,44 +2523,25 @@ export default function FamilyScreen() {
         )}
       </ScrollView>
 
-      {/* ── Sticky bar — primary "Add another event" always teal; secondary sort/resort below ── */}
+      {/* ── Sticky bar — See the plan + Re-sort when events exist ── */}
       {hasEvents && (
         <View style={[styles.sortCtaBar, { paddingBottom: TAB_BAR_HEIGHT + Math.max(insets.bottom, 0) + 8 }]}>
-          {/* Primary: always teal */}
-          <TouchableOpacity
-            style={styles.sortCtaBtn}
-            onPress={openAddEvent}
-            activeOpacity={0.88}
-          >
-            <Feather name="plus" size={15} color="#fff" />
-            <Text style={styles.sortCtaBtnText}>Add another</Text>
-          </TouchableOpacity>
-
-          {/* Secondary: Sort / Re-sort — only when events need sorting */}
-          {needsSort && (
+          <View style={styles.sortCtaBarBtns}>
             <TouchableOpacity
-              style={styles.sortCtaSortBtn}
+              style={styles.stickySeePlanBtn}
+              onPress={() => juggleResult ? setFamilyStep("results") : handleSortJuggle()}
+              activeOpacity={0.88}
+            >
+              <Text style={styles.stickySeePlanBtnText}>See the plan →</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.stickyResortBtn}
               onPress={() => handleSortJuggle()}
               activeOpacity={0.85}
             >
-              <Feather name="zap" size={14} color={GOLD} />
-              <Text style={styles.sortCtaSortBtnText}>
-                {juggleResult ? "Re-sort" : "Sort the week"}
-              </Text>
+              <Text style={styles.stickyResortBtnText}>Re-sort ↺</Text>
             </TouchableOpacity>
-          )}
-
-          {/* Re-sort link — low emphasis when already sorted and nothing changed */}
-          {juggleResult && isSorted && (
-            <TouchableOpacity
-              style={styles.sortCtaResortLink}
-              onPress={() => handleSortJuggle()}
-              activeOpacity={0.7}
-            >
-              <Feather name="refresh-cw" size={11} color={TEXT_MUTED} />
-              <Text style={styles.sortCtaResortLinkText}>Re-sort</Text>
-            </TouchableOpacity>
-          )}
+          </View>
         </View>
       )}
 
@@ -2704,6 +2712,15 @@ const styles = StyleSheet.create({
   peopleSection: {
     backgroundColor: CARD_BG, borderRadius: 14, borderWidth: 1, borderColor: BORDER, padding: 14, gap: 10,
   },
+  peopleCollapsedRow: {
+    flexDirection: "row", alignItems: "center", gap: 8,
+    backgroundColor: "#fff", borderRadius: 12, borderWidth: 1, borderColor: BORDER,
+    paddingHorizontal: 14, paddingVertical: 10, marginBottom: 12,
+  },
+  peopleCollapsedIcon: { fontSize: 15 },
+  peopleCollapsedNames: { flex: 1, fontSize: 14, fontFamily: "Inter_500Medium", color: TEXT },
+  peopleCollapsedEdit: { fontSize: 13, fontFamily: "Inter_500Medium", color: TEAL },
+  peopleDoneLink: { fontSize: 13, fontFamily: "Inter_500Medium", color: TEAL },
   peopleSectionHeader: { flexDirection: "row", alignItems: "center", gap: 7 },
   peopleSectionTitle: { fontSize: 13, fontFamily: "Inter_600SemiBold", color: TEXT_MUTED },
   peopleSectionEmpty: { fontSize: 13, fontFamily: "Inter_400Regular", color: TEXT_MUTED, fontStyle: "italic" },
@@ -2958,7 +2975,7 @@ const styles = StyleSheet.create({
   juggleAdultName: { fontSize: 16, fontFamily: "Inter_700Bold", color: TEXT },
   juggleScheduleRow: { flexDirection: "row", alignItems: "flex-start", gap: 10 },
   juggleTimePill: {
-    backgroundColor: PLUM, borderRadius: 20,
+    backgroundColor: "#2B2B2B", borderRadius: 20,
     paddingHorizontal: 8, paddingVertical: 3, flexShrink: 0,
   },
   juggleTimePillText: { color: "#fff", fontSize: 11, fontFamily: "Inter_600SemiBold" },
@@ -3132,6 +3149,24 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
   },
   sortCtaResortLinkText: { fontSize: 12, fontFamily: "Inter_400Regular", color: TEXT_MUTED },
+
+  // Sticky bar — new 2-button layout (See plan / Re-sort)
+  sortCtaBarBtns: { flexDirection: "row", gap: 10 },
+  stickySeePlanBtn: {
+    flex: 1, alignItems: "center", justifyContent: "center",
+    backgroundColor: GOLD, borderRadius: 14, height: 52,
+    ...Platform.select({
+      web: { boxShadow: `0px 3px 10px ${GOLD}55` },
+      default: { shadowColor: GOLD, shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.3, shadowRadius: 8, elevation: 5 },
+    }),
+  },
+  stickySeePlanBtnText: { fontSize: 16, fontFamily: "Inter_700Bold", color: "#fff" },
+  stickyResortBtn: {
+    flex: 1, alignItems: "center", justifyContent: "center",
+    borderWidth: 1.5, borderColor: TEAL, borderRadius: 14, height: 52,
+    backgroundColor: "transparent",
+  },
+  stickyResortBtnText: { fontSize: 15, fontFamily: "Inter_600SemiBold", color: TEAL },
 
   // Travel hint row (between events in DaySection)
   travelHintRow: {

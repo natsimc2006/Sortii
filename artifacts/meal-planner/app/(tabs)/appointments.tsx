@@ -481,13 +481,6 @@ interface ConnectionCardsProps {
 function ConnectionCards({ onConnectApple, onConnectGoogle, onManual }: ConnectionCardsProps) {
   return (
     <View style={styles.connectionWrap}>
-      <View style={styles.connectionIconWrap}>
-        <Text style={styles.connectionIcon}>📅</Text>
-      </View>
-      <Text style={styles.connectionHeading}>Everything in one place.</Text>
-      <Text style={styles.connectionSub}>
-        Connect your calendars and add anything else — Sortii pulls it all into one view.
-      </Text>
       <TouchableOpacity style={styles.connCard} onPress={onConnectApple} activeOpacity={0.8}>
         <View style={{ flex: 1 }}>
           <Text style={styles.connCardTitle}>🍎  iPhone Calendar</Text>
@@ -1434,14 +1427,6 @@ export default function AppointmentsScreen() {
         )}
       </ScrollView>
 
-      {/* FAB */}
-      <TouchableOpacity
-        style={[styles.fab, { bottom: insets.bottom + TAB_BAR_HEIGHT + 14 }]}
-        onPress={openAdd}
-        activeOpacity={0.85}
-      >
-        <Feather name="plus" size={22} color="#fff" />
-      </TouchableOpacity>
     </SafeAreaView>
   );
 }
@@ -1554,7 +1539,7 @@ const styles = StyleSheet.create({
   toastText: { color: "#fff", fontSize: 14, fontFamily: "Inter_600SemiBold" },
 
   // Connection empty state
-  connectionWrap: { alignItems: "center", paddingTop: 24, gap: 12, paddingHorizontal: 4 },
+  connectionWrap: { gap: 12, paddingHorizontal: 0, paddingTop: 8 },
   connectionIconWrap: {
     width: 72, height: 72, borderRadius: 18, backgroundColor: TEAL_TINT,
     alignItems: "center", justifyContent: "center",
@@ -1564,16 +1549,16 @@ const styles = StyleSheet.create({
   connectionSub: { fontSize: 15, fontFamily: "Inter_400Regular", color: MUTED, textAlign: "center", lineHeight: 22 },
   connCard: {
     flexDirection: "row", alignItems: "center",
-    backgroundColor: CARD, borderRadius: 14, borderWidth: 1, borderColor: BORDER,
+    backgroundColor: "#fff", borderRadius: 12, borderWidth: 1, borderColor: "#E6E1D7",
     padding: 16, gap: 12, width: "100%",
   },
   connCardTitle: { fontSize: 15, fontFamily: "Inter_600SemiBold", color: TEXT, marginBottom: 3 },
-  connCardSub: { fontSize: 12, fontFamily: "Inter_400Regular", color: MUTED, lineHeight: 18 },
+  connCardSub: { fontSize: 13, fontFamily: "Inter_400Regular", color: "#999", lineHeight: 18 },
   connBtn: {
     backgroundColor: TEAL, borderRadius: 20, paddingHorizontal: 14, paddingVertical: 8,
   },
   connBtnText: { color: "#fff", fontSize: 13, fontFamily: "Inter_600SemiBold" },
-  manualLink: { fontSize: 14, fontFamily: "Inter_500Medium", color: TEAL, marginTop: 4 },
+  manualLink: { fontSize: 14, fontFamily: "Inter_500Medium", color: TEAL, marginTop: 4, textAlign: "center" },
 
   // Calendar selector modal
   modalOverlay: { flex: 1, backgroundColor: "rgba(0,0,0,0.35)", justifyContent: "flex-end" },
