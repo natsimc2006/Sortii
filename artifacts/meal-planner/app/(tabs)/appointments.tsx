@@ -1,5 +1,6 @@
 import { Feather } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import Constants from "expo-constants";
 import { useFocusEffect, useRouter } from "expo-router";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
@@ -677,6 +678,11 @@ export default function AppointmentsScreen() {
     // OAuth uses auth.expo.io proxy which only works on native — not in a web browser
     if (Platform.OS === "web") {
       showToast("Google Calendar works in the Sortii app on your phone.", false);
+      return;
+    }
+    // expo-crypto (needed for PKCE) is not bundled inside the Expo Go preview app
+    if ((Constants as any).appOwnership === "expo") {
+      showToast("Google Calendar isn't available in the Expo Go preview — it works in the full app.", false);
       return;
     }
     if (!isGoogleConfigured()) {
