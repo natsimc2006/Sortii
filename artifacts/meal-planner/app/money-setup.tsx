@@ -223,7 +223,14 @@ export default function MoneySetupScreen() {
   // Restore saved values
   useEffect(() => {
     if (savedMoney) {
-      if (savedMoney.weeklyIncome > 0)    setIncomeRaw(String(savedMoney.weeklyIncome));
+      if (savedMoney.rawIncome !== undefined && savedMoney.rawIncome > 0) {
+        setIncomeRaw(String(savedMoney.rawIncome));
+      } else if (savedMoney.weeklyIncome > 0) {
+        setIncomeRaw(String(savedMoney.weeklyIncome));
+      }
+      if (savedMoney.incomePeriod) {
+        setIncomeFreq(savedMoney.incomePeriod as IncomeFreq);
+      }
       if (savedMoney.groceriesWeekly > 0) setGroceries(String(savedMoney.groceriesWeekly));
     }
     if (savedLifestyle) {
@@ -280,6 +287,8 @@ export default function MoneySetupScreen() {
         otherWeeklySpend: hasAnyLifestyle
           ? w_coffee + w_takeaway + w_entertain
           : undefined,
+        rawIncome:    incomeVal,
+        incomePeriod: incomeFreq,
       },
       {
         streaming:    safeNum(subscriptions),

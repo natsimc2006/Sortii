@@ -9,6 +9,8 @@ export interface MoneySetupData {
   groceries: number;
   eatingOut: number;
   otherWeeklySpend?: number;
+  rawIncome?: number;
+  incomePeriod?: string;
 }
 
 export interface LifestyleSpendData {

@@ -20,6 +20,8 @@ export interface MoneyInput {
   groceriesWeekly: number;
   eatingOutWeekly?: number;
   otherWeeklySpend?: number;
+  rawIncome?: number;
+  incomePeriod?: string;
 }
 
 interface UserWeekContextType {
@@ -98,6 +100,8 @@ export function UserWeekProvider({ children }: { children: React.ReactNode }) {
           groceriesWeekly: m.groceries,
           eatingOutWeekly: m.eatingOut,
           otherWeeklySpend: m.otherWeeklySpend,
+          rawIncome: m.rawIncome,
+          incomePeriod: m.incomePeriod,
         });
       } else {
         setHasMoneySetupState(state.hasMoneySetup);
@@ -139,6 +143,8 @@ export function UserWeekProvider({ children }: { children: React.ReactNode }) {
         groceries: m.groceriesWeekly,
         eatingOut: m.eatingOutWeekly ?? 0,
         otherWeeklySpend: m.otherWeeklySpend,
+        rawIncome: m.rawIncome,
+        incomePeriod: m.incomePeriod,
       },
     });
   };
@@ -197,6 +203,8 @@ export function UserWeekProvider({ children }: { children: React.ReactNode }) {
         groceries: m.groceriesWeekly,
         eatingOut: m.eatingOutWeekly ?? 0,
         otherWeeklySpend: m.otherWeeklySpend,
+        rawIncome: m.rawIncome,
+        incomePeriod: m.incomePeriod,
       },
       lifestyleSpend: lifestyle,
       goal: g,
