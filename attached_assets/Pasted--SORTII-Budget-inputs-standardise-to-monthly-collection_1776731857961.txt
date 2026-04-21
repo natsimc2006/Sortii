@@ -1,0 +1,204 @@
+## SORTII — Budget inputs: standardise to monthly collection
+
+This is a focused pass on the budget setup screen (MoneySetup / 
+BudgetSetup or equivalent) and the calculation logic that feeds from it.
+Do not change any other screens.
+
+---
+
+### PART 1 — Frequency label component
+
+Create a reusable FrequencyPill component for use on all budget input 
+fields. It renders a small rounded pill to the right of the input field 
+showing the collection frequency.
+
+Two variants:
+
+WEEKLY pill:
+- Background: #E6F3F0
+- Text colour: #2A8F88
+- Text: "/ week"
+- Font size: 12px
+- Font weight: 600
+- Border radius: 20px
+- Padding: 3px 10px
+
+MONTHLY pill:
+- Background: #F6E6BA
+- Text colour: #8A6010
+- Text: "/ month"
+- Font size: 12px
+- Font weight: 600
+- Border radius: 20px
+- Padding: 3px 10px
+
+Replace all existing plain "/ week" and "/ month" text labels on input 
+fields with this component. The pill sits inside the input field on the 
+right side, replacing whatever frequency indicator is there currently.
+
+---
+
+### PART 2 — Income field: add frequency selector
+
+The income field currently collects a weekly figure. Replace the static 
+"/ week" label with a three-option frequency selector:
+
+Options: "Weekly" | "Fortnightly" | "Monthly"
+Default: "Fortnightly" (most common AU pay cycle)
+
+Selector style:
+- Three small pill buttons in a row, right-aligned inside or directly 
+  below the income input field
+- Selected pill: teal background (#2A8F88), white text, 12px, 600 weight
+- Unselected pill: white background, #E6E1D7 border, #999999 text
+
+Conversion logic (convert to monthly figure for all calculations):
+- If Weekly selected: multiply entered value × 4.3
+- If Fortnightly selected: multiply entered value × 2.15
+- If Monthly selected: use entered value as-is
+
+Store the converted monthly figure as monthlyIncome in state.
+Never show the conversion to the user — just use it silently in 
+all calculations.
+
+---
+
+### PART 3 — Relabel and regroup all inputs
+
+Apply the following frequency labels and groupings. 
+Use the FrequencyPill component from Part 1 on every field.
+
+COMMITTED SPEND section:
+
+Field 1: Income
+- Label: "Monthly income"
+- Frequency: use selector from Part 2 (not a static pill)
+- Placeholder: $0
+
+Field 2: Mortgage or rent
+- Label: "Mortgage or rent"
+- Sublabel: "Your biggest fixed cost."
+- Frequency pill: MONTHLY (gold)
+- Placeholder: $0
+
+Field 3: Bills, loans & regular payments
+- Label: "Bills, loans & regular payments"
+- Sublabel: "Electricity, rates, loan repayments, insurance — monthly total."
+- Frequency pill: MONTHLY (gold)
+- Placeholder: $0
+
+Field 4: Streaming & subscriptions
+- Label: "Streaming & subscriptions"
+- Sublabel: "Netflix, Spotify, apps, memberships."
+- Frequency pill: MONTHLY (gold)
+- Placeholder: $0
+
+Field 5: Groceries
+- Label: "Groceries"
+- Sublabel: "The weekly shop — we'll estimate the dinner share from there."
+- Frequency pill: WEEKLY (teal)
+- Placeholder: $0
+
+LIFESTYLE SPEND section:
+
+Field 6: Coffee & café
+- Label: "Coffee & café"
+- Sublabel: "Coffee runs, snacks, extra café spend."
+- Frequency pill: WEEKLY (teal)
+- Placeholder: $0
+- Tag: "optional" — small grey label top right of field label
+
+Field 7: Takeaway
+- Label: "Takeaway"
+- Sublabel: "Delivery, drive-through, kebab runs."
+- Frequency pill: WEEKLY (teal)
+- Placeholder: $0
+- Tag: "optional"
+
+Field 8: Entertainment
+- Label: "Entertainment"
+- Sublabel: "Movies, drinks, weekend plans."
+- Frequency pill: MONTHLY (gold)
+- Placeholder: $0
+- Tag: "optional"
+
+---
+
+### PART 4 — Calculation logic
+
+All internal calculations must work in weekly figures.
+Convert inputs using these rules before any calculation runs:
+
+monthlyToWeekly(value) = value / 4.3
+
+Apply to these fields:
+- Mortgage or rent: divide by 4.3
+- Bills, loans & regular payments: divide by 4.3
+- Streaming & subscriptions: divide by 4.3
+- Entertainment: divide by 4.3
+
+Keep these as-is (already weekly):
+- Groceries
+- Coffee & café
+- Takeaway
+
+Income: use the conversion from Part 2 selector, then divide by 4.3 
+to get weeklyIncome.
+
+Committed breathing room (weekly):
+committedBreathingRoom = weeklyIncome
+  - monthlyToWeekly(mortgageRent)
+  - monthlyToWeekly(billsLoans)
+  - monthlyToWeekly(subscriptions)
+  - groceries
+
+Final breathing room (weekly):
+finalBreathingRoom = committedBreathingRoom
+  - coffee
+  - takeaway
+  - monthlyToWeekly(entertainment)
+
+Safety rules:
+- Treat any empty or null input as 0
+- Never render $NaN, $null, or $undefined anywhere
+- If finalBreathingRoom === 0 exactly, show $0 — this is valid
+- If negative, show as "−$[X] over" in red (#B86557)
+
+---
+
+### PART 5 — Result cards: add monthly equivalent line
+
+On both result cards (committed breathing room and final breathing room),
+add a small monthly equivalent line below the main weekly figure.
+
+Format:
+- Main figure: "$[X] this week" — large, teal (#2A8F88)
+- Below in small grey text (12px, #999999, italic):
+  "~$[Y]/month" where Y = weekly figure × 4.3, rounded to nearest $5
+
+Example:
+$87 breathing room this week
+~$375/month
+
+Do not show the monthly line if the result is negative.
+
+---
+
+### FINAL CHECK
+
+Once complete, verify:
+
+1. All /week fields show a teal frequency pill (#E6F3F0 / #2A8F88)
+2. All /month fields show a gold frequency pill (#F6E6BA / #8A6010)
+3. Income field has three-option frequency selector, defaults to Fortnightly
+4. Mortgage, bills, subscriptions, entertainment all collect monthly 
+   and divide by 4.3 in calculations
+5. Groceries, coffee, takeaway remain as weekly inputs
+6. Committed breathing room calculates correctly from monthly inputs
+7. Final breathing room calculates correctly
+8. Both result cards show weekly figure + small monthly equivalent below
+9. No $NaN, $null, or empty values render anywhere
+10. Pill colours are consistent — teal for weekly, gold for monthly —
+    on every single input field without exception
+
+Report any issues before closing.

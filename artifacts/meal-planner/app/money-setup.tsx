@@ -23,28 +23,124 @@ import { getOnboardingState } from "@/utils/onboardingState";
 
 const C = Colors.light;
 
+// ── Brand tokens ──────────────────────────────────────────────────────────────
 const TEAL      = "#2A8F88";
 const TEAL_TINT = "#E6F3F0";
-const GOLD      = "#D29A22";
+const GOLD_TEXT = "#8A6010";
 const GOLD_TINT = "#F6E6BA";
+const GOLD      = "#D29A22";
 const RED       = "#B86557";
 
+// ── Part 1: FrequencyPill ─────────────────────────────────────────────────────
+function FrequencyPill({ variant }: { variant: "weekly" | "monthly" }) {
+  const isWeekly = variant === "weekly";
+  return (
+    <View
+      style={[
+        pillStyles.pill,
+        { backgroundColor: isWeekly ? TEAL_TINT : GOLD_TINT },
+      ]}
+    >
+      <Text
+        style={[
+          pillStyles.pillText,
+          { color: isWeekly ? TEAL : GOLD_TEXT },
+        ]}
+      >
+        {isWeekly ? "/ week" : "/ month"}
+      </Text>
+    </View>
+  );
+}
+
+const pillStyles = StyleSheet.create({
+  pill: {
+    borderRadius: 20,
+    paddingHorizontal: 10,
+    paddingVertical: 3,
+  },
+  pillText: {
+    fontSize: 12,
+    fontFamily: "Inter_600SemiBold",
+  },
+});
+
+// ── Part 2: Income frequency selector ────────────────────────────────────────
+type IncomeFreq = "weekly" | "fortnightly" | "monthly";
+
+function FreqSelector({
+  value,
+  onChange,
+}: {
+  value: IncomeFreq;
+  onChange: (f: IncomeFreq) => void;
+}) {
+  const options: { key: IncomeFreq; label: string }[] = [
+    { key: "weekly",      label: "Weekly"      },
+    { key: "fortnightly", label: "Fortnightly" },
+    { key: "monthly",     label: "Monthly"     },
+  ];
+  return (
+    <View style={freqStyles.row}>
+      {options.map((o) => {
+        const active = value === o.key;
+        return (
+          <TouchableOpacity
+            key={o.key}
+            onPress={() => onChange(o.key)}
+            activeOpacity={0.75}
+            style={[
+              freqStyles.pill,
+              active
+                ? { backgroundColor: TEAL, borderColor: TEAL }
+                : { backgroundColor: "#fff", borderColor: "#E6E1D7" },
+            ]}
+          >
+            <Text
+              style={[
+                freqStyles.pillText,
+                { color: active ? "#fff" : "#999" },
+              ]}
+            >
+              {o.label}
+            </Text>
+          </TouchableOpacity>
+        );
+      })}
+    </View>
+  );
+}
+
+const freqStyles = StyleSheet.create({
+  row: { flexDirection: "row", gap: 6, marginTop: 8 },
+  pill: {
+    borderRadius: 20,
+    borderWidth: 1,
+    paddingHorizontal: 12,
+    paddingVertical: 5,
+  },
+  pillText: { fontSize: 12, fontFamily: "Inter_600SemiBold" },
+});
+
+// ── MoneyField ────────────────────────────────────────────────────────────────
 function MoneyField({
   label,
-  helper,
+  sublabel,
   value,
   onChange,
   optional,
   currencySymbol,
-  suffix = "/ week",
+  frequencyVariant,
+  freqSelector,
 }: {
   label: string;
-  helper?: string;
+  sublabel?: string;
   value: string;
   onChange: (v: string) => void;
   optional?: boolean;
   currencySymbol: string;
-  suffix?: string;
+  frequencyVariant?: "weekly" | "monthly";
+  freqSelector?: React.ReactNode;
 }) {
   return (
     <View style={styles.fieldBlock}>
@@ -54,8 +150,8 @@ function MoneyField({
           <Text style={[styles.fieldOptional, { color: C.textMuted }]}>optional</Text>
         )}
       </View>
-      {helper && (
-        <Text style={[styles.fieldHelper, { color: C.textMuted }]}>{helper}</Text>
+      {sublabel && (
+        <Text style={[styles.fieldHelper, { color: C.textMuted }]}>{sublabel}</Text>
       )}
       <View style={[styles.inputRow, { borderColor: C.inputBorder, backgroundColor: C.card }]}>
         <Text style={[styles.inputPrefix, { color: C.textSecondary }]}>{currencySymbol}</Text>
@@ -68,10 +164,21 @@ function MoneyField({
           style={[styles.inputField, { color: C.text }]}
           returnKeyType="done"
         />
-        <Text style={[styles.inputSuffix, { color: C.textMuted }]}>{suffix}</Text>
+        {frequencyVariant && <FrequencyPill variant={frequencyVariant} />}
       </View>
+      {freqSelector}
     </View>
   );
+}
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+function roundToFive(n: number): number {
+  return Math.round(n / 5) * 5;
+}
+
+function safeNum(s: string): number {
+  const n = parseFloat(s);
+  return isNaN(n) ? 0 : n;
 }
 
 const GOAL_OPTIONS: { value: WeekGoal; label: string; emoji: string }[] = [
@@ -81,89 +188,104 @@ const GOAL_OPTIONS: { value: WeekGoal; label: string; emoji: string }[] = [
   { value: "general", label: "Just saving",   emoji: "🐷" },
 ];
 
+// ── Main screen ───────────────────────────────────────────────────────────────
 export default function MoneySetupScreen() {
-  const router        = useRouter();
-  const { flow }      = useLocalSearchParams<{ flow?: string }>();
-  const isFreshFlow   = flow === "fresh";
+  const router      = useRouter();
+  const { flow }    = useLocalSearchParams<{ flow?: string }>();
+  const isFreshFlow = flow === "fresh";
   const { autoGeneratePlan } = usePlanner();
-  const insets        = useSafeAreaInsets();
+  const insets      = useSafeAreaInsets();
   const { currencySymbol } = useLocale();
   const { money: savedMoney, lifestyleSpend: savedLifestyle, saveMoneySetup, isLoaded } =
     useUserWeek();
 
-  // ── Committed inputs ──────────────────────────────────────────────────────
-  const [weeklyIncome, setWeeklyIncome] = useState("");
-  const [fixedCosts,   setFixedCosts]   = useState("");
-  const [groceries,    setGroceries]    = useState("");
-  const [streaming,    setStreaming]    = useState("");   // monthly
+  // ── Committed inputs (all monthly except groceries which is weekly) ─────────
+  const [incomeRaw,      setIncomeRaw]      = useState("");
+  const [incomeFreq,     setIncomeFreq]     = useState<IncomeFreq>("fortnightly");
+  const [mortgageRent,   setMortgageRent]   = useState("");   // monthly
+  const [billsLoans,     setBillsLoans]     = useState("");   // monthly
+  const [subscriptions,  setSubscriptions]  = useState("");   // monthly
+  const [groceries,      setGroceries]      = useState("");   // weekly
 
-  // ── Lifestyle inputs ──────────────────────────────────────────────────────
-  const [coffeeSpend,    setCoffeeSpend]    = useState("");
-  const [takeaway,       setTakeaway]       = useState("");
-  const [entertainment,  setEntertainment]  = useState("");  // monthly
+  // ── Lifestyle inputs ─────────────────────────────────────────────────────────
+  const [coffeeSpend,   setCoffeeSpend]   = useState("");   // weekly
+  const [takeaway,      setTakeaway]      = useState("");   // weekly
+  const [entertainment, setEntertainment] = useState("");   // monthly
 
-  const [selectedGoal, setSelectedGoal] = useState<WeekGoal>("none");
-  const [saving,       setSaving]        = useState(false);
+  const [selectedGoal,  setSelectedGoal]  = useState<WeekGoal>("none");
+  const [saving,        setSaving]        = useState(false);
   const [hasMealsSetup, setHasMealsSetup] = useState(false);
 
   useEffect(() => {
-    getOnboardingState().then((state) => setHasMealsSetup(state.hasMealsSetup));
+    getOnboardingState().then((s) => setHasMealsSetup(s.hasMealsSetup));
   }, []);
 
+  // Restore saved values
   useEffect(() => {
     if (savedMoney) {
-      if (savedMoney.weeklyIncome > 0)     setWeeklyIncome(String(savedMoney.weeklyIncome));
-      if (savedMoney.fixedWeeklyCosts > 0) setFixedCosts(String(savedMoney.fixedWeeklyCosts));
-      if (savedMoney.groceriesWeekly > 0)  setGroceries(String(savedMoney.groceriesWeekly));
+      if (savedMoney.weeklyIncome > 0)    setIncomeRaw(String(savedMoney.weeklyIncome));
+      if (savedMoney.groceriesWeekly > 0) setGroceries(String(savedMoney.groceriesWeekly));
     }
     if (savedLifestyle) {
-      if (savedLifestyle.streaming > 0)    setStreaming(String(savedLifestyle.streaming));
+      if (savedLifestyle.streaming > 0)    setSubscriptions(String(savedLifestyle.streaming));
       if (savedLifestyle.coffee > 0)       setCoffeeSpend(String(savedLifestyle.coffee));
       if (savedLifestyle.entertainment > 0) setEntertainment(String(savedLifestyle.entertainment));
       if ((savedLifestyle.takeaway ?? 0) > 0) setTakeaway(String(savedLifestyle.takeaway));
     }
   }, []);
 
-  // ── Parsed numbers (empty → 0) ────────────────────────────────────────────
-  const income         = parseFloat(weeklyIncome)  || 0;
-  const fixed          = parseFloat(fixedCosts)    || 0;
-  const grocery        = parseFloat(groceries)     || 0;
-  const streamingVal   = parseFloat(streaming)     || 0;   // monthly input
-  const coffeeVal      = parseFloat(coffeeSpend)   || 0;
-  const takeawayVal    = parseFloat(takeaway)      || 0;
-  const entertainVal   = parseFloat(entertainment) || 0;   // monthly input
+  // ── Derived weekly figures ────────────────────────────────────────────────────
+  const incomeVal   = safeNum(incomeRaw);
+  const monthlyIncome: number =
+    incomeFreq === "weekly"      ? incomeVal * 4.3
+    : incomeFreq === "fortnightly" ? incomeVal * 2.15
+    : incomeVal;
+  const weeklyIncome = monthlyIncome / 4.3;
 
-  // ── Two-tier calculation ──────────────────────────────────────────────────
+  const w_mortgage  = safeNum(mortgageRent)  / 4.3;
+  const w_bills     = safeNum(billsLoans)    / 4.3;
+  const w_subs      = safeNum(subscriptions) / 4.3;
+  const w_groceries = safeNum(groceries);
+  const w_coffee    = safeNum(coffeeSpend);
+  const w_takeaway  = safeNum(takeaway);
+  const w_entertain = safeNum(entertainment) / 4.3;
+
+  // ── Two-tier breathing room ───────────────────────────────────────────────────
   const committedBreathingRoom =
-    income - fixed - grocery - (streamingVal / 4.3);
-
-  const hasLifestyleInput = coffeeVal > 0 || takeawayVal > 0 || entertainVal > 0;
+    weeklyIncome - w_mortgage - w_bills - w_subs - w_groceries;
 
   const finalBreathingRoom =
-    committedBreathingRoom - coffeeVal - takeawayVal - (entertainVal / 4.3);
+    committedBreathingRoom - w_coffee - w_takeaway - w_entertain;
 
-  const showCard1 = weeklyIncome !== "" || fixedCosts !== "" || groceries !== "" || streaming !== "";
-  const showCard2 = showCard1 && hasLifestyleInput;
+  const hasAnyCommitted =
+    incomeRaw !== "" || mortgageRent !== "" || billsLoans !== "" ||
+    subscriptions !== "" || groceries !== "";
 
-  // ── Save ──────────────────────────────────────────────────────────────────
+  const hasAnyLifestyle =
+    coffeeSpend !== "" || takeaway !== "" || entertainment !== "";
+
+  const showCard1 = hasAnyCommitted;
+  const showCard2 = showCard1 && hasAnyLifestyle;
+
+  // ── Save ──────────────────────────────────────────────────────────────────────
   const handleSave = async () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     setSaving(true);
     saveMoneySetup(
       {
-        weeklyIncome:    income,
-        fixedWeeklyCosts: fixed,
-        groceriesWeekly: grocery,
-        eatingOutWeekly: takeawayVal,
-        otherWeeklySpend: hasLifestyleInput
-          ? coffeeVal + takeawayVal + entertainVal / 4.3
+        weeklyIncome,
+        fixedWeeklyCosts: w_mortgage + w_bills,
+        groceriesWeekly:  w_groceries,
+        eatingOutWeekly:  w_takeaway,
+        otherWeeklySpend: hasAnyLifestyle
+          ? w_coffee + w_takeaway + w_entertain
           : undefined,
       },
       {
-        streaming:    streamingVal,
-        coffee:       coffeeVal,
-        entertainment: entertainVal,
-        takeaway:     takeawayVal,
+        streaming:    safeNum(subscriptions),
+        coffee:       w_coffee,
+        entertainment: safeNum(entertainment),
+        takeaway:     w_takeaway,
       },
       selectedGoal,
     );
@@ -182,7 +304,7 @@ export default function MoneySetupScreen() {
     }, 400);
   };
 
-  const canSave = weeklyIncome !== "" || groceries !== "";
+  const canSave = incomeRaw !== "" || groceries !== "";
 
   const paddingTop    = Platform.OS === "web" ? 60 : insets.top;
   const paddingBottom = Platform.OS === "web" ? 40 : insets.bottom + 24;
@@ -200,6 +322,7 @@ export default function MoneySetupScreen() {
       style={{ flex: 1, backgroundColor: C.background }}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
+      {/* Header */}
       <View style={[styles.header, { paddingTop, borderBottomColor: "rgba(37,133,127,0.18)" }]}>
         <TouchableOpacity
           onPress={() => router.canGoBack() ? router.back() : router.navigate("/(tabs)/home")}
@@ -231,37 +354,66 @@ export default function MoneySetupScreen() {
         {/* ── Section 1: Committed spend ── */}
         <Text style={styles.sectionLabel}>COMMITTED SPEND</Text>
         <View style={[styles.setupCard, { borderColor: "rgba(37,133,127,0.28)" }]}>
+
+          {/* Income — frequency selector replaces pill */}
+          <View style={styles.fieldBlock}>
+            <View style={styles.fieldLabelRow}>
+              <Text style={[styles.fieldLabel, { color: C.primary }]}>Monthly income</Text>
+            </View>
+            <View style={[styles.inputRow, { borderColor: C.inputBorder, backgroundColor: C.card }]}>
+              <Text style={[styles.inputPrefix, { color: C.textSecondary }]}>{currencySymbol}</Text>
+              <TextInput
+                value={incomeRaw}
+                onChangeText={setIncomeRaw}
+                keyboardType="numeric"
+                placeholder="0"
+                placeholderTextColor={C.textMuted}
+                style={[styles.inputField, { color: C.text }]}
+                returnKeyType="done"
+              />
+            </View>
+            <FreqSelector value={incomeFreq} onChange={setIncomeFreq} />
+          </View>
+
+          <View style={[styles.divider, { backgroundColor: C.border }]} />
+
           <MoneyField
-            label="Weekly income"
-            value={weeklyIncome}
-            onChange={setWeeklyIncome}
+            label="Mortgage or rent"
+            sublabel="Your biggest fixed cost."
+            value={mortgageRent}
+            onChange={setMortgageRent}
             currencySymbol={currencySymbol}
+            frequencyVariant="monthly"
           />
           <View style={[styles.divider, { backgroundColor: C.border }]} />
+
           <MoneyField
-            label="Fixed weekly costs"
-            helper="Rent, mortgage, bills, loans — the usual."
-            value={fixedCosts}
-            onChange={setFixedCosts}
+            label="Bills, loans & regular payments"
+            sublabel="Electricity, rates, loan repayments, insurance — monthly total."
+            value={billsLoans}
+            onChange={setBillsLoans}
             currencySymbol={currencySymbol}
+            frequencyVariant="monthly"
           />
           <View style={[styles.divider, { backgroundColor: C.border }]} />
+
           <MoneyField
-            label="Groceries (rough weekly spend)"
-            helper="Includes the weekly shop — we'll estimate the dinner share from there."
+            label="Streaming & subscriptions"
+            sublabel="Netflix, Spotify, apps, memberships."
+            value={subscriptions}
+            onChange={setSubscriptions}
+            currencySymbol={currencySymbol}
+            frequencyVariant="monthly"
+          />
+          <View style={[styles.divider, { backgroundColor: C.border }]} />
+
+          <MoneyField
+            label="Groceries"
+            sublabel="The weekly shop — we'll estimate the dinner share from there."
             value={groceries}
             onChange={setGroceries}
             currencySymbol={currencySymbol}
-          />
-          <View style={[styles.divider, { backgroundColor: C.border }]} />
-          <MoneyField
-            label="Streaming & subscriptions"
-            helper="We'll work out your weekly share."
-            value={streaming}
-            onChange={setStreaming}
-            optional
-            currencySymbol={currencySymbol}
-            suffix="/ month"
+            frequencyVariant="weekly"
           />
         </View>
 
@@ -278,72 +430,53 @@ export default function MoneySetupScreen() {
           <Text style={[styles.lifestyleSubtitle, { color: C.textMuted }]}>
             Adding these gives you a more realistic picture of your week.
           </Text>
+
           <MoneyField
             label="Coffee & café"
-            helper="Coffee runs, snacks, extra café spend"
+            sublabel="Coffee runs, snacks, extra café spend."
             value={coffeeSpend}
             onChange={setCoffeeSpend}
             optional
             currencySymbol={currencySymbol}
+            frequencyVariant="weekly"
           />
           <View style={[styles.divider, { backgroundColor: C.border }]} />
+
           <MoneyField
             label="Takeaway"
-            helper="Delivery, drive-through, kebab runs"
+            sublabel="Delivery, drive-through, kebab runs."
             value={takeaway}
             onChange={setTakeaway}
             optional
             currencySymbol={currencySymbol}
+            frequencyVariant="weekly"
           />
           <View style={[styles.divider, { backgroundColor: C.border }]} />
+
           <MoneyField
             label="Entertainment"
-            helper="We'll work out your weekly share."
+            sublabel="Movies, drinks, weekend plans."
             value={entertainment}
             onChange={setEntertainment}
             optional
             currencySymbol={currencySymbol}
-            suffix="/ month"
+            frequencyVariant="monthly"
           />
         </View>
 
         {/* ── Card 1: Committed breathing room ── */}
-        {showCard1 && (
-          <View style={[styles.breathingCard, { backgroundColor: TEAL_TINT, borderColor: TEAL }]}>
-            <Text style={styles.breathingCardLabel}>AFTER COMMITTED SPEND</Text>
-            {committedBreathingRoom >= 0 ? (
-              <Text style={[styles.breathingCardAmount, { color: TEAL }]}>
-                {currencySymbol}{Math.round(committedBreathingRoom)} left before lifestyle spend
-              </Text>
-            ) : (
-              <Text style={[styles.breathingCardAmount, { color: RED }]}>
-                −{currencySymbol}{Math.round(Math.abs(committedBreathingRoom))} over before lifestyle spend
-              </Text>
-            )}
-            <Text style={styles.breathingCardNote}>
-              Income minus fixed costs, groceries and subscriptions.
-            </Text>
-          </View>
-        )}
+        {showCard1 && <BreathingCard
+          variant="committed"
+          weeklyAmount={committedBreathingRoom}
+          currencySymbol={currencySymbol}
+        />}
 
         {/* ── Card 2: After lifestyle spend ── */}
-        {showCard2 && (
-          <View style={[styles.breathingCard, { backgroundColor: GOLD_TINT, borderColor: GOLD }]}>
-            <Text style={[styles.breathingCardLabel, { color: GOLD }]}>AFTER LIFESTYLE SPEND</Text>
-            {finalBreathingRoom >= 0 ? (
-              <Text style={[styles.breathingCardAmount, { color: TEAL }]}>
-                {currencySymbol}{Math.round(finalBreathingRoom)} breathing room
-              </Text>
-            ) : (
-              <Text style={[styles.breathingCardAmount, { color: RED }]}>
-                −{currencySymbol}{Math.round(Math.abs(finalBreathingRoom))} over
-              </Text>
-            )}
-            <Text style={styles.breathingCardNote}>
-              This is what's left after everything — including coffee and takeaways.
-            </Text>
-          </View>
-        )}
+        {showCard2 && <BreathingCard
+          variant="lifestyle"
+          weeklyAmount={finalBreathingRoom}
+          currencySymbol={currencySymbol}
+        />}
 
         {/* ── Savings goal ── */}
         <View style={[styles.goalCard, { borderColor: "rgba(37,133,127,0.20)" }]}>
@@ -391,6 +524,7 @@ export default function MoneySetupScreen() {
         </Text>
       </ScrollView>
 
+      {/* Footer CTA */}
       <View
         style={[
           styles.footer,
@@ -441,50 +575,98 @@ export default function MoneySetupScreen() {
   );
 }
 
+// ── BreathingCard ─────────────────────────────────────────────────────────────
+function BreathingCard({
+  variant,
+  weeklyAmount,
+  currencySymbol,
+}: {
+  variant: "committed" | "lifestyle";
+  weeklyAmount: number;
+  currencySymbol: string;
+}) {
+  const isCommitted = variant === "committed";
+  const isNegative  = weeklyAmount < 0;
+  const absWeekly   = Math.abs(Math.round(weeklyAmount));
+  const monthlyEq   = roundToFive(Math.abs(weeklyAmount) * 4.3);
+
+  const label = isCommitted ? "AFTER COMMITTED SPEND" : "AFTER LIFESTYLE SPEND";
+
+  let amountText: string;
+  if (isNegative) {
+    amountText = `−${currencySymbol}${absWeekly} over${isCommitted ? " before lifestyle spend" : ""}`;
+  } else {
+    amountText = isCommitted
+      ? `${currencySymbol}${absWeekly} left before lifestyle spend`
+      : `${currencySymbol}${absWeekly} breathing room`;
+  }
+
+  return (
+    <View
+      style={[
+        cardStyles.card,
+        {
+          backgroundColor: isCommitted ? TEAL_TINT : GOLD_TINT,
+          borderColor:      isCommitted ? TEAL      : GOLD,
+        },
+      ]}
+    >
+      <Text style={[cardStyles.label, { color: isCommitted ? TEAL : GOLD_TEXT }]}>
+        {label}
+      </Text>
+      <Text style={[cardStyles.amount, { color: isNegative ? RED : TEAL }]}>
+        {amountText}
+      </Text>
+      {!isNegative && (
+        <Text style={cardStyles.monthly}>
+          ~{currencySymbol}{monthlyEq}/month
+        </Text>
+      )}
+      <Text style={cardStyles.note}>
+        {isCommitted
+          ? "Income minus mortgage, bills, subscriptions and groceries."
+          : "This is what's left after everything — including coffee and takeaways."}
+      </Text>
+    </View>
+  );
+}
+
+const cardStyles = StyleSheet.create({
+  card:    { borderRadius: 16, borderWidth: 1.5, padding: 18, gap: 4 },
+  label:   { fontSize: 11, fontFamily: "Inter_600SemiBold", letterSpacing: 1, textTransform: "uppercase", marginBottom: 2 },
+  amount:  { fontSize: 26, fontFamily: "Inter_700Bold", lineHeight: 30 },
+  monthly: { fontSize: 12, fontFamily: "Inter_400Regular", color: "#999", fontStyle: "italic", marginTop: 2 },
+  note:    { fontSize: 12, fontFamily: "Inter_400Regular", color: "#888", lineHeight: 17, marginTop: 4 },
+});
+
+// ── Styles ────────────────────────────────────────────────────────────────────
 const styles = StyleSheet.create({
   header: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    gap: 14,
-    paddingHorizontal: 24,
-    paddingBottom: 20,
-    borderBottomWidth: 1,
+    flexDirection: "row", alignItems: "flex-start", gap: 14,
+    paddingHorizontal: 24, paddingBottom: 20, borderBottomWidth: 1,
   },
   backBtn: {
     width: 40, height: 40, borderRadius: 12,
     alignItems: "center", justifyContent: "center", marginTop: 2,
   },
   closeBtn: {
-    width: 32, height: 32,
-    alignItems: "center", justifyContent: "center", marginTop: 2,
+    width: 32, height: 32, alignItems: "center", justifyContent: "center", marginTop: 2,
   },
-  pageTitle: { fontSize: 22, fontFamily: "Inter_700Bold", lineHeight: 28 },
+  pageTitle:  { fontSize: 22, fontFamily: "Inter_700Bold", lineHeight: 28 },
   pageHelper: { fontSize: 14, fontFamily: "Inter_400Regular", lineHeight: 20, marginTop: 3 },
 
   container: { paddingHorizontal: 24, paddingTop: 20, gap: 12 },
 
   sectionLabel: {
-    fontSize: 11,
-    fontFamily: "Inter_600SemiBold",
-    letterSpacing: 1.1,
-    color: "#999",
-    marginBottom: -4,
-    paddingLeft: 2,
+    fontSize: 11, fontFamily: "Inter_600SemiBold",
+    letterSpacing: 1.1, color: "#999", marginBottom: -4, paddingLeft: 2,
   },
 
   setupCard: {
-    borderRadius: 18,
-    borderWidth: 1.5,
-    overflow: "hidden",
+    borderRadius: 18, borderWidth: 1.5, overflow: "hidden",
     ...Platform.select({
       web: { boxShadow: "0px 2px 12px rgba(0,0,0,0.07)" },
-      default: {
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.07,
-        shadowRadius: 8,
-        elevation: 2,
-      },
+      default: { shadowColor: "#000", shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.07, shadowRadius: 8, elevation: 2 },
     }),
   },
 
@@ -502,88 +684,43 @@ const styles = StyleSheet.create({
   },
   inputPrefix: { fontSize: 16, fontFamily: "Inter_600SemiBold", marginRight: 4 },
   inputField:  { flex: 1, fontSize: 18, fontFamily: "Inter_600SemiBold", height: 48 },
-  inputSuffix: { fontSize: 13, fontFamily: "Inter_400Regular", marginLeft: 4 },
 
   lifestyleCard: {
-    borderRadius: 18,
-    borderWidth: 1.5,
-    overflow: "hidden",
-    backgroundColor: "#fff",
+    borderRadius: 18, borderWidth: 1.5, overflow: "hidden", backgroundColor: "#fff",
     ...Platform.select({
       web: { boxShadow: "0px 2px 8px rgba(0,0,0,0.05)" },
-      default: {
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.05,
-        shadowRadius: 6,
-        elevation: 1,
-      },
+      default: { shadowColor: "#000", shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 6, elevation: 1 },
     }),
   },
   lifestyleHeader: {
     flexDirection: "row", alignItems: "center", gap: 8,
     paddingHorizontal: 18, paddingTop: 16, paddingBottom: 6,
   },
-  lifestyleTitle: { fontSize: 15, fontFamily: "Inter_600SemiBold", flex: 1 },
-  lifestyleOptionalBadge: {
-    fontSize: 11, fontFamily: "Inter_400Regular",
-    borderRadius: 8, paddingHorizontal: 8, paddingVertical: 2, overflow: "hidden",
-  },
-  lifestyleSubtitle: {
-    fontSize: 12, fontFamily: "Inter_400Regular", lineHeight: 17,
-    paddingHorizontal: 18, paddingBottom: 8,
-  },
+  lifestyleTitle:         { fontSize: 15, fontFamily: "Inter_600SemiBold", flex: 1 },
+  lifestyleOptionalBadge: { fontSize: 11, fontFamily: "Inter_400Regular", borderRadius: 8, paddingHorizontal: 8, paddingVertical: 2, overflow: "hidden" },
+  lifestyleSubtitle:      { fontSize: 12, fontFamily: "Inter_400Regular", lineHeight: 17, paddingHorizontal: 18, paddingBottom: 8 },
 
-  // Two-tier breathing room cards
-  breathingCard: {
-    borderRadius: 16, borderWidth: 1.5, padding: 18, gap: 6,
-  },
-  breathingCardLabel: {
-    fontSize: 11, fontFamily: "Inter_600SemiBold",
-    letterSpacing: 1, textTransform: "uppercase", color: TEAL,
-    marginBottom: 2,
-  },
-  breathingCardAmount: {
-    fontSize: 26, fontFamily: "Inter_700Bold", lineHeight: 30,
-  },
-  breathingCardNote: {
-    fontSize: 12, fontFamily: "Inter_400Regular", color: "#888", lineHeight: 17, marginTop: 2,
-  },
-
-  goalCard: {
-    borderRadius: 18, borderWidth: 1.5, padding: 20, gap: 14, backgroundColor: "#fff",
-  },
+  goalCard:    { borderRadius: 18, borderWidth: 1.5, padding: 20, gap: 14, backgroundColor: "#fff" },
   goalHeading: { fontSize: 16, fontFamily: "Inter_600SemiBold", lineHeight: 22 },
   goalGrid:    { flexDirection: "row", flexWrap: "wrap", gap: 10 },
   goalChip: {
-    flexBasis: "47%", flexGrow: 1,
-    flexDirection: "row", alignItems: "center", gap: 8,
-    paddingVertical: 14, paddingHorizontal: 14,
-    borderRadius: 14, borderWidth: 1.5,
+    flexBasis: "47%", flexGrow: 1, flexDirection: "row", alignItems: "center", gap: 8,
+    paddingVertical: 14, paddingHorizontal: 14, borderRadius: 14, borderWidth: 1.5,
   },
   goalEmoji: { fontSize: 20 },
   goalLabel: { fontSize: 14, fontFamily: "Inter_600SemiBold", flex: 1 },
-  goalSkip: {
-    fontSize: 13, fontFamily: "Inter_400Regular",
-    textAlign: "center", textDecorationLine: "underline",
-  },
+  goalSkip:  { fontSize: 13, fontFamily: "Inter_400Regular", textAlign: "center", textDecorationLine: "underline" },
 
-  footNote: {
-    fontSize: 12, fontFamily: "Inter_400Regular", textAlign: "center", lineHeight: 18,
-  },
+  footNote: { fontSize: 12, fontFamily: "Inter_400Regular", textAlign: "center", lineHeight: 18 },
 
-  footer: { paddingHorizontal: 24, paddingTop: 16, borderTopWidth: 1, gap: 8 },
-  disabledHint: {
-    fontSize: 12.5, fontFamily: "Inter_400Regular", textAlign: "center", marginBottom: 8,
-  },
+  footer:       { paddingHorizontal: 24, paddingTop: 16, borderTopWidth: 1, gap: 8 },
+  disabledHint: { fontSize: 12.5, fontFamily: "Inter_400Regular", textAlign: "center", marginBottom: 8 },
   primaryCta: {
     flexDirection: "row", alignItems: "center", justifyContent: "center",
     gap: 10, paddingVertical: 18, borderRadius: 18,
-    shadowColor: "#F0AC2E",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.32, shadowRadius: 16, elevation: 6,
+    shadowColor: "#F0AC2E", shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.32, shadowRadius: 16, elevation: 6,
   },
   primaryCtaText: { fontSize: 17, fontFamily: "Inter_700Bold", color: "#fff" },
-  skipBtn:  { alignItems: "center", paddingVertical: 10 },
-  skipText: { fontSize: 13, fontFamily: "Inter_400Regular" },
+  skipBtn:        { alignItems: "center", paddingVertical: 10 },
+  skipText:       { fontSize: 13, fontFamily: "Inter_400Regular" },
 });
