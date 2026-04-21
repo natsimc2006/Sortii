@@ -240,6 +240,7 @@ function WeeklySnapshotSection({
   fmt,
   appliedSavingsTotal,
   defaultOpen,
+  collapsedSummaryLine,
 }: {
   money: NonNullable<ReturnType<typeof useUserWeek>["money"]>;
   result: MoneyPageResult;
@@ -249,6 +250,7 @@ function WeeklySnapshotSection({
   fmt: (n: number) => string;
   appliedSavingsTotal: number;
   defaultOpen?: boolean;
+  collapsedSummaryLine?: string;
 }) {
   const [open, setOpen] = useState(defaultOpen ?? false);
   const { weeklyIncome, fixedWeeklyCosts, groceriesWeekly, eatingOutWeekly, otherWeeklySpend } = money;
@@ -275,7 +277,11 @@ function WeeklySnapshotSection({
         style={styles.collapseHeader}
         activeOpacity={0.7}
       >
-        <Text style={styles.collapseTitle}>The quick version</Text>
+        {!open && collapsedSummaryLine ? (
+          <Text style={styles.snapshotSummaryLine} numberOfLines={1}>{collapsedSummaryLine}</Text>
+        ) : (
+          <Text style={styles.collapseTitle}>The quick version</Text>
+        )}
         <Feather name={open ? "chevron-up" : "chevron-down"} size={18} color={C.textMuted} />
       </TouchableOpacity>
 
@@ -426,11 +432,13 @@ function WinRow({ s, fmt }: { s: MoneySuggestion; fmt: (n: number) => string }) 
 function QuickWinsSection({
   suggestions,
   fmt,
+  defaultOpen,
 }: {
   suggestions: MoneySuggestion[];
   fmt: (n: number) => string;
+  defaultOpen?: boolean;
 }) {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(defaultOpen ?? false);
   const tips = suggestions.slice(0, 3);
   if (tips.length === 0) return null;
 
@@ -517,6 +525,33 @@ function SavingsGoalCard({
       <TouchableOpacity onPress={onUpdate} style={styles.updateGoalLink}>
         <Text style={styles.updateGoalLinkText}>Update goal</Text>
       </TouchableOpacity>
+    </View>
+  );
+}
+
+// ─── Meal Plan Saving Card ───────────────────────────────────
+
+function MealPlanSavingCard({
+  mealPlanSaving,
+  numMeals,
+  fmt,
+  appendLine,
+}: {
+  mealPlanSaving: number;
+  numMeals: number;
+  fmt: (n: number) => string;
+  appendLine?: string;
+}) {
+  if (mealPlanSaving <= 0 || !isFinite(mealPlanSaving)) return null;
+  return (
+    <View style={styles.mealSavingCard}>
+      <Text style={styles.mealSavingEyebrow}>THIS WEEK'S DINNER SAVING</Text>
+      <Text style={styles.mealSavingBig}>~{fmt(mealPlanSaving)}</Text>
+      <Text style={styles.mealSavingDesc}>Cooking this plan vs. your usual spend.</Text>
+      <Text style={styles.mealSavingCount}>{numMeals} dinners sorted this week.</Text>
+      {appendLine ? (
+        <Text style={styles.mealSavingAppend}>{appendLine}</Text>
+      ) : null}
     </View>
   );
 }
@@ -859,33 +894,101 @@ export default function MoneyScreen() {
       ) : !hasMoneySetup ? null : moneyTabState === "calm" ? (
         /* ── STATE 1 — Calm ──────────────────────────────────── */
         <>
-          <View style={styles.calmCard}>
-            <View style={styles.calmCheck}>
+          {/* 1. Calm signal — left-aligned */}
+          <View style={styles.calmSignal}>
+            <View style={styles.calmCheckLeft}>
               <Text style={styles.calmCheckText}>✓</Text>
             </View>
-            <Text style={styles.calmHeading}>This week looks fine.</Text>
-            <Text style={styles.calmSubtext}>
-              Nothing unexpected coming. Dinner's already covered.
-            </Text>
-            {adjustedBreathingRoom > 0 && (
-              <Text style={styles.calmBreathing}>
-                ~{formatMoneyRound(adjustedBreathingRoom)} breathing room this week.
-              </Text>
-            )}
+            <View style={styles.calmSignalText}>
+              <Text style={styles.calmHeading}>This week looks fine.</Text>
+              <Text style={styles.calmSubtext}>Nothing unexpected coming.</Text>
+              {adjustedBreathingRoom > 0 && (
+                <Text style={styles.calmBreathing}>
+                  ~{formatMoneyRound(adjustedBreathingRoom)} breathing room this week.
+                </Text>
+              )}
+              {adjustedBreathingRoom > 0 && (() => {
+                const monthly = Math.round(adjustedBreathingRoom * 4.3 / 5) * 5;
+                return monthly > 0 ? (
+                  <Text style={styles.calmMonthly}>
+                    ~{formatMoneyRound(monthly)}/month
+                  </Text>
+                ) : null;
+              })()}
+            </View>
           </View>
 
-          {/* "See full picture →" expand */}
+          {/* Gap */}
+          <View style={{ height: 4 }} />
+
+          {/* 2. Meal plan saving card */}
+          <MealPlanSavingCard
+            mealPlanSaving={mealPlanSaving}
+            numMeals={filledMeals.length}
+            fmt={formatMoneyRound}
+          />
+
+          {/* 3. Quick version — collapsed to single line */}
+          {money && (() => {
+            const remaining = result.remaining + appliedSavingsTotal;
+            const summaryLine = `Income ${formatMoneyRound(money.weeklyIncome)} · Fixed ${formatMoneyRound(money.fixedWeeklyCosts)} · Left ~${formatMoneyRound(Math.max(0, remaining))}`;
+            return (
+              <WeeklySnapshotSection
+                money={money}
+                result={result}
+                lifestyleSpend={lifestyleSpend}
+                dinnerPlanCost={dinnerPlanCost}
+                hasMealsSetup={hasMealsSetup}
+                fmt={formatMoneyRound}
+                appliedSavingsTotal={appliedSavingsTotal}
+                defaultOpen={false}
+                collapsedSummaryLine={summaryLine}
+              />
+            );
+          })()}
+
+          {/* 4. Quick wins — expanded by default in State 1 */}
+          <QuickWinsSection suggestions={result.suggestions} fmt={formatMoneyRound} defaultOpen={true} />
+
+          {/* 5. Savings goal card or quiet prompt */}
+          {savingsGoal ? (
+            <View style={{ marginTop: 0, marginBottom: 0 }}>
+              <SavingsGoalCard
+                goal={savingsGoal}
+                weeklyDinnerSaving={weeklySortiiSaving}
+                fmt={formatMoneyRound}
+                onUpdate={goToGoalSetup}
+              />
+            </View>
+          ) : (
+            <View style={styles.quietGoalPrompt}>
+              <Text style={styles.quietGoalPromptText}>
+                Got something you're saving for?{" "}
+                <Text style={styles.quietGoalPromptLink} onPress={goToGoalSetup}>Set a goal →</Text>
+              </Text>
+            </View>
+          )}
+
+          {/* 6. Full breakdown → */}
+          <View style={{ height: 8 }} />
           <TouchableOpacity
             onPress={() => setShowFullPicture((v) => !v)}
             activeOpacity={0.7}
             style={styles.fullPictureToggle}
           >
             <Text style={styles.fullPictureLink}>
-              {showFullPicture ? "Hide details ↑" : "See the full picture →"}
+              {showFullPicture ? "Full breakdown ↑" : "Full breakdown →"}
             </Text>
           </TouchableOpacity>
 
-          {showFullPicture && fullPictureSection}
+          {showFullPicture && (
+            <View style={styles.updateCtaWrap}>
+              <Text style={styles.updateCtaLabel}>Your numbers, your call. Update anytime.</Text>
+              <TouchableOpacity onPress={goToMoneySetup} activeOpacity={0.85} style={styles.updateCtaBtn}>
+                <Text style={styles.updateCtaBtnText}>Update my numbers</Text>
+              </TouchableOpacity>
+            </View>
+          )}
         </>
 
       ) : moneyTabState === "tight" ? (
@@ -909,12 +1012,6 @@ export default function MoneyScreen() {
 
             <View style={styles.tightDivider} />
 
-            {mealPlanSaving > 0 && (
-              <Text style={styles.tightMealLine}>
-                Dinner plan saves ~{formatMoneyRound(mealPlanSaving)} vs eating out. That helps.
-              </Text>
-            )}
-
             <Text style={[
               styles.tightBreathing,
               adjustedBreathingRoom < 20 && { color: GOLD },
@@ -922,6 +1019,12 @@ export default function MoneyScreen() {
               Breathing room this week: ~{formatMoneyRound(Math.max(0, adjustedBreathingRoom))}
             </Text>
           </View>
+
+          <MealPlanSavingCard
+            mealPlanSaving={mealPlanSaving}
+            numMeals={filledMeals.length}
+            fmt={formatMoneyRound}
+          />
 
           {fullPictureSection}
         </>
@@ -950,12 +1053,6 @@ export default function MoneyScreen() {
 
             <View style={styles.tightDivider} />
 
-            {hasMealsSetup && (
-              <Text style={styles.stretchedReassurance}>
-                Dinner is already sorted — that's one less thing.
-              </Text>
-            )}
-
             <Text style={styles.stretchedBreathing}>
               Breathing room:{" "}
               <Text style={{ color: RED }}>
@@ -964,6 +1061,13 @@ export default function MoneyScreen() {
               {" "}— tighter than usual.
             </Text>
           </View>
+
+          <MealPlanSavingCard
+            mealPlanSaving={mealPlanSaving}
+            numMeals={filledMeals.length}
+            fmt={formatMoneyRound}
+            appendLine="That's one less thing."
+          />
 
           {/* Overwhelm mode entry point (Phase 4) */}
           <TouchableOpacity
@@ -1467,32 +1571,37 @@ const styles = StyleSheet.create({
   },
 
   // ── Phase 3 — STATE 1: Calm ──────────────────────────────────
-  calmCard: {
-    alignItems: "center",
-    paddingVertical: 36,
-    paddingHorizontal: 20,
-    gap: 10,
+  calmSignal: {
+    flexDirection: "row", alignItems: "flex-start", gap: 14,
+    paddingVertical: 8,
   },
-  calmCheck: {
-    width: 56, height: 56, borderRadius: 28,
+  calmCheckLeft: {
+    width: 44, height: 44, borderRadius: 22,
     backgroundColor: TEAL_TINT,
     alignItems: "center", justifyContent: "center",
-    marginBottom: 4,
+    marginTop: 2, flexShrink: 0,
+  },
+  calmSignalText: {
+    flex: 1, gap: 4,
   },
   calmCheckText: {
-    fontSize: 26, color: TEAL, fontFamily: "Inter_700Bold",
+    fontSize: 20, color: TEAL, fontFamily: "Inter_700Bold",
   },
   calmHeading: {
-    fontSize: 20, fontFamily: "Manrope_700Bold",
-    color: "#2B2B2B", textAlign: "center",
+    fontSize: 22, fontFamily: "Manrope_700Bold",
+    color: "#2B2B2B",
   },
   calmSubtext: {
     fontSize: 14, fontFamily: "Inter_400Regular",
-    color: "#888", textAlign: "center", lineHeight: 20,
+    color: "#888", lineHeight: 20,
   },
   calmBreathing: {
-    fontSize: 13, fontFamily: "Inter_600SemiBold",
-    color: TEAL, textAlign: "center", marginTop: 4,
+    fontSize: 15, fontFamily: "Inter_600SemiBold",
+    color: TEAL, marginTop: 2,
+  },
+  calmMonthly: {
+    fontSize: 12, fontFamily: "Inter_400Regular",
+    color: "#AAA", fontStyle: "italic",
   },
   fullPictureToggle: {
     alignItems: "center", paddingVertical: 4,
@@ -1500,6 +1609,54 @@ const styles = StyleSheet.create({
   fullPictureLink: {
     fontSize: 14, fontFamily: "Inter_400Regular",
     color: "#AAA",
+  },
+
+  // Meal plan saving card
+  mealSavingCard: {
+    backgroundColor: TEAL_TINT,
+    borderRadius: 12,
+    padding: 16,
+    gap: 4,
+  },
+  mealSavingEyebrow: {
+    fontSize: 10, fontFamily: "Inter_600SemiBold",
+    color: TEAL, textTransform: "uppercase", letterSpacing: 0.8,
+    marginBottom: 2,
+  },
+  mealSavingBig: {
+    fontSize: 28, fontFamily: "Manrope_700Bold",
+    color: TEAL, lineHeight: 34,
+  },
+  mealSavingDesc: {
+    fontSize: 13, fontFamily: "Inter_400Regular",
+    color: "#3A6E6A", lineHeight: 18,
+  },
+  mealSavingCount: {
+    fontSize: 13, fontFamily: "Inter_600SemiBold",
+    color: TEAL, lineHeight: 18, marginTop: 2,
+  },
+  mealSavingAppend: {
+    fontSize: 13, fontFamily: "Inter_400Regular",
+    color: "#888", fontStyle: "italic", lineHeight: 18, marginTop: 4,
+  },
+
+  // Snapshot collapsed summary line
+  snapshotSummaryLine: {
+    fontSize: 13, fontFamily: "Inter_500Medium",
+    color: "#555", flex: 1,
+  },
+
+  // Quiet goal prompt (State 1, no savings goal set)
+  quietGoalPrompt: {
+    paddingVertical: 6,
+  },
+  quietGoalPromptText: {
+    fontSize: 13, fontFamily: "Inter_400Regular",
+    color: "#888", lineHeight: 18,
+  },
+  quietGoalPromptLink: {
+    fontSize: 13, fontFamily: "Inter_500Medium",
+    color: TEAL,
   },
 
   // ── Phase 3 — STATE 2: Tight ─────────────────────────────────

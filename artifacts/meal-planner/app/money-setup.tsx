@@ -358,7 +358,7 @@ export default function MoneySetupScreen() {
           {/* Income — frequency selector replaces pill */}
           <View style={styles.fieldBlock}>
             <View style={styles.fieldLabelRow}>
-              <Text style={[styles.fieldLabel, { color: C.primary }]}>Monthly income</Text>
+              <Text style={[styles.fieldLabel, { color: C.primary }]}>Income</Text>
             </View>
             <View style={[styles.inputRow, { borderColor: C.inputBorder, backgroundColor: C.card }]}>
               <Text style={[styles.inputPrefix, { color: C.textSecondary }]}>{currencySymbol}</Text>

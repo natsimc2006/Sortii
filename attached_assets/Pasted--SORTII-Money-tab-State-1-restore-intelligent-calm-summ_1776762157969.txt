@@ -1,0 +1,146 @@
+## SORTII — Money tab State 1: restore intelligent calm summary
+
+State 1 (calm week) is currently too minimal. A checkmark and 
+a single number does not give users enough to trust the app 
+understands their situation. Restore a calm but informative 
+summary layout. Do not restore the old dashboard — maintain 
+the calm tone, but show the intelligent context.
+
+---
+
+### FIX 1 — Income field label
+
+On the budget setup screen, change the label "Monthly income" 
+to simply "Income". The frequency selector already communicates 
+the period. The label does not need to repeat it.
+
+---
+
+### FIX 2 — State 1 layout: calm briefing, not empty screen
+
+Replace the current State 1 layout (checkmark + one line + 
+"See the full picture") with the following structure.
+State 1 still only renders when adjustedBreathingRoom > 50
+and no one-off bills or appointment costs are due this week.
+
+Layout (top to bottom):
+
+**1. Calm signal — keep this, adjust sizing**
+- Teal checkmark circle icon (existing) — reduce size slightly, 
+  move to left-align rather than centred
+- Heading: "This week looks fine." — left-aligned, 22px bold
+- Subtext: "Nothing unexpected coming." — grey, 14px
+- Breathing room line: "~$[adjustedBreathingRoom] breathing 
+  room this week." — teal, 15px
+- Small grey line below (12px, italic):
+  "~$[adjustedBreathingRoom × 4.3 rounded to nearest $5]/month"
+
+Gap: 20px
+
+**2. Meal plan saving card — always visible in all states**
+This card must appear in State 1, State 2, and State 3.
+It is the core proof that Sortii is doing something intelligent.
+
+Card style: teal tint background (#E6F3F0), no border, 
+border radius 12px, padding 16px
+
+Layout inside card:
+- Top line: "THIS WEEK'S DINNER SAVING" — 10px, uppercase, 
+  teal (#2A8F88)
+- Large figure: "~$[mealPlanSaving]" — 28px, bold, teal
+- Below: "Cooking this plan vs. your usual spend." — 13px, grey
+- Bottom line: "[N] dinners sorted this week." — 13px, teal
+
+mealPlanSaving = estimatedEatingOutCost - dinnerPlanCost
+If mealPlanSaving <= 0 or cannot be calculated: 
+suppress this card entirely. Never show ~$0.
+
+Gap: 16px
+
+**3. Quick version — visible by default, collapsible**
+
+Show the budget snapshot collapsed to a single summary line 
+by default, with a tap-to-expand chevron:
+
+Collapsed (default):
+Single line: "Income $[X] · Fixed $[Y] · Left ~$[Z]"
+Right side: chevron ↓
+Style: white card, #E6E1D7 border, 12px border radius
+
+Expanded (on tap):
+Full line item breakdown (existing quick version content):
+Income / Fixed costs / Groceries / Eating out / Other / 
+Remaining — with Remaining in teal
+Chevron changes to ↑
+
+---
+
+**4. Quick wins — visible by default, collapsible**
+
+Show "A few quick wins" in its existing collapsible format 
+but default to VISIBLE (expanded) in State 1, not collapsed.
+In State 1 these are reassuring, not alarming.
+Max 3 tips. Existing content and styling.
+
+If no tips are available: suppress section entirely.
+
+Gap: 16px
+
+**5. Savings goal card — full visibility**
+
+If a savings goal is set: render the full savings goal card 
+(existing component). Ensure it has 16px margin above and 
+below and is not cut off at the bottom of the screen.
+
+If no savings goal is set: show a quiet single-line prompt:
+"Got something you're saving for? Set a goal →" 
+— grey text, 13px, teal link
+
+Gap: 24px
+
+**6. Bottom link — rename**
+
+Change "See the full picture →" to "Full breakdown →"
+Keep as a small grey text link at the bottom.
+This now expands to show any additional detail not 
+already visible above.
+
+Remove "Hide details ↑" — this label is confusing.
+Instead: the full breakdown section simply has a 
+collapse chevron within it.
+
+---
+
+### FIX 3 — Meal plan saving card in State 2 and State 3
+
+Ensure the meal plan saving card (as specified above) also 
+renders in State 2 and State 3, positioned after the pressure 
+items list and before the quick version.
+
+In State 2: it follows the tight week pressure list.
+The line reads: "Dinner plan saves ~$[mealPlanSaving] vs 
+eating out. That helps." — this existing copy is correct, 
+but now render it as the full card, not just a line.
+
+In State 3: same card, but append one line below in the card:
+"That's one less thing." — italic, grey, 13px
+
+---
+
+### FINAL CHECK
+
+1. Income field label reads "Income" not "Monthly income"
+2. State 1 shows: calm signal + meal plan saving card + 
+   quick version (collapsed summary) + quick wins (expanded) 
+   + savings goal card or quiet prompt
+3. Meal plan saving card appears in all three states
+4. Quick version defaults to collapsed single-line summary 
+   in State 1, expandable on tap
+5. Quick wins defaults to expanded/visible in State 1
+6. Savings goal card has full visibility and is not cut off
+7. "See the full picture" renamed to "Full breakdown →"
+8. "Hide details ↑" label removed
+9. No $0 or $NaN values render anywhere
+10. All backgrounds white (#FFFFFF) at screen level
+
+Report any issues before closing.
