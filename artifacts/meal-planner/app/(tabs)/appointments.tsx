@@ -1033,7 +1033,7 @@ export default function AppointmentsScreen() {
   if (view === "form") return (
     <SafeAreaView style={styles.safe}>
       <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : "height"}>
-        <ScrollView contentContainerStyle={{ paddingBottom: 40 }} showsVerticalScrollIndicator={false}>
+        <ScrollView contentContainerStyle={{ paddingBottom: 100 }} showsVerticalScrollIndicator={false}>
           {/* Header */}
           <View style={styles.formHeader}>
             <TouchableOpacity onPress={() => setView("overview")} style={styles.backBtn}>
@@ -1530,7 +1530,7 @@ export default function AppointmentsScreen() {
 
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.push("/(tabs)/more")} style={styles.backBtn}>
+        <TouchableOpacity onPress={() => router.navigate("/(tabs)/home")} style={styles.backBtn}>
           <Feather name="arrow-left" size={18} color={TEAL} />
         </TouchableOpacity>
         <View style={{ flex: 1 }}>
@@ -1595,6 +1595,14 @@ export default function AppointmentsScreen() {
           </TouchableOpacity>
         ))}
       </ScrollView>
+
+      {/* Full-width Add appointment CTA */}
+      <View style={styles.addCtaRow}>
+        <TouchableOpacity style={styles.addCta} onPress={openAdd} activeOpacity={0.8}>
+          <Feather name="plus" size={15} color={TEAL} />
+          <Text style={styles.addCtaText}>Add appointment</Text>
+        </TouchableOpacity>
+      </View>
 
       {/* List */}
       <ScrollView
@@ -1876,6 +1884,14 @@ const styles = StyleSheet.create({
   emptyState: { alignItems: "center", paddingTop: 60, gap: 10 },
   emptyTitle: { fontSize: 18, fontFamily: "Inter_600SemiBold", color: TEXT },
   emptySubtitle: { fontSize: 14, fontFamily: "Inter_400Regular", color: MUTED, fontStyle: "italic" },
+  addCtaRow: { paddingHorizontal: 16, paddingTop: 4, paddingBottom: 8 },
+  addCta: {
+    borderWidth: 1.5, borderColor: TEAL, borderRadius: 12,
+    flexDirection: "row", alignItems: "center", justifyContent: "center",
+    gap: 6, paddingVertical: 11,
+  },
+  addCtaText: { fontSize: 14, fontFamily: "Inter_600SemiBold", color: TEAL },
+
   emptyBtn: {
     marginTop: 12, backgroundColor: TEAL, borderRadius: 14,
     paddingHorizontal: 24, paddingVertical: 12,

@@ -218,7 +218,7 @@ export default function HomeTab() {
       // Bills summary
       const overdue  = bills.filter((b) => computeBillStatus(b) === "Overdue").length;
       const dueSoon  = bills.filter((b) => computeBillStatus(b) === "Due Soon").length;
-      const total    = bills.filter((b) => !b.isPaid).reduce((s, b) => s + b.amount, 0);
+      const total    = bills.filter((b) => computeBillStatus(b) === "Due Soon").reduce((s, b) => s + b.amount, 0);
       setBillsData(bills.length > 0 ? { overdue, dueSoon, total } : null);
       setAllBills(bills);
       setAllAppts(appts);
@@ -397,14 +397,15 @@ export default function HomeTab() {
             const cardColor =
               hasConflicts ? "#E8A838"
               : hasSolved  ? TEAL
+              : hasEvents  ? TEAL
               : PLUM;
             const cardLine =
               !hasEvents  ? familyLine
               : hasSolved && hasConflicts
-                ? `${juggleResult!.conflicts.length} thing${juggleResult!.conflicts.length > 1 ? "s" : ""} need${juggleResult!.conflicts.length === 1 ? "s" : ""} sorting.`
+                ? `${juggleResult!.conflicts.length} conflict${juggleResult!.conflicts.length > 1 ? "s" : ""} need${juggleResult!.conflicts.length === 1 ? "s" : ""} sorting out.`
               : hasSolved
                 ? `Weekend sorted. ${juggleResult!.plan.length} ${juggleResult!.plan.length === 1 ? "duty" : "duties"} mapped.`
-              : `${totalThings} thing${totalThings > 1 ? "s" : ""} on this week.`;
+              : `${totalThings} event${totalThings > 1 ? "s" : ""} this week.`;
             const calBreakdown = !hasSolved && calPushedCount > 0 && familyEventCount > 0
               ? `${calPushedCount} from your calendar, ${familyEventCount} added.`
               : null;
@@ -735,7 +736,7 @@ export default function HomeTab() {
               : billsData.overdue > 0
                 ? "Tap to see what needs sorting →"
                 : billsData.dueSoon > 0
-                  ? `${currencySymbol}${billsData.total.toFixed(0)} outstanding this week →`
+                  ? `${currencySymbol}${billsData.total.toFixed(0)} due this week →`
                   : "All quiet. Tap to view →";
             return (
               <TouchableOpacity

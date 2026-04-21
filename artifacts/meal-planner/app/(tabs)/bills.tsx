@@ -676,7 +676,7 @@ export default function BillsScreen() {
   return (
     <SafeAreaView style={styles.safe}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.push("/(tabs)/more")} style={styles.backBtn}>
+        <TouchableOpacity onPress={() => router.navigate("/(tabs)/home")} style={styles.backBtn}>
           <Feather name="arrow-left" size={18} color={TEAL} />
         </TouchableOpacity>
         <View style={{ flex: 1 }}>

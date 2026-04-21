@@ -130,6 +130,9 @@ export default function OverwhelmModal({
       <SafeAreaView style={styles.safe}>
         <View style={styles.container}>
 
+          {/* Sortii logo mark */}
+          <Text style={styles.logoText}>sortii</Text>
+
           {/* Focus mode eyebrow */}
           <Text style={styles.focusLabel}>FOCUS MODE</Text>
 
@@ -154,11 +157,11 @@ export default function OverwhelmModal({
 
           {/* Exit actions */}
           <View style={styles.exitLinks}>
-            <TouchableOpacity onPress={handleBack} activeOpacity={0.7}>
-              <Text style={styles.exitLink}>I'm back  →</Text>
+            <TouchableOpacity onPress={handleBack} style={styles.backCta} activeOpacity={0.85}>
+              <Text style={styles.backCtaText}>Back to home</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={handleSeeEverything} activeOpacity={0.7}>
-              <Text style={styles.exitLink}>See everything  →</Text>
+              <Text style={styles.seeEverythingLink}>See everything  →</Text>
             </TouchableOpacity>
           </View>
 
@@ -180,7 +183,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 36,
     paddingBottom: 40,
     justifyContent: "center",
-    gap: 24,
+    gap: 20,
+  },
+  logoText: {
+    fontSize: 22,
+    fontFamily: "Manrope_700Bold",
+    color: TEAL,
+    textAlign: "center",
+    letterSpacing: -0.5,
+    marginBottom: -4,
   },
   focusLabel: {
     fontSize: 12,
@@ -188,7 +199,7 @@ const styles = StyleSheet.create({
     color: TEAL,
     textAlign: "center",
     letterSpacing: 1.8,
-    marginBottom: -8,
+    marginBottom: -4,
   },
   heading: {
     fontSize: 24,
@@ -232,11 +243,23 @@ const styles = StyleSheet.create({
   exitLinks: {
     flexDirection: "column",
     alignItems: "center",
-    gap: 18,
+    gap: 14,
     marginTop: 4,
   },
-  exitLink: {
-    fontSize: 15,
+  backCta: {
+    backgroundColor: TEAL,
+    borderRadius: 14,
+    paddingVertical: 16,
+    alignItems: "center",
+    width: "100%",
+  },
+  backCtaText: {
+    fontSize: 16,
+    fontFamily: "Inter_600SemiBold",
+    color: "#fff",
+  },
+  seeEverythingLink: {
+    fontSize: 14,
     fontFamily: "Inter_400Regular",
     color: "#AAAAAA",
     letterSpacing: 0.2,

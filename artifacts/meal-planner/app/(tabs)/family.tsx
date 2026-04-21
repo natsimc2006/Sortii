@@ -1852,16 +1852,6 @@ function SortContextCard({
         {sortedDate && (
           <Text style={styles.sortCardSortedDate}>Sorted {sortedDate}</Text>
         )}
-        <View style={styles.sortCardSortedBtns}>
-          <TouchableOpacity style={styles.sortCardSeePlanBtn} onPress={onViewPlan} activeOpacity={0.85}>
-            <Feather name="list" size={13} color="#fff" />
-            <Text style={styles.sortCardSeePlanBtnText}>See the plan →</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.sortCardResortBtn} onPress={onReSort} activeOpacity={0.8}>
-            <Feather name="refresh-cw" size={12} color={TEAL} />
-            <Text style={styles.sortCardResortBtnText}>Re-sort</Text>
-          </TouchableOpacity>
-        </View>
       </View>
     );
   }
@@ -3585,6 +3575,7 @@ const styles = StyleSheet.create({
   },
   timePill: {
     borderRadius: 20, paddingVertical: 3, paddingHorizontal: 8, marginRight: 10,
+    minWidth: 100, alignItems: "center",
   },
   timePillText: { color: "#fff", fontSize: 11, fontFamily: "Inter_700Bold" },
   tableWho: { fontSize: 13, fontFamily: "Inter_600SemiBold", color: TEXT, marginBottom: 2 },

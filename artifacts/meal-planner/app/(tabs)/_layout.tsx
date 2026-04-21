@@ -89,8 +89,8 @@ function QuickAddSheet({
         onPress={(e) => e.stopPropagation()}
       >
         <View style={styles.sheetHandle} />
-        <Text style={styles.sheetTitle}>What needs adding?</Text>
-        <Text style={styles.sheetSub}>Pop it in. We'll sort the rest.</Text>
+        <Text style={styles.sheetTitle}>What do you need?</Text>
+        <Text style={styles.sheetSub}>Add something or get somewhere fast.</Text>
 
         <View style={styles.sheetOptions}>
           {options.map(({ icon, color, label, sub, onPress }) => (
@@ -115,6 +115,23 @@ function QuickAddSheet({
               <Feather name="chevron-right" size={15} color="#D8D8D8" />
             </TouchableOpacity>
           ))}
+        </View>
+
+        <View style={styles.sheetNavLinks}>
+          <TouchableOpacity
+            style={styles.sheetNavLink}
+            onPress={() => { onClose(); router.push("/(tabs)/appointments"); }}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.sheetNavLinkText}>Go to Appointments →</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.sheetNavLink}
+            onPress={() => { onClose(); router.push("/(tabs)/bills"); }}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.sheetNavLinkText}>Go to Bills →</Text>
+          </TouchableOpacity>
         </View>
 
         <TouchableOpacity style={styles.sheetCancel} onPress={onClose}>
@@ -186,7 +203,7 @@ function AddTabButton({
           letterSpacing: 0.1,
         }}
       >
-        Add
+        More
       </Text>
     </TouchableOpacity>
   );
@@ -412,6 +429,21 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontFamily: "Inter_400Regular",
     color: "#ADADAD",
+  },
+  sheetNavLinks: {
+    marginTop: 6,
+    gap: 2,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: "#F0EDE8",
+    paddingTop: 10,
+  },
+  sheetNavLink: {
+    paddingVertical: 9,
+  },
+  sheetNavLinkText: {
+    fontSize: 13,
+    fontFamily: "Inter_500Medium",
+    color: "#2A8F88",
   },
   sheetCancel: {
     marginTop: 14,
