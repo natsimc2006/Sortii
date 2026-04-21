@@ -306,7 +306,7 @@ export default function TabLayout() {
           }}
         />
         <Tabs.Screen
-          name="appointments"
+          name="family"
           options={{
             title: "Family",
             tabBarIcon: ({ color, focused }) => (
@@ -341,7 +341,7 @@ export default function TabLayout() {
         <Tabs.Screen name="more"         options={{ href: null }} />
         <Tabs.Screen name="saved"        options={{ href: null }} />
         <Tabs.Screen name="preferences"  options={{ href: null }} />
-        <Tabs.Screen name="family"       options={{ href: null }} />
+        <Tabs.Screen name="appointments" options={{ href: null }} />
         <Tabs.Screen name="upcoming"     options={{ href: null }} />
         <Tabs.Screen name="index"           options={{ href: null }} />
         <Tabs.Screen name="household-profile" options={{ href: null }} />
