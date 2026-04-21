@@ -34,7 +34,8 @@ import {
 } from "@/utils/savingsGoalCopy";
 import type { SavingsGoal } from "@/utils/onboardingState";
 import type { Recipe } from "@/constants/recipes";
-import { loadBills, daysUntilDue } from "@/utils/billStore";
+import { loadBills, daysUntilDue, getOneOffBillsDueThisWeek, Bill } from "@/utils/billStore";
+import { getAppointmentsWithCostThisWeek, Appointment as ApptItem } from "@/utils/appointmentStore";
 
 const C = Colors.light;
 const TEAL = "#2A8F88";
