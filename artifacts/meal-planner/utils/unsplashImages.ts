@@ -17,8 +17,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const UNSPLASH_KEY = "cWU-u6hsZoSKXaZJ_-YfD5s09NoHtfmHmuaKZ_LXXF4";
 const UNSPLASH_BASE = "https://api.unsplash.com";
-// Bumped to v5 — forces a refresh of all previously cached images
-const CACHE_PREFIX = "sortii_img_v5_";
+// Bumped to v6 — forces a refresh after Bing CDN image URLs applied from CSV
+const CACHE_PREFIX = "sortii_img_v6_";
 const SESSION_CACHE: Record<string, string | null> = {};
 
 // Unsplash "Food & Drink" topic — ensures results are actually food photos
@@ -36,41 +36,9 @@ const FOOD_WORDS = [
 // Add a recipe name (lowercase) → URL here to lock a specific photo for a dish.
 // This takes priority over everything: session cache, AsyncStorage, and Unsplash.
 
-const PINNED_IMAGE_URLS: Record<string, string> = {
-  // Shepherd's Pie — bundled local image takes priority via localRecipeImages.ts,
-  // but keep the pin here as a backup
-  "shepherd's pie":  "https://www.themealdb.com/images/media/meals/sxrpws1511555907.jpg",
-  "shepherds pie":   "https://www.themealdb.com/images/media/meals/sxrpws1511555907.jpg",
-
-  // Chicken Satay — fix mismatch where script assigned Tikka Masala photo
-  "chicken satay":   "https://www.themealdb.com/images/media/meals/sstssx1487349585.jpg",
-  "satay chicken":   "https://www.themealdb.com/images/media/meals/sstssx1487349585.jpg",
-
-  // Sausages with Mashed Potato / Bangers and Mash
-  "sausages with mashed potato": "https://www.themealdb.com/images/media/meals/syqypv1486981727.jpg",
-  "bangers and mash":            "https://www.themealdb.com/images/media/meals/syqypv1486981727.jpg",
-
-  // Mac and Cheese
-  "mac and cheese": "https://www.themealdb.com/images/media/meals/uyxrwq1555249033.jpg",
-  "mac & cheese":   "https://www.themealdb.com/images/media/meals/uyxrwq1555249033.jpg",
-
-  // Toad in the Hole
-  "toad in the hole": "https://www.themealdb.com/images/media/meals/1550441882.jpg",
-
-  // Chicken Nuggets
-  "chicken nuggets": "https://www.themealdb.com/images/media/meals/bsxr381548942529.jpg",
-
-  // Fish fingers / fish and chips
-  "fish fingers":    "https://www.themealdb.com/images/media/meals/xxyupu1468262513.jpg",
-  "fish and chips":  "https://www.themealdb.com/images/media/meals/xxyupu1468262513.jpg",
-
-  // Beef and mushroom pie
-  "beef and mushroom pie": "https://www.themealdb.com/images/media/meals/toywww1476041291.jpg",
-  "beef mince and vegetable pie": "https://www.themealdb.com/images/media/meals/toywww1476041291.jpg",
-
-  // Pulled pork
-  "pulled pork":     "https://www.themealdb.com/images/media/meals/ursuup1487348423.jpg",
-};
+// All dishes previously pinned now have Bing CDN imageUrls in recipes.json.
+// Pins are no longer needed — step 4 (existingUrl) handles them correctly.
+const PINNED_IMAGE_URLS: Record<string, string> = {};
 
 // ── Curated query overrides for dishes that return poor Unsplash results ──────
 // Used ONLY when there is no TheMealDB imageUrl in the recipe data.
@@ -302,11 +270,10 @@ export async function getRecipeImage(
     }
   } catch {}
 
-  // ── 4. TheMealDB existingUrl — prefer over Unsplash keyword search ───────────
-  // TheMealDB images are professionally photographed and dish-matched by our
-  // script. They're more accurate than a keyword search that might return a
-  // similar-looking but wrong dish.
-  if (existingUrl && existingUrl.includes("themealdb.com")) {
+  // ── 4. existingUrl — curated Bing CDN or TheMealDB, prefer over Unsplash ─────
+  // Images in recipes.json are curated (Bing CDN from user CSV). They're more
+  // accurate than an Unsplash keyword search and should always be used when set.
+  if (existingUrl && existingUrl.trim().length > 0) {
     SESSION_CACHE[cacheKey] = existingUrl;
     try { await AsyncStorage.setItem(cacheKey, existingUrl); } catch {}
     return existingUrl;
