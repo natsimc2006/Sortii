@@ -40,6 +40,7 @@ import { buildJugglePrompt } from "@/utils/buildJugglePrompt";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { SortiiCalEvent, FAMILY_PUSHED_KEY } from "@/utils/calendarTypes";
 import { loadFamilyPushedEvents, removeEventFromFamily } from "@/utils/appointmentService";
+import { loadAppointments, Appointment } from "@/utils/appointmentStore";
 
 // ── Brand tokens ───────────────────────────────────────────────────────────────
 const TEAL         = "#2A8F88";
@@ -410,14 +411,18 @@ function JuggleResultsContent({
   const [swappedFlash, setSwappedFlash]       = useState<string | null>(null);
 
   const planRows = adultPlans.flatMap((p) =>
-    p.schedule.map((s) => ({
-      time:     s.time,
-      adult:    swapAssignments[s.event_id] ?? p.adult,
-      child:    s.child,
-      activity: s.activity,
-      location: s.location,
-      event_id: s.event_id,
-    }))
+    p.schedule.map((s) => {
+      const evtItem = (juggleResult.events ?? []).find((e) => e.id === s.event_id);
+      return {
+        time:     s.time,
+        endTime:  evtItem?.end_time ?? null as string | null,
+        adult:    swapAssignments[s.event_id] ?? p.adult,
+        child:    s.child,
+        activity: s.activity,
+        location: s.location,
+        event_id: s.event_id,
+      };
+    })
   ).sort((a, b) => a.time.localeCompare(b.time));
 
   function handleSwap(event_id: string) {
@@ -550,7 +555,7 @@ function JuggleResultsContent({
               <View style={[styles.jugglePlanDataRow, { backgroundColor: i % 2 === 0 ? "#fff" : "#FAFAF8" }]}>
                 <View style={styles.jugglePlanCellTime}>
                   <View style={styles.juggleTimePill}>
-                    <Text style={styles.juggleTimePillText}>{row.time}</Text>
+                    <Text style={styles.juggleTimePillText}>{row.time}{row.endTime ? `–${row.endTime}` : ""}</Text>
                   </View>
                 </View>
                 <View style={[styles.jugglePlanCellWho, { gap: 4 }]}>
@@ -600,10 +605,12 @@ function JuggleResultsContent({
                   <View style={[styles.juggleAdultDot, { backgroundColor: member?.color ?? TEAL }]} />
                   <Text style={styles.juggleAdultName}>{plan.adult}</Text>
                 </View>
-                {plan.schedule.map((s, i) => (
+                {plan.schedule.map((s, i) => {
+                  const evtForTime = (juggleResult.events ?? []).find((e) => e.id === s.event_id);
+                  return (
                   <View key={i} style={styles.juggleScheduleRow}>
                     <View style={styles.juggleTimePill}>
-                      <Text style={styles.juggleTimePillText}>{s.time}</Text>
+                      <Text style={styles.juggleTimePillText}>{s.time}{evtForTime?.end_time ? `–${evtForTime.end_time}` : ""}</Text>
                     </View>
                     <View style={{ flex: 1, gap: 1 }}>
                       <Text style={styles.juggleScheduleActivity}>{s.activity}</Text>
@@ -611,7 +618,8 @@ function JuggleResultsContent({
                       {s.location ? <Text style={styles.juggleScheduleLocation}>{s.location}</Text> : null}
                     </View>
                   </View>
-                ))}
+                  );
+                })}
                 {(() => {
                   const insight = buildFreeWindowInsight(plan);
                   return insight ? (
@@ -2047,6 +2055,7 @@ export default function FamilyScreen() {
   const [helpers, setHelpers]                 = useState<FamilyHelper[]>([]);
   const [showHelpers, setShowHelpers]         = useState(false);
   const [pushedCalEvents, setPushedCalEvents] = useState<SortiiCalEvent[]>([]);
+  const [apptItems,       setApptItems]       = useState<Appointment[]>([]);
 
   // Compute a map from eventId → AI-assigned adult name (including swaps)
   const juggleDriverMap = React.useMemo(() => {
@@ -2063,13 +2072,15 @@ export default function FamilyScreen() {
   }, [juggleResult]);
 
   const load = useCallback(async () => {
-    const [s, savedJuggle, savedHelpers] = await Promise.all([
+    const [s, savedJuggle, savedHelpers, appts] = await Promise.all([
       loadFamilyState(),
       AsyncStorage.getItem(JUGGLE_RESULT_KEY),
       AsyncStorage.getItem(HELPERS_KEY),
+      loadAppointments(),
     ]);
     setState(s);
     setResult(computeFamilyWeek(s));
+    setApptItems(appts);
     if (savedJuggle) {
       try { setJuggleResult(JSON.parse(savedJuggle)); setIsSorted(true); } catch {}
     }
@@ -2323,6 +2334,20 @@ export default function FamilyScreen() {
   }
 
   const hasEvents          = state.events.length > 0 || pushedCalEvents.length > 0;
+
+  // ── This-week appointments (for display in the event list) ─────────────────
+  const thisWeekAppts = React.useMemo(() => {
+    const today = new Date();
+    const jsDay = today.getDay();
+    const diff = jsDay === 0 ? -6 : 1 - jsDay;
+    const weekStart = new Date(today.getFullYear(), today.getMonth(), today.getDate() + diff);
+    const weekEnd   = new Date(weekStart.getFullYear(), weekStart.getMonth(), weekStart.getDate() + 6);
+    const ws = weekStart.toISOString().slice(0, 10);
+    const we = weekEnd.toISOString().slice(0, 10);
+    return apptItems
+      .filter((a) => !a.isDone && !a.isCancelled && a.date >= ws && a.date <= we)
+      .sort((a, b) => a.date.localeCompare(b.date) || a.startTime.localeCompare(b.startTime));
+  }, [apptItems]);
   const hasMembers         = state.members.length > 0;
   const hasAdults          = state.members.some((m) => m.role === "adult");
   const daysWithEvents     = result?.daysWithEvents ?? [];
@@ -2427,6 +2452,25 @@ export default function FamilyScreen() {
                       </View>
                     );
                   })}
+                </View>
+              )}
+
+              {/* Appointments this week */}
+              {thisWeekAppts.length > 0 && (
+                <View style={{ gap: 6, marginTop: 8 }}>
+                  <Text style={[styles.sectionLabel, { fontSize: 10, color: PLUM }]}>APPOINTMENTS THIS WEEK</Text>
+                  {thisWeekAppts.map((a) => (
+                    <View key={a.id} style={styles.calPushedCard}>
+                      <View style={styles.calPushedTimePill}>
+                        <Text style={styles.calPushedTimeText}>{formatTime(a.startTime)}</Text>
+                      </View>
+                      <Text>📌</Text>
+                      <View style={{ flex: 1 }}>
+                        <Text style={styles.calPushedTitle} numberOfLines={1}>{a.title}</Text>
+                        {a.person ? <Text style={styles.calPushedSource}>{a.person}</Text> : null}
+                      </View>
+                    </View>
+                  ))}
                 </View>
               )}
             </View>

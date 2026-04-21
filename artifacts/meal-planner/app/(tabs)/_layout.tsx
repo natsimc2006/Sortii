@@ -150,10 +150,7 @@ function AddTabButton({
   style?: any;
   onPress: () => void;
 }) {
-  const insets = useSafeAreaInsets();
-  const bottomPad = Platform.OS === "ios"
-    ? Math.max(insets.bottom + 2, 10)
-    : Platform.OS === "web" ? 9 : 5;
+  const bottomPad = Platform.OS === "web" ? 6 : 2;
 
   return (
     <TouchableOpacity

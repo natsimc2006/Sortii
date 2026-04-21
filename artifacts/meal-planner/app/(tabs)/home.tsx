@@ -402,9 +402,19 @@ export default function HomeTab() {
             const cardLine =
               !hasEvents  ? familyLine
               : hasSolved && hasConflicts
-                ? `${juggleResult!.conflicts.length} conflict${juggleResult!.conflicts.length > 1 ? "s" : ""} need${juggleResult!.conflicts.length === 1 ? "s" : ""} sorting out.`
+                ? (() => {
+                    const all = juggleResult!.conflicts;
+                    const n = all.length;
+                    const unassigned = all.filter((c: any) => c.type === "unassigned").length;
+                    const overlaps   = all.filter((c: any) => c.type === "overlap").length;
+                    if (unassigned > 0 && overlaps === 0)
+                      return `${unassigned} event${unassigned > 1 ? "s" : ""} need${unassigned === 1 ? "s" : ""} a driver.`;
+                    if (overlaps > 0 && unassigned === 0)
+                      return `${overlaps} event${overlaps > 1 ? "s" : ""} clash${overlaps > 1 ? "" : "es"} this week.`;
+                    return `${n} thing${n > 1 ? "s" : ""} need${n === 1 ? "s" : ""} sorting out.`;
+                  })()
               : hasSolved
-                ? `Weekend sorted. ${juggleResult!.plan.length} ${juggleResult!.plan.length === 1 ? "duty" : "duties"} mapped.`
+                ? `Weekend sorted. ${juggleResult!.events?.length ?? 0} thing${(juggleResult!.events?.length ?? 0) === 1 ? "" : "s"} mapped.`
               : `${totalThings} event${totalThings > 1 ? "s" : ""} this week.`;
             const calBreakdown = !hasSolved && calPushedCount > 0 && familyEventCount > 0
               ? `${calPushedCount} from your calendar, ${familyEventCount} added.`
