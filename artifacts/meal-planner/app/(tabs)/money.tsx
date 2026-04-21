@@ -39,12 +39,32 @@ import { getAppointmentsWithCostThisWeek, Appointment as ApptItem } from "@/util
 
 const C = Colors.light;
 const TEAL = "#2A8F88";
+const TEAL_TINT = "#E6F3F0";
 const GOLD = "#D29A22";
+const RED = "#B86557";
 const PLUM = "#5E3A4C";
 const PLUM_TINT = "#F3E8EE";
 const PLUM_BORDER = "rgba(94,58,76,0.20)";
 const HERO_BG = "#E6F3F0";
 const PAGE_BG = "#FFFFFF";
+
+// ─── Pressure item type ───────────────────────────────────────
+interface PressureItem {
+  name: string;
+  amount: number;
+  dateStr: string;
+}
+
+function pressureDayLabel(dateStr: string): string {
+  const [y, m, d] = dateStr.split("-").map(Number);
+  const date = new Date(y!, (m! - 1), d!);
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  const diff = Math.floor((date.getTime() - today.getTime()) / 86_400_000);
+  if (diff === 0) return "today";
+  if (diff === 1) return "tomorrow";
+  const DAYS = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+  return DAYS[date.getDay()] ?? dateStr;
+}
 
 // ─── Quick win confirm messages ───────────────────────────────
 
@@ -544,9 +564,14 @@ export default function MoneyScreen() {
   const [toastMsg, setToastMsg] = useState<string | null>(null);
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Bills due this week
+  // Bills due this week (legacy counts used by bills-note card — kept for now)
   const [billsTotalThisWeek, setBillsTotalThisWeek] = useState(0);
   const [billsCountThisWeek, setBillsCountThisWeek] = useState(0);
+
+  // Phase 3 — pressure data
+  const [oneOffBillsThisWeek, setOneOffBillsThisWeek] = useState<Bill[]>([]);
+  const [apptCostsThisWeek, setApptCostsThisWeek] = useState<ApptItem[]>([]);
+  const [showFullPicture, setShowFullPicture] = useState(false);
 
   // Money nudge dismiss state
   const [nudgeHidden, setNudgeHidden] = useState(false);
@@ -565,12 +590,16 @@ export default function MoneyScreen() {
       }
     }).catch(() => {});
 
-    // Bills due this week
+    // Bills due this week (all bills for legacy note card)
     loadBills().then((bills) => {
       const dueSoon = bills.filter((b) => !b.isPaid && daysUntilDue(b) >= 0 && daysUntilDue(b) <= 7);
       setBillsCountThisWeek(dueSoon.length);
       setBillsTotalThisWeek(dueSoon.reduce((s, b) => s + b.amount, 0));
     }).catch(() => {});
+
+    // Phase 3 — one-off bills + appointment costs
+    getOneOffBillsDueThisWeek().then(setOneOffBillsThisWeek).catch(() => {});
+    getAppointmentsWithCostThisWeek().then(setApptCostsThisWeek).catch(() => {});
 
     // Check nudge dismiss state
     AsyncStorage.getItem("sortii_money_nudge_v1").then((raw) => {
@@ -705,6 +734,61 @@ export default function MoneyScreen() {
     formatMoneyRound,
   );
 
+  // ── Phase 3 — pressure calculations ───────────────────────────────────────
+  const pressureItems: PressureItem[] = [
+    ...oneOffBillsThisWeek.map((b) => ({ name: b.title, amount: b.amount, dateStr: b.dueDate })),
+    ...apptCostsThisWeek.map((a) => ({ name: a.title, amount: a.appointmentCost!, dateStr: a.date })),
+  ].sort((a, b) => a.dateStr.localeCompare(b.dateStr));
+
+  const weeklyBreathingRoom = money ? result.remaining + appliedSavingsTotal : 0;
+  const pressureTotal = pressureItems.reduce((s, p) => s + p.amount, 0);
+  const adjustedBreathingRoom = weeklyBreathingRoom - pressureTotal;
+  const mealPlanSaving = Math.max(0, Math.round(result.estimatedDinnerSpend - dinnerPlanCost));
+
+  type MoneyTabState = "calm" | "tight" | "stretched";
+  const moneyTabState: MoneyTabState = hasMoneySetup
+    ? adjustedBreathingRoom > 50 ? "calm"
+      : adjustedBreathingRoom >= 1 ? "tight"
+      : "stretched"
+    : "calm"; // irrelevant when no setup
+
+  // Shared "full picture" section (State 1 expand + State 2 always-visible)
+  const fullPictureSection = (
+    <>
+      {money && (
+        <WeeklySnapshotSection
+          money={money}
+          result={result}
+          lifestyleSpend={lifestyleSpend}
+          dinnerPlanCost={dinnerPlanCost}
+          hasMealsSetup={hasMealsSetup}
+          fmt={formatMoneyRound}
+          appliedSavingsTotal={appliedSavingsTotal}
+          defaultOpen={snapshotDefaultOpen}
+        />
+      )}
+      <QuickWinsSection suggestions={result.suggestions} fmt={formatMoneyRound} />
+      {savingsGoal ? (
+        <SavingsGoalCard
+          goal={savingsGoal}
+          weeklyDinnerSaving={weeklySortiiSaving}
+          fmt={formatMoneyRound}
+          onUpdate={goToGoalSetup}
+        />
+      ) : (
+        <TouchableOpacity onPress={goToGoalSetup} activeOpacity={0.7} style={styles.setGoalLink}>
+          <Text style={styles.setGoalLinkText}>Set a savings goal →</Text>
+        </TouchableOpacity>
+      )}
+      <View style={styles.updateCtaWrap}>
+        <Text style={styles.updateCtaLabel}>Your numbers, your call. Update anytime.</Text>
+        <TouchableOpacity onPress={goToMoneySetup} activeOpacity={0.85} style={styles.updateCtaBtn}>
+          <Text style={styles.updateCtaBtnText}>Update my numbers</Text>
+        </TouchableOpacity>
+      </View>
+    </>
+  );
+
   return (
     <View style={{ flex: 1, backgroundColor: PAGE_BG }}>
     <ScrollView
@@ -732,108 +816,126 @@ export default function MoneyScreen() {
         </View>
       )}
 
+      {/* ── No budget set ── */}
       {!hasMoneySetup && !nudgeHidden ? (
         <MoneyEmptyState onSetup={goToMoneySetup} onDismiss={handleNudgeDismiss} />
-      ) : (
+
+      ) : !hasMoneySetup ? null : moneyTabState === "calm" ? (
+        /* ── STATE 1 — Calm ──────────────────────────────────── */
         <>
-          {/* 1. Hero card */}
-          <HeroCard
-            estimatedDinnerSpend={result.estimatedDinnerSpend}
-            dinnerPlanCost={dinnerPlanCost}
-            weeklyState={result.weeklyState}
-            fmt={formatMoneyRound}
-          />
-          {result.estimatedDinnerSpend > 0 && dinnerPlanCost > 0 &&
-            Math.round(result.estimatedDinnerSpend - dinnerPlanCost) > 0 && (
-            <Text style={styles.heroDisclaimer}>
-              Estimated saving vs. your usual spend. Not exact — close enough.
+          <View style={styles.calmCard}>
+            <View style={styles.calmCheck}>
+              <Text style={styles.calmCheckText}>✓</Text>
+            </View>
+            <Text style={styles.calmHeading}>This week looks fine.</Text>
+            <Text style={styles.calmSubtext}>
+              Nothing unexpected coming. Dinner's already covered.
             </Text>
-          )}
-
-          {/* 2. Weekly Snapshot */}
-          {money && (
-            <WeeklySnapshotSection
-              money={money}
-              result={result}
-              lifestyleSpend={lifestyleSpend}
-              dinnerPlanCost={dinnerPlanCost}
-              hasMealsSetup={hasMealsSetup}
-              fmt={formatMoneyRound}
-              appliedSavingsTotal={appliedSavingsTotal}
-              defaultOpen={snapshotDefaultOpen}
-            />
-          )}
-
-          {/* 2b. Bills impact on breathing room */}
-          {money && billsTotalThisWeek > 0 && (() => {
-            const breathing = result.remaining + appliedSavingsTotal;
-            const adjusted = breathing - billsTotalThisWeek;
-            const isNeg = adjusted < 0;
-            return (
-              <View style={[styles.billsNoteCard, { borderColor: isNeg ? "#B86557" : GOLD }]}>
-                <View style={styles.billsNoteRow}>
-                  <Text style={styles.billsNoteLabel}>
-                    After {billsCountThisWeek} bill{billsCountThisWeek > 1 ? "s" : ""} this week
-                  </Text>
-                  <Text style={[styles.billsNoteAmount, { color: isNeg ? "#B86557" : GOLD }]}>
-                    {isNeg ? `–${formatMoneyRound(Math.abs(adjusted))}` : formatMoneyRound(adjusted)}
-                  </Text>
-                </View>
-                <Text style={[styles.billsNoteSub, { color: isNeg ? "#B86557" : "#888" }]}>
-                  {isNeg
-                    ? "Tight week — bills exceed breathing room."
-                    : `Includes ${formatMoneyRound(billsTotalThisWeek)} in upcoming bills.`}
-                </Text>
-              </View>
-            );
-          })()}
-
-          {/* 3. Where groceries are going */}
-          {money && (
-            <GroceriesSection
-              estimatedDinnerSpend={result.estimatedDinnerSpend}
-              dinnerPlanCost={dinnerPlanCost}
-              dinnerInsight={result.dinnerInsight}
-              hasMealsSetup={hasMealsSetup}
-              numMeals={filledMeals.length}
-              hasGroceries={result.hasGroceries}
-              fmt={formatMoneyRound}
-            />
-          )}
-
-          {/* 4. Quick wins */}
-          <QuickWinsSection
-            suggestions={result.suggestions}
-            fmt={formatMoneyRound}
-          />
-
-          {/* 5. Savings goal card */}
-          {savingsGoal ? (
-            <SavingsGoalCard
-              goal={savingsGoal}
-              weeklyDinnerSaving={weeklySortiiSaving}
-              fmt={formatMoneyRound}
-              onUpdate={goToGoalSetup}
-            />
-          ) : (
-            <TouchableOpacity onPress={goToGoalSetup} activeOpacity={0.7} style={styles.setGoalLink}>
-              <Text style={styles.setGoalLinkText}>Set a savings goal →</Text>
-            </TouchableOpacity>
-          )}
-
-          {/* 6. Update CTA */}
-          <View style={styles.updateCtaWrap}>
-            <Text style={styles.updateCtaLabel}>
-              Your numbers, your call. Update anytime.
-            </Text>
-            <TouchableOpacity
-              onPress={goToMoneySetup}
-              activeOpacity={0.85}
-              style={styles.updateCtaBtn}
-            >
-              <Text style={styles.updateCtaBtnText}>Update my numbers</Text>
-            </TouchableOpacity>
+            {adjustedBreathingRoom > 0 && (
+              <Text style={styles.calmBreathing}>
+                ~{formatMoneyRound(adjustedBreathingRoom)} breathing room this week.
+              </Text>
+            )}
           </View>
+
+          {/* "See full picture →" expand */}
+          <TouchableOpacity
+            onPress={() => setShowFullPicture((v) => !v)}
+            activeOpacity={0.7}
+            style={styles.fullPictureToggle}
+          >
+            <Text style={styles.fullPictureLink}>
+              {showFullPicture ? "Hide details ↑" : "See the full picture →"}
+            </Text>
+          </TouchableOpacity>
+
+          {showFullPicture && fullPictureSection}
+        </>
+
+      ) : moneyTabState === "tight" ? (
+        /* ── STATE 2 — Tight ─────────────────────────────────── */
+        <>
+          <View style={styles.tightCard}>
+            <View style={styles.tightIconRow}>
+              <Text style={styles.tightIcon}>⚠</Text>
+              <Text style={styles.tightHeading}>Tighter than usual this week.</Text>
+            </View>
+
+            {pressureItems.length > 0 && (
+              <View style={styles.pressureList}>
+                {pressureItems.map((p, i) => (
+                  <Text key={i} style={styles.pressureItem}>
+                    · {p.name} — {formatMoneyRound(p.amount)} due {pressureDayLabel(p.dateStr)}
+                  </Text>
+                ))}
+              </View>
+            )}
+
+            <View style={styles.tightDivider} />
+
+            {mealPlanSaving > 0 && (
+              <Text style={styles.tightMealLine}>
+                Dinner plan saves ~{formatMoneyRound(mealPlanSaving)} vs eating out. That helps.
+              </Text>
+            )}
+
+            <Text style={[
+              styles.tightBreathing,
+              adjustedBreathingRoom < 20 && { color: GOLD },
+            ]}>
+              Breathing room this week: ~{formatMoneyRound(Math.max(0, adjustedBreathingRoom))}
+            </Text>
+          </View>
+
+          {fullPictureSection}
+        </>
+
+      ) : (
+        /* ── STATE 3 — Stretched ─────────────────────────────── */
+        <>
+          <View style={styles.stretchedCard}>
+            <Text style={styles.stretchedHeading}>This week is stretched.</Text>
+            <Text style={styles.stretchedSubtext}>
+              Here's what's hitting all at once.
+            </Text>
+
+            {pressureItems.length > 0 && (
+              <View style={styles.pressureList}>
+                {pressureItems.slice(0, 4).map((p, i) => (
+                  <Text key={i} style={styles.pressureItem}>
+                    · {p.name} — {formatMoneyRound(p.amount)} — {pressureDayLabel(p.dateStr)}
+                  </Text>
+                ))}
+                {pressureItems.length > 4 && (
+                  <Text style={styles.pressureMore}>· +{pressureItems.length - 4} more</Text>
+                )}
+              </View>
+            )}
+
+            <View style={styles.tightDivider} />
+
+            {hasMealsSetup && (
+              <Text style={styles.stretchedReassurance}>
+                Dinner is already sorted — that's one less thing.
+              </Text>
+            )}
+
+            <Text style={styles.stretchedBreathing}>
+              Breathing room:{" "}
+              <Text style={{ color: RED }}>
+                −{formatMoneyRound(Math.abs(adjustedBreathingRoom))} over
+              </Text>
+              {" "}— tighter than usual.
+            </Text>
+          </View>
+
+          {/* Overwhelm mode entry point (Phase 4) */}
+          <TouchableOpacity
+            activeOpacity={0.7}
+            style={styles.overwhelmLink}
+          >
+            <Text style={styles.overwhelmLinkText}>Want to see what can wait? →</Text>
+          </TouchableOpacity>
         </>
       )}
     </ScrollView>
@@ -1305,5 +1407,113 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontFamily: "Inter_400Regular",
     color: C.textMuted,
+  },
+
+  // ── Phase 3 — STATE 1: Calm ──────────────────────────────────
+  calmCard: {
+    alignItems: "center",
+    paddingVertical: 36,
+    paddingHorizontal: 20,
+    gap: 10,
+  },
+  calmCheck: {
+    width: 56, height: 56, borderRadius: 28,
+    backgroundColor: TEAL_TINT,
+    alignItems: "center", justifyContent: "center",
+    marginBottom: 4,
+  },
+  calmCheckText: {
+    fontSize: 26, color: TEAL, fontFamily: "Inter_700Bold",
+  },
+  calmHeading: {
+    fontSize: 20, fontFamily: "Manrope_700Bold",
+    color: "#2B2B2B", textAlign: "center",
+  },
+  calmSubtext: {
+    fontSize: 14, fontFamily: "Inter_400Regular",
+    color: "#888", textAlign: "center", lineHeight: 20,
+  },
+  calmBreathing: {
+    fontSize: 13, fontFamily: "Inter_600SemiBold",
+    color: TEAL, textAlign: "center", marginTop: 4,
+  },
+  fullPictureToggle: {
+    alignItems: "center", paddingVertical: 4,
+  },
+  fullPictureLink: {
+    fontSize: 14, fontFamily: "Inter_400Regular",
+    color: "#AAA",
+  },
+
+  // ── Phase 3 — STATE 2: Tight ─────────────────────────────────
+  tightCard: {
+    borderRadius: 16,
+    backgroundColor: "#FFFDF5",
+    borderWidth: 1.5,
+    borderColor: "rgba(210,154,34,0.30)",
+    padding: 20,
+    gap: 10,
+  },
+  tightIconRow: {
+    flexDirection: "row", alignItems: "center", gap: 8,
+  },
+  tightIcon: {
+    fontSize: 18, color: GOLD,
+  },
+  tightHeading: {
+    fontSize: 20, fontFamily: "Manrope_700Bold", color: "#2B2B2B", flex: 1,
+  },
+  tightDivider: {
+    height: 1, backgroundColor: "#E6E1D7", marginVertical: 4,
+  },
+  tightMealLine: {
+    fontSize: 14, fontFamily: "Inter_400Regular",
+    color: TEAL, lineHeight: 20,
+  },
+  tightBreathing: {
+    fontSize: 14, fontFamily: "Inter_400Regular",
+    color: "#888", lineHeight: 20,
+  },
+
+  // ── Phase 3 — STATE 3: Stretched ─────────────────────────────
+  stretchedCard: {
+    borderRadius: 16,
+    backgroundColor: "#FFFFFF",
+    padding: 20,
+    gap: 10,
+  },
+  stretchedHeading: {
+    fontSize: 22, fontFamily: "Manrope_700Bold", color: "#2B2B2B",
+  },
+  stretchedSubtext: {
+    fontSize: 14, fontFamily: "Inter_400Regular",
+    color: "#888", fontStyle: "italic", lineHeight: 20,
+  },
+  stretchedReassurance: {
+    fontSize: 14, fontFamily: "Inter_400Regular",
+    color: TEAL, lineHeight: 20,
+  },
+  stretchedBreathing: {
+    fontSize: 14, fontFamily: "Inter_400Regular",
+    color: "#888", lineHeight: 20,
+  },
+
+  // ── Shared pressure list ──────────────────────────────────────
+  pressureList: { gap: 6, marginTop: 2 },
+  pressureItem: {
+    fontSize: 14, fontFamily: "Inter_400Regular",
+    color: "#2B2B2B", lineHeight: 22,
+  },
+  pressureMore: {
+    fontSize: 14, fontFamily: "Inter_400Regular",
+    color: "#AAA", lineHeight: 22,
+  },
+
+  // ── Overwhelm mode entry link ─────────────────────────────────
+  overwhelmLink: {
+    alignSelf: "flex-start", paddingVertical: 4,
+  },
+  overwhelmLinkText: {
+    fontSize: 14, fontFamily: "Inter_400Regular", color: TEAL,
   },
 });
