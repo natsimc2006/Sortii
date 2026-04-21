@@ -2286,6 +2286,20 @@ export default function FamilyScreen() {
     await AsyncStorage.setItem(HELPERS_KEY, JSON.stringify(next));
   }
 
+  // ── This-week appointments — must be before early returns (Rules of Hooks) ──
+  const thisWeekAppts = React.useMemo(() => {
+    const today = new Date();
+    const jsDay = today.getDay();
+    const diff = jsDay === 0 ? -6 : 1 - jsDay;
+    const weekStart = new Date(today.getFullYear(), today.getMonth(), today.getDate() + diff);
+    const weekEnd   = new Date(weekStart.getFullYear(), weekStart.getMonth(), weekStart.getDate() + 6);
+    const ws = weekStart.toISOString().slice(0, 10);
+    const we = weekEnd.toISOString().slice(0, 10);
+    return apptItems
+      .filter((a) => !a.isDone && !a.isCancelled && a.date >= ws && a.date <= we)
+      .sort((a, b) => a.date.localeCompare(b.date) || a.startTime.localeCompare(b.startTime));
+  }, [apptItems]);
+
   if (loading) return <View style={{ flex: 1, backgroundColor: BG }} />;
 
   // ── Page 2: Sorting / loading screen ───────────────────────────────────────
@@ -2335,19 +2349,6 @@ export default function FamilyScreen() {
 
   const hasEvents          = state.events.length > 0 || pushedCalEvents.length > 0;
 
-  // ── This-week appointments (for display in the event list) ─────────────────
-  const thisWeekAppts = React.useMemo(() => {
-    const today = new Date();
-    const jsDay = today.getDay();
-    const diff = jsDay === 0 ? -6 : 1 - jsDay;
-    const weekStart = new Date(today.getFullYear(), today.getMonth(), today.getDate() + diff);
-    const weekEnd   = new Date(weekStart.getFullYear(), weekStart.getMonth(), weekStart.getDate() + 6);
-    const ws = weekStart.toISOString().slice(0, 10);
-    const we = weekEnd.toISOString().slice(0, 10);
-    return apptItems
-      .filter((a) => !a.isDone && !a.isCancelled && a.date >= ws && a.date <= we)
-      .sort((a, b) => a.date.localeCompare(b.date) || a.startTime.localeCompare(b.startTime));
-  }, [apptItems]);
   const hasMembers         = state.members.length > 0;
   const hasAdults          = state.members.some((m) => m.role === "adult");
   const daysWithEvents     = result?.daysWithEvents ?? [];

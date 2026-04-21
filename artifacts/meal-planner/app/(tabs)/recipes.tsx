@@ -1,5 +1,5 @@
-import { Feather } from "@expo/vector-icons";
-import React, { useMemo, useState } from "react";
+import { Feather, Ionicons } from "@expo/vector-icons";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   FlatList,
   Platform,
@@ -7,21 +7,24 @@ import {
   StyleSheet,
   Text,
   TextInput,
+  TouchableOpacity,
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Colors from "@/constants/Colors";
 import { Recipe, getApproxCostPerServe } from "@/constants/recipes";
 import { useLocale } from "@/context/LocaleContext";
+import { usePlanner } from "@/context/PlannerContext";
 import { RecipeCard } from "@/components/RecipeCard";
 import { PillButton } from "@/components/PillButton";
 import { RecipeDetailModal } from "@/components/RecipeDetailModal";
 
-type FilterType = "all" | "budget" | "healthy" | "high-protein" | "one-pan" | "air-fryer" | "leftovers";
+type FilterType = "all" | "budget" | "healthy" | "high-protein" | "one-pan" | "air-fryer" | "leftovers" | "favourites";
 type CostFilter = "any" | "under5" | "under10";
 
-const FILTERS: { label: string; value: FilterType }[] = [
+const FILTERS: { label: string; value: FilterType; star?: boolean }[] = [
   { label: "All", value: "all" },
+  { label: "Favourites", value: "favourites", star: true },
   { label: "Budget", value: "budget" },
   { label: "Healthy", value: "healthy" },
   { label: "High Protein", value: "high-protein" },
@@ -45,6 +48,7 @@ export default function RecipesScreen() {
   const insets = useSafeAreaInsets();
   const C = Colors.light;
   const { appRecipes, currencySymbol, locale } = useLocale();
+  const { favoriteIds } = usePlanner();
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<FilterType>("all");
   const [costFilter, setCostFilter] = useState<CostFilter>("any");
@@ -54,6 +58,21 @@ export default function RecipesScreen() {
 
   const filtered = useMemo(() => {
     return appRecipes.filter((r) => {
+      if (filter === "favourites") {
+        if (!favoriteIds.includes(r.id)) return false;
+      } else {
+        if (filter === "budget" && !r.budgetTags.includes("budget")) return false;
+        if (filter === "healthy" && !r.healthTags.includes("healthy")) return false;
+        if (filter === "high-protein" && !r.healthTags.includes("high-protein")) return false;
+        if (filter === "one-pan" && r.cookingStyle !== "one-pan") return false;
+        if (filter === "air-fryer" && r.cookingStyle !== "air-fryer") return false;
+        if (filter === "leftovers" && !r.leftoversFriendly) return false;
+
+        const costPerServe = r.costPerServe ?? getApproxCostPerServe(r);
+        if (costFilter === "under5" && costPerServe >= costThresholds.low) return false;
+        if (costFilter === "under10" && costPerServe >= costThresholds.high) return false;
+      }
+
       if (search.trim()) {
         const q = search.toLowerCase();
         if (
@@ -63,20 +82,10 @@ export default function RecipesScreen() {
         )
           return false;
       }
-      if (filter === "budget") return r.budgetTags.includes("budget");
-      if (filter === "healthy" && !r.healthTags.includes("healthy")) return false;
-      if (filter === "high-protein" && !r.healthTags.includes("high-protein")) return false;
-      if (filter === "one-pan" && r.cookingStyle !== "one-pan") return false;
-      if (filter === "air-fryer" && r.cookingStyle !== "air-fryer") return false;
-      if (filter === "leftovers" && !r.leftoversFriendly) return false;
-
-      const costPerServe = r.costPerServe ?? getApproxCostPerServe(r);
-      if (costFilter === "under5" && costPerServe >= costThresholds.low) return false;
-      if (costFilter === "under10" && costPerServe >= costThresholds.high) return false;
 
       return true;
     });
-  }, [search, filter, costFilter, appRecipes]);
+  }, [search, filter, costFilter, appRecipes, favoriteIds]);
 
   return (
     <View style={{ flex: 1, backgroundColor: C.background }}>
@@ -84,7 +93,7 @@ export default function RecipesScreen() {
         style={[
           styles.header,
           {
-            paddingTop: Platform.OS === "web" ? 67 : insets.top + 8,
+            paddingTop: Platform.OS === "web" ? 14 : insets.top + 8,
             borderBottomColor: C.cardBorder,
           },
         ]}
@@ -113,15 +122,42 @@ export default function RecipesScreen() {
 
         <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterScroll}>
           <View style={styles.filters}>
-            {FILTERS.map((f) => (
-              <PillButton
-                key={f.value}
-                label={f.label}
-                active={filter === f.value}
-                onPress={() => setFilter(f.value)}
-                small
-              />
-            ))}
+            {FILTERS.map((f) => {
+              const isFavChip = f.star;
+              const isActive = filter === f.value;
+              if (isFavChip) {
+                return (
+                  <TouchableOpacity
+                    key={f.value}
+                    onPress={() => setFilter(f.value)}
+                    style={[
+                      styles.favChip,
+                      isActive && { backgroundColor: "#FFF3CD", borderColor: "#D29A22" },
+                      !isActive && { backgroundColor: C.chipBg, borderColor: C.cardBorder },
+                    ]}
+                  >
+                    <Ionicons
+                      name={isActive ? "star" : "star-outline"}
+                      size={12}
+                      color={isActive ? "#D29A22" : C.textMuted}
+                    />
+                    <Text style={[styles.favChipText, { color: isActive ? "#D29A22" : C.textSecondary }]}>
+                      {f.label}
+                      {favoriteIds.length > 0 ? ` (${favoriteIds.length})` : ""}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              }
+              return (
+                <PillButton
+                  key={f.value}
+                  label={f.label}
+                  active={filter === f.value}
+                  onPress={() => setFilter(f.value)}
+                  small
+                />
+              );
+            })}
           </View>
         </ScrollView>
 
@@ -219,6 +255,19 @@ const styles = StyleSheet.create({
     gap: 8,
     paddingHorizontal: 20,
     paddingVertical: 2,
+  },
+  favChip: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 5,
+    paddingHorizontal: 12,
+    paddingVertical: 5,
+    borderRadius: 20,
+    borderWidth: 1,
+  },
+  favChipText: {
+    fontSize: 13,
+    fontFamily: "Inter_500Medium",
   },
   costRow: {
     flexDirection: "row",
