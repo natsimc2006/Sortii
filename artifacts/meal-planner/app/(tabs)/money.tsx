@@ -35,7 +35,8 @@ import {
 import type { SavingsGoal } from "@/utils/onboardingState";
 import type { Recipe } from "@/constants/recipes";
 import { loadBills, daysUntilDue, getOneOffBillsDueThisWeek, Bill } from "@/utils/billStore";
-import { getAppointmentsWithCostThisWeek, Appointment as ApptItem } from "@/utils/appointmentStore";
+import { getAppointmentsWithCostThisWeek, loadAppointments, Appointment as ApptItem } from "@/utils/appointmentStore";
+import OverwhelmModal from "@/components/OverwhelmModal";
 
 const C = Colors.light;
 const TEAL = "#2A8F88";
@@ -573,6 +574,10 @@ export default function MoneyScreen() {
   const [apptCostsThisWeek, setApptCostsThisWeek] = useState<ApptItem[]>([]);
   const [showFullPicture, setShowFullPicture] = useState(false);
 
+  // Phase 4 — Overwhelm mode
+  const [showOverwhelm, setShowOverwhelm] = useState(false);
+  const [allAppts, setAllAppts] = useState<ApptItem[]>([]);
+
   // Money nudge dismiss state
   const [nudgeHidden, setNudgeHidden] = useState(false);
 
@@ -600,6 +605,9 @@ export default function MoneyScreen() {
     // Phase 3 — one-off bills + appointment costs
     getOneOffBillsDueThisWeek().then(setOneOffBillsThisWeek).catch(() => {});
     getAppointmentsWithCostThisWeek().then(setApptCostsThisWeek).catch(() => {});
+
+    // Phase 4 — load all appointments for overwhelm mode today/tomorrow filter
+    loadAppointments().then(setAllAppts).catch(() => {});
 
     // Check nudge dismiss state
     AsyncStorage.getItem("sortii_money_nudge_v1").then((raw) => {
@@ -751,6 +759,34 @@ export default function MoneyScreen() {
       : adjustedBreathingRoom >= 1 ? "tight"
       : "stretched"
     : "calm"; // irrelevant when no setup
+
+  // ── Phase 4 — Overwhelm mode computed data ─────────────────────
+  const JS_DAY_TO_SORTII = [
+    "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday",
+  ] as const;
+  const todayDayName = JS_DAY_TO_SORTII[new Date().getDay()];
+  const tonightEntry = currentPlan.find(
+    (e) => e.day === todayDayName && e.slot === "dinner",
+  );
+  const tonightsRecipe = tonightEntry?.recipeId
+    ? getRecipeById(tonightEntry.recipeId)
+    : null;
+  const tonightsDinner: string | null = tonightsRecipe?.name ?? null;
+
+  const _today = new Date(); _today.setHours(0, 0, 0, 0);
+  const _tomorrow = new Date(_today); _tomorrow.setDate(_today.getDate() + 1);
+  const _todayStr = _today.toISOString().split("T")[0]!;
+  const _tomorrowStr = _tomorrow.toISOString().split("T")[0]!;
+  const todayTomorrowAppts = allAppts.filter(
+    (a) =>
+      !a.isDone &&
+      !a.isCancelled &&
+      (a.date === _todayStr || a.date === _tomorrowStr),
+  ).sort(
+    (a, b) =>
+      a.date.localeCompare(b.date) ||
+      a.startTime.localeCompare(b.startTime),
+  );
 
   // Shared "full picture" section (State 1 expand + State 2 always-visible)
   const fullPictureSection = (
@@ -933,6 +969,10 @@ export default function MoneyScreen() {
           <TouchableOpacity
             activeOpacity={0.7}
             style={styles.overwhelmLink}
+            onPress={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              setShowOverwhelm(true);
+            }}
           >
             <Text style={styles.overwhelmLinkText}>Want to see what can wait? →</Text>
           </TouchableOpacity>
@@ -940,6 +980,23 @@ export default function MoneyScreen() {
       )}
     </ScrollView>
     <WinsToast message={toastMsg} bottomInset={paddingBottom} />
+
+    {/* Phase 4 — Overwhelm Mode overlay */}
+    <OverwhelmModal
+      visible={showOverwhelm}
+      pressureItems={pressureItems}
+      apptsTodayTomorrow={todayTomorrowAppts}
+      tonightsDinner={tonightsDinner}
+      formatMoney={formatMoneyRound}
+      onBack={() => {
+        setShowOverwhelm(false);
+        router.push("/(tabs)");
+      }}
+      onSeeEverything={() => {
+        setShowOverwhelm(false);
+        router.push("/(tabs)");
+      }}
+    />
     </View>
   );
 }
