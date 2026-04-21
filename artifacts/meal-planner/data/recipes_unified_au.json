@@ -225,6 +225,9 @@
         "unit": "tsp",
         "category": "herbs"
       }
+    ],
+    "categoryTags": [
+      "budget"
     ]
   },
   {
@@ -455,6 +458,11 @@
         "unit": "tbsp",
         "category": "pantry"
       }
+    ],
+    "categoryTags": [
+      "budget",
+      "quick",
+      "low-prep"
     ]
   },
   {
@@ -665,6 +673,9 @@
         "unit": "g",
         "category": "dairy"
       }
+    ],
+    "categoryTags": [
+      "everyday"
     ]
   },
   {
@@ -858,6 +869,10 @@
         "unit": "tsp",
         "category": "herbs"
       }
+    ],
+    "categoryTags": [
+      "premium",
+      "quick"
     ]
   },
   {
@@ -1086,6 +1101,10 @@
         "unit": "slices",
         "category": "grains"
       }
+    ],
+    "categoryTags": [
+      "budget",
+      "batch-cooking"
     ]
   },
   {
@@ -1315,6 +1334,11 @@
         "unit": "tbsp",
         "category": "condiments"
       }
+    ],
+    "categoryTags": [
+      "budget",
+      "quick",
+      "low-prep"
     ]
   },
   {
@@ -1505,6 +1529,10 @@
         "unit": "g",
         "category": "vegetables"
       }
+    ],
+    "categoryTags": [
+      "budget",
+      "quick"
     ]
   },
   {
@@ -1736,6 +1764,11 @@
         "category": "vegetables",
         "optional": true
       }
+    ],
+    "categoryTags": [
+      "premium",
+      "quick",
+      "low-prep"
     ]
   },
   {
@@ -1962,6 +1995,10 @@
         "unit": "slices",
         "category": "grains"
       }
+    ],
+    "categoryTags": [
+      "budget",
+      "quick"
     ]
   },
   {
@@ -2153,6 +2190,10 @@
         "unit": "g",
         "category": "vegetables"
       }
+    ],
+    "categoryTags": [
+      "premium",
+      "quick"
     ]
   },
   {
@@ -2379,6 +2420,10 @@
         "unit": "g",
         "category": "vegetables"
       }
+    ],
+    "categoryTags": [
+      "quick",
+      "everyday"
     ]
   },
   {
@@ -2571,6 +2616,11 @@
         "unit": "tbsp",
         "category": "condiments"
       }
+    ],
+    "categoryTags": [
+      "quick",
+      "low-prep",
+      "everyday"
     ]
   },
   {
@@ -2778,6 +2828,9 @@
         "unit": "tsp",
         "category": "herbs"
       }
+    ],
+    "categoryTags": [
+      "budget"
     ]
   },
   {
@@ -2988,6 +3041,10 @@
         "unit": "g",
         "category": "pantry"
       }
+    ],
+    "categoryTags": [
+      "budget",
+      "batch-cooking"
     ]
   },
   {
@@ -3178,6 +3235,9 @@
         "unit": "g",
         "category": "dairy"
       }
+    ],
+    "categoryTags": [
+      "premium"
     ]
   },
   {
@@ -3403,6 +3463,11 @@
         "unit": "whole",
         "category": "grains"
       }
+    ],
+    "categoryTags": [
+      "quick",
+      "low-prep",
+      "everyday"
     ]
   },
   {
@@ -3612,6 +3677,10 @@
         "unit": "bunch",
         "category": "herbs"
       }
+    ],
+    "categoryTags": [
+      "budget",
+      "batch-cooking"
     ]
   },
   {
@@ -3840,6 +3909,10 @@
         "unit": "whole",
         "category": "vegetables"
       }
+    ],
+    "categoryTags": [
+      "premium",
+      "quick"
     ]
   },
   {
@@ -4031,6 +4104,10 @@
         "unit": "slices",
         "category": "grains"
       }
+    ],
+    "categoryTags": [
+      "budget",
+      "batch-cooking"
     ]
   },
   {
@@ -4241,6 +4318,11 @@
         "unit": "whole",
         "category": "fruit"
       }
+    ],
+    "categoryTags": [
+      "budget",
+      "quick",
+      "low-prep"
     ]
   },
   {
@@ -4433,6 +4515,10 @@
         "unit": "tbsp",
         "category": "pantry"
       }
+    ],
+    "categoryTags": [
+      "budget",
+      "quick"
     ]
   },
   {
@@ -4660,6 +4746,9 @@
         "unit": "tbsp",
         "category": "condiments"
       }
+    ],
+    "categoryTags": [
+      "everyday"
     ]
   },
   {
@@ -4887,6 +4976,10 @@
         "unit": "tbsp",
         "category": "condiments"
       }
+    ],
+    "categoryTags": [
+      "premium",
+      "quick"
     ]
   },
   {
@@ -5113,6 +5206,10 @@
         "unit": "cups",
         "category": "grains"
       }
+    ],
+    "categoryTags": [
+      "budget",
+      "batch-cooking"
     ]
   },
   {
@@ -5286,6 +5383,11 @@
         "unit": "slices",
         "category": "condiments"
       }
+    ],
+    "categoryTags": [
+      "budget",
+      "batch-cooking",
+      "quick"
     ]
   },
   {
@@ -5493,6 +5595,9 @@
         "unit": "can",
         "category": "condiments"
       }
+    ],
+    "categoryTags": [
+      "everyday"
     ]
   },
   {
@@ -5720,6 +5825,11 @@
         "unit": "g",
         "category": "condiments"
       }
+    ],
+    "categoryTags": [
+      "quick",
+      "low-prep",
+      "everyday"
     ]
   },
   {
@@ -5946,6 +6056,10 @@
         "unit": "tsp",
         "category": "herbs"
       }
+    ],
+    "categoryTags": [
+      "budget",
+      "batch-cooking"
     ]
   },
   {
@@ -6172,6 +6286,10 @@
         "unit": "ml",
         "category": "condiments"
       }
+    ],
+    "categoryTags": [
+      "quick",
+      "everyday"
     ]
   },
   {
@@ -6361,6 +6479,9 @@
         "unit": "whole",
         "category": "vegetables"
       }
+    ],
+    "categoryTags": [
+      "everyday"
     ]
   },
   {
@@ -6625,6 +6746,10 @@
         "unit": "cups",
         "category": "grains"
       }
+    ],
+    "categoryTags": [
+      "budget",
+      "batch-cooking"
     ]
   },
   {
@@ -6868,6 +6993,11 @@
         "unit": "whole",
         "category": "vegetables"
       }
+    ],
+    "categoryTags": [
+      "budget",
+      "quick",
+      "low-prep"
     ]
   },
   {
@@ -7076,6 +7206,10 @@
         "unit": "g",
         "category": "vegetables"
       }
+    ],
+    "categoryTags": [
+      "premium",
+      "quick"
     ]
   },
   {
@@ -7304,6 +7438,11 @@
         "unit": "slices",
         "category": "grains"
       }
+    ],
+    "categoryTags": [
+      "budget",
+      "batch-cooking",
+      "quick"
     ]
   },
   {
@@ -7535,6 +7674,10 @@
         "unit": "cups",
         "category": "grains"
       }
+    ],
+    "categoryTags": [
+      "quick",
+      "everyday"
     ]
   },
   {
@@ -7762,6 +7905,9 @@
         "unit": "bunch",
         "category": "herbs"
       }
+    ],
+    "categoryTags": [
+      "everyday"
     ]
   },
   {
@@ -7992,6 +8138,11 @@
         "unit": "bunch",
         "category": "herbs"
       }
+    ],
+    "categoryTags": [
+      "budget",
+      "quick",
+      "low-prep"
     ]
   },
   {
@@ -8200,6 +8351,10 @@
         "unit": "whole",
         "category": "proteins"
       }
+    ],
+    "categoryTags": [
+      "batch-cooking",
+      "everyday"
     ]
   },
   {
@@ -8409,6 +8564,10 @@
         "unit": "g",
         "category": "frozen"
       }
+    ],
+    "categoryTags": [
+      "budget",
+      "quick"
     ]
   },
   {
@@ -8636,6 +8795,10 @@
         "unit": "cups",
         "category": "grains"
       }
+    ],
+    "categoryTags": [
+      "batch-cooking",
+      "everyday"
     ]
   },
   {
@@ -8826,6 +8989,11 @@
         "unit": "whole",
         "category": "vegetables"
       }
+    ],
+    "categoryTags": [
+      "quick",
+      "low-prep",
+      "everyday"
     ]
   },
   {
@@ -9034,6 +9202,10 @@
         "unit": "bunch",
         "category": "herbs"
       }
+    ],
+    "categoryTags": [
+      "quick",
+      "everyday"
     ]
   },
   {
@@ -9260,6 +9432,10 @@
         "unit": "g",
         "category": "vegetables"
       }
+    ],
+    "categoryTags": [
+      "premium",
+      "quick"
     ]
   },
   {
@@ -9469,6 +9645,9 @@
         "unit": "ml",
         "category": "condiments"
       }
+    ],
+    "categoryTags": [
+      "budget"
     ]
   },
   {
@@ -9661,6 +9840,11 @@
         "unit": "tsp",
         "category": "herbs"
       }
+    ],
+    "categoryTags": [
+      "budget",
+      "quick",
+      "low-prep"
     ]
   },
   {
@@ -9854,6 +10038,10 @@
         "unit": "tbsp",
         "category": "pantry"
       }
+    ],
+    "categoryTags": [
+      "budget",
+      "quick"
     ]
   },
   {
@@ -10062,6 +10250,11 @@
         "unit": "tbsp",
         "category": "condiments"
       }
+    ],
+    "categoryTags": [
+      "budget",
+      "quick",
+      "low-prep"
     ]
   },
   {
@@ -10254,6 +10447,11 @@
         "unit": "tbsp",
         "category": "condiments"
       }
+    ],
+    "categoryTags": [
+      "budget",
+      "quick",
+      "low-prep"
     ]
   },
   {
@@ -10464,6 +10662,11 @@
         "unit": "whole",
         "category": "proteins"
       }
+    ],
+    "categoryTags": [
+      "budget",
+      "quick",
+      "low-prep"
     ]
   },
   {
@@ -10657,6 +10860,11 @@
         "unit": "ml",
         "category": "condiments"
       }
+    ],
+    "categoryTags": [
+      "budget",
+      "quick",
+      "low-prep"
     ]
   },
   {
@@ -10884,6 +11092,11 @@
         "unit": "tsp",
         "category": "herbs"
       }
+    ],
+    "categoryTags": [
+      "budget",
+      "quick",
+      "low-prep"
     ]
   },
   {
@@ -11093,6 +11306,11 @@
         "unit": "bunch",
         "category": "herbs"
       }
+    ],
+    "categoryTags": [
+      "quick",
+      "low-prep",
+      "everyday"
     ]
   },
   {
@@ -11305,6 +11523,11 @@
         "unit": "cups",
         "category": "grains"
       }
+    ],
+    "categoryTags": [
+      "quick",
+      "low-prep",
+      "everyday"
     ]
   },
   {
@@ -11497,6 +11720,11 @@
         "unit": "tbsp",
         "category": "condiments"
       }
+    ],
+    "categoryTags": [
+      "premium",
+      "quick",
+      "low-prep"
     ]
   },
   {
@@ -11706,6 +11934,11 @@
         "unit": "cloves",
         "category": "herbs"
       }
+    ],
+    "categoryTags": [
+      "quick",
+      "low-prep",
+      "everyday"
     ]
   },
   {
@@ -11916,6 +12149,11 @@
         "unit": "g",
         "category": "dairy"
       }
+    ],
+    "categoryTags": [
+      "budget",
+      "quick",
+      "low-prep"
     ]
   },
   {
@@ -12125,6 +12363,11 @@
         "unit": "cups",
         "category": "grains"
       }
+    ],
+    "categoryTags": [
+      "budget",
+      "quick",
+      "low-prep"
     ]
   },
   {
@@ -12317,6 +12560,9 @@
         "unit": "sprigs",
         "category": "herbs"
       }
+    ],
+    "categoryTags": [
+      "budget"
     ]
   },
   {
@@ -12508,6 +12754,11 @@
         "unit": "whole",
         "category": "fruit"
       }
+    ],
+    "categoryTags": [
+      "budget",
+      "quick",
+      "low-prep"
     ]
   },
   {
@@ -12716,6 +12967,10 @@
         "unit": "whole",
         "category": "fruit"
       }
+    ],
+    "categoryTags": [
+      "premium",
+      "quick"
     ]
   },
   {
@@ -12929,6 +13184,11 @@
         "category": "fruit",
         "optional": true
       }
+    ],
+    "categoryTags": [
+      "premium",
+      "quick",
+      "low-prep"
     ]
   },
   {
@@ -13122,6 +13382,11 @@
         "unit": "cloves",
         "category": "herbs"
       }
+    ],
+    "categoryTags": [
+      "budget",
+      "quick",
+      "low-prep"
     ]
   },
   {
@@ -13332,6 +13597,10 @@
         "unit": "whole",
         "category": "fruit"
       }
+    ],
+    "categoryTags": [
+      "budget",
+      "quick"
     ]
   },
   {
@@ -13523,6 +13792,11 @@
         "unit": "slices",
         "category": "grains"
       }
+    ],
+    "categoryTags": [
+      "budget",
+      "batch-cooking",
+      "quick"
     ]
   },
   {
@@ -13716,6 +13990,10 @@
         "unit": "tbsp",
         "category": "condiments"
       }
+    ],
+    "categoryTags": [
+      "budget",
+      "quick"
     ]
   },
   {
@@ -13907,6 +14185,10 @@
         "unit": "tsp",
         "category": "herbs"
       }
+    ],
+    "categoryTags": [
+      "budget",
+      "quick"
     ]
   },
   {
@@ -14062,6 +14344,11 @@
         "unit": "tbsp",
         "category": "condiments"
       }
+    ],
+    "categoryTags": [
+      "premium",
+      "quick",
+      "low-prep"
     ]
   },
   {
@@ -14254,6 +14541,11 @@
         "unit": "tsp",
         "category": "herbs"
       }
+    ],
+    "categoryTags": [
+      "budget",
+      "quick",
+      "low-prep"
     ]
   },
   {
@@ -14463,6 +14755,9 @@
         "unit": "bunch",
         "category": "herbs"
       }
+    ],
+    "categoryTags": [
+      "budget"
     ]
   },
   {
@@ -14655,6 +14950,11 @@
         "unit": "whole",
         "category": "fruit"
       }
+    ],
+    "categoryTags": [
+      "budget",
+      "quick",
+      "low-prep"
     ]
   },
   {
@@ -14863,6 +15163,10 @@
         "unit": "tbsp",
         "category": "condiments"
       }
+    ],
+    "categoryTags": [
+      "quick",
+      "everyday"
     ]
   },
   {
@@ -15055,6 +15359,11 @@
         "unit": "tbsp",
         "category": "condiments"
       }
+    ],
+    "categoryTags": [
+      "premium",
+      "quick",
+      "low-prep"
     ]
   },
   {
@@ -15245,6 +15554,10 @@
         "unit": "g",
         "category": "vegetables"
       }
+    ],
+    "categoryTags": [
+      "budget",
+      "quick"
     ]
   },
   {
@@ -15418,6 +15731,11 @@
         "unit": "g",
         "category": "dairy"
       }
+    ],
+    "categoryTags": [
+      "budget",
+      "quick",
+      "low-prep"
     ]
   },
   {
@@ -15591,6 +15909,10 @@
         "unit": "cups",
         "category": "grains"
       }
+    ],
+    "categoryTags": [
+      "budget",
+      "quick"
     ]
   },
   {
@@ -15746,6 +16068,11 @@
         "unit": "g",
         "category": "dairy"
       }
+    ],
+    "categoryTags": [
+      "budget",
+      "quick",
+      "low-prep"
     ]
   },
   {
@@ -15919,6 +16246,11 @@
         "unit": "tbsp",
         "category": "condiments"
       }
+    ],
+    "categoryTags": [
+      "budget",
+      "quick",
+      "low-prep"
     ]
   },
   {
@@ -16073,6 +16405,11 @@
         "unit": "g",
         "category": "dairy"
       }
+    ],
+    "categoryTags": [
+      "budget",
+      "quick",
+      "low-prep"
     ]
   },
   {
@@ -16264,6 +16601,10 @@
         "unit": "whole",
         "category": "fruit"
       }
+    ],
+    "categoryTags": [
+      "budget",
+      "quick"
     ]
   },
   {
@@ -16455,6 +16796,10 @@
         "unit": "cups",
         "category": "grains"
       }
+    ],
+    "categoryTags": [
+      "quick",
+      "everyday"
     ]
   },
   {
@@ -16626,6 +16971,9 @@
         "unit": "tsp",
         "category": "herbs"
       }
+    ],
+    "categoryTags": [
+      "budget"
     ]
   },
   {
@@ -16783,6 +17131,11 @@
         "category": "dairy",
         "optional": true
       }
+    ],
+    "categoryTags": [
+      "budget",
+      "quick",
+      "low-prep"
     ]
   },
   {
@@ -16973,6 +17326,10 @@
         "unit": "whole",
         "category": "vegetables"
       }
+    ],
+    "categoryTags": [
+      "quick",
+      "everyday"
     ]
   },
   {
@@ -17128,6 +17485,11 @@
         "unit": "bunches",
         "category": "vegetables"
       }
+    ],
+    "categoryTags": [
+      "quick",
+      "low-prep",
+      "everyday"
     ]
   },
   {
@@ -17301,6 +17663,11 @@
         "unit": "whole",
         "category": "fruit"
       }
+    ],
+    "categoryTags": [
+      "premium",
+      "quick",
+      "low-prep"
     ]
   },
   {
@@ -17492,6 +17859,10 @@
         "unit": "tbsp",
         "category": "condiments"
       }
+    ],
+    "categoryTags": [
+      "budget",
+      "quick"
     ]
   },
   {
@@ -17664,6 +18035,11 @@
         "unit": "tbsp",
         "category": "condiments"
       }
+    ],
+    "categoryTags": [
+      "budget",
+      "quick",
+      "low-prep"
     ]
   },
   {
@@ -17836,6 +18212,11 @@
         "unit": "g",
         "category": "vegetables"
       }
+    ],
+    "categoryTags": [
+      "quick",
+      "low-prep",
+      "everyday"
     ]
   },
   {
@@ -18010,6 +18391,11 @@
         "unit": "cloves",
         "category": "herbs"
       }
+    ],
+    "categoryTags": [
+      "quick",
+      "low-prep",
+      "everyday"
     ]
   },
   {
@@ -18182,6 +18568,11 @@
         "unit": "g",
         "category": "dairy"
       }
+    ],
+    "categoryTags": [
+      "budget",
+      "quick",
+      "low-prep"
     ]
   },
   {
@@ -18338,6 +18729,9 @@
         "unit": "g",
         "category": "vegetables"
       }
+    ],
+    "categoryTags": [
+      "budget"
     ]
   },
   {
@@ -18512,6 +18906,10 @@
         "unit": "ml",
         "category": "dairy"
       }
+    ],
+    "categoryTags": [
+      "budget",
+      "quick"
     ]
   },
   {
@@ -18703,6 +19101,9 @@
         "unit": "cups",
         "category": "grains"
       }
+    ],
+    "categoryTags": [
+      "everyday"
     ]
   },
   {
@@ -18874,6 +19275,9 @@
         "unit": "whole",
         "category": "fruit"
       }
+    ],
+    "categoryTags": [
+      "everyday"
     ]
   },
   {
@@ -19064,6 +19468,11 @@
         "unit": "cups",
         "category": "grains"
       }
+    ],
+    "categoryTags": [
+      "quick",
+      "low-prep",
+      "everyday"
     ]
   },
   {
@@ -19255,6 +19664,10 @@
         "unit": "cups",
         "category": "grains"
       }
+    ],
+    "categoryTags": [
+      "budget",
+      "quick"
     ]
   },
   {
@@ -19447,6 +19860,10 @@
         "unit": "slices",
         "category": "grains"
       }
+    ],
+    "categoryTags": [
+      "budget",
+      "quick"
     ]
   },
   {
@@ -19638,6 +20055,9 @@
         "unit": "cloves",
         "category": "herbs"
       }
+    ],
+    "categoryTags": [
+      "budget"
     ]
   },
   {
@@ -19829,6 +20249,11 @@
         "unit": "slices",
         "category": "grains"
       }
+    ],
+    "categoryTags": [
+      "budget",
+      "quick",
+      "low-prep"
     ]
   },
   {
@@ -20022,6 +20447,9 @@
         "unit": "handful",
         "category": "herbs"
       }
+    ],
+    "categoryTags": [
+      "budget"
     ]
   },
   {
@@ -20212,6 +20640,10 @@
         "unit": "tbsp",
         "category": "condiments"
       }
+    ],
+    "categoryTags": [
+      "quick",
+      "everyday"
     ]
   },
   {
@@ -20404,6 +20836,9 @@
         "unit": "whole",
         "category": "fruit"
       }
+    ],
+    "categoryTags": [
+      "everyday"
     ]
   },
   {
@@ -20596,6 +21031,11 @@
         "unit": "whole",
         "category": "herbs"
       }
+    ],
+    "categoryTags": [
+      "budget",
+      "quick",
+      "low-prep"
     ]
   },
   {
@@ -20787,6 +21227,10 @@
         "unit": "g",
         "category": "dairy"
       }
+    ],
+    "categoryTags": [
+      "budget",
+      "quick"
     ]
   },
   {
@@ -20978,6 +21422,9 @@
         "unit": "handful",
         "category": "herbs"
       }
+    ],
+    "categoryTags": [
+      "budget"
     ]
   },
   {
@@ -21170,6 +21617,10 @@
         "unit": "tbsp",
         "category": "condiments"
       }
+    ],
+    "categoryTags": [
+      "budget",
+      "quick"
     ]
   },
   {
@@ -21378,6 +21829,11 @@
         "unit": "cloves",
         "category": "herbs"
       }
+    ],
+    "categoryTags": [
+      "budget",
+      "quick",
+      "low-prep"
     ]
   },
   {
@@ -21589,6 +22045,11 @@
         "unit": "whole",
         "category": "vegetables"
       }
+    ],
+    "categoryTags": [
+      "budget",
+      "quick",
+      "low-prep"
     ]
   },
   {
@@ -21797,6 +22258,9 @@
         "unit": "g",
         "category": "dairy"
       }
+    ],
+    "categoryTags": [
+      "everyday"
     ]
   },
   {
@@ -21987,6 +22451,11 @@
         "unit": "whole",
         "category": "fruit"
       }
+    ],
+    "categoryTags": [
+      "quick",
+      "low-prep",
+      "everyday"
     ]
   },
   {
@@ -22176,6 +22645,10 @@
         "unit": "whole",
         "category": "fruit"
       }
+    ],
+    "categoryTags": [
+      "budget",
+      "quick"
     ]
   },
   {
@@ -22368,6 +22841,9 @@
         "unit": "tbsp",
         "category": "condiments"
       }
+    ],
+    "categoryTags": [
+      "budget"
     ]
   },
   {
@@ -22560,6 +23036,10 @@
         "unit": "tbsp",
         "category": "pantry"
       }
+    ],
+    "categoryTags": [
+      "budget",
+      "quick"
     ]
   },
   {
@@ -22769,6 +23249,9 @@
         "unit": "tbsp",
         "category": "condiments"
       }
+    ],
+    "categoryTags": [
+      "everyday"
     ]
   },
   {
@@ -22959,6 +23442,11 @@
         "unit": "whole",
         "category": "vegetables"
       }
+    ],
+    "categoryTags": [
+      "quick",
+      "low-prep",
+      "everyday"
     ]
   },
   {
@@ -23150,6 +23638,9 @@
         "unit": "tsp",
         "category": "herbs"
       }
+    ],
+    "categoryTags": [
+      "budget"
     ]
   },
   {
@@ -23341,6 +23832,11 @@
         "unit": "handful",
         "category": "herbs"
       }
+    ],
+    "categoryTags": [
+      "budget",
+      "quick",
+      "low-prep"
     ]
   },
   {
@@ -23533,6 +24029,11 @@
         "unit": "whole",
         "category": "proteins"
       }
+    ],
+    "categoryTags": [
+      "budget",
+      "quick",
+      "low-prep"
     ]
   },
   {
@@ -23726,6 +24227,9 @@
         "unit": "sprigs",
         "category": "herbs"
       }
+    ],
+    "categoryTags": [
+      "budget"
     ]
   },
   {
@@ -23917,6 +24421,9 @@
         "unit": "tbsp",
         "category": "condiments"
       }
+    ],
+    "categoryTags": [
+      "everyday"
     ]
   },
   {
@@ -24106,6 +24613,10 @@
         "unit": "whole",
         "category": "vegetables"
       }
+    ],
+    "categoryTags": [
+      "budget",
+      "quick"
     ]
   },
   {
@@ -24297,6 +24808,11 @@
         "unit": "whole",
         "category": "herbs"
       }
+    ],
+    "categoryTags": [
+      "budget",
+      "quick",
+      "low-prep"
     ]
   },
   {
@@ -24489,6 +25005,10 @@
         "unit": "whole",
         "category": "fruit"
       }
+    ],
+    "categoryTags": [
+      "budget",
+      "quick"
     ]
   },
   {
@@ -24680,6 +25200,10 @@
         "unit": "handful",
         "category": "herbs"
       }
+    ],
+    "categoryTags": [
+      "budget",
+      "quick"
     ]
   },
   {
@@ -24873,6 +25397,11 @@
         "unit": "whole",
         "category": "herbs"
       }
+    ],
+    "categoryTags": [
+      "budget",
+      "quick",
+      "low-prep"
     ]
   },
   {
@@ -25064,6 +25593,10 @@
         "unit": "tbsp",
         "category": "condiments"
       }
+    ],
+    "categoryTags": [
+      "quick",
+      "everyday"
     ]
   },
   {
@@ -25255,6 +25788,11 @@
         "unit": "cups",
         "category": "grains"
       }
+    ],
+    "categoryTags": [
+      "quick",
+      "low-prep",
+      "everyday"
     ]
   },
   {
@@ -25445,6 +25983,9 @@
         "unit": "tbsp",
         "category": "condiments"
       }
+    ],
+    "categoryTags": [
+      "everyday"
     ]
   },
   {
@@ -25635,6 +26176,9 @@
         "unit": "cups",
         "category": "vegetables"
       }
+    ],
+    "categoryTags": [
+      "budget"
     ]
   },
   {
@@ -25827,6 +26371,9 @@
         "unit": "cups",
         "category": "vegetables"
       }
+    ],
+    "categoryTags": [
+      "budget"
     ]
   },
   {
@@ -26037,6 +26584,10 @@
         "unit": "cups",
         "category": "grains"
       }
+    ],
+    "categoryTags": [
+      "budget",
+      "quick"
     ]
   },
   {
@@ -26246,6 +26797,10 @@
         "unit": "cups",
         "category": "grains"
       }
+    ],
+    "categoryTags": [
+      "budget",
+      "quick"
     ]
   },
   {
@@ -26438,6 +26993,10 @@
         "unit": "tbsp",
         "category": "pantry"
       }
+    ],
+    "categoryTags": [
+      "budget",
+      "quick"
     ]
   },
   {
@@ -26645,6 +27204,10 @@
         "unit": "g",
         "category": "grains"
       }
+    ],
+    "categoryTags": [
+      "quick",
+      "everyday"
     ]
   },
   {
@@ -26835,6 +27398,11 @@
         "unit": "cups",
         "category": "grains"
       }
+    ],
+    "categoryTags": [
+      "quick",
+      "low-prep",
+      "everyday"
     ]
   },
   {
@@ -27061,6 +27629,10 @@
         "unit": "whole",
         "category": "grains"
       }
+    ],
+    "categoryTags": [
+      "budget",
+      "quick"
     ]
   },
   {
@@ -27253,6 +27825,11 @@
         "unit": "tbsp",
         "category": "condiments"
       }
+    ],
+    "categoryTags": [
+      "budget",
+      "quick",
+      "low-prep"
     ]
   },
   {
@@ -27464,6 +28041,9 @@
         "unit": "tbsp",
         "category": "condiments"
       }
+    ],
+    "categoryTags": [
+      "everyday"
     ]
   },
   {
@@ -27675,6 +28255,9 @@
         "unit": "g",
         "category": "dairy"
       }
+    ],
+    "categoryTags": [
+      "budget"
     ]
   },
   {
@@ -27866,6 +28449,9 @@
         "unit": "whole",
         "category": "fruit"
       }
+    ],
+    "categoryTags": [
+      "everyday"
     ]
   },
   {
@@ -28058,6 +28644,9 @@
         "unit": "cups",
         "category": "grains"
       }
+    ],
+    "categoryTags": [
+      "budget"
     ]
   },
   {
@@ -28268,6 +28857,9 @@
         "unit": "tsp",
         "category": "herbs"
       }
+    ],
+    "categoryTags": [
+      "budget"
     ]
   },
   {
@@ -28478,6 +29070,9 @@
         "unit": "tbsp",
         "category": "pantry"
       }
+    ],
+    "categoryTags": [
+      "everyday"
     ]
   },
   {
@@ -28669,6 +29264,11 @@
         "unit": "whole",
         "category": "fruit"
       }
+    ],
+    "categoryTags": [
+      "quick",
+      "low-prep",
+      "everyday"
     ]
   },
   {
@@ -28878,6 +29478,9 @@
         "unit": "g",
         "category": "dairy"
       }
+    ],
+    "categoryTags": [
+      "everyday"
     ]
   },
   {
@@ -29069,6 +29672,11 @@
         "unit": "whole",
         "category": "vegetables"
       }
+    ],
+    "categoryTags": [
+      "premium",
+      "quick",
+      "low-prep"
     ]
   },
   {
@@ -29278,6 +29886,9 @@
         "unit": "cloves",
         "category": "herbs"
       }
+    ],
+    "categoryTags": [
+      "everyday"
     ]
   },
   {
@@ -29469,6 +30080,11 @@
         "unit": "cups",
         "category": "grains"
       }
+    ],
+    "categoryTags": [
+      "budget",
+      "quick",
+      "low-prep"
     ]
   },
   {
@@ -29679,6 +30295,11 @@
         "unit": "whole",
         "category": "fruit"
       }
+    ],
+    "categoryTags": [
+      "budget",
+      "quick",
+      "low-prep"
     ]
   },
   {
@@ -29887,6 +30508,10 @@
         "unit": "g",
         "category": "dairy"
       }
+    ],
+    "categoryTags": [
+      "quick",
+      "everyday"
     ]
   },
   {
@@ -30080,6 +30705,9 @@
         "unit": "tsp",
         "category": "herbs"
       }
+    ],
+    "categoryTags": [
+      "budget"
     ]
   },
   {
@@ -30271,6 +30899,11 @@
         "unit": "tbsp",
         "category": "condiments"
       }
+    ],
+    "categoryTags": [
+      "budget",
+      "quick",
+      "low-prep"
     ]
   },
   {
@@ -30463,6 +31096,9 @@
         "unit": "whole",
         "category": "grains"
       }
+    ],
+    "categoryTags": [
+      "premium"
     ]
   },
   {
@@ -30671,6 +31307,10 @@
         "unit": "whole",
         "category": "fruit"
       }
+    ],
+    "categoryTags": [
+      "quick",
+      "everyday"
     ]
   },
   {
@@ -30881,6 +31521,9 @@
         "unit": "cups",
         "category": "grains"
       }
+    ],
+    "categoryTags": [
+      "budget"
     ]
   },
   {
@@ -31090,6 +31733,11 @@
         "unit": "tbsp",
         "category": "pantry"
       }
+    ],
+    "categoryTags": [
+      "budget",
+      "quick",
+      "low-prep"
     ]
   },
   {
@@ -31297,6 +31945,10 @@
         "unit": "whole",
         "category": "vegetables"
       }
+    ],
+    "categoryTags": [
+      "quick",
+      "everyday"
     ]
   },
   {
@@ -31504,6 +32156,9 @@
         "unit": "whole",
         "category": "vegetables"
       }
+    ],
+    "categoryTags": [
+      "premium"
     ]
   },
   {
@@ -31714,6 +32369,10 @@
         "unit": "g",
         "category": "vegetables"
       }
+    ],
+    "categoryTags": [
+      "budget",
+      "quick"
     ]
   },
   {
@@ -31906,6 +32565,11 @@
         "unit": "whole",
         "category": "herbs"
       }
+    ],
+    "categoryTags": [
+      "budget",
+      "quick",
+      "low-prep"
     ]
   },
   {
@@ -32077,6 +32741,10 @@
         "unit": "g",
         "category": "vegetables"
       }
+    ],
+    "categoryTags": [
+      "quick",
+      "everyday"
     ]
   },
   {
@@ -32288,6 +32956,11 @@
         "unit": "whole",
         "category": "vegetables"
       }
+    ],
+    "categoryTags": [
+      "budget",
+      "quick",
+      "low-prep"
     ]
   },
   {
@@ -32444,6 +33117,11 @@
         "unit": "tsp",
         "category": "herbs"
       }
+    ],
+    "categoryTags": [
+      "budget",
+      "quick",
+      "low-prep"
     ]
   },
   {
@@ -32617,6 +33295,10 @@
         "unit": "g",
         "category": "vegetables"
       }
+    ],
+    "categoryTags": [
+      "budget",
+      "quick"
     ]
   },
   {
@@ -32791,6 +33473,11 @@
         "unit": "ml",
         "category": "condiments"
       }
+    ],
+    "categoryTags": [
+      "budget",
+      "quick",
+      "low-prep"
     ]
   },
   {
@@ -33001,6 +33688,10 @@
         "unit": "cloves",
         "category": "herbs"
       }
+    ],
+    "categoryTags": [
+      "budget",
+      "quick"
     ]
   },
   {
@@ -33209,6 +33900,9 @@
         "unit": "tbsp",
         "category": "condiments"
       }
+    ],
+    "categoryTags": [
+      "everyday"
     ]
   },
   {
@@ -33401,6 +34095,11 @@
         "unit": "cups",
         "category": "grains"
       }
+    ],
+    "categoryTags": [
+      "budget",
+      "quick",
+      "low-prep"
     ]
   },
   {
@@ -33574,6 +34273,9 @@
         "unit": "tbsp",
         "category": "condiments"
       }
+    ],
+    "categoryTags": [
+      "premium"
     ]
   },
   {
@@ -33782,6 +34484,9 @@
         "unit": "tsp",
         "category": "herbs"
       }
+    ],
+    "categoryTags": [
+      "premium"
     ]
   },
   {
@@ -33974,6 +34679,10 @@
         "unit": "slices",
         "category": "grains"
       }
+    ],
+    "categoryTags": [
+      "budget",
+      "quick"
     ]
   },
   {
@@ -34147,6 +34856,11 @@
         "unit": "ml",
         "category": "condiments"
       }
+    ],
+    "categoryTags": [
+      "budget",
+      "quick",
+      "low-prep"
     ]
   },
   {
@@ -34337,6 +35051,9 @@
         "unit": "whole",
         "category": "grains"
       }
+    ],
+    "categoryTags": [
+      "everyday"
     ]
   },
   {
@@ -34528,6 +35245,11 @@
         "unit": "handful",
         "category": "herbs"
       }
+    ],
+    "categoryTags": [
+      "premium",
+      "quick",
+      "low-prep"
     ]
   },
   {
@@ -34718,6 +35440,11 @@
         "unit": "tsp",
         "category": "herbs"
       }
+    ],
+    "categoryTags": [
+      "quick",
+      "low-prep",
+      "everyday"
     ]
   },
   {
@@ -34909,6 +35636,11 @@
         "unit": "cups",
         "category": "grains"
       }
+    ],
+    "categoryTags": [
+      "quick",
+      "low-prep",
+      "everyday"
     ]
   },
   {
@@ -35099,6 +35831,11 @@
         "unit": "cups",
         "category": "vegetables"
       }
+    ],
+    "categoryTags": [
+      "premium",
+      "quick",
+      "low-prep"
     ]
   },
   {
@@ -35290,6 +36027,11 @@
         "unit": "cups",
         "category": "vegetables"
       }
+    ],
+    "categoryTags": [
+      "quick",
+      "low-prep",
+      "everyday"
     ]
   },
   {
@@ -35499,6 +36241,10 @@
         "unit": "whole",
         "category": "fruit"
       }
+    ],
+    "categoryTags": [
+      "budget",
+      "quick"
     ]
   },
   {
@@ -35691,6 +36437,11 @@
         "unit": "whole",
         "category": "herbs"
       }
+    ],
+    "categoryTags": [
+      "budget",
+      "quick",
+      "low-prep"
     ]
   },
   {
@@ -35880,6 +36631,10 @@
         "unit": "g",
         "category": "vegetables"
       }
+    ],
+    "categoryTags": [
+      "premium",
+      "quick"
     ]
   },
   {
@@ -36090,6 +36845,11 @@
         "unit": "tbsp",
         "category": "condiments"
       }
+    ],
+    "categoryTags": [
+      "budget",
+      "quick",
+      "low-prep"
     ]
   },
   {
@@ -36262,6 +37022,11 @@
         "unit": "slices",
         "category": "grains"
       }
+    ],
+    "categoryTags": [
+      "premium",
+      "quick",
+      "low-prep"
     ]
   },
   {
@@ -36471,6 +37236,9 @@
         "unit": "cloves",
         "category": "herbs"
       }
+    ],
+    "categoryTags": [
+      "premium"
     ]
   },
   {
@@ -36643,6 +37411,11 @@
         "unit": "cups",
         "category": "vegetables"
       }
+    ],
+    "categoryTags": [
+      "premium",
+      "quick",
+      "low-prep"
     ]
   },
   {
@@ -36851,6 +37624,10 @@
         "unit": "tbsp",
         "category": "condiments"
       }
+    ],
+    "categoryTags": [
+      "quick",
+      "everyday"
     ]
   },
   {
@@ -37042,6 +37819,9 @@
         "unit": "g",
         "category": "vegetables"
       }
+    ],
+    "categoryTags": [
+      "premium"
     ]
   },
   {
@@ -37251,6 +38031,9 @@
         "unit": "cloves",
         "category": "herbs"
       }
+    ],
+    "categoryTags": [
+      "everyday"
     ]
   },
   {
@@ -37442,6 +38225,11 @@
         "unit": "cup",
         "category": "vegetables"
       }
+    ],
+    "categoryTags": [
+      "premium",
+      "quick",
+      "low-prep"
     ]
   },
   {
@@ -37650,6 +38438,9 @@
         "unit": "g",
         "category": "dairy"
       }
+    ],
+    "categoryTags": [
+      "premium"
     ]
   },
   {
@@ -37860,6 +38651,9 @@
         "unit": "handful",
         "category": "herbs"
       }
+    ],
+    "categoryTags": [
+      "premium"
     ]
   },
   {
@@ -38087,6 +38881,9 @@
         "unit": "g",
         "category": "dairy"
       }
+    ],
+    "categoryTags": [
+      "premium"
     ]
   },
   {
@@ -38296,6 +39093,9 @@
         "unit": "cups",
         "category": "grains"
       }
+    ],
+    "categoryTags": [
+      "everyday"
     ]
   },
   {
@@ -38505,6 +39305,11 @@
         "unit": "tbsp",
         "category": "condiments"
       }
+    ],
+    "categoryTags": [
+      "premium",
+      "quick",
+      "low-prep"
     ]
   },
   {
@@ -38713,6 +39518,9 @@
         "unit": "handful",
         "category": "herbs"
       }
+    ],
+    "categoryTags": [
+      "everyday"
     ]
   },
   {
@@ -38939,6 +39747,11 @@
         "unit": "handful",
         "category": "herbs"
       }
+    ],
+    "categoryTags": [
+      "quick",
+      "low-prep",
+      "everyday"
     ]
   },
   {
@@ -39147,6 +39960,9 @@
         "unit": "cups",
         "category": "grains"
       }
+    ],
+    "categoryTags": [
+      "premium"
     ]
   },
   {
@@ -39357,6 +40173,10 @@
         "unit": "slices",
         "category": "grains"
       }
+    ],
+    "categoryTags": [
+      "budget",
+      "quick"
     ]
   },
   {
@@ -39566,6 +40386,10 @@
         "unit": "handful",
         "category": "herbs"
       }
+    ],
+    "categoryTags": [
+      "budget",
+      "quick"
     ]
   },
   {
@@ -39793,6 +40617,10 @@
         "unit": "tbsp",
         "category": "condiments"
       }
+    ],
+    "categoryTags": [
+      "budget",
+      "quick"
     ]
   },
   {
@@ -40001,6 +40829,10 @@
         "unit": "handful",
         "category": "herbs"
       }
+    ],
+    "categoryTags": [
+      "budget",
+      "quick"
     ]
   },
   {
@@ -40194,6 +41026,10 @@
         "unit": "tbsp",
         "category": "condiments"
       }
+    ],
+    "categoryTags": [
+      "budget",
+      "quick"
     ]
   },
   {
@@ -40422,6 +41258,11 @@
         "unit": "g",
         "category": "dairy"
       }
+    ],
+    "categoryTags": [
+      "budget",
+      "quick",
+      "low-prep"
     ]
   },
   {
@@ -40612,6 +41453,9 @@
         "unit": "tbsp",
         "category": "condiments"
       }
+    ],
+    "categoryTags": [
+      "budget"
     ]
   },
   {
@@ -40822,6 +41666,11 @@
         "unit": "cups",
         "category": "grains"
       }
+    ],
+    "categoryTags": [
+      "budget",
+      "quick",
+      "low-prep"
     ]
   },
   {
@@ -41014,6 +41863,11 @@
         "unit": "whole",
         "category": "fruit"
       }
+    ],
+    "categoryTags": [
+      "budget",
+      "quick",
+      "low-prep"
     ]
   },
   {
@@ -41223,6 +42077,10 @@
         "unit": "whole",
         "category": "fruit"
       }
+    ],
+    "categoryTags": [
+      "budget",
+      "quick"
     ]
   },
   {
@@ -41432,6 +42290,9 @@
         "unit": "tbsp",
         "category": "condiments"
       }
+    ],
+    "categoryTags": [
+      "budget"
     ]
   },
   {
@@ -41642,6 +42503,9 @@
         "unit": "tsp",
         "category": "herbs"
       }
+    ],
+    "categoryTags": [
+      "budget"
     ]
   },
   {
@@ -41851,6 +42715,11 @@
         "unit": "g",
         "category": "dairy"
       }
+    ],
+    "categoryTags": [
+      "budget",
+      "quick",
+      "low-prep"
     ]
   },
   {
@@ -42042,6 +42911,11 @@
         "unit": "tsp",
         "category": "herbs"
       }
+    ],
+    "categoryTags": [
+      "budget",
+      "quick",
+      "low-prep"
     ]
   },
   {
@@ -42270,6 +43144,10 @@
         "unit": "tsp",
         "category": "herbs"
       }
+    ],
+    "categoryTags": [
+      "budget",
+      "quick"
     ]
   },
   {
@@ -42477,6 +43355,9 @@
         "unit": "leaves",
         "category": "herbs"
       }
+    ],
+    "categoryTags": [
+      "everyday"
     ]
   },
   {
@@ -42666,6 +43547,9 @@
         "unit": "sprigs",
         "category": "herbs"
       }
+    ],
+    "categoryTags": [
+      "everyday"
     ]
   },
   {
@@ -42876,6 +43760,9 @@
         "unit": "g",
         "category": "dairy"
       }
+    ],
+    "categoryTags": [
+      "budget"
     ]
   },
   {
@@ -43065,6 +43952,9 @@
         "unit": "tbsp",
         "category": "condiments"
       }
+    ],
+    "categoryTags": [
+      "everyday"
     ]
   },
   {
@@ -43254,6 +44144,9 @@
         "unit": "tbsp",
         "category": "condiments"
       }
+    ],
+    "categoryTags": [
+      "everyday"
     ]
   },
   {
@@ -43463,6 +44356,9 @@
         "unit": "handful",
         "category": "herbs"
       }
+    ],
+    "categoryTags": [
+      "budget"
     ]
   },
   {
@@ -43671,6 +44567,10 @@
         "unit": "slices",
         "category": "grains"
       }
+    ],
+    "categoryTags": [
+      "budget",
+      "quick"
     ]
   },
   {
@@ -43880,6 +44780,11 @@
         "unit": "cups",
         "category": "grains"
       }
+    ],
+    "categoryTags": [
+      "budget",
+      "quick",
+      "low-prep"
     ]
   },
   {
@@ -44054,6 +44959,11 @@
         "unit": "cups",
         "category": "vegetables"
       }
+    ],
+    "categoryTags": [
+      "budget",
+      "quick",
+      "low-prep"
     ]
   },
   {
@@ -44246,6 +45156,11 @@
         "unit": "g",
         "category": "dairy"
       }
+    ],
+    "categoryTags": [
+      "budget",
+      "quick",
+      "low-prep"
     ]
   },
   {
@@ -44417,6 +45332,10 @@
         "unit": "g",
         "category": "vegetables"
       }
+    ],
+    "categoryTags": [
+      "premium",
+      "quick"
     ]
   },
   {
@@ -44589,6 +45508,11 @@
         "unit": "tbsp",
         "category": "condiments"
       }
+    ],
+    "categoryTags": [
+      "quick",
+      "low-prep",
+      "everyday"
     ]
   },
   {
@@ -44780,6 +45704,11 @@
         "unit": "handful",
         "category": "herbs"
       }
+    ],
+    "categoryTags": [
+      "premium",
+      "quick",
+      "low-prep"
     ]
   },
   {
@@ -44987,6 +45916,10 @@
         "unit": "whole",
         "category": "fruit"
       }
+    ],
+    "categoryTags": [
+      "quick",
+      "everyday"
     ]
   },
   {
@@ -45159,6 +46092,10 @@
         "unit": "ml",
         "category": "condiments"
       }
+    ],
+    "categoryTags": [
+      "premium",
+      "quick"
     ]
   },
   {
@@ -45385,6 +46322,10 @@
         "unit": "tbsp",
         "category": "condiments"
       }
+    ],
+    "categoryTags": [
+      "quick",
+      "everyday"
     ]
   },
   {
@@ -45593,6 +46534,10 @@
         "unit": "g",
         "category": "vegetables"
       }
+    ],
+    "categoryTags": [
+      "quick",
+      "everyday"
     ]
   },
   {
@@ -45802,6 +46747,10 @@
         "unit": "whole",
         "category": "fruit"
       }
+    ],
+    "categoryTags": [
+      "budget",
+      "quick"
     ]
   },
   {
@@ -45993,6 +46942,11 @@
         "unit": "tsp",
         "category": "condiments"
       }
+    ],
+    "categoryTags": [
+      "premium",
+      "quick",
+      "low-prep"
     ]
   },
   {
@@ -46184,6 +47138,11 @@
         "unit": "whole",
         "category": "fruit"
       }
+    ],
+    "categoryTags": [
+      "budget",
+      "quick",
+      "low-prep"
     ]
   },
   {
@@ -46374,6 +47333,11 @@
         "unit": "whole",
         "category": "fruit"
       }
+    ],
+    "categoryTags": [
+      "quick",
+      "low-prep",
+      "everyday"
     ]
   },
   {
@@ -46564,6 +47528,11 @@
         "unit": "cups",
         "category": "grains"
       }
+    ],
+    "categoryTags": [
+      "premium",
+      "quick",
+      "low-prep"
     ]
   },
   {
@@ -46772,6 +47741,11 @@
         "unit": "cup",
         "category": "vegetables"
       }
+    ],
+    "categoryTags": [
+      "quick",
+      "low-prep",
+      "everyday"
     ]
   },
   {
@@ -46961,6 +47935,11 @@
         "unit": "tbsp",
         "category": "pantry"
       }
+    ],
+    "categoryTags": [
+      "quick",
+      "low-prep",
+      "everyday"
     ]
   },
   {
@@ -47170,6 +48149,11 @@
         "unit": "tsp",
         "category": "condiments"
       }
+    ],
+    "categoryTags": [
+      "premium",
+      "quick",
+      "low-prep"
     ]
   },
   {
@@ -47378,6 +48362,10 @@
         "unit": "whole",
         "category": "vegetables"
       }
+    ],
+    "categoryTags": [
+      "quick",
+      "everyday"
     ]
   },
   {
@@ -47587,6 +48575,9 @@
         "unit": "tsp",
         "category": "herbs"
       }
+    ],
+    "categoryTags": [
+      "everyday"
     ]
   },
   {
@@ -47794,6 +48785,9 @@
         "unit": "handful",
         "category": "herbs"
       }
+    ],
+    "categoryTags": [
+      "premium"
     ]
   },
   {
@@ -48003,6 +48997,9 @@
         "unit": "g",
         "category": "pantry"
       }
+    ],
+    "categoryTags": [
+      "everyday"
     ]
   },
   {
@@ -48212,6 +49209,10 @@
         "unit": "tbsp",
         "category": "condiments"
       }
+    ],
+    "categoryTags": [
+      "budget",
+      "quick"
     ]
   },
   {
@@ -48421,6 +49422,10 @@
         "unit": "tbsp",
         "category": "condiments"
       }
+    ],
+    "categoryTags": [
+      "budget",
+      "quick"
     ]
   },
   {
@@ -48631,6 +49636,9 @@
         "unit": "handful",
         "category": "herbs"
       }
+    ],
+    "categoryTags": [
+      "everyday"
     ]
   },
   {
@@ -48839,6 +49847,10 @@
         "unit": "handful",
         "category": "herbs"
       }
+    ],
+    "categoryTags": [
+      "quick",
+      "everyday"
     ]
   },
   {
@@ -49013,7 +50025,10 @@
         "category": "pantry"
       }
     ],
-    "imageUrl": "https://tse1.mm.bing.net/th/id/OIP.TyQvD8-oCgLiMpFu6HQs4gHaE8?pid=Api&P=0&h=180"
+    "imageUrl": "https://tse1.mm.bing.net/th/id/OIP.TyQvD8-oCgLiMpFu6HQs4gHaE8?pid=Api&P=0&h=180",
+    "categoryTags": [
+      "budget"
+    ]
   },
   {
     "id": "r252",
@@ -49188,7 +50203,11 @@
         "category": "condiments"
       }
     ],
-    "imageUrl": "https://tse4.mm.bing.net/th/id/OIP.fglxcbHL-P-87IvSaD1voAHaE8?pid=Api&P=0&h=180"
+    "imageUrl": "https://tse4.mm.bing.net/th/id/OIP.fglxcbHL-P-87IvSaD1voAHaE8?pid=Api&P=0&h=180",
+    "categoryTags": [
+      "budget",
+      "quick"
+    ]
   },
   {
     "id": "r253",
@@ -49343,7 +50362,10 @@
         "category": "pantry"
       }
     ],
-    "imageUrl": "https://tse3.mm.bing.net/th/id/OIP.7hy5JMOC843asGKOtZi88AHaEV?pid=Api&P=0&h=180"
+    "imageUrl": "https://tse3.mm.bing.net/th/id/OIP.7hy5JMOC843asGKOtZi88AHaEV?pid=Api&P=0&h=180",
+    "categoryTags": [
+      "budget"
+    ]
   },
   {
     "id": "r254",
@@ -49535,7 +50557,10 @@
         "category": "condiments"
       }
     ],
-    "imageUrl": "https://tse1.mm.bing.net/th/id/OIP.hGu2VZqRbY1crq5y6vDVrgHaE8?pid=Api&P=0&h=180"
+    "imageUrl": "https://tse1.mm.bing.net/th/id/OIP.hGu2VZqRbY1crq5y6vDVrgHaE8?pid=Api&P=0&h=180",
+    "categoryTags": [
+      "budget"
+    ]
   },
   {
     "id": "r255",
@@ -49762,7 +50787,10 @@
         "category": "dairy"
       }
     ],
-    "imageUrl": "https://tse2.mm.bing.net/th/id/OIP.tU6VhZPEZDJrVal9B2-BqQHaE8?pid=Api&P=0&h=180"
+    "imageUrl": "https://tse2.mm.bing.net/th/id/OIP.tU6VhZPEZDJrVal9B2-BqQHaE8?pid=Api&P=0&h=180",
+    "categoryTags": [
+      "budget"
+    ]
   },
   {
     "id": "r256",
@@ -49900,7 +50928,10 @@
         "category": "condiments"
       }
     ],
-    "imageUrl": "https://tse2.mm.bing.net/th/id/OIP.TMWPcsFvvsUxCh3dfPWVhAHaE3?pid=Api&P=0&h=180"
+    "imageUrl": "https://tse2.mm.bing.net/th/id/OIP.TMWPcsFvvsUxCh3dfPWVhAHaE3?pid=Api&P=0&h=180",
+    "categoryTags": [
+      "budget"
+    ]
   },
   {
     "id": "r257",
@@ -50054,7 +51085,12 @@
         "category": "herbs"
       }
     ],
-    "imageUrl": "https://tse4.mm.bing.net/th/id/OIP._zelNhWqczmaXM0OmnbhsgHaEU?pid=Api&P=0&h=180"
+    "imageUrl": "https://tse4.mm.bing.net/th/id/OIP._zelNhWqczmaXM0OmnbhsgHaEU?pid=Api&P=0&h=180",
+    "categoryTags": [
+      "budget",
+      "quick",
+      "low-prep"
+    ]
   },
   {
     "id": "r258",
@@ -50209,7 +51245,10 @@
         "category": "herbs"
       }
     ],
-    "imageUrl": "https://tse1.mm.bing.net/th/id/OIP.8W0wsOibLNzAmw7gcPdZmAHaEc?pid=Api&P=0&h=180"
+    "imageUrl": "https://tse1.mm.bing.net/th/id/OIP.8W0wsOibLNzAmw7gcPdZmAHaEc?pid=Api&P=0&h=180",
+    "categoryTags": [
+      "budget"
+    ]
   },
   {
     "id": "r259",
@@ -50399,7 +51438,10 @@
         "category": "herbs"
       }
     ],
-    "imageUrl": "https://tse1.mm.bing.net/th/id/OIP.CEbsOywvgFAo9Yq7FIYcCwHaE8?pid=Api&P=0&h=180"
+    "imageUrl": "https://tse1.mm.bing.net/th/id/OIP.CEbsOywvgFAo9Yq7FIYcCwHaE8?pid=Api&P=0&h=180",
+    "categoryTags": [
+      "budget"
+    ]
   },
   {
     "id": "r260",
@@ -50591,7 +51633,11 @@
         "category": "condiments"
       }
     ],
-    "imageUrl": "https://tse4.mm.bing.net/th/id/OIP.nH__KtRY0LZ-evnwh66-9wHaEK?pid=Api&P=0&h=180"
+    "imageUrl": "https://tse4.mm.bing.net/th/id/OIP.nH__KtRY0LZ-evnwh66-9wHaEK?pid=Api&P=0&h=180",
+    "categoryTags": [
+      "budget",
+      "quick"
+    ]
   },
   {
     "id": "r261",
@@ -50727,7 +51773,12 @@
         "category": "dairy"
       }
     ],
-    "imageUrl": "https://tse2.mm.bing.net/th/id/OIP.NH5jq-B9ad5s6DdugsioowHaDt?pid=Api&P=0&h=180"
+    "imageUrl": "https://tse2.mm.bing.net/th/id/OIP.NH5jq-B9ad5s6DdugsioowHaDt?pid=Api&P=0&h=180",
+    "categoryTags": [
+      "budget",
+      "quick",
+      "low-prep"
+    ]
   },
   {
     "id": "r262",
@@ -50864,7 +51915,12 @@
         "category": "grains"
       }
     ],
-    "imageUrl": "https://tse4.mm.bing.net/th/id/OIP.mH2EdddnAhs7y-jeQx3E1QHaE8?pid=Api&P=0&h=180"
+    "imageUrl": "https://tse4.mm.bing.net/th/id/OIP.mH2EdddnAhs7y-jeQx3E1QHaE8?pid=Api&P=0&h=180",
+    "categoryTags": [
+      "budget",
+      "quick",
+      "low-prep"
+    ]
   },
   {
     "id": "r263",
@@ -51072,7 +52128,11 @@
         "category": "dairy"
       }
     ],
-    "imageUrl": "https://tse2.mm.bing.net/th/id/OIP.EqwZL-WHTn4wRj-TFkXLCwHaEK?pid=Api&P=0&h=180"
+    "imageUrl": "https://tse2.mm.bing.net/th/id/OIP.EqwZL-WHTn4wRj-TFkXLCwHaEK?pid=Api&P=0&h=180",
+    "categoryTags": [
+      "budget",
+      "quick"
+    ]
   },
   {
     "id": "r264",
@@ -51228,7 +52288,11 @@
         "category": "condiments"
       }
     ],
-    "imageUrl": "https://tse4.mm.bing.net/th/id/OIP.2bpycQXvmI8r7y2AJMMm8gHaE7?pid=Api&P=0&h=180"
+    "imageUrl": "https://tse4.mm.bing.net/th/id/OIP.2bpycQXvmI8r7y2AJMMm8gHaE7?pid=Api&P=0&h=180",
+    "categoryTags": [
+      "budget",
+      "quick"
+    ]
   },
   {
     "id": "r265",
@@ -51400,7 +52464,10 @@
         "category": "pantry"
       }
     ],
-    "imageUrl": "https://tse4.mm.bing.net/th/id/OIP.JS8MypT0qnHNB3N3BaOYwwHaE8?pid=Api&P=0&h=180"
+    "imageUrl": "https://tse4.mm.bing.net/th/id/OIP.JS8MypT0qnHNB3N3BaOYwwHaE8?pid=Api&P=0&h=180",
+    "categoryTags": [
+      "budget"
+    ]
   },
   {
     "id": "r266",
@@ -51554,7 +52621,10 @@
         "category": "condiments"
       }
     ],
-    "imageUrl": "https://tse1.mm.bing.net/th/id/OIP.2A2ctBicgoUuBPEumWs-OwHaE8?pid=Api&P=0&h=180"
+    "imageUrl": "https://tse1.mm.bing.net/th/id/OIP.2A2ctBicgoUuBPEumWs-OwHaE8?pid=Api&P=0&h=180",
+    "categoryTags": [
+      "everyday"
+    ]
   },
   {
     "id": "r267",
@@ -51763,7 +52833,10 @@
         "category": "dairy"
       }
     ],
-    "imageUrl": "https://tse4.mm.bing.net/th/id/OIP.eNXa7Iy2OoCAC7hx3fXzYAHaEo?pid=Api&P=0&h=180"
+    "imageUrl": "https://tse4.mm.bing.net/th/id/OIP.eNXa7Iy2OoCAC7hx3fXzYAHaEo?pid=Api&P=0&h=180",
+    "categoryTags": [
+      "budget"
+    ]
   },
   {
     "id": "r268",
@@ -51882,7 +52955,12 @@
         "category": "herbs"
       }
     ],
-    "imageUrl": "https://tse2.mm.bing.net/th/id/OIP.4MOSWakcK0oqRrLeQEF1KgHaEK?pid=Api&P=0&h=180"
+    "imageUrl": "https://tse2.mm.bing.net/th/id/OIP.4MOSWakcK0oqRrLeQEF1KgHaEK?pid=Api&P=0&h=180",
+    "categoryTags": [
+      "budget",
+      "quick",
+      "low-prep"
+    ]
   },
   {
     "id": "r269",
@@ -52018,7 +53096,10 @@
         "category": "dairy"
       }
     ],
-    "imageUrl": "https://tse4.mm.bing.net/th/id/OIP.GXtGrMbja9S0wrR3k1ZI2gHaEO?pid=Api&P=0&h=180"
+    "imageUrl": "https://tse4.mm.bing.net/th/id/OIP.GXtGrMbja9S0wrR3k1ZI2gHaEO?pid=Api&P=0&h=180",
+    "categoryTags": [
+      "budget"
+    ]
   },
   {
     "id": "r270",
@@ -52154,7 +53235,10 @@
         "category": "dairy"
       }
     ],
-    "imageUrl": "https://tse2.mm.bing.net/th/id/OIP.D-StXMwX70qMXq2_sc2hnAHaEK?pid=Api&P=0&h=180"
+    "imageUrl": "https://tse2.mm.bing.net/th/id/OIP.D-StXMwX70qMXq2_sc2hnAHaEK?pid=Api&P=0&h=180",
+    "categoryTags": [
+      "budget"
+    ]
   },
   {
     "id": "r271",
@@ -52291,7 +53375,12 @@
         "category": "condiments"
       }
     ],
-    "imageUrl": "https://tse1.mm.bing.net/th/id/OIP.lcj6nhwaRVNAclpZEOW3ggHaEW?pid=Api&P=0&h=180"
+    "imageUrl": "https://tse1.mm.bing.net/th/id/OIP.lcj6nhwaRVNAclpZEOW3ggHaEW?pid=Api&P=0&h=180",
+    "categoryTags": [
+      "budget",
+      "quick",
+      "low-prep"
+    ]
   },
   {
     "id": "r272",
@@ -52428,7 +53517,11 @@
         "category": "condiments"
       }
     ],
-    "imageUrl": "https://tse3.mm.bing.net/th/id/OIP.uUfsKyLulNNznmVRKsJ50QHaD4?pid=Api&P=0&h=180"
+    "imageUrl": "https://tse3.mm.bing.net/th/id/OIP.uUfsKyLulNNznmVRKsJ50QHaD4?pid=Api&P=0&h=180",
+    "categoryTags": [
+      "budget",
+      "quick"
+    ]
   },
   {
     "id": "r273",
@@ -52601,7 +53694,10 @@
         "category": "fruit"
       }
     ],
-    "imageUrl": "https://tse3.mm.bing.net/th/id/OIP.nh69nliPzhhb8jWxo4TahwHaE8?pid=Api&P=0&h=180"
+    "imageUrl": "https://tse3.mm.bing.net/th/id/OIP.nh69nliPzhhb8jWxo4TahwHaE8?pid=Api&P=0&h=180",
+    "categoryTags": [
+      "budget"
+    ]
   },
   {
     "id": "r274",
@@ -52811,7 +53907,11 @@
         "category": "pantry"
       }
     ],
-    "imageUrl": "https://tse2.mm.bing.net/th/id/OIP.jSgy0JaLTnxgVbU9q1gptwHaE6?pid=Api&P=0&h=180"
+    "imageUrl": "https://tse2.mm.bing.net/th/id/OIP.jSgy0JaLTnxgVbU9q1gptwHaE6?pid=Api&P=0&h=180",
+    "categoryTags": [
+      "budget",
+      "quick"
+    ]
   },
   {
     "id": "r275",
@@ -52964,7 +54064,10 @@
         "category": "herbs"
       }
     ],
-    "imageUrl": "https://tse3.mm.bing.net/th/id/OIP.5cdfUq8I4RHjWNmzjbDzlQHaEd?pid=Api&P=0&h=180"
+    "imageUrl": "https://tse3.mm.bing.net/th/id/OIP.5cdfUq8I4RHjWNmzjbDzlQHaEd?pid=Api&P=0&h=180",
+    "categoryTags": [
+      "budget"
+    ]
   },
   {
     "id": "r276",
@@ -53100,7 +54203,12 @@
         "category": "fruit"
       }
     ],
-    "imageUrl": "https://tse4.mm.bing.net/th/id/OIP.E609YNFcDMXdHIQWcNZu4QHaE8?pid=Api&P=0&h=180"
+    "imageUrl": "https://tse4.mm.bing.net/th/id/OIP.E609YNFcDMXdHIQWcNZu4QHaE8?pid=Api&P=0&h=180",
+    "categoryTags": [
+      "budget",
+      "quick",
+      "low-prep"
+    ]
   },
   {
     "id": "r277",
@@ -53238,7 +54346,12 @@
         "category": "dairy"
       }
     ],
-    "imageUrl": "https://tse1.mm.bing.net/th/id/OIP.ZwUQ-DqtEKDOIA3kOTbyJAHaFj?pid=Api&P=0&h=180"
+    "imageUrl": "https://tse1.mm.bing.net/th/id/OIP.ZwUQ-DqtEKDOIA3kOTbyJAHaFj?pid=Api&P=0&h=180",
+    "categoryTags": [
+      "budget",
+      "quick",
+      "low-prep"
+    ]
   },
   {
     "id": "r278",
@@ -53392,7 +54505,11 @@
         "category": "pantry"
       }
     ],
-    "imageUrl": "https://tse4.mm.bing.net/th/id/OIP.UsGpTp52Bmr82rKwqka-ggAAAA?pid=Api&P=0&h=180"
+    "imageUrl": "https://tse4.mm.bing.net/th/id/OIP.UsGpTp52Bmr82rKwqka-ggAAAA?pid=Api&P=0&h=180",
+    "categoryTags": [
+      "budget",
+      "quick"
+    ]
   },
   {
     "id": "r279",
@@ -53547,7 +54664,10 @@
         "category": "fruit"
       }
     ],
-    "imageUrl": "https://tse2.mm.bing.net/th/id/OIP._BySysvJtMKNKft1CviHyAHaF7?pid=Api&P=0&h=180"
+    "imageUrl": "https://tse2.mm.bing.net/th/id/OIP._BySysvJtMKNKft1CviHyAHaF7?pid=Api&P=0&h=180",
+    "categoryTags": [
+      "budget"
+    ]
   },
   {
     "id": "r280",
@@ -53774,7 +54894,10 @@
         "category": "dairy"
       }
     ],
-    "imageUrl": "https://tse4.mm.bing.net/th/id/OIP.MW75XTUnaUJa4yYNpKK2IwHaD4?pid=Api&P=0&h=180"
+    "imageUrl": "https://tse4.mm.bing.net/th/id/OIP.MW75XTUnaUJa4yYNpKK2IwHaD4?pid=Api&P=0&h=180",
+    "categoryTags": [
+      "budget"
+    ]
   },
   {
     "id": "r281",
@@ -53984,6 +55107,5352 @@
         "unit": "ml",
         "category": "condiments"
       }
+    ],
+    "categoryTags": [
+      "budget",
+      "batch-cooking"
+    ]
+  },
+  {
+    "id": "r300",
+    "name": "Sausage Ragù",
+    "description": "Rich pork sausage meat simmered with tomatoes, red wine and herbs over pasta",
+    "baseServings": 4,
+    "cookTimeMinutes": 45,
+    "difficulty": "easy",
+    "cookingStyle": "one-pot",
+    "healthTags": [
+      "standard"
+    ],
+    "budgetTags": [
+      "budget",
+      "standard"
+    ],
+    "leftoversFriendly": true,
+    "mealType": "dinner",
+    "estimatedCostBand": "low",
+    "proteinType": "pork",
+    "cuisineType": "italian",
+    "seasonTags": [
+      "all"
+    ],
+    "costPerServeAUD": 4.8,
+    "kidFriendly": true,
+    "kidFriendlyScore": 3,
+    "kidFriendlyReason": "mild sausage pasta",
+    "categoryTags": [
+      "everyday",
+      "budget"
+    ],
+    "imageUrl": "https://tse1.mm.bing.net/th/id/OIP.rSTnH2e6mOv9qG5sXi1eVwHaE8?pid=Api&P=0&h=180",
+    "ingredients": [
+      {
+        "name": "Pork sausages",
+        "quantity": 500,
+        "unit": "g",
+        "category": "proteins"
+      },
+      {
+        "name": "Crushed tomatoes",
+        "quantity": 400,
+        "unit": "g",
+        "category": "pantry"
+      },
+      {
+        "name": "Red wine",
+        "quantity": 125,
+        "unit": "ml",
+        "category": "condiments"
+      },
+      {
+        "name": "Onion",
+        "quantity": 1,
+        "unit": "whole",
+        "category": "vegetables"
+      },
+      {
+        "name": "Garlic",
+        "quantity": 3,
+        "unit": "cloves",
+        "category": "herbs"
+      },
+      {
+        "name": "Dried fennel seeds",
+        "quantity": 1,
+        "unit": "tsp",
+        "category": "herbs"
+      },
+      {
+        "name": "Pappardelle pasta",
+        "quantity": 400,
+        "unit": "g",
+        "category": "grains"
+      },
+      {
+        "name": "Parmesan cheese",
+        "quantity": 50,
+        "unit": "g",
+        "category": "dairy"
+      },
+      {
+        "name": "Olive oil",
+        "quantity": 2,
+        "unit": "tbsp",
+        "category": "condiments"
+      }
+    ],
+    "instructions": [
+      "Remove sausage meat from casings and crumble.",
+      "Fry onion and garlic in oil 3 mins. Add sausage meat and brown.",
+      "Pour in wine and cook 2 mins, then add tomatoes and fennel seeds.",
+      "Simmer 25 mins until thick. Season to taste.",
+      "Cook pasta per packet. Serve ragù over pasta with parmesan."
+    ]
+  },
+  {
+    "id": "r301",
+    "name": "Apricot Chicken",
+    "description": "Tender chicken pieces braised in a sweet-savoury apricot sauce — an Aussie classic",
+    "baseServings": 4,
+    "cookTimeMinutes": 50,
+    "difficulty": "easy",
+    "cookingStyle": "oven",
+    "healthTags": [
+      "standard"
+    ],
+    "budgetTags": [
+      "standard"
+    ],
+    "leftoversFriendly": true,
+    "mealType": "dinner",
+    "estimatedCostBand": "low",
+    "proteinType": "chicken",
+    "cuisineType": "australian",
+    "seasonTags": [
+      "all"
+    ],
+    "costPerServeAUD": 5.5,
+    "kidFriendly": true,
+    "kidFriendlyScore": 4,
+    "kidFriendlyReason": "sweet mild sauce kids love",
+    "categoryTags": [
+      "everyday",
+      "kid-friendly"
+    ],
+    "imageUrl": "https://tse2.mm.bing.net/th/id/OIP.eOy3RuqP2lf3vFSvd8dWxAHaE8?pid=Api&P=0&h=180",
+    "ingredients": [
+      {
+        "name": "Chicken thighs bone-in",
+        "quantity": 1,
+        "unit": "kg",
+        "category": "proteins"
+      },
+      {
+        "name": "Apricot jam",
+        "quantity": 200,
+        "unit": "g",
+        "category": "condiments"
+      },
+      {
+        "name": "French onion soup mix",
+        "quantity": 40,
+        "unit": "g",
+        "category": "pantry"
+      },
+      {
+        "name": "Water",
+        "quantity": 125,
+        "unit": "ml",
+        "category": "pantry"
+      },
+      {
+        "name": "Onion",
+        "quantity": 1,
+        "unit": "whole",
+        "category": "vegetables"
+      },
+      {
+        "name": "Olive oil",
+        "quantity": 1,
+        "unit": "tbsp",
+        "category": "condiments"
+      }
+    ],
+    "instructions": [
+      "Preheat oven to 180°C. Brown chicken in oil in an ovenproof dish.",
+      "Whisk apricot jam, onion soup mix and water together.",
+      "Pour sauce over chicken. Add sliced onion around chicken.",
+      "Cover and bake 40 mins, removing lid for last 10 mins to caramelise.",
+      "Serve with rice and steamed greens."
+    ]
+  },
+  {
+    "id": "r302",
+    "name": "Vietnamese Caramel Pork",
+    "description": "Tender pork belly in a sticky, sweet and salty Vietnamese-style caramel sauce",
+    "baseServings": 4,
+    "cookTimeMinutes": 40,
+    "difficulty": "medium",
+    "cookingStyle": "stovetop",
+    "healthTags": [
+      "standard"
+    ],
+    "budgetTags": [
+      "standard"
+    ],
+    "leftoversFriendly": true,
+    "mealType": "dinner",
+    "estimatedCostBand": "medium",
+    "proteinType": "pork",
+    "cuisineType": "vietnamese",
+    "seasonTags": [
+      "all"
+    ],
+    "costPerServeAUD": 6.2,
+    "kidFriendly": false,
+    "kidFriendlyScore": 2,
+    "kidFriendlyReason": "strong fish sauce flavour",
+    "categoryTags": [
+      "everyday"
+    ],
+    "imageUrl": "https://tse3.mm.bing.net/th/id/OIP.pTyPziFWEsAcT0E9K6-DlgHaFj?pid=Api&P=0&h=180",
+    "ingredients": [
+      {
+        "name": "Pork belly",
+        "quantity": 600,
+        "unit": "g",
+        "category": "proteins"
+      },
+      {
+        "name": "Fish sauce",
+        "quantity": 3,
+        "unit": "tbsp",
+        "category": "condiments"
+      },
+      {
+        "name": "Brown sugar",
+        "quantity": 4,
+        "unit": "tbsp",
+        "category": "pantry"
+      },
+      {
+        "name": "Garlic",
+        "quantity": 4,
+        "unit": "cloves",
+        "category": "herbs"
+      },
+      {
+        "name": "Shallots",
+        "quantity": 4,
+        "unit": "whole",
+        "category": "vegetables"
+      },
+      {
+        "name": "Black pepper",
+        "quantity": 1,
+        "unit": "tsp",
+        "category": "herbs"
+      },
+      {
+        "name": "Coconut water",
+        "quantity": 250,
+        "unit": "ml",
+        "category": "pantry"
+      },
+      {
+        "name": "Spring onions",
+        "quantity": 3,
+        "unit": "stalks",
+        "category": "vegetables"
+      }
+    ],
+    "instructions": [
+      "Cut pork belly into 3cm cubes.",
+      "Make caramel: melt sugar in a dry wok until amber. Add garlic and shallots.",
+      "Add pork and stir to coat in caramel.",
+      "Pour in fish sauce, coconut water and pepper. Bring to a boil.",
+      "Simmer 25–30 mins until sauce is thick and pork is tender.",
+      "Serve over steamed rice, garnished with spring onions."
+    ]
+  },
+  {
+    "id": "r303",
+    "name": "Salisbury Steak with Gravy",
+    "description": "Pan-fried beef patties simmered in rich mushroom and onion gravy — comfort food classic",
+    "baseServings": 4,
+    "cookTimeMinutes": 35,
+    "difficulty": "easy",
+    "cookingStyle": "stovetop",
+    "healthTags": [
+      "standard"
+    ],
+    "budgetTags": [
+      "budget",
+      "standard"
+    ],
+    "leftoversFriendly": true,
+    "mealType": "dinner",
+    "estimatedCostBand": "low",
+    "proteinType": "beef",
+    "cuisineType": "american",
+    "seasonTags": [
+      "all"
+    ],
+    "costPerServeAUD": 5,
+    "kidFriendly": true,
+    "kidFriendlyScore": 3,
+    "kidFriendlyReason": "familiar beef patties with gravy",
+    "categoryTags": [
+      "everyday",
+      "budget"
+    ],
+    "imageUrl": "https://tse4.mm.bing.net/th/id/OIP.A2rBf0xXKNnK5V1DsxWB6wHaE8?pid=Api&P=0&h=180",
+    "ingredients": [
+      {
+        "name": "Beef mince",
+        "quantity": 500,
+        "unit": "g",
+        "category": "proteins"
+      },
+      {
+        "name": "Breadcrumbs",
+        "quantity": 40,
+        "unit": "g",
+        "category": "grains"
+      },
+      {
+        "name": "Egg",
+        "quantity": 1,
+        "unit": "whole",
+        "category": "dairy"
+      },
+      {
+        "name": "Dijon mustard",
+        "quantity": 1,
+        "unit": "tbsp",
+        "category": "condiments"
+      },
+      {
+        "name": "Mushrooms",
+        "quantity": 250,
+        "unit": "g",
+        "category": "vegetables"
+      },
+      {
+        "name": "Onion",
+        "quantity": 1,
+        "unit": "whole",
+        "category": "vegetables"
+      },
+      {
+        "name": "Beef stock",
+        "quantity": 400,
+        "unit": "ml",
+        "category": "pantry"
+      },
+      {
+        "name": "Worcestershire sauce",
+        "quantity": 1,
+        "unit": "tbsp",
+        "category": "condiments"
+      },
+      {
+        "name": "Cornflour",
+        "quantity": 2,
+        "unit": "tsp",
+        "category": "pantry"
+      },
+      {
+        "name": "Butter",
+        "quantity": 20,
+        "unit": "g",
+        "category": "dairy"
+      }
+    ],
+    "instructions": [
+      "Mix mince, breadcrumbs, egg and mustard. Shape into 4 oval patties.",
+      "Brown patties in a pan 3 mins per side. Set aside.",
+      "Sauté sliced mushrooms and onion in butter until golden.",
+      "Add stock, Worcestershire and cornflour mixed with cold water. Stir until thickened.",
+      "Return patties to pan, simmer 8 mins. Serve with mashed potato."
+    ]
+  },
+  {
+    "id": "r304",
+    "name": "Creamy Pork and Apple Casserole",
+    "description": "Pork shoulder braised with apple, cider and cream — a warming European-inspired one-pot",
+    "baseServings": 4,
+    "cookTimeMinutes": 75,
+    "difficulty": "medium",
+    "cookingStyle": "oven",
+    "healthTags": [
+      "standard"
+    ],
+    "budgetTags": [
+      "standard"
+    ],
+    "leftoversFriendly": true,
+    "mealType": "dinner",
+    "estimatedCostBand": "medium",
+    "proteinType": "pork",
+    "cuisineType": "european",
+    "seasonTags": [
+      "autumn",
+      "winter"
+    ],
+    "costPerServeAUD": 7.5,
+    "kidFriendly": true,
+    "kidFriendlyScore": 3,
+    "kidFriendlyReason": "mild creamy flavour",
+    "categoryTags": [
+      "everyday"
+    ],
+    "imageUrl": "https://tse1.mm.bing.net/th/id/OIP.UsFY5QF4VrPr2B9P3FTBYQAAAAA?pid=Api&P=0&h=180",
+    "ingredients": [
+      {
+        "name": "Pork shoulder diced",
+        "quantity": 700,
+        "unit": "g",
+        "category": "proteins"
+      },
+      {
+        "name": "Apples",
+        "quantity": 2,
+        "unit": "whole",
+        "category": "fruits"
+      },
+      {
+        "name": "Apple cider",
+        "quantity": 250,
+        "unit": "ml",
+        "category": "condiments"
+      },
+      {
+        "name": "Thickened cream",
+        "quantity": 150,
+        "unit": "ml",
+        "category": "dairy"
+      },
+      {
+        "name": "Onion",
+        "quantity": 1,
+        "unit": "whole",
+        "category": "vegetables"
+      },
+      {
+        "name": "Garlic",
+        "quantity": 2,
+        "unit": "cloves",
+        "category": "herbs"
+      },
+      {
+        "name": "Dijon mustard",
+        "quantity": 1,
+        "unit": "tbsp",
+        "category": "condiments"
+      },
+      {
+        "name": "Fresh thyme",
+        "quantity": 4,
+        "unit": "sprigs",
+        "category": "herbs"
+      },
+      {
+        "name": "Chicken stock",
+        "quantity": 200,
+        "unit": "ml",
+        "category": "pantry"
+      },
+      {
+        "name": "Olive oil",
+        "quantity": 2,
+        "unit": "tbsp",
+        "category": "condiments"
+      }
+    ],
+    "instructions": [
+      "Brown pork in batches in oil. Remove and set aside.",
+      "Fry onion and garlic until soft. Add pork back.",
+      "Pour in cider and stock. Add thyme and mustard.",
+      "Cover and cook in oven at 160°C for 50 mins.",
+      "Core and slice apples, add to casserole and cook 15 mins more.",
+      "Stir in cream, adjust seasoning. Serve with mashed potato."
+    ]
+  },
+  {
+    "id": "r305",
+    "name": "Ground Beef and Rice",
+    "description": "Quick, budget-friendly spiced beef mince served over steamed rice with peas",
+    "baseServings": 4,
+    "cookTimeMinutes": 25,
+    "difficulty": "easy",
+    "cookingStyle": "stovetop",
+    "healthTags": [
+      "standard",
+      "high-protein"
+    ],
+    "budgetTags": [
+      "budget"
+    ],
+    "leftoversFriendly": true,
+    "mealType": "dinner",
+    "estimatedCostBand": "low",
+    "proteinType": "beef",
+    "cuisineType": "australian",
+    "seasonTags": [
+      "all"
+    ],
+    "costPerServeAUD": 3.8,
+    "kidFriendly": true,
+    "kidFriendlyScore": 4,
+    "kidFriendlyReason": "simple mince and rice",
+    "categoryTags": [
+      "everyday",
+      "budget",
+      "quick"
+    ],
+    "imageUrl": "https://tse2.mm.bing.net/th/id/OIP.x-OM2eKqBi3Lg5J0LKLAkgHaE8?pid=Api&P=0&h=180",
+    "ingredients": [
+      {
+        "name": "Beef mince",
+        "quantity": 500,
+        "unit": "g",
+        "category": "proteins"
+      },
+      {
+        "name": "White rice",
+        "quantity": 320,
+        "unit": "g",
+        "category": "grains"
+      },
+      {
+        "name": "Frozen peas",
+        "quantity": 150,
+        "unit": "g",
+        "category": "vegetables"
+      },
+      {
+        "name": "Onion",
+        "quantity": 1,
+        "unit": "whole",
+        "category": "vegetables"
+      },
+      {
+        "name": "Garlic",
+        "quantity": 2,
+        "unit": "cloves",
+        "category": "herbs"
+      },
+      {
+        "name": "Soy sauce",
+        "quantity": 2,
+        "unit": "tbsp",
+        "category": "condiments"
+      },
+      {
+        "name": "Oyster sauce",
+        "quantity": 1,
+        "unit": "tbsp",
+        "category": "condiments"
+      },
+      {
+        "name": "Sesame oil",
+        "quantity": 1,
+        "unit": "tsp",
+        "category": "condiments"
+      },
+      {
+        "name": "Vegetable oil",
+        "quantity": 1,
+        "unit": "tbsp",
+        "category": "condiments"
+      }
+    ],
+    "instructions": [
+      "Cook rice per packet instructions. Keep warm.",
+      "Brown mince with onion and garlic in oil, breaking up.",
+      "Add soy sauce, oyster sauce and sesame oil. Stir well.",
+      "Add frozen peas, cook 2 mins. Serve over rice."
+    ]
+  },
+  {
+    "id": "r310",
+    "name": "Beef Wellington",
+    "description": "Beef eye fillet wrapped in mushroom duxelles and golden puff pastry — the ultimate centrepiece",
+    "baseServings": 6,
+    "cookTimeMinutes": 90,
+    "difficulty": "hard",
+    "cookingStyle": "oven",
+    "healthTags": [
+      "standard"
+    ],
+    "budgetTags": [
+      "premium"
+    ],
+    "leftoversFriendly": false,
+    "mealType": "dinner",
+    "estimatedCostBand": "high",
+    "proteinType": "beef",
+    "cuisineType": "british",
+    "seasonTags": [
+      "winter",
+      "all"
+    ],
+    "costPerServeAUD": 22,
+    "kidFriendly": false,
+    "kidFriendlyScore": 1,
+    "kidFriendlyReason": "complex flavours and textures",
+    "categoryTags": [
+      "premium"
+    ],
+    "imageUrl": "https://tse3.mm.bing.net/th/id/OIP.WDvf5k3kRmjFEYuETJNMnQHaE8?pid=Api&P=0&h=180",
+    "ingredients": [
+      {
+        "name": "Beef eye fillet",
+        "quantity": 800,
+        "unit": "g",
+        "category": "proteins"
+      },
+      {
+        "name": "Puff pastry",
+        "quantity": 500,
+        "unit": "g",
+        "category": "grains"
+      },
+      {
+        "name": "Mushrooms",
+        "quantity": 400,
+        "unit": "g",
+        "category": "vegetables"
+      },
+      {
+        "name": "Prosciutto",
+        "quantity": 100,
+        "unit": "g",
+        "category": "proteins"
+      },
+      {
+        "name": "Dijon mustard",
+        "quantity": 2,
+        "unit": "tbsp",
+        "category": "condiments"
+      },
+      {
+        "name": "Shallots",
+        "quantity": 3,
+        "unit": "whole",
+        "category": "vegetables"
+      },
+      {
+        "name": "Garlic",
+        "quantity": 3,
+        "unit": "cloves",
+        "category": "herbs"
+      },
+      {
+        "name": "Thyme",
+        "quantity": 3,
+        "unit": "sprigs",
+        "category": "herbs"
+      },
+      {
+        "name": "Egg",
+        "quantity": 2,
+        "unit": "whole",
+        "category": "dairy"
+      },
+      {
+        "name": "Olive oil",
+        "quantity": 2,
+        "unit": "tbsp",
+        "category": "condiments"
+      }
+    ],
+    "instructions": [
+      "Sear beef fillet on all sides in a hot pan. Cool, then brush with Dijon mustard.",
+      "Blitz mushrooms, shallots and garlic to a paste (duxelles). Cook in a pan until dry.",
+      "Lay prosciutto on cling film, spread duxelles, place beef at edge and roll tightly. Chill 30 mins.",
+      "Wrap in puff pastry, seal with egg wash and chill 15 mins.",
+      "Bake at 200°C for 25 mins for medium-rare. Rest 10 mins before slicing."
+    ]
+  },
+  {
+    "id": "r311",
+    "name": "Osso Buco",
+    "description": "Italian braised veal shanks with gremolata on creamy saffron risotto — a Milanese classic",
+    "baseServings": 4,
+    "cookTimeMinutes": 150,
+    "difficulty": "hard",
+    "cookingStyle": "oven",
+    "healthTags": [
+      "standard"
+    ],
+    "budgetTags": [
+      "premium"
+    ],
+    "leftoversFriendly": true,
+    "mealType": "dinner",
+    "estimatedCostBand": "high",
+    "proteinType": "veal",
+    "cuisineType": "italian",
+    "seasonTags": [
+      "winter",
+      "autumn"
+    ],
+    "costPerServeAUD": 18,
+    "kidFriendly": false,
+    "kidFriendlyScore": 1,
+    "kidFriendlyReason": "sophisticated flavour profile",
+    "categoryTags": [
+      "premium"
+    ],
+    "imageUrl": "https://tse2.mm.bing.net/th/id/OIP.YMn9mUdl-pY0JfBXzqCXcQHaE8?pid=Api&P=0&h=180",
+    "ingredients": [
+      {
+        "name": "Veal osso buco (cross-cut shanks)",
+        "quantity": 4,
+        "unit": "pieces",
+        "category": "proteins"
+      },
+      {
+        "name": "White wine",
+        "quantity": 250,
+        "unit": "ml",
+        "category": "condiments"
+      },
+      {
+        "name": "Crushed tomatoes",
+        "quantity": 400,
+        "unit": "g",
+        "category": "pantry"
+      },
+      {
+        "name": "Chicken stock",
+        "quantity": 500,
+        "unit": "ml",
+        "category": "pantry"
+      },
+      {
+        "name": "Onion",
+        "quantity": 1,
+        "unit": "whole",
+        "category": "vegetables"
+      },
+      {
+        "name": "Celery",
+        "quantity": 2,
+        "unit": "stalks",
+        "category": "vegetables"
+      },
+      {
+        "name": "Carrot",
+        "quantity": 2,
+        "unit": "whole",
+        "category": "vegetables"
+      },
+      {
+        "name": "Garlic",
+        "quantity": 4,
+        "unit": "cloves",
+        "category": "herbs"
+      },
+      {
+        "name": "Lemon zest",
+        "quantity": 1,
+        "unit": "lemon",
+        "category": "fruits"
+      },
+      {
+        "name": "Flat-leaf parsley",
+        "quantity": 1,
+        "unit": "handful",
+        "category": "herbs"
+      },
+      {
+        "name": "Plain flour",
+        "quantity": 60,
+        "unit": "g",
+        "category": "grains"
+      },
+      {
+        "name": "Olive oil",
+        "quantity": 3,
+        "unit": "tbsp",
+        "category": "condiments"
+      }
+    ],
+    "instructions": [
+      "Dust shanks in flour and brown in oil in a heavy casserole.",
+      "Sauté onion, celery, carrot and garlic until soft.",
+      "Add wine, reduce by half. Add tomatoes and stock.",
+      "Return shanks, cover and braise at 160°C for 2 hours until tender.",
+      "Make gremolata: mix lemon zest, parsley and garlic. Serve over saffron risotto topped with gremolata."
+    ]
+  },
+  {
+    "id": "r312",
+    "name": "Pan-Seared Scallops with Garlic Butter",
+    "description": "Golden-seared sea scallops with brown butter, garlic and lemon — elegant and quick",
+    "baseServings": 2,
+    "cookTimeMinutes": 15,
+    "difficulty": "medium",
+    "cookingStyle": "stovetop",
+    "healthTags": [
+      "healthy",
+      "high-protein"
+    ],
+    "budgetTags": [
+      "premium"
+    ],
+    "leftoversFriendly": false,
+    "mealType": "dinner",
+    "estimatedCostBand": "high",
+    "proteinType": "seafood",
+    "cuisineType": "french",
+    "seasonTags": [
+      "all"
+    ],
+    "costPerServeAUD": 19,
+    "kidFriendly": false,
+    "kidFriendlyScore": 1,
+    "kidFriendlyReason": "delicate texture not typical for children",
+    "categoryTags": [
+      "premium",
+      "quick"
+    ],
+    "imageUrl": "https://tse4.mm.bing.net/th/id/OIP.VgJqMwsJuTHxG8C6FT0YVAHaE8?pid=Api&P=0&h=180",
+    "ingredients": [
+      {
+        "name": "Scallops",
+        "quantity": 300,
+        "unit": "g",
+        "category": "proteins"
+      },
+      {
+        "name": "Butter",
+        "quantity": 60,
+        "unit": "g",
+        "category": "dairy"
+      },
+      {
+        "name": "Garlic",
+        "quantity": 3,
+        "unit": "cloves",
+        "category": "herbs"
+      },
+      {
+        "name": "Lemon",
+        "quantity": 1,
+        "unit": "whole",
+        "category": "fruits"
+      },
+      {
+        "name": "Olive oil",
+        "quantity": 1,
+        "unit": "tbsp",
+        "category": "condiments"
+      },
+      {
+        "name": "Fresh parsley",
+        "quantity": 1,
+        "unit": "tbsp",
+        "category": "herbs"
+      },
+      {
+        "name": "Capers",
+        "quantity": 1,
+        "unit": "tbsp",
+        "category": "condiments"
+      }
+    ],
+    "instructions": [
+      "Pat scallops completely dry. Season with salt and pepper.",
+      "Heat a heavy pan until smoking. Add oil.",
+      "Sear scallops 90 seconds per side until golden. Remove.",
+      "Reduce heat, add butter and garlic. Cook until butter is nutty brown.",
+      "Add lemon juice and capers. Spoon over scallops. Garnish with parsley."
+    ]
+  },
+  {
+    "id": "r313",
+    "name": "Creamy Garlic Prawns",
+    "description": "Plump prawns in a rich garlic cream sauce — ready in 15 minutes, impressive every time",
+    "baseServings": 4,
+    "cookTimeMinutes": 15,
+    "difficulty": "easy",
+    "cookingStyle": "stovetop",
+    "healthTags": [
+      "healthy",
+      "high-protein"
+    ],
+    "budgetTags": [
+      "premium"
+    ],
+    "leftoversFriendly": false,
+    "mealType": "dinner",
+    "estimatedCostBand": "high",
+    "proteinType": "seafood",
+    "cuisineType": "french",
+    "seasonTags": [
+      "all"
+    ],
+    "costPerServeAUD": 12,
+    "kidFriendly": false,
+    "kidFriendlyScore": 2,
+    "kidFriendlyReason": "rich and garlicky",
+    "categoryTags": [
+      "premium",
+      "quick"
+    ],
+    "imageUrl": "https://tse1.mm.bing.net/th/id/OIP.oVGXrG4Qe6JjJC1hSMJkuAHaE8?pid=Api&P=0&h=180",
+    "ingredients": [
+      {
+        "name": "Raw prawns peeled",
+        "quantity": 600,
+        "unit": "g",
+        "category": "proteins"
+      },
+      {
+        "name": "Thickened cream",
+        "quantity": 200,
+        "unit": "ml",
+        "category": "dairy"
+      },
+      {
+        "name": "Garlic",
+        "quantity": 6,
+        "unit": "cloves",
+        "category": "herbs"
+      },
+      {
+        "name": "White wine",
+        "quantity": 125,
+        "unit": "ml",
+        "category": "condiments"
+      },
+      {
+        "name": "Butter",
+        "quantity": 40,
+        "unit": "g",
+        "category": "dairy"
+      },
+      {
+        "name": "Lemon",
+        "quantity": 1,
+        "unit": "whole",
+        "category": "fruits"
+      },
+      {
+        "name": "Fresh parsley",
+        "quantity": 2,
+        "unit": "tbsp",
+        "category": "herbs"
+      },
+      {
+        "name": "Chilli flakes",
+        "quantity": 0.5,
+        "unit": "tsp",
+        "category": "herbs"
+      }
+    ],
+    "instructions": [
+      "Melt butter in a large pan. Add garlic and chilli flakes, cook 1 min.",
+      "Add prawns and cook 1–2 mins per side until pink. Remove.",
+      "Add wine to pan, reduce by half. Add cream and simmer 3 mins.",
+      "Return prawns, add lemon juice and parsley. Serve with crusty bread."
+    ]
+  },
+  {
+    "id": "r314",
+    "name": "Pork Belly with Crispy Crackling",
+    "description": "Slow-roasted pork belly with perfect crackling and rich pan jus — a show-stopping roast",
+    "baseServings": 6,
+    "cookTimeMinutes": 180,
+    "difficulty": "medium",
+    "cookingStyle": "oven",
+    "healthTags": [
+      "standard"
+    ],
+    "budgetTags": [
+      "premium"
+    ],
+    "leftoversFriendly": true,
+    "mealType": "dinner",
+    "estimatedCostBand": "medium",
+    "proteinType": "pork",
+    "cuisineType": "australian",
+    "seasonTags": [
+      "all"
+    ],
+    "costPerServeAUD": 9,
+    "kidFriendly": true,
+    "kidFriendlyScore": 3,
+    "kidFriendlyReason": "crispy crackling is popular with kids",
+    "categoryTags": [
+      "premium"
+    ],
+    "imageUrl": "https://tse4.mm.bing.net/th/id/OIP.0i9u9rcVQJPVdRpqyWxeOAHaE8?pid=Api&P=0&h=180",
+    "ingredients": [
+      {
+        "name": "Pork belly skin-on",
+        "quantity": 1.5,
+        "unit": "kg",
+        "category": "proteins"
+      },
+      {
+        "name": "Sea salt flakes",
+        "quantity": 2,
+        "unit": "tbsp",
+        "category": "herbs"
+      },
+      {
+        "name": "Garlic",
+        "quantity": 4,
+        "unit": "cloves",
+        "category": "herbs"
+      },
+      {
+        "name": "Fennel seeds",
+        "quantity": 1,
+        "unit": "tsp",
+        "category": "herbs"
+      },
+      {
+        "name": "Rosemary",
+        "quantity": 3,
+        "unit": "sprigs",
+        "category": "herbs"
+      },
+      {
+        "name": "Apple cider vinegar",
+        "quantity": 1,
+        "unit": "tbsp",
+        "category": "condiments"
+      },
+      {
+        "name": "Chicken stock",
+        "quantity": 250,
+        "unit": "ml",
+        "category": "pantry"
+      }
+    ],
+    "instructions": [
+      "Score skin with sharp knife 1cm apart. Pat completely dry. Refrigerate uncovered overnight.",
+      "Rub salt generously over skin only. Let rest 30 mins.",
+      "Roast at 240°C for 30 mins for crackling, then reduce to 160°C.",
+      "Roast a further 2 hours until meat is very tender.",
+      "Rest 15 mins, carve and serve with apple sauce and roast vegetables."
+    ]
+  },
+  {
+    "id": "r315",
+    "name": "Beef Bourguignon",
+    "description": "Classic French braised beef with mushrooms, bacon lardons and red wine — slow-cooked perfection",
+    "baseServings": 6,
+    "cookTimeMinutes": 180,
+    "difficulty": "medium",
+    "cookingStyle": "oven",
+    "healthTags": [
+      "standard"
+    ],
+    "budgetTags": [
+      "premium"
+    ],
+    "leftoversFriendly": true,
+    "mealType": "dinner",
+    "estimatedCostBand": "high",
+    "proteinType": "beef",
+    "cuisineType": "french",
+    "seasonTags": [
+      "winter",
+      "autumn"
+    ],
+    "costPerServeAUD": 14,
+    "kidFriendly": false,
+    "kidFriendlyScore": 1,
+    "kidFriendlyReason": "wine-based sauce",
+    "categoryTags": [
+      "premium",
+      "batch-cooking"
+    ],
+    "imageUrl": "https://tse2.mm.bing.net/th/id/OIP.4nJEQJT3V4bkJm-IjFuqWgHaE8?pid=Api&P=0&h=180",
+    "ingredients": [
+      {
+        "name": "Beef chuck stew meat",
+        "quantity": 1,
+        "unit": "kg",
+        "category": "proteins"
+      },
+      {
+        "name": "Red wine (Burgundy style)",
+        "quantity": 750,
+        "unit": "ml",
+        "category": "condiments"
+      },
+      {
+        "name": "Bacon lardons",
+        "quantity": 150,
+        "unit": "g",
+        "category": "proteins"
+      },
+      {
+        "name": "Mushrooms",
+        "quantity": 300,
+        "unit": "g",
+        "category": "vegetables"
+      },
+      {
+        "name": "Pearl onions",
+        "quantity": 200,
+        "unit": "g",
+        "category": "vegetables"
+      },
+      {
+        "name": "Carrot",
+        "quantity": 2,
+        "unit": "whole",
+        "category": "vegetables"
+      },
+      {
+        "name": "Garlic",
+        "quantity": 4,
+        "unit": "cloves",
+        "category": "herbs"
+      },
+      {
+        "name": "Thyme",
+        "quantity": 4,
+        "unit": "sprigs",
+        "category": "herbs"
+      },
+      {
+        "name": "Bay leaves",
+        "quantity": 2,
+        "unit": "whole",
+        "category": "herbs"
+      },
+      {
+        "name": "Tomato paste",
+        "quantity": 2,
+        "unit": "tbsp",
+        "category": "pantry"
+      },
+      {
+        "name": "Beef stock",
+        "quantity": 250,
+        "unit": "ml",
+        "category": "pantry"
+      },
+      {
+        "name": "Olive oil",
+        "quantity": 3,
+        "unit": "tbsp",
+        "category": "condiments"
+      }
+    ],
+    "instructions": [
+      "Marinate beef in wine, thyme and bay leaves overnight.",
+      "Brown lardons and remove. Brown drained beef in batches.",
+      "Sauté garlic and onions. Add tomato paste.",
+      "Return beef, add marinade and stock. Bring to a boil.",
+      "Cover and braise in oven at 160°C for 2–2.5 hours.",
+      "Add mushrooms and pearl onions for last 30 mins. Serve with crusty bread."
+    ]
+  },
+  {
+    "id": "r316",
+    "name": "Herb-Crusted Salmon",
+    "description": "Oven-baked salmon fillets with a golden Dijon and herb breadcrumb crust",
+    "baseServings": 4,
+    "cookTimeMinutes": 25,
+    "difficulty": "easy",
+    "cookingStyle": "oven",
+    "healthTags": [
+      "healthy",
+      "high-protein"
+    ],
+    "budgetTags": [
+      "premium"
+    ],
+    "leftoversFriendly": false,
+    "mealType": "dinner",
+    "estimatedCostBand": "high",
+    "proteinType": "seafood",
+    "cuisineType": "european",
+    "seasonTags": [
+      "all"
+    ],
+    "costPerServeAUD": 13,
+    "kidFriendly": false,
+    "kidFriendlyScore": 2,
+    "kidFriendlyReason": "herb crust may be off-putting",
+    "categoryTags": [
+      "premium",
+      "quick"
+    ],
+    "imageUrl": "https://tse3.mm.bing.net/th/id/OIP.dHcZn5B6F2HqlbIq3sNLSAHaE8?pid=Api&P=0&h=180",
+    "ingredients": [
+      {
+        "name": "Salmon fillets",
+        "quantity": 4,
+        "unit": "pieces",
+        "category": "proteins"
+      },
+      {
+        "name": "Panko breadcrumbs",
+        "quantity": 80,
+        "unit": "g",
+        "category": "grains"
+      },
+      {
+        "name": "Dijon mustard",
+        "quantity": 2,
+        "unit": "tbsp",
+        "category": "condiments"
+      },
+      {
+        "name": "Fresh dill",
+        "quantity": 2,
+        "unit": "tbsp",
+        "category": "herbs"
+      },
+      {
+        "name": "Fresh parsley",
+        "quantity": 2,
+        "unit": "tbsp",
+        "category": "herbs"
+      },
+      {
+        "name": "Lemon zest",
+        "quantity": 1,
+        "unit": "lemon",
+        "category": "fruits"
+      },
+      {
+        "name": "Garlic",
+        "quantity": 2,
+        "unit": "cloves",
+        "category": "herbs"
+      },
+      {
+        "name": "Olive oil",
+        "quantity": 3,
+        "unit": "tbsp",
+        "category": "condiments"
+      }
+    ],
+    "instructions": [
+      "Preheat oven to 200°C.",
+      "Mix breadcrumbs, herbs, lemon zest, garlic and oil together.",
+      "Brush salmon with Dijon mustard. Press herb crust on top.",
+      "Bake 15–18 mins until crust is golden and fish flakes easily.",
+      "Serve with lemon wedges and salad."
+    ]
+  },
+  {
+    "id": "r320",
+    "name": "Hidden Veg Bolognese",
+    "description": "Classic bolognese with blended zucchini, carrot and spinach hidden in the sauce",
+    "baseServings": 4,
+    "cookTimeMinutes": 40,
+    "difficulty": "easy",
+    "cookingStyle": "stovetop",
+    "healthTags": [
+      "healthy"
+    ],
+    "budgetTags": [
+      "budget",
+      "standard"
+    ],
+    "leftoversFriendly": true,
+    "mealType": "dinner",
+    "estimatedCostBand": "low",
+    "proteinType": "beef",
+    "cuisineType": "italian",
+    "seasonTags": [
+      "all"
+    ],
+    "costPerServeAUD": 4.5,
+    "kidFriendly": true,
+    "kidFriendlyScore": 5,
+    "kidFriendlyReason": "kids love it — they can't see the veggies",
+    "categoryTags": [
+      "everyday",
+      "kid-friendly",
+      "fussy-eater"
+    ],
+    "imageUrl": "https://tse1.mm.bing.net/th/id/OIP.7_YbbpJCJ-vVW2k2PJcVEAHaE8?pid=Api&P=0&h=180",
+    "ingredients": [
+      {
+        "name": "Beef mince",
+        "quantity": 500,
+        "unit": "g",
+        "category": "proteins"
+      },
+      {
+        "name": "Spaghetti",
+        "quantity": 400,
+        "unit": "g",
+        "category": "grains"
+      },
+      {
+        "name": "Crushed tomatoes",
+        "quantity": 400,
+        "unit": "g",
+        "category": "pantry"
+      },
+      {
+        "name": "Zucchini",
+        "quantity": 1,
+        "unit": "whole",
+        "category": "vegetables"
+      },
+      {
+        "name": "Carrot",
+        "quantity": 2,
+        "unit": "whole",
+        "category": "vegetables"
+      },
+      {
+        "name": "Baby spinach",
+        "quantity": 60,
+        "unit": "g",
+        "category": "vegetables"
+      },
+      {
+        "name": "Onion",
+        "quantity": 1,
+        "unit": "whole",
+        "category": "vegetables"
+      },
+      {
+        "name": "Garlic",
+        "quantity": 2,
+        "unit": "cloves",
+        "category": "herbs"
+      },
+      {
+        "name": "Tomato paste",
+        "quantity": 2,
+        "unit": "tbsp",
+        "category": "pantry"
+      },
+      {
+        "name": "Olive oil",
+        "quantity": 1,
+        "unit": "tbsp",
+        "category": "condiments"
+      },
+      {
+        "name": "Parmesan cheese",
+        "quantity": 50,
+        "unit": "g",
+        "category": "dairy"
+      }
+    ],
+    "instructions": [
+      "Blitz zucchini, carrot and spinach in a food processor to a rough paste.",
+      "Brown mince with onion and garlic in oil.",
+      "Add blended vegetables and tomato paste, cook 2 mins.",
+      "Add crushed tomatoes, simmer 20 mins until thick.",
+      "Cook spaghetti per packet. Serve sauce over pasta with parmesan."
+    ]
+  },
+  {
+    "id": "r321",
+    "name": "Rainbow Mini Pizzas",
+    "description": "Fun mini English muffin pizzas with colourful vegetable toppings — kids build their own",
+    "baseServings": 4,
+    "cookTimeMinutes": 20,
+    "difficulty": "easy",
+    "cookingStyle": "oven",
+    "healthTags": [
+      "standard"
+    ],
+    "budgetTags": [
+      "budget"
+    ],
+    "leftoversFriendly": false,
+    "mealType": "dinner",
+    "estimatedCostBand": "low",
+    "proteinType": "vegetarian",
+    "cuisineType": "italian",
+    "seasonTags": [
+      "all"
+    ],
+    "costPerServeAUD": 3.5,
+    "kidFriendly": true,
+    "kidFriendlyScore": 5,
+    "kidFriendlyReason": "interactive — kids love customising their own pizza",
+    "categoryTags": [
+      "kid-friendly",
+      "fussy-eater",
+      "budget"
+    ],
+    "imageUrl": "https://tse2.mm.bing.net/th/id/OIP.q9mEhW9AEW3FqcVR5bYTxQHaFj?pid=Api&P=0&h=180",
+    "ingredients": [
+      {
+        "name": "English muffins",
+        "quantity": 4,
+        "unit": "whole",
+        "category": "grains"
+      },
+      {
+        "name": "Tomato paste",
+        "quantity": 4,
+        "unit": "tbsp",
+        "category": "pantry"
+      },
+      {
+        "name": "Shredded mozzarella",
+        "quantity": 200,
+        "unit": "g",
+        "category": "dairy"
+      },
+      {
+        "name": "Capsicum (mixed colours)",
+        "quantity": 1,
+        "unit": "whole",
+        "category": "vegetables"
+      },
+      {
+        "name": "Corn kernels",
+        "quantity": 100,
+        "unit": "g",
+        "category": "vegetables"
+      },
+      {
+        "name": "Cherry tomatoes",
+        "quantity": 10,
+        "unit": "whole",
+        "category": "vegetables"
+      },
+      {
+        "name": "Black olives",
+        "quantity": 10,
+        "unit": "whole",
+        "category": "vegetables"
+      },
+      {
+        "name": "Dried oregano",
+        "quantity": 1,
+        "unit": "tsp",
+        "category": "herbs"
+      }
+    ],
+    "instructions": [
+      "Preheat oven to 190°C. Split muffins and place on baking tray.",
+      "Spread tomato paste on each half. Scatter mozzarella.",
+      "Let kids add their favourite toppings.",
+      "Bake 10–12 mins until cheese is melted and golden."
+    ]
+  },
+  {
+    "id": "r322",
+    "name": "Cheesy Broccoli Bites",
+    "description": "Baked broccoli and cheese fritters — a great way to get kids eating greens",
+    "baseServings": 4,
+    "cookTimeMinutes": 30,
+    "difficulty": "easy",
+    "cookingStyle": "oven",
+    "healthTags": [
+      "healthy"
+    ],
+    "budgetTags": [
+      "budget"
+    ],
+    "leftoversFriendly": true,
+    "mealType": "dinner",
+    "estimatedCostBand": "low",
+    "proteinType": "vegetarian",
+    "cuisineType": "australian",
+    "seasonTags": [
+      "all"
+    ],
+    "costPerServeAUD": 3,
+    "kidFriendly": true,
+    "kidFriendlyScore": 5,
+    "kidFriendlyReason": "fun bite-sized shapes with cheese",
+    "categoryTags": [
+      "kid-friendly",
+      "fussy-eater",
+      "vegetarian"
+    ],
+    "imageUrl": "https://tse4.mm.bing.net/th/id/OIP.KdLHX6hHk9pNg4s0jLNXNQHaE8?pid=Api&P=0&h=180",
+    "ingredients": [
+      {
+        "name": "Broccoli",
+        "quantity": 400,
+        "unit": "g",
+        "category": "vegetables"
+      },
+      {
+        "name": "Shredded cheddar",
+        "quantity": 150,
+        "unit": "g",
+        "category": "dairy"
+      },
+      {
+        "name": "Egg",
+        "quantity": 2,
+        "unit": "whole",
+        "category": "dairy"
+      },
+      {
+        "name": "Breadcrumbs",
+        "quantity": 80,
+        "unit": "g",
+        "category": "grains"
+      },
+      {
+        "name": "Garlic powder",
+        "quantity": 0.5,
+        "unit": "tsp",
+        "category": "herbs"
+      },
+      {
+        "name": "Spring onion",
+        "quantity": 2,
+        "unit": "stalks",
+        "category": "vegetables"
+      }
+    ],
+    "instructions": [
+      "Preheat oven to 200°C. Line baking tray with paper.",
+      "Steam broccoli until just tender, then chop very finely.",
+      "Mix broccoli, cheese, eggs, breadcrumbs, garlic powder and spring onion.",
+      "Form into small patties and place on tray.",
+      "Bake 18–20 mins until golden. Serve with tomato sauce."
+    ]
+  },
+  {
+    "id": "r323",
+    "name": "San Choy Bow",
+    "description": "Chinese-style pork mince in crunchy lettuce cups — light, fresh and fun to eat",
+    "baseServings": 4,
+    "cookTimeMinutes": 20,
+    "difficulty": "easy",
+    "cookingStyle": "stovetop",
+    "healthTags": [
+      "healthy",
+      "high-protein"
+    ],
+    "budgetTags": [
+      "standard"
+    ],
+    "leftoversFriendly": true,
+    "mealType": "dinner",
+    "estimatedCostBand": "low",
+    "proteinType": "pork",
+    "cuisineType": "chinese",
+    "seasonTags": [
+      "all"
+    ],
+    "costPerServeAUD": 5.5,
+    "kidFriendly": true,
+    "kidFriendlyScore": 4,
+    "kidFriendlyReason": "fun to assemble and eat",
+    "categoryTags": [
+      "kid-friendly",
+      "quick",
+      "gluten-free"
+    ],
+    "imageUrl": "https://tse1.mm.bing.net/th/id/OIP.Sm1XGnVoR6uClbMxEr9cOAHaE8?pid=Api&P=0&h=180",
+    "ingredients": [
+      {
+        "name": "Pork mince",
+        "quantity": 500,
+        "unit": "g",
+        "category": "proteins"
+      },
+      {
+        "name": "Iceberg lettuce",
+        "quantity": 1,
+        "unit": "whole",
+        "category": "vegetables"
+      },
+      {
+        "name": "Water chestnuts",
+        "quantity": 225,
+        "unit": "g",
+        "category": "vegetables"
+      },
+      {
+        "name": "Oyster sauce",
+        "quantity": 3,
+        "unit": "tbsp",
+        "category": "condiments"
+      },
+      {
+        "name": "Soy sauce",
+        "quantity": 1,
+        "unit": "tbsp",
+        "category": "condiments"
+      },
+      {
+        "name": "Sesame oil",
+        "quantity": 1,
+        "unit": "tsp",
+        "category": "condiments"
+      },
+      {
+        "name": "Garlic",
+        "quantity": 3,
+        "unit": "cloves",
+        "category": "herbs"
+      },
+      {
+        "name": "Ginger",
+        "quantity": 2,
+        "unit": "cm",
+        "category": "herbs"
+      },
+      {
+        "name": "Spring onions",
+        "quantity": 3,
+        "unit": "stalks",
+        "category": "vegetables"
+      }
+    ],
+    "instructions": [
+      "Brown pork mince with garlic and ginger in oil.",
+      "Add diced water chestnuts. Cook 2 mins.",
+      "Add oyster sauce, soy sauce and sesame oil. Stir well.",
+      "Separate lettuce into cups. Spoon mince into cups.",
+      "Top with spring onions and serve immediately."
+    ]
+  },
+  {
+    "id": "r324",
+    "name": "Sweetcorn Pancakes",
+    "description": "Fluffy corn-studded savoury pancakes — great as a snack, lunch or side dish for kids",
+    "baseServings": 4,
+    "cookTimeMinutes": 20,
+    "difficulty": "easy",
+    "cookingStyle": "stovetop",
+    "healthTags": [
+      "standard"
+    ],
+    "budgetTags": [
+      "budget"
+    ],
+    "leftoversFriendly": false,
+    "mealType": "dinner",
+    "estimatedCostBand": "low",
+    "proteinType": "vegetarian",
+    "cuisineType": "australian",
+    "seasonTags": [
+      "all"
+    ],
+    "costPerServeAUD": 2.8,
+    "kidFriendly": true,
+    "kidFriendlyScore": 5,
+    "kidFriendlyReason": "sweet and fluffy — universally loved",
+    "categoryTags": [
+      "kid-friendly",
+      "fussy-eater",
+      "vegetarian",
+      "budget",
+      "quick"
+    ],
+    "imageUrl": "https://tse3.mm.bing.net/th/id/OIP.9MaLFTb7PJBzJXkbvzGfQAHaE8?pid=Api&P=0&h=180",
+    "ingredients": [
+      {
+        "name": "Self-raising flour",
+        "quantity": 200,
+        "unit": "g",
+        "category": "grains"
+      },
+      {
+        "name": "Corn kernels",
+        "quantity": 400,
+        "unit": "g",
+        "category": "vegetables"
+      },
+      {
+        "name": "Milk",
+        "quantity": 200,
+        "unit": "ml",
+        "category": "dairy"
+      },
+      {
+        "name": "Egg",
+        "quantity": 2,
+        "unit": "whole",
+        "category": "dairy"
+      },
+      {
+        "name": "Cheddar cheese",
+        "quantity": 100,
+        "unit": "g",
+        "category": "dairy"
+      },
+      {
+        "name": "Spring onion",
+        "quantity": 2,
+        "unit": "stalks",
+        "category": "vegetables"
+      },
+      {
+        "name": "Butter",
+        "quantity": 20,
+        "unit": "g",
+        "category": "dairy"
+      }
+    ],
+    "instructions": [
+      "Whisk flour, milk and eggs into a batter.",
+      "Stir in corn, cheese and spring onion. Season well.",
+      "Heat a non-stick pan and melt butter.",
+      "Cook spoonfuls of batter 2–3 mins per side until golden.",
+      "Serve with sour cream and sweet chilli sauce."
+    ]
+  },
+  {
+    "id": "r330",
+    "name": "Vegan Ramen",
+    "description": "Rich miso-based broth with ramen noodles, tofu, corn and soft-boiled egg alternatives",
+    "baseServings": 4,
+    "cookTimeMinutes": 40,
+    "difficulty": "medium",
+    "cookingStyle": "stovetop",
+    "healthTags": [
+      "vegan",
+      "healthy"
+    ],
+    "budgetTags": [
+      "standard"
+    ],
+    "leftoversFriendly": false,
+    "mealType": "dinner",
+    "estimatedCostBand": "medium",
+    "proteinType": "plant",
+    "cuisineType": "japanese",
+    "seasonTags": [
+      "all"
+    ],
+    "costPerServeAUD": 6.5,
+    "kidFriendly": false,
+    "kidFriendlyScore": 2,
+    "kidFriendlyReason": "complex umami flavours",
+    "categoryTags": [
+      "vegan"
+    ],
+    "imageUrl": "https://tse2.mm.bing.net/th/id/OIP.a2oEWQo2r5XlGpMLf79gxgHaE8?pid=Api&P=0&h=180",
+    "ingredients": [
+      {
+        "name": "Ramen noodles",
+        "quantity": 320,
+        "unit": "g",
+        "category": "grains"
+      },
+      {
+        "name": "Firm tofu",
+        "quantity": 400,
+        "unit": "g",
+        "category": "proteins"
+      },
+      {
+        "name": "White miso paste",
+        "quantity": 4,
+        "unit": "tbsp",
+        "category": "condiments"
+      },
+      {
+        "name": "Vegetable stock",
+        "quantity": 1.2,
+        "unit": "L",
+        "category": "pantry"
+      },
+      {
+        "name": "Corn kernels",
+        "quantity": 200,
+        "unit": "g",
+        "category": "vegetables"
+      },
+      {
+        "name": "Bok choy",
+        "quantity": 2,
+        "unit": "heads",
+        "category": "vegetables"
+      },
+      {
+        "name": "Nori sheets",
+        "quantity": 4,
+        "unit": "whole",
+        "category": "pantry"
+      },
+      {
+        "name": "Spring onions",
+        "quantity": 4,
+        "unit": "stalks",
+        "category": "vegetables"
+      },
+      {
+        "name": "Sesame oil",
+        "quantity": 2,
+        "unit": "tsp",
+        "category": "condiments"
+      },
+      {
+        "name": "Garlic",
+        "quantity": 3,
+        "unit": "cloves",
+        "category": "herbs"
+      },
+      {
+        "name": "Ginger",
+        "quantity": 3,
+        "unit": "cm",
+        "category": "herbs"
+      },
+      {
+        "name": "Soy sauce",
+        "quantity": 2,
+        "unit": "tbsp",
+        "category": "condiments"
+      }
+    ],
+    "instructions": [
+      "Dice tofu and pan-fry in sesame oil until golden on all sides.",
+      "Simmer garlic and ginger in stock 5 mins. Whisk in miso and soy sauce.",
+      "Cook ramen per packet. Blanch bok choy in broth.",
+      "Divide noodles among bowls. Ladle broth over. Top with tofu, corn, bok choy, spring onions and nori."
+    ]
+  },
+  {
+    "id": "r331",
+    "name": "Roasted Aubergine and Tomato Curry",
+    "description": "Roasted eggplant and cherry tomatoes in a fragrant Indian-spiced curry base",
+    "baseServings": 4,
+    "cookTimeMinutes": 45,
+    "difficulty": "easy",
+    "cookingStyle": "oven",
+    "healthTags": [
+      "vegan",
+      "healthy"
+    ],
+    "budgetTags": [
+      "budget",
+      "standard"
+    ],
+    "leftoversFriendly": true,
+    "mealType": "dinner",
+    "estimatedCostBand": "low",
+    "proteinType": "plant",
+    "cuisineType": "indian",
+    "seasonTags": [
+      "all"
+    ],
+    "costPerServeAUD": 5,
+    "kidFriendly": false,
+    "kidFriendlyScore": 2,
+    "kidFriendlyReason": "spiced and complex",
+    "categoryTags": [
+      "vegan",
+      "vegetarian"
+    ],
+    "imageUrl": "https://tse3.mm.bing.net/th/id/OIP.bClmIRXYV3SZb0_HkuQC_AHaE8?pid=Api&P=0&h=180",
+    "ingredients": [
+      {
+        "name": "Eggplant (aubergine)",
+        "quantity": 2,
+        "unit": "whole",
+        "category": "vegetables"
+      },
+      {
+        "name": "Cherry tomatoes",
+        "quantity": 250,
+        "unit": "g",
+        "category": "vegetables"
+      },
+      {
+        "name": "Tinned tomatoes",
+        "quantity": 400,
+        "unit": "g",
+        "category": "pantry"
+      },
+      {
+        "name": "Coconut milk",
+        "quantity": 400,
+        "unit": "ml",
+        "category": "pantry"
+      },
+      {
+        "name": "Onion",
+        "quantity": 1,
+        "unit": "whole",
+        "category": "vegetables"
+      },
+      {
+        "name": "Garlic",
+        "quantity": 4,
+        "unit": "cloves",
+        "category": "herbs"
+      },
+      {
+        "name": "Garam masala",
+        "quantity": 2,
+        "unit": "tsp",
+        "category": "herbs"
+      },
+      {
+        "name": "Cumin",
+        "quantity": 1,
+        "unit": "tsp",
+        "category": "herbs"
+      },
+      {
+        "name": "Turmeric",
+        "quantity": 0.5,
+        "unit": "tsp",
+        "category": "herbs"
+      },
+      {
+        "name": "Fresh coriander",
+        "quantity": 1,
+        "unit": "handful",
+        "category": "herbs"
+      },
+      {
+        "name": "Olive oil",
+        "quantity": 3,
+        "unit": "tbsp",
+        "category": "condiments"
+      }
+    ],
+    "instructions": [
+      "Cube eggplant and toss with oil and salt. Roast at 200°C for 25 mins until golden.",
+      "Fry onion, garlic and spices 3 mins. Add tinned tomatoes and coconut milk.",
+      "Simmer 15 mins until sauce thickens.",
+      "Add roasted eggplant and cherry tomatoes. Simmer 5 mins.",
+      "Top with fresh coriander. Serve with basmati rice."
+    ]
+  },
+  {
+    "id": "r332",
+    "name": "Vegan Jambalaya",
+    "description": "Smoky spiced rice dish with beans, peppers, tomatoes and Cajun seasonings",
+    "baseServings": 4,
+    "cookTimeMinutes": 40,
+    "difficulty": "easy",
+    "cookingStyle": "one-pot",
+    "healthTags": [
+      "vegan",
+      "healthy"
+    ],
+    "budgetTags": [
+      "budget"
+    ],
+    "leftoversFriendly": true,
+    "mealType": "dinner",
+    "estimatedCostBand": "low",
+    "proteinType": "plant",
+    "cuisineType": "american",
+    "seasonTags": [
+      "all"
+    ],
+    "costPerServeAUD": 4.2,
+    "kidFriendly": false,
+    "kidFriendlyScore": 2,
+    "kidFriendlyReason": "spicy Cajun flavours",
+    "categoryTags": [
+      "vegan",
+      "budget"
+    ],
+    "imageUrl": "https://tse1.mm.bing.net/th/id/OIP.kD0hT3-OlX3_MNgV8mvYeQHaE8?pid=Api&P=0&h=180",
+    "ingredients": [
+      {
+        "name": "Long-grain rice",
+        "quantity": 300,
+        "unit": "g",
+        "category": "grains"
+      },
+      {
+        "name": "Kidney beans (tinned)",
+        "quantity": 400,
+        "unit": "g",
+        "category": "proteins"
+      },
+      {
+        "name": "Red capsicum",
+        "quantity": 1,
+        "unit": "whole",
+        "category": "vegetables"
+      },
+      {
+        "name": "Green capsicum",
+        "quantity": 1,
+        "unit": "whole",
+        "category": "vegetables"
+      },
+      {
+        "name": "Celery",
+        "quantity": 2,
+        "unit": "stalks",
+        "category": "vegetables"
+      },
+      {
+        "name": "Onion",
+        "quantity": 1,
+        "unit": "whole",
+        "category": "vegetables"
+      },
+      {
+        "name": "Crushed tomatoes",
+        "quantity": 400,
+        "unit": "g",
+        "category": "pantry"
+      },
+      {
+        "name": "Vegetable stock",
+        "quantity": 600,
+        "unit": "ml",
+        "category": "pantry"
+      },
+      {
+        "name": "Smoked paprika",
+        "quantity": 2,
+        "unit": "tsp",
+        "category": "herbs"
+      },
+      {
+        "name": "Cajun seasoning",
+        "quantity": 2,
+        "unit": "tsp",
+        "category": "herbs"
+      },
+      {
+        "name": "Garlic",
+        "quantity": 3,
+        "unit": "cloves",
+        "category": "herbs"
+      },
+      {
+        "name": "Olive oil",
+        "quantity": 2,
+        "unit": "tbsp",
+        "category": "condiments"
+      }
+    ],
+    "instructions": [
+      "Sauté onion, capsicum, celery and garlic in oil until soft.",
+      "Add spices and cook 1 min. Add tomatoes, rice and stock.",
+      "Bring to a boil, reduce heat, cover and cook 20 mins.",
+      "Stir in beans and heat through. Season and serve."
+    ]
+  },
+  {
+    "id": "r333",
+    "name": "Middle Eastern Lentil Soup",
+    "description": "Earthy red lentil soup with cumin, turmeric and lemon — warming and deeply satisfying",
+    "baseServings": 4,
+    "cookTimeMinutes": 30,
+    "difficulty": "easy",
+    "cookingStyle": "one-pot",
+    "healthTags": [
+      "vegan",
+      "healthy"
+    ],
+    "budgetTags": [
+      "budget"
+    ],
+    "leftoversFriendly": true,
+    "mealType": "dinner",
+    "estimatedCostBand": "low",
+    "proteinType": "plant",
+    "cuisineType": "middle-eastern",
+    "seasonTags": [
+      "autumn",
+      "winter"
+    ],
+    "costPerServeAUD": 3.5,
+    "kidFriendly": true,
+    "kidFriendlyScore": 3,
+    "kidFriendlyReason": "mild and comforting",
+    "categoryTags": [
+      "vegan",
+      "budget",
+      "quick"
+    ],
+    "imageUrl": "https://tse4.mm.bing.net/th/id/OIP.pM6qA5Lz2L8BUcbSZWCH-AHaE8?pid=Api&P=0&h=180",
+    "ingredients": [
+      {
+        "name": "Red lentils",
+        "quantity": 300,
+        "unit": "g",
+        "category": "proteins"
+      },
+      {
+        "name": "Vegetable stock",
+        "quantity": 1.2,
+        "unit": "L",
+        "category": "pantry"
+      },
+      {
+        "name": "Onion",
+        "quantity": 1,
+        "unit": "whole",
+        "category": "vegetables"
+      },
+      {
+        "name": "Garlic",
+        "quantity": 4,
+        "unit": "cloves",
+        "category": "herbs"
+      },
+      {
+        "name": "Cumin",
+        "quantity": 2,
+        "unit": "tsp",
+        "category": "herbs"
+      },
+      {
+        "name": "Turmeric",
+        "quantity": 1,
+        "unit": "tsp",
+        "category": "herbs"
+      },
+      {
+        "name": "Smoked paprika",
+        "quantity": 1,
+        "unit": "tsp",
+        "category": "herbs"
+      },
+      {
+        "name": "Lemon",
+        "quantity": 2,
+        "unit": "whole",
+        "category": "fruits"
+      },
+      {
+        "name": "Olive oil",
+        "quantity": 2,
+        "unit": "tbsp",
+        "category": "condiments"
+      },
+      {
+        "name": "Fresh coriander",
+        "quantity": 1,
+        "unit": "handful",
+        "category": "herbs"
+      }
+    ],
+    "instructions": [
+      "Sauté onion and garlic in oil until soft. Add spices and cook 1 min.",
+      "Add rinsed lentils and stock. Bring to a boil.",
+      "Simmer 20 mins until lentils are completely soft. Blend half if desired.",
+      "Squeeze in lemon juice, season generously.",
+      "Serve with flatbread, topped with coriander and a drizzle of oil."
+    ]
+  },
+  {
+    "id": "r334",
+    "name": "Vegan Mac and Cheese",
+    "description": "Creamy dairy-free mac and cheese made with a cashew and nutritional yeast sauce",
+    "baseServings": 4,
+    "cookTimeMinutes": 30,
+    "difficulty": "easy",
+    "cookingStyle": "stovetop",
+    "healthTags": [
+      "vegan"
+    ],
+    "budgetTags": [
+      "standard"
+    ],
+    "leftoversFriendly": true,
+    "mealType": "dinner",
+    "estimatedCostBand": "medium",
+    "proteinType": "plant",
+    "cuisineType": "american",
+    "seasonTags": [
+      "all"
+    ],
+    "costPerServeAUD": 5.5,
+    "kidFriendly": true,
+    "kidFriendlyScore": 4,
+    "kidFriendlyReason": "creamy cheesy pasta kids enjoy",
+    "categoryTags": [
+      "vegan"
+    ],
+    "imageUrl": "https://tse2.mm.bing.net/th/id/OIP.vR9a9XvqGSV7jYGHMpYHsQHaE8?pid=Api&P=0&h=180",
+    "ingredients": [
+      {
+        "name": "Macaroni pasta",
+        "quantity": 400,
+        "unit": "g",
+        "category": "grains"
+      },
+      {
+        "name": "Raw cashews",
+        "quantity": 150,
+        "unit": "g",
+        "category": "proteins"
+      },
+      {
+        "name": "Nutritional yeast",
+        "quantity": 4,
+        "unit": "tbsp",
+        "category": "pantry"
+      },
+      {
+        "name": "Oat milk (unsweetened)",
+        "quantity": 300,
+        "unit": "ml",
+        "category": "dairy"
+      },
+      {
+        "name": "Garlic",
+        "quantity": 2,
+        "unit": "cloves",
+        "category": "herbs"
+      },
+      {
+        "name": "Lemon juice",
+        "quantity": 2,
+        "unit": "tbsp",
+        "category": "fruits"
+      },
+      {
+        "name": "Mustard powder",
+        "quantity": 0.5,
+        "unit": "tsp",
+        "category": "herbs"
+      },
+      {
+        "name": "Smoked paprika",
+        "quantity": 0.5,
+        "unit": "tsp",
+        "category": "herbs"
+      },
+      {
+        "name": "Onion powder",
+        "quantity": 0.5,
+        "unit": "tsp",
+        "category": "herbs"
+      }
+    ],
+    "instructions": [
+      "Soak cashews in boiling water 20 mins, then drain.",
+      "Blend cashews with oat milk, nutritional yeast, garlic, lemon, mustard, paprika and onion powder until smooth.",
+      "Cook pasta per packet.",
+      "Pour sauce into a pan and warm over medium heat until thickened.",
+      "Drain pasta and stir into sauce. Season to taste."
+    ]
+  },
+  {
+    "id": "r335",
+    "name": "Roasted Cauliflower Curry",
+    "description": "Golden roasted cauliflower florets in a rich coconut tomato curry sauce",
+    "baseServings": 4,
+    "cookTimeMinutes": 45,
+    "difficulty": "easy",
+    "cookingStyle": "oven",
+    "healthTags": [
+      "vegan",
+      "healthy"
+    ],
+    "budgetTags": [
+      "budget",
+      "standard"
+    ],
+    "leftoversFriendly": true,
+    "mealType": "dinner",
+    "estimatedCostBand": "low",
+    "proteinType": "plant",
+    "cuisineType": "indian",
+    "seasonTags": [
+      "all"
+    ],
+    "costPerServeAUD": 4.8,
+    "kidFriendly": false,
+    "kidFriendlyScore": 2,
+    "kidFriendlyReason": "spiced sauce",
+    "categoryTags": [
+      "vegan",
+      "vegetarian",
+      "budget"
+    ],
+    "imageUrl": "https://tse1.mm.bing.net/th/id/OIP.f2LfDYN1bLiMBi7Y1AvXUQHaE8?pid=Api&P=0&h=180",
+    "ingredients": [
+      {
+        "name": "Cauliflower",
+        "quantity": 1,
+        "unit": "whole",
+        "category": "vegetables"
+      },
+      {
+        "name": "Tinned tomatoes",
+        "quantity": 400,
+        "unit": "g",
+        "category": "pantry"
+      },
+      {
+        "name": "Coconut milk",
+        "quantity": 400,
+        "unit": "ml",
+        "category": "pantry"
+      },
+      {
+        "name": "Onion",
+        "quantity": 1,
+        "unit": "whole",
+        "category": "vegetables"
+      },
+      {
+        "name": "Garlic",
+        "quantity": 3,
+        "unit": "cloves",
+        "category": "herbs"
+      },
+      {
+        "name": "Ginger",
+        "quantity": 2,
+        "unit": "cm",
+        "category": "herbs"
+      },
+      {
+        "name": "Garam masala",
+        "quantity": 2,
+        "unit": "tsp",
+        "category": "herbs"
+      },
+      {
+        "name": "Cumin",
+        "quantity": 1,
+        "unit": "tsp",
+        "category": "herbs"
+      },
+      {
+        "name": "Olive oil",
+        "quantity": 3,
+        "unit": "tbsp",
+        "category": "condiments"
+      },
+      {
+        "name": "Basmati rice",
+        "quantity": 320,
+        "unit": "g",
+        "category": "grains"
+      }
+    ],
+    "instructions": [
+      "Cut cauliflower into florets. Toss with oil and garam masala. Roast 200°C for 20 mins.",
+      "Fry onion, garlic and ginger until soft. Add cumin and remaining garam masala.",
+      "Add tomatoes and coconut milk. Simmer 15 mins.",
+      "Add roasted cauliflower and simmer 5 mins.",
+      "Cook rice per packet. Serve curry over rice."
+    ]
+  },
+  {
+    "id": "r340",
+    "name": "Sweet Potato and Peanut Curry",
+    "description": "Creamy West African-inspired curry with sweet potato, chickpeas and peanut butter",
+    "baseServings": 4,
+    "cookTimeMinutes": 35,
+    "difficulty": "easy",
+    "cookingStyle": "one-pot",
+    "healthTags": [
+      "vegetarian",
+      "healthy"
+    ],
+    "budgetTags": [
+      "budget",
+      "standard"
+    ],
+    "leftoversFriendly": true,
+    "mealType": "dinner",
+    "estimatedCostBand": "low",
+    "proteinType": "plant",
+    "cuisineType": "african",
+    "seasonTags": [
+      "all"
+    ],
+    "costPerServeAUD": 5.2,
+    "kidFriendly": false,
+    "kidFriendlyScore": 2,
+    "kidFriendlyReason": "bold spiced flavours",
+    "categoryTags": [
+      "vegetarian",
+      "vegan",
+      "budget"
+    ],
+    "imageUrl": "https://tse3.mm.bing.net/th/id/OIP.tKZi7RWQoLlCzJnk2S7b5AHaE8?pid=Api&P=0&h=180",
+    "ingredients": [
+      {
+        "name": "Sweet potato",
+        "quantity": 600,
+        "unit": "g",
+        "category": "vegetables"
+      },
+      {
+        "name": "Chickpeas (tinned)",
+        "quantity": 400,
+        "unit": "g",
+        "category": "proteins"
+      },
+      {
+        "name": "Peanut butter",
+        "quantity": 3,
+        "unit": "tbsp",
+        "category": "condiments"
+      },
+      {
+        "name": "Tinned tomatoes",
+        "quantity": 400,
+        "unit": "g",
+        "category": "pantry"
+      },
+      {
+        "name": "Coconut milk",
+        "quantity": 200,
+        "unit": "ml",
+        "category": "pantry"
+      },
+      {
+        "name": "Onion",
+        "quantity": 1,
+        "unit": "whole",
+        "category": "vegetables"
+      },
+      {
+        "name": "Garlic",
+        "quantity": 3,
+        "unit": "cloves",
+        "category": "herbs"
+      },
+      {
+        "name": "Ginger",
+        "quantity": 2,
+        "unit": "cm",
+        "category": "herbs"
+      },
+      {
+        "name": "Curry powder",
+        "quantity": 2,
+        "unit": "tsp",
+        "category": "herbs"
+      },
+      {
+        "name": "Fresh coriander",
+        "quantity": 1,
+        "unit": "handful",
+        "category": "herbs"
+      }
+    ],
+    "instructions": [
+      "Peel and cube sweet potato. Fry onion, garlic and ginger 3 mins.",
+      "Add curry powder and cook 1 min. Add sweet potato and stir.",
+      "Add tomatoes, coconut milk and peanut butter. Stir to combine.",
+      "Simmer 20 mins until sweet potato is tender.",
+      "Add chickpeas, heat through. Serve with rice and coriander."
+    ]
+  },
+  {
+    "id": "r341",
+    "name": "Coconut Squash Dhansak",
+    "description": "Lentil and butternut pumpkin curry with warm Parsi-inspired spices and coconut",
+    "baseServings": 4,
+    "cookTimeMinutes": 45,
+    "difficulty": "medium",
+    "cookingStyle": "one-pot",
+    "healthTags": [
+      "vegetarian",
+      "vegan",
+      "healthy"
+    ],
+    "budgetTags": [
+      "budget"
+    ],
+    "leftoversFriendly": true,
+    "mealType": "dinner",
+    "estimatedCostBand": "low",
+    "proteinType": "plant",
+    "cuisineType": "indian",
+    "seasonTags": [
+      "all"
+    ],
+    "costPerServeAUD": 4.5,
+    "kidFriendly": false,
+    "kidFriendlyScore": 2,
+    "kidFriendlyReason": "complex spice profile",
+    "categoryTags": [
+      "vegetarian",
+      "vegan",
+      "budget",
+      "batch-cooking"
+    ],
+    "imageUrl": "https://tse4.mm.bing.net/th/id/OIP.sPDHNHGmE-k8RYCjWW0g-wHaE8?pid=Api&P=0&h=180",
+    "ingredients": [
+      {
+        "name": "Red lentils",
+        "quantity": 200,
+        "unit": "g",
+        "category": "proteins"
+      },
+      {
+        "name": "Butternut pumpkin",
+        "quantity": 500,
+        "unit": "g",
+        "category": "vegetables"
+      },
+      {
+        "name": "Coconut milk",
+        "quantity": 400,
+        "unit": "ml",
+        "category": "pantry"
+      },
+      {
+        "name": "Spinach",
+        "quantity": 100,
+        "unit": "g",
+        "category": "vegetables"
+      },
+      {
+        "name": "Onion",
+        "quantity": 1,
+        "unit": "whole",
+        "category": "vegetables"
+      },
+      {
+        "name": "Garlic",
+        "quantity": 3,
+        "unit": "cloves",
+        "category": "herbs"
+      },
+      {
+        "name": "Garam masala",
+        "quantity": 2,
+        "unit": "tsp",
+        "category": "herbs"
+      },
+      {
+        "name": "Ground coriander",
+        "quantity": 1,
+        "unit": "tsp",
+        "category": "herbs"
+      },
+      {
+        "name": "Vegetable stock",
+        "quantity": 500,
+        "unit": "ml",
+        "category": "pantry"
+      },
+      {
+        "name": "Lemon juice",
+        "quantity": 2,
+        "unit": "tbsp",
+        "category": "fruits"
+      }
+    ],
+    "instructions": [
+      "Fry onion and garlic 3 mins. Add spices and cook 1 min.",
+      "Add cubed pumpkin, rinsed lentils, stock and coconut milk.",
+      "Simmer 25 mins until lentils and pumpkin are very soft.",
+      "Stir in spinach and lemon juice. Season and serve with naan."
+    ]
+  },
+  {
+    "id": "r342",
+    "name": "Baked Ziti",
+    "description": "Hearty baked pasta with rich tomato sauce and three cheeses — Italian-American comfort food",
+    "baseServings": 6,
+    "cookTimeMinutes": 60,
+    "difficulty": "easy",
+    "cookingStyle": "oven",
+    "healthTags": [
+      "vegetarian"
+    ],
+    "budgetTags": [
+      "standard"
+    ],
+    "leftoversFriendly": true,
+    "mealType": "dinner",
+    "estimatedCostBand": "medium",
+    "proteinType": "vegetarian",
+    "cuisineType": "italian",
+    "seasonTags": [
+      "all"
+    ],
+    "costPerServeAUD": 5.8,
+    "kidFriendly": true,
+    "kidFriendlyScore": 4,
+    "kidFriendlyReason": "cheesy pasta — always a winner",
+    "categoryTags": [
+      "vegetarian",
+      "kid-friendly"
+    ],
+    "imageUrl": "https://tse1.mm.bing.net/th/id/OIP.GE3p4PVbMbKiRDKCfC-nQQHaE8?pid=Api&P=0&h=180",
+    "ingredients": [
+      {
+        "name": "Ziti or penne pasta",
+        "quantity": 500,
+        "unit": "g",
+        "category": "grains"
+      },
+      {
+        "name": "Crushed tomatoes",
+        "quantity": 800,
+        "unit": "g",
+        "category": "pantry"
+      },
+      {
+        "name": "Ricotta cheese",
+        "quantity": 500,
+        "unit": "g",
+        "category": "dairy"
+      },
+      {
+        "name": "Mozzarella shredded",
+        "quantity": 300,
+        "unit": "g",
+        "category": "dairy"
+      },
+      {
+        "name": "Parmesan cheese",
+        "quantity": 100,
+        "unit": "g",
+        "category": "dairy"
+      },
+      {
+        "name": "Onion",
+        "quantity": 1,
+        "unit": "whole",
+        "category": "vegetables"
+      },
+      {
+        "name": "Garlic",
+        "quantity": 4,
+        "unit": "cloves",
+        "category": "herbs"
+      },
+      {
+        "name": "Dried basil",
+        "quantity": 2,
+        "unit": "tsp",
+        "category": "herbs"
+      },
+      {
+        "name": "Egg",
+        "quantity": 1,
+        "unit": "whole",
+        "category": "dairy"
+      },
+      {
+        "name": "Olive oil",
+        "quantity": 2,
+        "unit": "tbsp",
+        "category": "condiments"
+      }
+    ],
+    "instructions": [
+      "Preheat oven to 190°C. Cook pasta until al dente.",
+      "Sauté onion and garlic. Add tomatoes and basil, simmer 15 mins.",
+      "Mix ricotta with egg, half the parmesan and salt.",
+      "Layer in a baking dish: sauce, pasta, ricotta mixture, mozzarella. Repeat.",
+      "Top with remaining parmesan. Bake 30 mins until bubbling and golden."
+    ]
+  },
+  {
+    "id": "r343",
+    "name": "Halloumi Curry",
+    "description": "Golden fried halloumi in a fragrant tomato-based curry sauce with spinach",
+    "baseServings": 4,
+    "cookTimeMinutes": 30,
+    "difficulty": "easy",
+    "cookingStyle": "stovetop",
+    "healthTags": [
+      "vegetarian"
+    ],
+    "budgetTags": [
+      "standard"
+    ],
+    "leftoversFriendly": false,
+    "mealType": "dinner",
+    "estimatedCostBand": "medium",
+    "proteinType": "vegetarian",
+    "cuisineType": "indian",
+    "seasonTags": [
+      "all"
+    ],
+    "costPerServeAUD": 8,
+    "kidFriendly": false,
+    "kidFriendlyScore": 2,
+    "kidFriendlyReason": "spiced curry sauce",
+    "categoryTags": [
+      "vegetarian",
+      "quick"
+    ],
+    "imageUrl": "https://tse2.mm.bing.net/th/id/OIP.IZjvUJWA3pJ-nLAMlPdP1gHaE8?pid=Api&P=0&h=180",
+    "ingredients": [
+      {
+        "name": "Halloumi",
+        "quantity": 400,
+        "unit": "g",
+        "category": "dairy"
+      },
+      {
+        "name": "Tinned tomatoes",
+        "quantity": 400,
+        "unit": "g",
+        "category": "pantry"
+      },
+      {
+        "name": "Baby spinach",
+        "quantity": 150,
+        "unit": "g",
+        "category": "vegetables"
+      },
+      {
+        "name": "Onion",
+        "quantity": 1,
+        "unit": "whole",
+        "category": "vegetables"
+      },
+      {
+        "name": "Garlic",
+        "quantity": 3,
+        "unit": "cloves",
+        "category": "herbs"
+      },
+      {
+        "name": "Ginger",
+        "quantity": 2,
+        "unit": "cm",
+        "category": "herbs"
+      },
+      {
+        "name": "Garam masala",
+        "quantity": 2,
+        "unit": "tsp",
+        "category": "herbs"
+      },
+      {
+        "name": "Cumin seeds",
+        "quantity": 1,
+        "unit": "tsp",
+        "category": "herbs"
+      },
+      {
+        "name": "Double cream",
+        "quantity": 100,
+        "unit": "ml",
+        "category": "dairy"
+      },
+      {
+        "name": "Vegetable oil",
+        "quantity": 2,
+        "unit": "tbsp",
+        "category": "condiments"
+      }
+    ],
+    "instructions": [
+      "Slice halloumi and fry in a dry pan until golden on both sides. Set aside.",
+      "Fry onion, garlic and ginger in oil until soft.",
+      "Add cumin seeds and garam masala. Cook 1 min.",
+      "Add tomatoes and simmer 10 mins. Stir in cream.",
+      "Add spinach and halloumi. Serve with basmati rice."
+    ]
+  },
+  {
+    "id": "r344",
+    "name": "Haloumi Burgers",
+    "description": "Grilled halloumi patties with roasted capsicum, avocado and herb mayo in a toasted bun",
+    "baseServings": 4,
+    "cookTimeMinutes": 20,
+    "difficulty": "easy",
+    "cookingStyle": "stovetop",
+    "healthTags": [
+      "vegetarian"
+    ],
+    "budgetTags": [
+      "standard"
+    ],
+    "leftoversFriendly": false,
+    "mealType": "dinner",
+    "estimatedCostBand": "medium",
+    "proteinType": "vegetarian",
+    "cuisineType": "australian",
+    "seasonTags": [
+      "spring",
+      "summer"
+    ],
+    "costPerServeAUD": 8.5,
+    "kidFriendly": true,
+    "kidFriendlyScore": 3,
+    "kidFriendlyReason": "kids enjoy the burger format",
+    "categoryTags": [
+      "vegetarian",
+      "quick"
+    ],
+    "imageUrl": "https://tse3.mm.bing.net/th/id/OIP.0XHKC7JaBpEfvTNTfLgW7wHaFj?pid=Api&P=0&h=180",
+    "ingredients": [
+      {
+        "name": "Halloumi",
+        "quantity": 500,
+        "unit": "g",
+        "category": "dairy"
+      },
+      {
+        "name": "Burger buns",
+        "quantity": 4,
+        "unit": "whole",
+        "category": "grains"
+      },
+      {
+        "name": "Roasted red capsicum",
+        "quantity": 1,
+        "unit": "whole",
+        "category": "vegetables"
+      },
+      {
+        "name": "Avocado",
+        "quantity": 1,
+        "unit": "whole",
+        "category": "fruits"
+      },
+      {
+        "name": "Baby rocket",
+        "quantity": 60,
+        "unit": "g",
+        "category": "vegetables"
+      },
+      {
+        "name": "Mayonnaise",
+        "quantity": 4,
+        "unit": "tbsp",
+        "category": "condiments"
+      },
+      {
+        "name": "Lemon juice",
+        "quantity": 1,
+        "unit": "tbsp",
+        "category": "fruits"
+      },
+      {
+        "name": "Fresh basil",
+        "quantity": 1,
+        "unit": "handful",
+        "category": "herbs"
+      }
+    ],
+    "instructions": [
+      "Slice halloumi 1cm thick. Grill or pan-fry 2 mins per side until golden.",
+      "Mix mayo with lemon juice and torn basil.",
+      "Toast burger buns. Spread herb mayo on bases.",
+      "Layer rocket, halloumi, roasted capsicum and sliced avocado.",
+      "Season with salt and pepper and serve immediately."
+    ]
+  },
+  {
+    "id": "r350",
+    "name": "Thai Peanut Chicken Noodles",
+    "description": "15-minute stir-fried noodles with chicken in a creamy peanut and sweet chilli sauce",
+    "baseServings": 4,
+    "cookTimeMinutes": 15,
+    "difficulty": "easy",
+    "cookingStyle": "stovetop",
+    "healthTags": [
+      "standard"
+    ],
+    "budgetTags": [
+      "standard"
+    ],
+    "leftoversFriendly": false,
+    "mealType": "dinner",
+    "estimatedCostBand": "medium",
+    "proteinType": "chicken",
+    "cuisineType": "thai",
+    "seasonTags": [
+      "all"
+    ],
+    "costPerServeAUD": 6,
+    "kidFriendly": true,
+    "kidFriendlyScore": 4,
+    "kidFriendlyReason": "mild peanut noodles are a crowd-pleaser",
+    "categoryTags": [
+      "quick",
+      "kid-friendly"
+    ],
+    "imageUrl": "https://tse4.mm.bing.net/th/id/OIP.3JG7K8M5bGvHJzRoFMXkMwHaE8?pid=Api&P=0&h=180",
+    "ingredients": [
+      {
+        "name": "Chicken breast",
+        "quantity": 500,
+        "unit": "g",
+        "category": "proteins"
+      },
+      {
+        "name": "Egg noodles",
+        "quantity": 400,
+        "unit": "g",
+        "category": "grains"
+      },
+      {
+        "name": "Peanut butter",
+        "quantity": 3,
+        "unit": "tbsp",
+        "category": "condiments"
+      },
+      {
+        "name": "Sweet chilli sauce",
+        "quantity": 2,
+        "unit": "tbsp",
+        "category": "condiments"
+      },
+      {
+        "name": "Soy sauce",
+        "quantity": 2,
+        "unit": "tbsp",
+        "category": "condiments"
+      },
+      {
+        "name": "Lime juice",
+        "quantity": 2,
+        "unit": "tbsp",
+        "category": "fruits"
+      },
+      {
+        "name": "Beansprouts",
+        "quantity": 150,
+        "unit": "g",
+        "category": "vegetables"
+      },
+      {
+        "name": "Spring onions",
+        "quantity": 4,
+        "unit": "stalks",
+        "category": "vegetables"
+      },
+      {
+        "name": "Roasted peanuts",
+        "quantity": 50,
+        "unit": "g",
+        "category": "proteins"
+      },
+      {
+        "name": "Sesame oil",
+        "quantity": 1,
+        "unit": "tsp",
+        "category": "condiments"
+      }
+    ],
+    "instructions": [
+      "Cook noodles per packet, reserve ¼ cup cooking water.",
+      "Slice chicken and stir-fry in oil until cooked.",
+      "Whisk peanut butter, sweet chilli, soy, lime juice and cooking water into a sauce.",
+      "Toss noodles, chicken, beansprouts and sauce together.",
+      "Serve topped with spring onions and roasted peanuts."
+    ]
+  },
+  {
+    "id": "r351",
+    "name": "Creamy Garlic Butter Chicken",
+    "description": "Pan-seared chicken in a rich garlic, herb and cream sauce — on the table in 20 minutes",
+    "baseServings": 4,
+    "cookTimeMinutes": 20,
+    "difficulty": "easy",
+    "cookingStyle": "stovetop",
+    "healthTags": [
+      "high-protein"
+    ],
+    "budgetTags": [
+      "standard"
+    ],
+    "leftoversFriendly": false,
+    "mealType": "dinner",
+    "estimatedCostBand": "medium",
+    "proteinType": "chicken",
+    "cuisineType": "french",
+    "seasonTags": [
+      "all"
+    ],
+    "costPerServeAUD": 7.5,
+    "kidFriendly": true,
+    "kidFriendlyScore": 4,
+    "kidFriendlyReason": "creamy mild chicken sauce",
+    "categoryTags": [
+      "quick",
+      "everyday"
+    ],
+    "imageUrl": "https://tse1.mm.bing.net/th/id/OIP.cqFJWe3JKJhDxAvqpZj8-QHaE8?pid=Api&P=0&h=180",
+    "ingredients": [
+      {
+        "name": "Chicken thigh fillets",
+        "quantity": 600,
+        "unit": "g",
+        "category": "proteins"
+      },
+      {
+        "name": "Butter",
+        "quantity": 50,
+        "unit": "g",
+        "category": "dairy"
+      },
+      {
+        "name": "Garlic",
+        "quantity": 6,
+        "unit": "cloves",
+        "category": "herbs"
+      },
+      {
+        "name": "Thickened cream",
+        "quantity": 200,
+        "unit": "ml",
+        "category": "dairy"
+      },
+      {
+        "name": "Chicken stock",
+        "quantity": 100,
+        "unit": "ml",
+        "category": "pantry"
+      },
+      {
+        "name": "Fresh thyme",
+        "quantity": 3,
+        "unit": "sprigs",
+        "category": "herbs"
+      },
+      {
+        "name": "Parmesan cheese",
+        "quantity": 50,
+        "unit": "g",
+        "category": "dairy"
+      },
+      {
+        "name": "Olive oil",
+        "quantity": 1,
+        "unit": "tbsp",
+        "category": "condiments"
+      }
+    ],
+    "instructions": [
+      "Season chicken and sear in oil 4–5 mins per side until golden. Remove.",
+      "Melt butter in same pan, fry garlic 1 min.",
+      "Add stock, cream and thyme. Simmer 3 mins.",
+      "Stir in parmesan. Return chicken and simmer 3 mins.",
+      "Serve with mashed potato or pasta."
+    ]
+  },
+  {
+    "id": "r352",
+    "name": "Garlic Butter Basa Fillets",
+    "description": "Tender basa fillets pan-fried in garlic butter and lemon — a quick budget-friendly dinner",
+    "baseServings": 4,
+    "cookTimeMinutes": 15,
+    "difficulty": "easy",
+    "cookingStyle": "stovetop",
+    "healthTags": [
+      "healthy",
+      "high-protein"
+    ],
+    "budgetTags": [
+      "budget"
+    ],
+    "leftoversFriendly": false,
+    "mealType": "dinner",
+    "estimatedCostBand": "low",
+    "proteinType": "seafood",
+    "cuisineType": "european",
+    "seasonTags": [
+      "all"
+    ],
+    "costPerServeAUD": 5.5,
+    "kidFriendly": true,
+    "kidFriendlyScore": 4,
+    "kidFriendlyReason": "mild white fish",
+    "categoryTags": [
+      "quick",
+      "budget"
+    ],
+    "imageUrl": "https://tse2.mm.bing.net/th/id/OIP.EoLw4K9TxEoxJ1wf2oIiKAHaE8?pid=Api&P=0&h=180",
+    "ingredients": [
+      {
+        "name": "Basa fillets",
+        "quantity": 600,
+        "unit": "g",
+        "category": "proteins"
+      },
+      {
+        "name": "Butter",
+        "quantity": 60,
+        "unit": "g",
+        "category": "dairy"
+      },
+      {
+        "name": "Garlic",
+        "quantity": 4,
+        "unit": "cloves",
+        "category": "herbs"
+      },
+      {
+        "name": "Lemon",
+        "quantity": 1,
+        "unit": "whole",
+        "category": "fruits"
+      },
+      {
+        "name": "Fresh parsley",
+        "quantity": 2,
+        "unit": "tbsp",
+        "category": "herbs"
+      },
+      {
+        "name": "Capers",
+        "quantity": 1,
+        "unit": "tbsp",
+        "category": "condiments"
+      },
+      {
+        "name": "Plain flour",
+        "quantity": 60,
+        "unit": "g",
+        "category": "grains"
+      }
+    ],
+    "instructions": [
+      "Lightly coat fillets in flour. Season with salt and pepper.",
+      "Fry fillets in butter 3 mins per side until golden. Remove.",
+      "Add garlic to pan, cook 1 min. Add lemon juice and capers.",
+      "Spoon butter sauce over fish. Top with parsley. Serve with salad."
+    ]
+  },
+  {
+    "id": "r353",
+    "name": "Air Fryer Pork Chops",
+    "description": "Juicy, well-seasoned pork chops cooked in the air fryer in under 15 minutes",
+    "baseServings": 4,
+    "cookTimeMinutes": 15,
+    "difficulty": "easy",
+    "cookingStyle": "air-fryer",
+    "healthTags": [
+      "high-protein"
+    ],
+    "budgetTags": [
+      "budget",
+      "standard"
+    ],
+    "leftoversFriendly": false,
+    "mealType": "dinner",
+    "estimatedCostBand": "low",
+    "proteinType": "pork",
+    "cuisineType": "australian",
+    "seasonTags": [
+      "all"
+    ],
+    "costPerServeAUD": 5.8,
+    "kidFriendly": true,
+    "kidFriendlyScore": 4,
+    "kidFriendlyReason": "simple flavour profile",
+    "categoryTags": [
+      "quick",
+      "budget"
+    ],
+    "imageUrl": "https://tse4.mm.bing.net/th/id/OIP.sJ0k-b5OkiKIk5r7d5sn-wHaE8?pid=Api&P=0&h=180",
+    "ingredients": [
+      {
+        "name": "Pork loin chops",
+        "quantity": 4,
+        "unit": "whole",
+        "category": "proteins"
+      },
+      {
+        "name": "Smoked paprika",
+        "quantity": 1,
+        "unit": "tsp",
+        "category": "herbs"
+      },
+      {
+        "name": "Garlic powder",
+        "quantity": 1,
+        "unit": "tsp",
+        "category": "herbs"
+      },
+      {
+        "name": "Brown sugar",
+        "quantity": 1,
+        "unit": "tsp",
+        "category": "pantry"
+      },
+      {
+        "name": "Dried thyme",
+        "quantity": 0.5,
+        "unit": "tsp",
+        "category": "herbs"
+      },
+      {
+        "name": "Olive oil",
+        "quantity": 1,
+        "unit": "tbsp",
+        "category": "condiments"
+      },
+      {
+        "name": "Lemon",
+        "quantity": 1,
+        "unit": "whole",
+        "category": "fruits"
+      }
+    ],
+    "instructions": [
+      "Mix spices, sugar and oil to a paste. Rub all over chops.",
+      "Preheat air fryer to 200°C.",
+      "Cook chops 8–10 mins, flipping halfway, until internal temp 63°C.",
+      "Rest 3 mins. Serve with lemon, chips and salad."
+    ]
+  },
+  {
+    "id": "r354",
+    "name": "Quick Chicken Hummus Bowl",
+    "description": "Spiced chicken strips served over creamy hummus with cucumber, tomato and flatbread",
+    "baseServings": 4,
+    "cookTimeMinutes": 20,
+    "difficulty": "easy",
+    "cookingStyle": "stovetop",
+    "healthTags": [
+      "healthy",
+      "high-protein"
+    ],
+    "budgetTags": [
+      "standard"
+    ],
+    "leftoversFriendly": false,
+    "mealType": "dinner",
+    "estimatedCostBand": "medium",
+    "proteinType": "chicken",
+    "cuisineType": "middle-eastern",
+    "seasonTags": [
+      "all"
+    ],
+    "costPerServeAUD": 7,
+    "kidFriendly": false,
+    "kidFriendlyScore": 2,
+    "kidFriendlyReason": "kids may not like hummus base",
+    "categoryTags": [
+      "quick"
+    ],
+    "imageUrl": "https://tse1.mm.bing.net/th/id/OIP.RCxFyXWiQxT_T5HcpXbRKQHaE8?pid=Api&P=0&h=180",
+    "ingredients": [
+      {
+        "name": "Chicken breast",
+        "quantity": 500,
+        "unit": "g",
+        "category": "proteins"
+      },
+      {
+        "name": "Hummus",
+        "quantity": 400,
+        "unit": "g",
+        "category": "condiments"
+      },
+      {
+        "name": "Cherry tomatoes",
+        "quantity": 200,
+        "unit": "g",
+        "category": "vegetables"
+      },
+      {
+        "name": "Cucumber",
+        "quantity": 1,
+        "unit": "whole",
+        "category": "vegetables"
+      },
+      {
+        "name": "Flatbread",
+        "quantity": 4,
+        "unit": "whole",
+        "category": "grains"
+      },
+      {
+        "name": "Smoked paprika",
+        "quantity": 1,
+        "unit": "tsp",
+        "category": "herbs"
+      },
+      {
+        "name": "Cumin",
+        "quantity": 1,
+        "unit": "tsp",
+        "category": "herbs"
+      },
+      {
+        "name": "Olive oil",
+        "quantity": 2,
+        "unit": "tbsp",
+        "category": "condiments"
+      },
+      {
+        "name": "Fresh parsley",
+        "quantity": 2,
+        "unit": "tbsp",
+        "category": "herbs"
+      },
+      {
+        "name": "Lemon",
+        "quantity": 1,
+        "unit": "whole",
+        "category": "fruits"
+      }
+    ],
+    "instructions": [
+      "Slice chicken and toss with paprika, cumin and oil.",
+      "Pan-fry chicken 6–8 mins until cooked. Squeeze lemon over.",
+      "Warm flatbreads in the oven or dry pan.",
+      "Spread hummus over bowls. Top with chicken, diced cucumber and tomato.",
+      "Drizzle with oil and parsley. Serve with flatbread."
+    ]
+  },
+  {
+    "id": "r355",
+    "name": "Sausage Pasta in Tomato Sauce",
+    "description": "Sliced Italian-style sausages simmered in a quick, fragrant tomato sauce over pasta",
+    "baseServings": 4,
+    "cookTimeMinutes": 25,
+    "difficulty": "easy",
+    "cookingStyle": "stovetop",
+    "healthTags": [
+      "standard"
+    ],
+    "budgetTags": [
+      "budget"
+    ],
+    "leftoversFriendly": true,
+    "mealType": "dinner",
+    "estimatedCostBand": "low",
+    "proteinType": "pork",
+    "cuisineType": "italian",
+    "seasonTags": [
+      "all"
+    ],
+    "costPerServeAUD": 4,
+    "kidFriendly": true,
+    "kidFriendlyScore": 4,
+    "kidFriendlyReason": "sausage pasta is a family staple",
+    "categoryTags": [
+      "quick",
+      "budget",
+      "everyday"
+    ],
+    "imageUrl": "https://tse3.mm.bing.net/th/id/OIP.sXWADmpAkY9OQRM-5xPwAQHaE8?pid=Api&P=0&h=180",
+    "ingredients": [
+      {
+        "name": "Pork sausages",
+        "quantity": 500,
+        "unit": "g",
+        "category": "proteins"
+      },
+      {
+        "name": "Penne pasta",
+        "quantity": 400,
+        "unit": "g",
+        "category": "grains"
+      },
+      {
+        "name": "Crushed tomatoes",
+        "quantity": 400,
+        "unit": "g",
+        "category": "pantry"
+      },
+      {
+        "name": "Garlic",
+        "quantity": 3,
+        "unit": "cloves",
+        "category": "herbs"
+      },
+      {
+        "name": "Chilli flakes",
+        "quantity": 0.5,
+        "unit": "tsp",
+        "category": "herbs"
+      },
+      {
+        "name": "Fennel seeds",
+        "quantity": 1,
+        "unit": "tsp",
+        "category": "herbs"
+      },
+      {
+        "name": "Olive oil",
+        "quantity": 2,
+        "unit": "tbsp",
+        "category": "condiments"
+      },
+      {
+        "name": "Parmesan",
+        "quantity": 60,
+        "unit": "g",
+        "category": "dairy"
+      },
+      {
+        "name": "Fresh basil",
+        "quantity": 1,
+        "unit": "handful",
+        "category": "herbs"
+      }
+    ],
+    "instructions": [
+      "Cook pasta per packet.",
+      "Remove sausage from casing and brown in oil, breaking up.",
+      "Add garlic, chilli and fennel seeds. Cook 1 min.",
+      "Add tomatoes, simmer 10 mins. Season.",
+      "Toss with drained pasta. Serve with parmesan and basil."
+    ]
+  },
+  {
+    "id": "r360",
+    "name": "Spaghetti Puttanesca",
+    "description": "Bold pantry pasta with olives, capers, anchovies and tomatoes — ready in 20 minutes",
+    "baseServings": 4,
+    "cookTimeMinutes": 20,
+    "difficulty": "easy",
+    "cookingStyle": "stovetop",
+    "healthTags": [
+      "standard"
+    ],
+    "budgetTags": [
+      "budget"
+    ],
+    "leftoversFriendly": false,
+    "mealType": "dinner",
+    "estimatedCostBand": "low",
+    "proteinType": "seafood",
+    "cuisineType": "italian",
+    "seasonTags": [
+      "all"
+    ],
+    "costPerServeAUD": 3.5,
+    "kidFriendly": false,
+    "kidFriendlyScore": 1,
+    "kidFriendlyReason": "strong anchovy and olive flavours",
+    "categoryTags": [
+      "budget",
+      "quick"
+    ],
+    "imageUrl": "https://tse2.mm.bing.net/th/id/OIP.z0E-qJRnvHovxoHLjWCdXQHaE8?pid=Api&P=0&h=180",
+    "ingredients": [
+      {
+        "name": "Spaghetti",
+        "quantity": 400,
+        "unit": "g",
+        "category": "grains"
+      },
+      {
+        "name": "Crushed tomatoes",
+        "quantity": 400,
+        "unit": "g",
+        "category": "pantry"
+      },
+      {
+        "name": "Black olives",
+        "quantity": 100,
+        "unit": "g",
+        "category": "vegetables"
+      },
+      {
+        "name": "Capers",
+        "quantity": 2,
+        "unit": "tbsp",
+        "category": "condiments"
+      },
+      {
+        "name": "Anchovies (tinned)",
+        "quantity": 6,
+        "unit": "fillets",
+        "category": "proteins"
+      },
+      {
+        "name": "Garlic",
+        "quantity": 4,
+        "unit": "cloves",
+        "category": "herbs"
+      },
+      {
+        "name": "Chilli flakes",
+        "quantity": 1,
+        "unit": "tsp",
+        "category": "herbs"
+      },
+      {
+        "name": "Olive oil",
+        "quantity": 3,
+        "unit": "tbsp",
+        "category": "condiments"
+      },
+      {
+        "name": "Fresh parsley",
+        "quantity": 2,
+        "unit": "tbsp",
+        "category": "herbs"
+      }
+    ],
+    "instructions": [
+      "Cook spaghetti per packet. Reserve 1 cup pasta water.",
+      "Fry garlic, anchovies and chilli in oil until anchovies dissolve.",
+      "Add tomatoes, olives and capers. Simmer 10 mins.",
+      "Toss with pasta and a splash of pasta water.",
+      "Serve with parsley and crusty bread."
+    ]
+  },
+  {
+    "id": "r361",
+    "name": "Smoky Chickpeas on Toast",
+    "description": "Crispy spiced chickpeas on sourdough with Greek yoghurt and chilli oil — a 15-minute hero",
+    "baseServings": 2,
+    "cookTimeMinutes": 15,
+    "difficulty": "easy",
+    "cookingStyle": "stovetop",
+    "healthTags": [
+      "vegetarian",
+      "healthy"
+    ],
+    "budgetTags": [
+      "budget"
+    ],
+    "leftoversFriendly": false,
+    "mealType": "dinner",
+    "estimatedCostBand": "low",
+    "proteinType": "plant",
+    "cuisineType": "middle-eastern",
+    "seasonTags": [
+      "all"
+    ],
+    "costPerServeAUD": 3,
+    "kidFriendly": false,
+    "kidFriendlyScore": 2,
+    "kidFriendlyReason": "spiced flavour may not suit kids",
+    "categoryTags": [
+      "budget",
+      "quick",
+      "vegetarian"
+    ],
+    "imageUrl": "https://tse4.mm.bing.net/th/id/OIP.BTm2wGUHhk-2O68zuvIlFQHaE8?pid=Api&P=0&h=180",
+    "ingredients": [
+      {
+        "name": "Chickpeas (tinned)",
+        "quantity": 400,
+        "unit": "g",
+        "category": "proteins"
+      },
+      {
+        "name": "Sourdough bread",
+        "quantity": 4,
+        "unit": "slices",
+        "category": "grains"
+      },
+      {
+        "name": "Greek yoghurt",
+        "quantity": 150,
+        "unit": "g",
+        "category": "dairy"
+      },
+      {
+        "name": "Smoked paprika",
+        "quantity": 1.5,
+        "unit": "tsp",
+        "category": "herbs"
+      },
+      {
+        "name": "Cumin",
+        "quantity": 1,
+        "unit": "tsp",
+        "category": "herbs"
+      },
+      {
+        "name": "Garlic",
+        "quantity": 2,
+        "unit": "cloves",
+        "category": "herbs"
+      },
+      {
+        "name": "Chilli flakes",
+        "quantity": 0.5,
+        "unit": "tsp",
+        "category": "herbs"
+      },
+      {
+        "name": "Olive oil",
+        "quantity": 2,
+        "unit": "tbsp",
+        "category": "condiments"
+      },
+      {
+        "name": "Lemon",
+        "quantity": 1,
+        "unit": "whole",
+        "category": "fruits"
+      }
+    ],
+    "instructions": [
+      "Drain and dry chickpeas. Fry in oil with garlic and spices until crispy, 8–10 mins.",
+      "Toast bread.",
+      "Spread yoghurt on toast. Top with chickpeas.",
+      "Drizzle with oil and squeeze of lemon. Scatter chilli flakes."
+    ]
+  },
+  {
+    "id": "r362",
+    "name": "Red Lentil Dal",
+    "description": "Simple tarka dal — red lentils simmered until silky with a tempering of spiced butter",
+    "baseServings": 4,
+    "cookTimeMinutes": 30,
+    "difficulty": "easy",
+    "cookingStyle": "stovetop",
+    "healthTags": [
+      "vegan",
+      "healthy"
+    ],
+    "budgetTags": [
+      "budget"
+    ],
+    "leftoversFriendly": true,
+    "mealType": "dinner",
+    "estimatedCostBand": "low",
+    "proteinType": "plant",
+    "cuisineType": "indian",
+    "seasonTags": [
+      "all"
+    ],
+    "costPerServeAUD": 2.5,
+    "kidFriendly": true,
+    "kidFriendlyScore": 3,
+    "kidFriendlyReason": "mild version with minimal spice is kid-friendly",
+    "categoryTags": [
+      "budget",
+      "vegan"
+    ],
+    "imageUrl": "https://tse1.mm.bing.net/th/id/OIP.xJxzVNR3y2N4E6cISi7mewHaE8?pid=Api&P=0&h=180",
+    "ingredients": [
+      {
+        "name": "Red lentils",
+        "quantity": 300,
+        "unit": "g",
+        "category": "proteins"
+      },
+      {
+        "name": "Onion",
+        "quantity": 1,
+        "unit": "whole",
+        "category": "vegetables"
+      },
+      {
+        "name": "Garlic",
+        "quantity": 4,
+        "unit": "cloves",
+        "category": "herbs"
+      },
+      {
+        "name": "Ginger",
+        "quantity": 2,
+        "unit": "cm",
+        "category": "herbs"
+      },
+      {
+        "name": "Cumin seeds",
+        "quantity": 1,
+        "unit": "tsp",
+        "category": "herbs"
+      },
+      {
+        "name": "Turmeric",
+        "quantity": 1,
+        "unit": "tsp",
+        "category": "herbs"
+      },
+      {
+        "name": "Butter or coconut oil",
+        "quantity": 40,
+        "unit": "g",
+        "category": "condiments"
+      },
+      {
+        "name": "Vegetable stock",
+        "quantity": 900,
+        "unit": "ml",
+        "category": "pantry"
+      },
+      {
+        "name": "Lemon juice",
+        "quantity": 2,
+        "unit": "tbsp",
+        "category": "fruits"
+      },
+      {
+        "name": "Fresh coriander",
+        "quantity": 1,
+        "unit": "handful",
+        "category": "herbs"
+      }
+    ],
+    "instructions": [
+      "Rinse lentils. Simmer in stock with turmeric 20 mins until soft.",
+      "Heat butter in a small pan. Add cumin seeds until sizzling.",
+      "Add onion, garlic and ginger. Cook until golden.",
+      "Pour tarka over lentils. Add lemon juice and season.",
+      "Serve with basmati rice and coriander."
+    ]
+  },
+  {
+    "id": "r363",
+    "name": "Cheeseburger Pasta",
+    "description": "All the flavours of a cheeseburger in one creamy pasta dish — a family crowd-pleaser",
+    "baseServings": 4,
+    "cookTimeMinutes": 25,
+    "difficulty": "easy",
+    "cookingStyle": "stovetop",
+    "healthTags": [
+      "standard"
+    ],
+    "budgetTags": [
+      "budget"
+    ],
+    "leftoversFriendly": true,
+    "mealType": "dinner",
+    "estimatedCostBand": "low",
+    "proteinType": "beef",
+    "cuisineType": "american",
+    "seasonTags": [
+      "all"
+    ],
+    "costPerServeAUD": 4.5,
+    "kidFriendly": true,
+    "kidFriendlyScore": 5,
+    "kidFriendlyReason": "cheeseburger flavour in pasta form",
+    "categoryTags": [
+      "budget",
+      "kid-friendly",
+      "fussy-eater"
+    ],
+    "imageUrl": "https://tse3.mm.bing.net/th/id/OIP.fmFjf3m4LRbAu3-RQAW_AQHaE8?pid=Api&P=0&h=180",
+    "ingredients": [
+      {
+        "name": "Beef mince",
+        "quantity": 500,
+        "unit": "g",
+        "category": "proteins"
+      },
+      {
+        "name": "Macaroni or penne",
+        "quantity": 400,
+        "unit": "g",
+        "category": "grains"
+      },
+      {
+        "name": "Beef stock",
+        "quantity": 400,
+        "unit": "ml",
+        "category": "pantry"
+      },
+      {
+        "name": "Crushed tomatoes",
+        "quantity": 400,
+        "unit": "g",
+        "category": "pantry"
+      },
+      {
+        "name": "Cheddar cheese",
+        "quantity": 200,
+        "unit": "g",
+        "category": "dairy"
+      },
+      {
+        "name": "Onion",
+        "quantity": 1,
+        "unit": "whole",
+        "category": "vegetables"
+      },
+      {
+        "name": "Garlic",
+        "quantity": 2,
+        "unit": "cloves",
+        "category": "herbs"
+      },
+      {
+        "name": "Mustard",
+        "quantity": 1,
+        "unit": "tbsp",
+        "category": "condiments"
+      },
+      {
+        "name": "Worcestershire sauce",
+        "quantity": 1,
+        "unit": "tbsp",
+        "category": "condiments"
+      },
+      {
+        "name": "Pickles",
+        "quantity": 4,
+        "unit": "whole",
+        "category": "condiments"
+      }
+    ],
+    "instructions": [
+      "Brown mince with onion and garlic. Drain fat.",
+      "Add tomatoes, stock, mustard and Worcestershire. Bring to a boil.",
+      "Add pasta and stir. Cook uncovered 12 mins, stirring occasionally.",
+      "Remove from heat and stir through cheese until melted.",
+      "Top with sliced pickles and serve."
+    ]
+  },
+  {
+    "id": "r364",
+    "name": "Garlic Butter Rice with Fried Egg",
+    "description": "Golden crispy rice tossed in garlic butter, topped with a runny fried egg — pantry gold",
+    "baseServings": 2,
+    "cookTimeMinutes": 15,
+    "difficulty": "easy",
+    "cookingStyle": "stovetop",
+    "healthTags": [
+      "standard"
+    ],
+    "budgetTags": [
+      "budget"
+    ],
+    "leftoversFriendly": false,
+    "mealType": "dinner",
+    "estimatedCostBand": "low",
+    "proteinType": "vegetarian",
+    "cuisineType": "asian",
+    "seasonTags": [
+      "all"
+    ],
+    "costPerServeAUD": 2,
+    "kidFriendly": true,
+    "kidFriendlyScore": 4,
+    "kidFriendlyReason": "simple and familiar",
+    "categoryTags": [
+      "budget",
+      "quick"
+    ],
+    "imageUrl": "https://tse2.mm.bing.net/th/id/OIP.UTPv0YjgI0kTX_w2b97x4AHaE8?pid=Api&P=0&h=180",
+    "ingredients": [
+      {
+        "name": "Cooked rice (day-old)",
+        "quantity": 400,
+        "unit": "g",
+        "category": "grains"
+      },
+      {
+        "name": "Egg",
+        "quantity": 2,
+        "unit": "whole",
+        "category": "dairy"
+      },
+      {
+        "name": "Butter",
+        "quantity": 40,
+        "unit": "g",
+        "category": "dairy"
+      },
+      {
+        "name": "Garlic",
+        "quantity": 4,
+        "unit": "cloves",
+        "category": "herbs"
+      },
+      {
+        "name": "Soy sauce",
+        "quantity": 1,
+        "unit": "tbsp",
+        "category": "condiments"
+      },
+      {
+        "name": "Spring onions",
+        "quantity": 2,
+        "unit": "stalks",
+        "category": "vegetables"
+      },
+      {
+        "name": "Sesame oil",
+        "quantity": 1,
+        "unit": "tsp",
+        "category": "condiments"
+      }
+    ],
+    "instructions": [
+      "Melt butter in a wok over high heat. Add garlic and cook 30 secs.",
+      "Add cold rice and press into the pan. Cook 3–4 mins until crispy on base.",
+      "Toss with soy sauce and sesame oil. Remove from heat.",
+      "Fry eggs in another pan to desired doneness.",
+      "Serve rice topped with fried egg and spring onions."
+    ]
+  },
+  {
+    "id": "r370",
+    "name": "Chicken Pot Pie",
+    "description": "Creamy chicken and vegetable filling under a golden puff pastry lid — freeze the extras",
+    "baseServings": 6,
+    "cookTimeMinutes": 75,
+    "difficulty": "medium",
+    "cookingStyle": "oven",
+    "healthTags": [
+      "standard"
+    ],
+    "budgetTags": [
+      "standard"
+    ],
+    "leftoversFriendly": true,
+    "mealType": "dinner",
+    "estimatedCostBand": "medium",
+    "proteinType": "chicken",
+    "cuisineType": "british",
+    "seasonTags": [
+      "winter",
+      "autumn"
+    ],
+    "costPerServeAUD": 7.5,
+    "kidFriendly": true,
+    "kidFriendlyScore": 4,
+    "kidFriendlyReason": "creamy chicken pie — universally loved",
+    "categoryTags": [
+      "batch-cooking",
+      "everyday"
+    ],
+    "imageUrl": "https://tse4.mm.bing.net/th/id/OIP.pVfbdtSvHt7ICZDipDyvlwHaEp?pid=Api&P=0&h=180",
+    "ingredients": [
+      {
+        "name": "Chicken thigh fillets",
+        "quantity": 700,
+        "unit": "g",
+        "category": "proteins"
+      },
+      {
+        "name": "Puff pastry sheets",
+        "quantity": 2,
+        "unit": "sheets",
+        "category": "grains"
+      },
+      {
+        "name": "Thickened cream",
+        "quantity": 200,
+        "unit": "ml",
+        "category": "dairy"
+      },
+      {
+        "name": "Chicken stock",
+        "quantity": 400,
+        "unit": "ml",
+        "category": "pantry"
+      },
+      {
+        "name": "Frozen peas",
+        "quantity": 150,
+        "unit": "g",
+        "category": "vegetables"
+      },
+      {
+        "name": "Corn kernels",
+        "quantity": 150,
+        "unit": "g",
+        "category": "vegetables"
+      },
+      {
+        "name": "Carrot",
+        "quantity": 2,
+        "unit": "whole",
+        "category": "vegetables"
+      },
+      {
+        "name": "Celery",
+        "quantity": 2,
+        "unit": "stalks",
+        "category": "vegetables"
+      },
+      {
+        "name": "Onion",
+        "quantity": 1,
+        "unit": "whole",
+        "category": "vegetables"
+      },
+      {
+        "name": "Plain flour",
+        "quantity": 60,
+        "unit": "g",
+        "category": "grains"
+      },
+      {
+        "name": "Butter",
+        "quantity": 50,
+        "unit": "g",
+        "category": "dairy"
+      },
+      {
+        "name": "Egg",
+        "quantity": 1,
+        "unit": "whole",
+        "category": "dairy"
+      }
+    ],
+    "instructions": [
+      "Dice chicken and brown in butter. Remove. Sauté vegetables until soft.",
+      "Add flour, cook 1 min. Gradually whisk in stock and cream.",
+      "Return chicken. Add peas and corn. Simmer until thick.",
+      "Transfer to pie dish. Top with pastry, seal edges, brush with egg wash.",
+      "Bake at 200°C for 25–30 mins until golden."
+    ]
+  },
+  {
+    "id": "r371",
+    "name": "Spiced Lentil and Butternut Soup",
+    "description": "Warming bulk soup with lentils, butternut pumpkin and warming spices — makes 8–10 serves",
+    "baseServings": 8,
+    "cookTimeMinutes": 45,
+    "difficulty": "easy",
+    "cookingStyle": "one-pot",
+    "healthTags": [
+      "vegan",
+      "healthy"
+    ],
+    "budgetTags": [
+      "budget"
+    ],
+    "leftoversFriendly": true,
+    "mealType": "dinner",
+    "estimatedCostBand": "low",
+    "proteinType": "plant",
+    "cuisineType": "middle-eastern",
+    "seasonTags": [
+      "autumn",
+      "winter"
+    ],
+    "costPerServeAUD": 2.5,
+    "kidFriendly": true,
+    "kidFriendlyScore": 3,
+    "kidFriendlyReason": "sweet and mild with warming spices",
+    "categoryTags": [
+      "batch-cooking",
+      "vegan",
+      "budget"
+    ],
+    "imageUrl": "https://tse1.mm.bing.net/th/id/OIP.MJB8HMDuIIRg2YNfJV2v9AHaE8?pid=Api&P=0&h=180",
+    "ingredients": [
+      {
+        "name": "Red lentils",
+        "quantity": 400,
+        "unit": "g",
+        "category": "proteins"
+      },
+      {
+        "name": "Butternut pumpkin",
+        "quantity": 1,
+        "unit": "kg",
+        "category": "vegetables"
+      },
+      {
+        "name": "Vegetable stock",
+        "quantity": 2,
+        "unit": "L",
+        "category": "pantry"
+      },
+      {
+        "name": "Onion",
+        "quantity": 2,
+        "unit": "whole",
+        "category": "vegetables"
+      },
+      {
+        "name": "Garlic",
+        "quantity": 4,
+        "unit": "cloves",
+        "category": "herbs"
+      },
+      {
+        "name": "Ground cumin",
+        "quantity": 2,
+        "unit": "tsp",
+        "category": "herbs"
+      },
+      {
+        "name": "Ground coriander",
+        "quantity": 1,
+        "unit": "tsp",
+        "category": "herbs"
+      },
+      {
+        "name": "Smoked paprika",
+        "quantity": 1,
+        "unit": "tsp",
+        "category": "herbs"
+      },
+      {
+        "name": "Olive oil",
+        "quantity": 3,
+        "unit": "tbsp",
+        "category": "condiments"
+      },
+      {
+        "name": "Lemon",
+        "quantity": 2,
+        "unit": "whole",
+        "category": "fruits"
+      }
+    ],
+    "instructions": [
+      "Sauté onion and garlic in oil until soft. Add spices and cook 1 min.",
+      "Add peeled, diced pumpkin and rinsed lentils.",
+      "Pour in stock. Bring to a boil, simmer 30 mins.",
+      "Blend until smooth. Add lemon juice and season.",
+      "Freeze in portions. Reheat with a swirl of yoghurt."
+    ]
+  },
+  {
+    "id": "r372",
+    "name": "Slow Cooker Pork Carnitas",
+    "description": "Mexican pulled pork braised low and slow until tender — crisp under the grill to finish",
+    "baseServings": 8,
+    "cookTimeMinutes": 480,
+    "difficulty": "easy",
+    "cookingStyle": "slow-cooker",
+    "healthTags": [
+      "high-protein"
+    ],
+    "budgetTags": [
+      "standard"
+    ],
+    "leftoversFriendly": true,
+    "mealType": "dinner",
+    "estimatedCostBand": "low",
+    "proteinType": "pork",
+    "cuisineType": "mexican",
+    "seasonTags": [
+      "all"
+    ],
+    "costPerServeAUD": 4.2,
+    "kidFriendly": true,
+    "kidFriendlyScore": 3,
+    "kidFriendlyReason": "pulled pork in tacos or rice bowls",
+    "categoryTags": [
+      "batch-cooking"
+    ],
+    "imageUrl": "https://tse2.mm.bing.net/th/id/OIP.jbkbmOj97vBz9AirxBe14AHaE8?pid=Api&P=0&h=180",
+    "ingredients": [
+      {
+        "name": "Pork shoulder",
+        "quantity": 1.5,
+        "unit": "kg",
+        "category": "proteins"
+      },
+      {
+        "name": "Orange juice",
+        "quantity": 200,
+        "unit": "ml",
+        "category": "fruits"
+      },
+      {
+        "name": "Lime juice",
+        "quantity": 3,
+        "unit": "tbsp",
+        "category": "fruits"
+      },
+      {
+        "name": "Garlic",
+        "quantity": 5,
+        "unit": "cloves",
+        "category": "herbs"
+      },
+      {
+        "name": "Cumin",
+        "quantity": 2,
+        "unit": "tsp",
+        "category": "herbs"
+      },
+      {
+        "name": "Dried oregano",
+        "quantity": 1,
+        "unit": "tsp",
+        "category": "herbs"
+      },
+      {
+        "name": "Smoked paprika",
+        "quantity": 2,
+        "unit": "tsp",
+        "category": "herbs"
+      },
+      {
+        "name": "Chipotle in adobo",
+        "quantity": 2,
+        "unit": "tbsp",
+        "category": "condiments"
+      },
+      {
+        "name": "Onion",
+        "quantity": 1,
+        "unit": "whole",
+        "category": "vegetables"
+      }
+    ],
+    "instructions": [
+      "Score pork and rub with cumin, oregano, paprika and salt.",
+      "Place in slow cooker with orange juice, lime juice, garlic, chipotle and onion.",
+      "Cook on low 8 hours until falling apart.",
+      "Remove pork, shred, then spread on baking tray.",
+      "Spoon over some cooking juices. Grill 5 mins until edges are crispy.",
+      "Serve in tacos with salsa, pickled onion and coriander."
+    ]
+  },
+  {
+    "id": "r380",
+    "name": "Spinach and Pesto Gnocchi",
+    "description": "Pillowy gnocchi tossed with jarred pesto and fresh spinach — ready in under 15 minutes",
+    "baseServings": 4,
+    "cookTimeMinutes": 12,
+    "difficulty": "easy",
+    "cookingStyle": "stovetop",
+    "healthTags": [
+      "vegetarian"
+    ],
+    "budgetTags": [
+      "budget",
+      "standard"
+    ],
+    "leftoversFriendly": false,
+    "mealType": "dinner",
+    "estimatedCostBand": "low",
+    "proteinType": "vegetarian",
+    "cuisineType": "italian",
+    "seasonTags": [
+      "all"
+    ],
+    "costPerServeAUD": 4.5,
+    "kidFriendly": true,
+    "kidFriendlyScore": 4,
+    "kidFriendlyReason": "soft gnocchi with mild pesto",
+    "categoryTags": [
+      "low-prep",
+      "quick",
+      "vegetarian"
+    ],
+    "imageUrl": "https://tse3.mm.bing.net/th/id/OIP.xXt7fEd2Oa4ZSHPf2lJJBwHaE8?pid=Api&P=0&h=180",
+    "ingredients": [
+      {
+        "name": "Potato gnocchi (fresh or packet)",
+        "quantity": 500,
+        "unit": "g",
+        "category": "grains"
+      },
+      {
+        "name": "Basil pesto",
+        "quantity": 4,
+        "unit": "tbsp",
+        "category": "condiments"
+      },
+      {
+        "name": "Baby spinach",
+        "quantity": 150,
+        "unit": "g",
+        "category": "vegetables"
+      },
+      {
+        "name": "Cherry tomatoes",
+        "quantity": 200,
+        "unit": "g",
+        "category": "vegetables"
+      },
+      {
+        "name": "Parmesan cheese",
+        "quantity": 60,
+        "unit": "g",
+        "category": "dairy"
+      },
+      {
+        "name": "Olive oil",
+        "quantity": 1,
+        "unit": "tbsp",
+        "category": "condiments"
+      },
+      {
+        "name": "Pine nuts",
+        "quantity": 30,
+        "unit": "g",
+        "category": "proteins"
+      }
+    ],
+    "instructions": [
+      "Cook gnocchi per packet. Reserve ¼ cup cooking water before draining.",
+      "Toss gnocchi with pesto, spinach and reserved water.",
+      "Add halved cherry tomatoes and heat through 1 min.",
+      "Serve topped with parmesan and toasted pine nuts."
+    ]
+  },
+  {
+    "id": "r381",
+    "name": "Tomato and Ricotta Ravioli Traybake",
+    "description": "Fresh ravioli baked in a vibrant cherry tomato sauce with basil and cheese",
+    "baseServings": 4,
+    "cookTimeMinutes": 25,
+    "difficulty": "easy",
+    "cookingStyle": "oven",
+    "healthTags": [
+      "vegetarian"
+    ],
+    "budgetTags": [
+      "standard"
+    ],
+    "leftoversFriendly": false,
+    "mealType": "dinner",
+    "estimatedCostBand": "medium",
+    "proteinType": "vegetarian",
+    "cuisineType": "italian",
+    "seasonTags": [
+      "all"
+    ],
+    "costPerServeAUD": 6.5,
+    "kidFriendly": true,
+    "kidFriendlyScore": 4,
+    "kidFriendlyReason": "pasta bake format kids love",
+    "categoryTags": [
+      "low-prep",
+      "vegetarian"
+    ],
+    "imageUrl": "https://tse4.mm.bing.net/th/id/OIP.V0gFYLnGm6JmIAQ4bwcfAAHaE8?pid=Api&P=0&h=180",
+    "ingredients": [
+      {
+        "name": "Fresh ricotta and spinach ravioli",
+        "quantity": 600,
+        "unit": "g",
+        "category": "grains"
+      },
+      {
+        "name": "Cherry tomatoes",
+        "quantity": 400,
+        "unit": "g",
+        "category": "vegetables"
+      },
+      {
+        "name": "Passata",
+        "quantity": 500,
+        "unit": "ml",
+        "category": "pantry"
+      },
+      {
+        "name": "Mozzarella",
+        "quantity": 150,
+        "unit": "g",
+        "category": "dairy"
+      },
+      {
+        "name": "Garlic",
+        "quantity": 3,
+        "unit": "cloves",
+        "category": "herbs"
+      },
+      {
+        "name": "Dried basil",
+        "quantity": 1,
+        "unit": "tsp",
+        "category": "herbs"
+      },
+      {
+        "name": "Olive oil",
+        "quantity": 2,
+        "unit": "tbsp",
+        "category": "condiments"
+      },
+      {
+        "name": "Fresh basil",
+        "quantity": 1,
+        "unit": "handful",
+        "category": "herbs"
+      },
+      {
+        "name": "Parmesan",
+        "quantity": 50,
+        "unit": "g",
+        "category": "dairy"
+      }
+    ],
+    "instructions": [
+      "Preheat oven to 200°C.",
+      "Mix passata, olive oil, garlic and dried basil in a large baking dish.",
+      "Add fresh ravioli and cherry tomatoes, toss gently.",
+      "Tear mozzarella over the top. Scatter parmesan.",
+      "Bake 20 mins until bubbling and golden. Top with fresh basil."
+    ]
+  },
+  {
+    "id": "r382",
+    "name": "Hoisin Sausage Rice Bowl",
+    "description": "Glazed cocktail sausages in hoisin sauce over steamed rice with quick-pickled cucumber",
+    "baseServings": 4,
+    "cookTimeMinutes": 20,
+    "difficulty": "easy",
+    "cookingStyle": "stovetop",
+    "healthTags": [
+      "standard"
+    ],
+    "budgetTags": [
+      "budget"
+    ],
+    "leftoversFriendly": false,
+    "mealType": "dinner",
+    "estimatedCostBand": "low",
+    "proteinType": "pork",
+    "cuisineType": "asian",
+    "seasonTags": [
+      "all"
+    ],
+    "costPerServeAUD": 4,
+    "kidFriendly": true,
+    "kidFriendlyScore": 5,
+    "kidFriendlyReason": "sticky sausages are a hit with kids",
+    "categoryTags": [
+      "low-prep",
+      "budget",
+      "kid-friendly"
+    ],
+    "imageUrl": "https://tse1.mm.bing.net/th/id/OIP.2xJ6yIGE35Gry7-YeOWZ2QHaE8?pid=Api&P=0&h=180",
+    "ingredients": [
+      {
+        "name": "Cocktail sausages",
+        "quantity": 500,
+        "unit": "g",
+        "category": "proteins"
+      },
+      {
+        "name": "Hoisin sauce",
+        "quantity": 4,
+        "unit": "tbsp",
+        "category": "condiments"
+      },
+      {
+        "name": "Soy sauce",
+        "quantity": 1,
+        "unit": "tbsp",
+        "category": "condiments"
+      },
+      {
+        "name": "Sesame oil",
+        "quantity": 1,
+        "unit": "tsp",
+        "category": "condiments"
+      },
+      {
+        "name": "Cucumber",
+        "quantity": 1,
+        "unit": "whole",
+        "category": "vegetables"
+      },
+      {
+        "name": "Rice vinegar",
+        "quantity": 2,
+        "unit": "tbsp",
+        "category": "condiments"
+      },
+      {
+        "name": "White rice",
+        "quantity": 320,
+        "unit": "g",
+        "category": "grains"
+      },
+      {
+        "name": "Spring onions",
+        "quantity": 3,
+        "unit": "stalks",
+        "category": "vegetables"
+      },
+      {
+        "name": "Sesame seeds",
+        "quantity": 1,
+        "unit": "tbsp",
+        "category": "herbs"
+      }
+    ],
+    "instructions": [
+      "Cook rice per packet. Quickly pickle thinly sliced cucumber in vinegar with a pinch of sugar.",
+      "Brown sausages in a pan 5 mins. Add hoisin, soy and sesame oil.",
+      "Cook 3 mins until glazed.",
+      "Serve over rice with pickled cucumber, spring onions and sesame seeds."
+    ]
+  },
+  {
+    "id": "r383",
+    "name": "Mediterranean Prawn and Rice Bake",
+    "description": "One-pan baked rice with prawns, olives, sun-dried tomatoes and feta — minimal washing up",
+    "baseServings": 4,
+    "cookTimeMinutes": 35,
+    "difficulty": "easy",
+    "cookingStyle": "oven",
+    "healthTags": [
+      "healthy",
+      "high-protein"
+    ],
+    "budgetTags": [
+      "standard"
+    ],
+    "leftoversFriendly": false,
+    "mealType": "dinner",
+    "estimatedCostBand": "medium",
+    "proteinType": "seafood",
+    "cuisineType": "mediterranean",
+    "seasonTags": [
+      "all"
+    ],
+    "costPerServeAUD": 9,
+    "kidFriendly": false,
+    "kidFriendlyScore": 2,
+    "kidFriendlyReason": "strong Mediterranean flavours",
+    "categoryTags": [
+      "low-prep"
+    ],
+    "imageUrl": "https://tse3.mm.bing.net/th/id/OIP.WEomHXy0RKJo3H5dJcVE9AHaE8?pid=Api&P=0&h=180",
+    "ingredients": [
+      {
+        "name": "Raw prawns",
+        "quantity": 500,
+        "unit": "g",
+        "category": "proteins"
+      },
+      {
+        "name": "Long-grain rice",
+        "quantity": 300,
+        "unit": "g",
+        "category": "grains"
+      },
+      {
+        "name": "Vegetable or chicken stock",
+        "quantity": 700,
+        "unit": "ml",
+        "category": "pantry"
+      },
+      {
+        "name": "Cherry tomatoes",
+        "quantity": 250,
+        "unit": "g",
+        "category": "vegetables"
+      },
+      {
+        "name": "Kalamata olives",
+        "quantity": 80,
+        "unit": "g",
+        "category": "vegetables"
+      },
+      {
+        "name": "Feta cheese",
+        "quantity": 120,
+        "unit": "g",
+        "category": "dairy"
+      },
+      {
+        "name": "Garlic",
+        "quantity": 3,
+        "unit": "cloves",
+        "category": "herbs"
+      },
+      {
+        "name": "Sun-dried tomatoes",
+        "quantity": 60,
+        "unit": "g",
+        "category": "vegetables"
+      },
+      {
+        "name": "Dried oregano",
+        "quantity": 1,
+        "unit": "tsp",
+        "category": "herbs"
+      },
+      {
+        "name": "Olive oil",
+        "quantity": 3,
+        "unit": "tbsp",
+        "category": "condiments"
+      },
+      {
+        "name": "Fresh parsley",
+        "quantity": 2,
+        "unit": "tbsp",
+        "category": "herbs"
+      }
+    ],
+    "instructions": [
+      "Preheat oven to 200°C.",
+      "Combine rice, stock, garlic, sun-dried tomatoes, oregano and oil in a baking dish.",
+      "Cover with foil and bake 20 mins.",
+      "Remove foil, add prawns, cherry tomatoes and olives. Bake 10 mins.",
+      "Crumble feta over top. Scatter parsley and serve from the dish."
+    ]
+  },
+  {
+    "id": "r384",
+    "name": "Quick Bulgogi Rice Bowls",
+    "description": "Korean-style marinated beef mince served over rice with sesame and spring onion",
+    "baseServings": 4,
+    "cookTimeMinutes": 20,
+    "difficulty": "easy",
+    "cookingStyle": "stovetop",
+    "healthTags": [
+      "high-protein"
+    ],
+    "budgetTags": [
+      "standard"
+    ],
+    "leftoversFriendly": true,
+    "mealType": "dinner",
+    "estimatedCostBand": "medium",
+    "proteinType": "beef",
+    "cuisineType": "korean",
+    "seasonTags": [
+      "all"
+    ],
+    "costPerServeAUD": 6.5,
+    "kidFriendly": false,
+    "kidFriendlyScore": 3,
+    "kidFriendlyReason": "sweet-savoury flavour kids often enjoy",
+    "categoryTags": [
+      "low-prep",
+      "quick"
+    ],
+    "imageUrl": "https://tse2.mm.bing.net/th/id/OIP.9kdFSTjMqAI7DKvq3XO3ggHaE8?pid=Api&P=0&h=180",
+    "ingredients": [
+      {
+        "name": "Beef mince",
+        "quantity": 500,
+        "unit": "g",
+        "category": "proteins"
+      },
+      {
+        "name": "White rice",
+        "quantity": 320,
+        "unit": "g",
+        "category": "grains"
+      },
+      {
+        "name": "Soy sauce",
+        "quantity": 3,
+        "unit": "tbsp",
+        "category": "condiments"
+      },
+      {
+        "name": "Sesame oil",
+        "quantity": 2,
+        "unit": "tsp",
+        "category": "condiments"
+      },
+      {
+        "name": "Brown sugar",
+        "quantity": 2,
+        "unit": "tbsp",
+        "category": "pantry"
+      },
+      {
+        "name": "Garlic",
+        "quantity": 4,
+        "unit": "cloves",
+        "category": "herbs"
+      },
+      {
+        "name": "Ginger",
+        "quantity": 2,
+        "unit": "cm",
+        "category": "herbs"
+      },
+      {
+        "name": "Gochujang paste",
+        "quantity": 1,
+        "unit": "tbsp",
+        "category": "condiments"
+      },
+      {
+        "name": "Spring onions",
+        "quantity": 4,
+        "unit": "stalks",
+        "category": "vegetables"
+      },
+      {
+        "name": "Sesame seeds",
+        "quantity": 1,
+        "unit": "tbsp",
+        "category": "herbs"
+      },
+      {
+        "name": "Cucumber",
+        "quantity": 1,
+        "unit": "whole",
+        "category": "vegetables"
+      }
+    ],
+    "instructions": [
+      "Cook rice. Mix soy, sesame oil, sugar, garlic, ginger and gochujang.",
+      "Brown beef mince in a wok over high heat.",
+      "Pour sauce over and cook 2 mins until caramelised.",
+      "Serve over rice with sliced cucumber, spring onions and sesame seeds."
+    ]
+  },
+  {
+    "id": "r385",
+    "name": "Parmesan-Crusted Fish Fillets",
+    "description": "Oven-baked fish fillets with a crispy parmesan and herb crust — fast and impressive",
+    "baseServings": 4,
+    "cookTimeMinutes": 20,
+    "difficulty": "easy",
+    "cookingStyle": "oven",
+    "healthTags": [
+      "healthy",
+      "high-protein"
+    ],
+    "budgetTags": [
+      "standard"
+    ],
+    "leftoversFriendly": false,
+    "mealType": "dinner",
+    "estimatedCostBand": "medium",
+    "proteinType": "seafood",
+    "cuisineType": "european",
+    "seasonTags": [
+      "all"
+    ],
+    "costPerServeAUD": 8,
+    "kidFriendly": true,
+    "kidFriendlyScore": 4,
+    "kidFriendlyReason": "crispy crust appeals to kids",
+    "categoryTags": [
+      "low-prep",
+      "quick"
+    ],
+    "imageUrl": "https://tse4.mm.bing.net/th/id/OIP.yqPG4kDQ7YRdiqmrdqPFsQHaE8?pid=Api&P=0&h=180",
+    "ingredients": [
+      {
+        "name": "White fish fillets (barramundi or snapper)",
+        "quantity": 600,
+        "unit": "g",
+        "category": "proteins"
+      },
+      {
+        "name": "Parmesan cheese",
+        "quantity": 80,
+        "unit": "g",
+        "category": "dairy"
+      },
+      {
+        "name": "Panko breadcrumbs",
+        "quantity": 60,
+        "unit": "g",
+        "category": "grains"
+      },
+      {
+        "name": "Garlic",
+        "quantity": 2,
+        "unit": "cloves",
+        "category": "herbs"
+      },
+      {
+        "name": "Lemon zest",
+        "quantity": 1,
+        "unit": "lemon",
+        "category": "fruits"
+      },
+      {
+        "name": "Fresh parsley",
+        "quantity": 2,
+        "unit": "tbsp",
+        "category": "herbs"
+      },
+      {
+        "name": "Olive oil",
+        "quantity": 2,
+        "unit": "tbsp",
+        "category": "condiments"
+      },
+      {
+        "name": "Mayonnaise",
+        "quantity": 2,
+        "unit": "tbsp",
+        "category": "condiments"
+      }
+    ],
+    "instructions": [
+      "Preheat oven to 210°C. Line baking tray with paper.",
+      "Mix parmesan, breadcrumbs, garlic, lemon zest, parsley and oil.",
+      "Spread mayo over fish fillets. Press parmesan crust on top.",
+      "Bake 14–16 mins until crust is golden and fish flakes easily.",
+      "Serve with chips and salad."
+    ]
+  },
+  {
+    "id": "r386",
+    "name": "Orange Teriyaki Pork with Noodles",
+    "description": "Pork strips glazed in sweet orange teriyaki sauce over rice noodles with greens",
+    "baseServings": 4,
+    "cookTimeMinutes": 20,
+    "difficulty": "easy",
+    "cookingStyle": "stovetop",
+    "healthTags": [
+      "standard"
+    ],
+    "budgetTags": [
+      "standard"
+    ],
+    "leftoversFriendly": false,
+    "mealType": "dinner",
+    "estimatedCostBand": "medium",
+    "proteinType": "pork",
+    "cuisineType": "japanese",
+    "seasonTags": [
+      "all"
+    ],
+    "costPerServeAUD": 7,
+    "kidFriendly": true,
+    "kidFriendlyScore": 4,
+    "kidFriendlyReason": "sweet teriyaki glaze is popular with kids",
+    "categoryTags": [
+      "low-prep",
+      "quick"
+    ],
+    "imageUrl": "https://tse1.mm.bing.net/th/id/OIP.K7KXm7TJc-f5LVxJuKaF2QHaEK?pid=Api&P=0&h=180",
+    "ingredients": [
+      {
+        "name": "Pork loin strips",
+        "quantity": 500,
+        "unit": "g",
+        "category": "proteins"
+      },
+      {
+        "name": "Rice noodles",
+        "quantity": 300,
+        "unit": "g",
+        "category": "grains"
+      },
+      {
+        "name": "Teriyaki sauce",
+        "quantity": 4,
+        "unit": "tbsp",
+        "category": "condiments"
+      },
+      {
+        "name": "Orange juice",
+        "quantity": 4,
+        "unit": "tbsp",
+        "category": "fruits"
+      },
+      {
+        "name": "Bok choy",
+        "quantity": 2,
+        "unit": "heads",
+        "category": "vegetables"
+      },
+      {
+        "name": "Garlic",
+        "quantity": 2,
+        "unit": "cloves",
+        "category": "herbs"
+      },
+      {
+        "name": "Sesame seeds",
+        "quantity": 1,
+        "unit": "tbsp",
+        "category": "herbs"
+      },
+      {
+        "name": "Spring onions",
+        "quantity": 3,
+        "unit": "stalks",
+        "category": "vegetables"
+      },
+      {
+        "name": "Vegetable oil",
+        "quantity": 1,
+        "unit": "tbsp",
+        "category": "condiments"
+      }
+    ],
+    "instructions": [
+      "Soak rice noodles in boiling water 5 mins, drain.",
+      "Stir-fry pork in oil over high heat 3–4 mins.",
+      "Mix teriyaki and orange juice. Add to pork with garlic. Cook 2 mins.",
+      "Add bok choy and noodles. Toss to combine.",
+      "Serve topped with sesame seeds and spring onions."
+    ]
+  },
+  {
+    "id": "r387",
+    "name": "One-Tray Thai Green Fish Curry",
+    "description": "Fish fillets, vegetables and coconut milk baked with Thai green curry paste in one tray",
+    "baseServings": 4,
+    "cookTimeMinutes": 25,
+    "difficulty": "easy",
+    "cookingStyle": "oven",
+    "healthTags": [
+      "healthy",
+      "high-protein"
+    ],
+    "budgetTags": [
+      "standard"
+    ],
+    "leftoversFriendly": false,
+    "mealType": "dinner",
+    "estimatedCostBand": "medium",
+    "proteinType": "seafood",
+    "cuisineType": "thai",
+    "seasonTags": [
+      "all"
+    ],
+    "costPerServeAUD": 8.5,
+    "kidFriendly": false,
+    "kidFriendlyScore": 2,
+    "kidFriendlyReason": "spiced curry sauce",
+    "categoryTags": [
+      "low-prep"
+    ],
+    "imageUrl": "https://tse3.mm.bing.net/th/id/OIP.OT6Vf4bMbI1pqfPnj9yFcAHaE8?pid=Api&P=0&h=180",
+    "ingredients": [
+      {
+        "name": "White fish fillets (snapper or basa)",
+        "quantity": 600,
+        "unit": "g",
+        "category": "proteins"
+      },
+      {
+        "name": "Coconut milk",
+        "quantity": 400,
+        "unit": "ml",
+        "category": "pantry"
+      },
+      {
+        "name": "Thai green curry paste",
+        "quantity": 3,
+        "unit": "tbsp",
+        "category": "condiments"
+      },
+      {
+        "name": "Broccolini",
+        "quantity": 200,
+        "unit": "g",
+        "category": "vegetables"
+      },
+      {
+        "name": "Red capsicum",
+        "quantity": 1,
+        "unit": "whole",
+        "category": "vegetables"
+      },
+      {
+        "name": "Kaffir lime leaves",
+        "quantity": 4,
+        "unit": "whole",
+        "category": "herbs"
+      },
+      {
+        "name": "Fish sauce",
+        "quantity": 1,
+        "unit": "tbsp",
+        "category": "condiments"
+      },
+      {
+        "name": "Lime juice",
+        "quantity": 2,
+        "unit": "tbsp",
+        "category": "fruits"
+      },
+      {
+        "name": "Fresh coriander",
+        "quantity": 1,
+        "unit": "handful",
+        "category": "herbs"
+      },
+      {
+        "name": "Basmati rice",
+        "quantity": 320,
+        "unit": "g",
+        "category": "grains"
+      }
+    ],
+    "instructions": [
+      "Preheat oven to 200°C.",
+      "Whisk coconut milk, curry paste, fish sauce and lime juice.",
+      "Pour into a baking dish. Add broccolini, capsicum and kaffir lime leaves.",
+      "Nestle fish fillets in the sauce.",
+      "Bake 18–20 mins until fish is cooked. Scatter coriander. Serve with rice."
+    ]
+  },
+  {
+    "id": "r388",
+    "name": "Air Fryer Sweet Chilli Chicken Tacos",
+    "description": "Crispy air-fried chicken strips tossed in sweet chilli glaze, served in warm taco shells",
+    "baseServings": 4,
+    "cookTimeMinutes": 25,
+    "difficulty": "easy",
+    "cookingStyle": "air-fryer",
+    "healthTags": [
+      "standard"
+    ],
+    "budgetTags": [
+      "standard"
+    ],
+    "leftoversFriendly": false,
+    "mealType": "dinner",
+    "estimatedCostBand": "medium",
+    "proteinType": "chicken",
+    "cuisineType": "fusion",
+    "seasonTags": [
+      "all"
+    ],
+    "costPerServeAUD": 6.5,
+    "kidFriendly": true,
+    "kidFriendlyScore": 4,
+    "kidFriendlyReason": "fun tacos with sweet glaze",
+    "categoryTags": [
+      "low-prep",
+      "quick",
+      "kid-friendly"
+    ],
+    "imageUrl": "https://tse2.mm.bing.net/th/id/OIP.bFQ-vXGVfXh7WuBYkq1HxgHaE8?pid=Api&P=0&h=180",
+    "ingredients": [
+      {
+        "name": "Chicken breast",
+        "quantity": 600,
+        "unit": "g",
+        "category": "proteins"
+      },
+      {
+        "name": "Mini taco shells or tortillas",
+        "quantity": 12,
+        "unit": "whole",
+        "category": "grains"
+      },
+      {
+        "name": "Sweet chilli sauce",
+        "quantity": 4,
+        "unit": "tbsp",
+        "category": "condiments"
+      },
+      {
+        "name": "Soy sauce",
+        "quantity": 1,
+        "unit": "tbsp",
+        "category": "condiments"
+      },
+      {
+        "name": "Panko breadcrumbs",
+        "quantity": 80,
+        "unit": "g",
+        "category": "grains"
+      },
+      {
+        "name": "Egg",
+        "quantity": 1,
+        "unit": "whole",
+        "category": "dairy"
+      },
+      {
+        "name": "Cabbage",
+        "quantity": 200,
+        "unit": "g",
+        "category": "vegetables"
+      },
+      {
+        "name": "Avocado",
+        "quantity": 1,
+        "unit": "whole",
+        "category": "fruits"
+      },
+      {
+        "name": "Sour cream",
+        "quantity": 100,
+        "unit": "g",
+        "category": "dairy"
+      },
+      {
+        "name": "Lime",
+        "quantity": 1,
+        "unit": "whole",
+        "category": "fruits"
+      }
+    ],
+    "instructions": [
+      "Slice chicken into strips. Dip in egg, coat in breadcrumbs.",
+      "Air fry at 200°C for 12 mins until crispy. Toss in sweet chilli and soy.",
+      "Shred cabbage finely. Slice avocado.",
+      "Warm taco shells. Fill with cabbage, chicken and avocado.",
+      "Serve with sour cream and lime wedges."
+    ]
+  },
+  {
+    "id": "r390",
+    "name": "Baked Honey Lime Salmon",
+    "description": "Salmon fillets glazed with honey, lime and garlic — naturally gluten-free, 20-minute dinner",
+    "baseServings": 4,
+    "cookTimeMinutes": 20,
+    "difficulty": "easy",
+    "cookingStyle": "oven",
+    "healthTags": [
+      "healthy",
+      "high-protein",
+      "gluten-free"
+    ],
+    "budgetTags": [
+      "standard"
+    ],
+    "leftoversFriendly": false,
+    "mealType": "dinner",
+    "estimatedCostBand": "high",
+    "proteinType": "seafood",
+    "cuisineType": "australian",
+    "seasonTags": [
+      "all"
+    ],
+    "costPerServeAUD": 11,
+    "kidFriendly": false,
+    "kidFriendlyScore": 2,
+    "kidFriendlyReason": "salmon texture not always popular with kids",
+    "categoryTags": [
+      "gluten-free",
+      "quick"
+    ],
+    "imageUrl": "https://tse4.mm.bing.net/th/id/OIP.pAYa2j7MYy6T43BOVxbVPQHaE8?pid=Api&P=0&h=180",
+    "ingredients": [
+      {
+        "name": "Salmon fillets",
+        "quantity": 4,
+        "unit": "pieces",
+        "category": "proteins"
+      },
+      {
+        "name": "Honey",
+        "quantity": 3,
+        "unit": "tbsp",
+        "category": "condiments"
+      },
+      {
+        "name": "Lime juice",
+        "quantity": 3,
+        "unit": "tbsp",
+        "category": "fruits"
+      },
+      {
+        "name": "Garlic",
+        "quantity": 3,
+        "unit": "cloves",
+        "category": "herbs"
+      },
+      {
+        "name": "Soy sauce (gluten-free tamari)",
+        "quantity": 1,
+        "unit": "tbsp",
+        "category": "condiments"
+      },
+      {
+        "name": "Olive oil",
+        "quantity": 1,
+        "unit": "tbsp",
+        "category": "condiments"
+      },
+      {
+        "name": "Fresh coriander",
+        "quantity": 2,
+        "unit": "tbsp",
+        "category": "herbs"
+      }
+    ],
+    "instructions": [
+      "Preheat oven to 200°C.",
+      "Mix honey, lime juice, garlic and tamari.",
+      "Place salmon on lined baking tray. Spoon glaze over each fillet.",
+      "Bake 12–14 mins until salmon is just cooked and glaze is sticky.",
+      "Garnish with coriander. Serve with steamed jasmine rice and greens."
+    ]
+  },
+  {
+    "id": "r391",
+    "name": "Halloumi Skewers with Mint Yoghurt",
+    "description": "Grilled halloumi and vegetable skewers with cooling mint and garlic yoghurt dip",
+    "baseServings": 4,
+    "cookTimeMinutes": 20,
+    "difficulty": "easy",
+    "cookingStyle": "bbq",
+    "healthTags": [
+      "vegetarian",
+      "gluten-free"
+    ],
+    "budgetTags": [
+      "standard"
+    ],
+    "leftoversFriendly": false,
+    "mealType": "dinner",
+    "estimatedCostBand": "medium",
+    "proteinType": "vegetarian",
+    "cuisineType": "mediterranean",
+    "seasonTags": [
+      "spring",
+      "summer"
+    ],
+    "costPerServeAUD": 8,
+    "kidFriendly": true,
+    "kidFriendlyScore": 3,
+    "kidFriendlyReason": "fun skewer format",
+    "categoryTags": [
+      "gluten-free",
+      "vegetarian",
+      "quick"
+    ],
+    "imageUrl": "https://tse1.mm.bing.net/th/id/OIP.M-4IH1_zr7q1Tz-3mUFb2AHaE8?pid=Api&P=0&h=180",
+    "ingredients": [
+      {
+        "name": "Halloumi",
+        "quantity": 500,
+        "unit": "g",
+        "category": "dairy"
+      },
+      {
+        "name": "Red capsicum",
+        "quantity": 2,
+        "unit": "whole",
+        "category": "vegetables"
+      },
+      {
+        "name": "Zucchini",
+        "quantity": 2,
+        "unit": "whole",
+        "category": "vegetables"
+      },
+      {
+        "name": "Red onion",
+        "quantity": 1,
+        "unit": "whole",
+        "category": "vegetables"
+      },
+      {
+        "name": "Greek yoghurt",
+        "quantity": 250,
+        "unit": "g",
+        "category": "dairy"
+      },
+      {
+        "name": "Fresh mint",
+        "quantity": 2,
+        "unit": "tbsp",
+        "category": "herbs"
+      },
+      {
+        "name": "Garlic",
+        "quantity": 1,
+        "unit": "clove",
+        "category": "herbs"
+      },
+      {
+        "name": "Lemon juice",
+        "quantity": 2,
+        "unit": "tbsp",
+        "category": "fruits"
+      },
+      {
+        "name": "Olive oil",
+        "quantity": 2,
+        "unit": "tbsp",
+        "category": "condiments"
+      },
+      {
+        "name": "Dried oregano",
+        "quantity": 1,
+        "unit": "tsp",
+        "category": "herbs"
+      }
+    ],
+    "instructions": [
+      "Soak skewers if wooden. Cut halloumi and vegetables into 3cm pieces.",
+      "Thread alternately onto skewers. Brush with oil and oregano.",
+      "Grill or BBQ 4–5 mins per side until charred.",
+      "Mix yoghurt with mint, garlic and lemon juice.",
+      "Serve skewers with mint yoghurt, flatbread and salad."
+    ]
+  },
+  {
+    "id": "r392",
+    "name": "Quinoa Roasted Veg Bowl",
+    "description": "Protein-packed quinoa with roasted seasonal vegetables, feta and lemon dressing",
+    "baseServings": 4,
+    "cookTimeMinutes": 35,
+    "difficulty": "easy",
+    "cookingStyle": "oven",
+    "healthTags": [
+      "vegetarian",
+      "gluten-free",
+      "healthy"
+    ],
+    "budgetTags": [
+      "standard"
+    ],
+    "leftoversFriendly": true,
+    "mealType": "dinner",
+    "estimatedCostBand": "medium",
+    "proteinType": "vegetarian",
+    "cuisineType": "mediterranean",
+    "seasonTags": [
+      "all"
+    ],
+    "costPerServeAUD": 7,
+    "kidFriendly": false,
+    "kidFriendlyScore": 2,
+    "kidFriendlyReason": "quinoa texture often disliked by young kids",
+    "categoryTags": [
+      "gluten-free",
+      "vegetarian"
+    ],
+    "imageUrl": "https://tse3.mm.bing.net/th/id/OIP.yT9PsarY2YAm1nqt43g8BgHaEK?pid=Api&P=0&h=180",
+    "ingredients": [
+      {
+        "name": "Quinoa",
+        "quantity": 300,
+        "unit": "g",
+        "category": "grains"
+      },
+      {
+        "name": "Beetroot",
+        "quantity": 2,
+        "unit": "whole",
+        "category": "vegetables"
+      },
+      {
+        "name": "Sweet potato",
+        "quantity": 400,
+        "unit": "g",
+        "category": "vegetables"
+      },
+      {
+        "name": "Red capsicum",
+        "quantity": 1,
+        "unit": "whole",
+        "category": "vegetables"
+      },
+      {
+        "name": "Chickpeas (tinned)",
+        "quantity": 400,
+        "unit": "g",
+        "category": "proteins"
+      },
+      {
+        "name": "Feta cheese",
+        "quantity": 120,
+        "unit": "g",
+        "category": "dairy"
+      },
+      {
+        "name": "Olive oil",
+        "quantity": 4,
+        "unit": "tbsp",
+        "category": "condiments"
+      },
+      {
+        "name": "Lemon juice",
+        "quantity": 3,
+        "unit": "tbsp",
+        "category": "fruits"
+      },
+      {
+        "name": "Honey",
+        "quantity": 1,
+        "unit": "tbsp",
+        "category": "condiments"
+      },
+      {
+        "name": "Rocket leaves",
+        "quantity": 60,
+        "unit": "g",
+        "category": "vegetables"
+      }
+    ],
+    "instructions": [
+      "Preheat oven to 200°C. Cube vegetables and toss with oil. Roast 25 mins.",
+      "Cook quinoa per packet. Drain and fluff.",
+      "Whisk olive oil, lemon juice and honey for dressing.",
+      "Combine quinoa, roasted veg, chickpeas and rocket in a bowl.",
+      "Drizzle dressing over. Crumble feta on top."
     ]
   }
 ]

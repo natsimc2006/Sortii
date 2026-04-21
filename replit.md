@@ -98,7 +98,7 @@ Expo / React Native mobile app — **Sortii**, a weekly household meal planner f
 **Key design:**
 - Brand: "Sortii" — teal-green `#2A8F88`, gold CTA `#D29A22`, deep plum `#5E3A4C`, cream bg `#F7F3EB`
 - Logo: `assets/images/sortii-logo.png` — full lockup with "sortii." and "Dinner... Sorted." tagline
-- 250 recipes in `data/recipes.json` with images from TheMealDB (`imageUrl` field)
+- **330 recipes** in `data/recipes.json` — IDs r001–r392 (55 new AU/UK sourced recipes added r300–r392); image URLs updated to Bing CDN thumbnails; all recipes have `categoryTags` field (values: everyday, premium, kid-friendly, fussy-eater, gluten-free, vegan, vegetarian, batch-cooking, quick, budget, low-prep)
 - `constants/recipes.ts` — Recipe/PlanPreferences interfaces, utility functions, filter/score helpers, kidFriendly support
 - `context/PlannerContext.tsx` — all plan state, staged-scoring `autoGeneratePlan`, `planHasLimitedVariety` flag, kid-friendly scoring
 - `components/Toast.tsx` — animated toast (variants: success, info, undo, warning, smart-tip)
