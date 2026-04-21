@@ -46,9 +46,8 @@ interface MealSlotCardProps {
   recipe: Recipe | null;
   onAdd: () => void;
   onRemove: () => void;
-  onSwap: () => void;
+  onSwitchMeal: () => void;
   onViewRecipe?: () => void;
-  onAutoSwap?: () => void;
   onHideRecipe?: () => void;
   onAutoFill?: () => void;
   seasonalMode?: boolean;
@@ -63,9 +62,8 @@ export function MealSlotCard({
   recipe,
   onAdd,
   onRemove,
-  onSwap,
+  onSwitchMeal,
   onViewRecipe,
-  onAutoSwap,
   onHideRecipe,
   onAutoFill,
   seasonalMode = false,
@@ -196,32 +194,6 @@ export function MealSlotCard({
             </TouchableOpacity>
           )}
 
-          {/* Auto swap — gold: featured smart action */}
-          {onAutoSwap && (
-            <TouchableOpacity
-              onPress={() => {
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                onAutoSwap();
-              }}
-              style={[styles.actionBtn, { backgroundColor: ICON.autoSwap.bg }]}
-              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-            >
-              <Feather name="zap" size={13} color={ICON.autoSwap.icon} />
-            </TouchableOpacity>
-          )}
-
-          {/* Swap/regenerate — plum */}
-          <TouchableOpacity
-            onPress={() => {
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-              onSwap();
-            }}
-            style={[styles.actionBtn, { backgroundColor: ICON.swap.bg }]}
-            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-          >
-            <Feather name="refresh-cw" size={14} color={ICON.swap.icon} />
-          </TouchableOpacity>
-
           {/* Hide — plum */}
           {onHideRecipe && (
             <TouchableOpacity
@@ -312,6 +284,20 @@ export function MealSlotCard({
         {onViewRecipe && (
           <Feather name="chevron-right" size={14} color={C.textMuted} style={styles.chevron} />
         )}
+      </TouchableOpacity>
+
+      {/* Switch meal pill */}
+      <TouchableOpacity
+        onPress={() => {
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+          onSwitchMeal();
+        }}
+        activeOpacity={0.75}
+        style={styles.switchMealPill}
+        hitSlop={{ top: 4, bottom: 4, left: 4, right: 4 }}
+      >
+        <Feather name="refresh-cw" size={12} color="#5E3A4C" />
+        <Text style={styles.switchMealText}>Switch meal</Text>
       </TouchableOpacity>
 
       {swapBadge && onSwapBadgePress && (
@@ -524,6 +510,24 @@ const styles = StyleSheet.create({
   swapBadgeText: {
     fontSize: 11,
     fontFamily: "Inter_600SemiBold",
+    letterSpacing: 0.1,
+  },
+  switchMealPill: {
+    flexDirection: "row",
+    alignItems: "center",
+    alignSelf: "flex-start",
+    gap: 5,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 20,
+    backgroundColor: "#F3E8EE",
+    borderWidth: 1,
+    borderColor: "#E8D8E4",
+  },
+  switchMealText: {
+    fontSize: 12,
+    fontFamily: "Inter_600SemiBold",
+    color: "#5E3A4C",
     letterSpacing: 0.1,
   },
 });
