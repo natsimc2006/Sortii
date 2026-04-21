@@ -24,10 +24,13 @@ import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context"
 
 import {
   Appointment,
+  AvailabilityBlock,
   ChecklistItem,
   loadAppointments,
   saveAppointments,
 } from "@/utils/appointmentStore";
+import { loadFamilyState } from "@/utils/familyStore";
+import { FamilyMember } from "@/utils/familyTypes";
 import { getAppleCalendars, getUpcomingAppleEvents, requestCalendarPermission } from "@/utils/appleCalendar";
 import {
   APPLE_CALENDAR_IDS_KEY,
@@ -192,6 +195,8 @@ function blankForm(): Omit<Appointment, "id" | "createdAt" | "updatedAt"> {
     recurringEnabled: false,
     isDone: false,
     isCancelled: false,
+    appointmentCost: null,
+    availabilityBlock: null,
   };
 }
 
@@ -317,6 +322,8 @@ function ApptCard({ appt, busyPersons, onPress }: ApptCardProps) {
   const prep    = needsPrep(appt);
   const timeStr = fmt12h(appt.startTime) + (appt.endTime ? `–${fmt12h(appt.endTime)}` : "");
   const isBusy  = busyPersons && appt.person && busyPersons.includes(appt.person);
+  const hasCost = appt.appointmentCost && appt.appointmentCost > 0;
+  const hasAvail = appt.availabilityBlock && appt.availabilityBlock.personIds.length > 0;
   return (
     <TouchableOpacity onPress={onPress} activeOpacity={0.75} style={[styles.apptCard, { borderLeftColor: color }]}>
       <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start" }}>
@@ -334,6 +341,18 @@ function ApptCard({ appt, busyPersons, onPress }: ApptCardProps) {
           {isBusy ? (
             <Text style={styles.apptBusy}>Bit of a juggle for {appt.person} that day.</Text>
           ) : null}
+          <View style={{ flexDirection: "row", gap: 6, marginTop: hasCost || hasAvail ? 4 : 0 }}>
+            {hasCost ? (
+              <View style={styles.apptFlagChip}>
+                <Text style={styles.apptFlagText}>💰 ${appt.appointmentCost!.toFixed(0)}</Text>
+              </View>
+            ) : null}
+            {hasAvail ? (
+              <View style={[styles.apptFlagChip, { backgroundColor: TEAL + "14" }]}>
+                <Text style={[styles.apptFlagText, { color: TEAL }]}>📅 Availability flagged</Text>
+              </View>
+            ) : null}
+          </View>
         </View>
         <View style={{ alignItems: "flex-end", gap: 4 }}>
           <StatusChip label={appt.category} color={color} />
@@ -524,6 +543,19 @@ export default function AppointmentsScreen() {
   const [showEndTime, setShowEndTime] = useState(false);
   const [checkInput,  setCheckInput]  = useState("");
 
+  // ── More details form state ────────────────────────────────────────────────
+  const [showMoreDetails, setShowMoreDetails] = useState(false);
+  const [hasCost,         setHasCost]         = useState(false);
+  const [costText,        setCostText]        = useState("");
+  const [hasAvailBlock,   setHasAvailBlock]   = useState(false);
+  const [availPersonIds,  setAvailPersonIds]  = useState<string[]>([]);
+  const [availScope,      setAvailScope]      = useState<AvailabilityBlock["scope"]>("appointment");
+  const [availStart,      setAvailStart]      = useState("08:00");
+  const [availEnd,        setAvailEnd]        = useState("17:00");
+
+  // ── Family members (for availability block selector) ──────────────────────
+  const [familyMembers, setFamilyMembers] = useState<FamilyMember[]>([]);
+
   // ── Calendar state ─────────────────────────────────────────────────────────
   const [calEvents,       setCalEvents]       = useState<SortiiCalEvent[]>([]);
   const [pushedIds,       setPushedIds]       = useState<Set<string>>(new Set());
@@ -619,6 +651,7 @@ export default function AppointmentsScreen() {
   useFocusEffect(useCallback(() => {
     loadAppointments().then(setItems);
     loadCalendarData(false);
+    loadFamilyState().then((fs) => setFamilyMembers(fs.members));
   }, []));
 
   // AppState foreground refresh
@@ -849,11 +882,23 @@ export default function AppointmentsScreen() {
   const noContent    = apptGroups.length === 0 && calGroups.length === 0;
 
   // ── Handlers ───────────────────────────────────────────────────────────────
+  function resetMoreDetails() {
+    setShowMoreDetails(false);
+    setHasCost(false);
+    setCostText("");
+    setHasAvailBlock(false);
+    setAvailPersonIds([]);
+    setAvailScope("appointment");
+    setAvailStart("08:00");
+    setAvailEnd("17:00");
+  }
+
   function openAdd() {
     setForm(blankForm());
     setShowEndTime(false);
     setCheckInput("");
     setSelectedId(null);
+    resetMoreDetails();
     setView("form");
   }
 
@@ -869,10 +914,30 @@ export default function AppointmentsScreen() {
       reminderEnabled: a.reminderEnabled,
       recurringEnabled: a.recurringEnabled,
       isDone: a.isDone, isCancelled: a.isCancelled,
+      appointmentCost: a.appointmentCost ?? null,
+      availabilityBlock: a.availabilityBlock ?? null,
     });
     setShowEndTime(!!a.endTime);
     setCheckInput("");
     setSelectedId(id);
+    // Restore More Details state from saved appointment
+    const hasCostVal = !!(a.appointmentCost && a.appointmentCost > 0);
+    setHasCost(hasCostVal);
+    setCostText(hasCostVal ? String(a.appointmentCost) : "");
+    const hasAvail = !!(a.availabilityBlock && a.availabilityBlock.personIds.length > 0);
+    setHasAvailBlock(hasAvail);
+    if (hasAvail && a.availabilityBlock) {
+      setAvailPersonIds(a.availabilityBlock.personIds);
+      setAvailScope(a.availabilityBlock.scope);
+      setAvailStart(a.availabilityBlock.startTime ?? "08:00");
+      setAvailEnd(a.availabilityBlock.endTime ?? "17:00");
+    } else {
+      setAvailPersonIds([]);
+      setAvailScope("appointment");
+      setAvailStart("08:00");
+      setAvailEnd("17:00");
+    }
+    setShowMoreDetails(hasCostVal || hasAvail);
     setView("form");
   }
 
@@ -887,16 +952,28 @@ export default function AppointmentsScreen() {
       return;
     }
     const now = Date.now();
+    const costValue: number | null = hasCost && costText ? (parseFloat(costText) || null) : null;
+    const availValue: AvailabilityBlock | null = hasAvailBlock && availPersonIds.length > 0
+      ? {
+          personIds: availPersonIds,
+          scope: availScope,
+          startTime: availScope === "custom" ? availStart : undefined,
+          endTime: availScope === "custom" ? availEnd : undefined,
+        }
+      : null;
+
     let next: Appointment[];
     if (selectedId) {
       next = items.map((a) => a.id === selectedId
-        ? { ...a, ...form, endTime: showEndTime ? form.endTime : undefined, updatedAt: now }
+        ? { ...a, ...form, endTime: showEndTime ? form.endTime : undefined,
+            appointmentCost: costValue, availabilityBlock: availValue, updatedAt: now }
         : a
       );
     } else {
       const appt: Appointment = {
         id: uid(), ...form,
         endTime: showEndTime ? form.endTime : undefined,
+        appointmentCost: costValue, availabilityBlock: availValue,
         createdAt: now, updatedAt: now,
       };
       next = [...items, appt];
@@ -1125,6 +1202,143 @@ export default function AppointmentsScreen() {
             </View>
           </View>
 
+          {/* More details (cost + availability) */}
+          <View style={styles.formSection}>
+            <TouchableOpacity
+              onPress={() => setShowMoreDetails((v) => !v)}
+              activeOpacity={0.7}
+              style={styles.moreDetailsToggle}
+            >
+              <Text style={styles.moreDetailsLink}>
+                {showMoreDetails ? "Less details ↑" : "More details ↓"}
+              </Text>
+              {(hasCost || hasAvailBlock) ? (
+                <View style={styles.moreDetailsBadge}>
+                  <Text style={styles.moreDetailsBadgeText}>
+                    {[hasCost && "Cost", hasAvailBlock && "Availability"].filter(Boolean).join(" · ")}
+                  </Text>
+                </View>
+              ) : null}
+            </TouchableOpacity>
+
+            {showMoreDetails && (
+              <View style={styles.formCard}>
+                {/* FLAG 1: Cost */}
+                <View style={styles.rowBetween}>
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.fieldLabel}>Does this have a cost?</Text>
+                    <Text style={styles.fieldSub}>Dental, school fees, tickets…</Text>
+                  </View>
+                  <Switch
+                    value={hasCost}
+                    onValueChange={(v) => { setHasCost(v); if (!v) setCostText(""); }}
+                    trackColor={{ false: BORDER, true: TEAL + "60" }}
+                    thumbColor={hasCost ? TEAL : "#ccc"}
+                  />
+                </View>
+                {hasCost && (
+                  <View style={{ marginTop: 10 }}>
+                    <Text style={styles.fieldLabel}>Estimated cost</Text>
+                    <View style={[styles.input, { flexDirection: "row", alignItems: "center", marginBottom: 0 }]}>
+                      <Text style={{ fontSize: 16, color: MUTED, marginRight: 4 }}>$</Text>
+                      <TextInput
+                        style={{ flex: 1, fontSize: 14, fontFamily: "Inter_400Regular", color: TEXT }}
+                        placeholder="0"
+                        placeholderTextColor={MUTED}
+                        keyboardType="decimal-pad"
+                        value={costText}
+                        onChangeText={setCostText}
+                      />
+                    </View>
+                  </View>
+                )}
+
+                {/* Divider */}
+                <View style={{ height: 1, backgroundColor: BORDER, marginVertical: 14 }} />
+
+                {/* FLAG 2: Availability */}
+                <View style={styles.rowBetween}>
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.fieldLabel}>Does this affect who's available?</Text>
+                    <Text style={styles.fieldSub}>Work trip, all-day commitment…</Text>
+                  </View>
+                  <Switch
+                    value={hasAvailBlock}
+                    onValueChange={(v) => { setHasAvailBlock(v); if (!v) { setAvailPersonIds([]); setAvailScope("appointment"); } }}
+                    trackColor={{ false: BORDER, true: TEAL + "60" }}
+                    thumbColor={hasAvailBlock ? TEAL : "#ccc"}
+                  />
+                </View>
+
+                {hasAvailBlock && (
+                  <View style={{ marginTop: 12, gap: 14 }}>
+                    {/* Who's unavailable */}
+                    <View>
+                      <Text style={styles.fieldLabel}>Who's unavailable?</Text>
+                      {familyMembers.length === 0 ? (
+                        <Text style={[styles.fieldSub, { fontStyle: "italic" }]}>
+                          Add family members first — set them up in the Family tab.
+                        </Text>
+                      ) : (
+                        <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8, marginTop: 4 }}>
+                          {familyMembers.map((m) => {
+                            const sel = availPersonIds.includes(m.id);
+                            return (
+                              <TouchableOpacity
+                                key={m.id}
+                                onPress={() => setAvailPersonIds((prev) =>
+                                  sel ? prev.filter((id) => id !== m.id) : [...prev, m.id]
+                                )}
+                                style={[
+                                  styles.catPill,
+                                  sel && { backgroundColor: m.color ?? TEAL, borderColor: m.color ?? TEAL },
+                                ]}
+                                activeOpacity={0.7}
+                              >
+                                <Text style={[styles.catPillText, sel && { color: "#fff" }]}>{m.name}</Text>
+                              </TouchableOpacity>
+                            );
+                          })}
+                        </View>
+                      )}
+                    </View>
+
+                    {/* For how long */}
+                    <View>
+                      <Text style={styles.fieldLabel}>For how long?</Text>
+                      <View style={{ flexDirection: "row", gap: 8, flexWrap: "wrap", marginTop: 4 }}>
+                        {(["appointment", "allday", "custom"] as AvailabilityBlock["scope"][]).map((s) => {
+                          const label = s === "appointment" ? "This appt only" : s === "allday" ? "All day" : "Custom hours";
+                          const active = availScope === s;
+                          return (
+                            <TouchableOpacity
+                              key={s}
+                              onPress={() => setAvailScope(s)}
+                              style={[styles.catPill, active && { backgroundColor: TEAL, borderColor: TEAL }]}
+                              activeOpacity={0.7}
+                            >
+                              <Text style={[styles.catPillText, active && { color: "#fff" }]}>{label}</Text>
+                            </TouchableOpacity>
+                          );
+                        })}
+                      </View>
+                    </View>
+
+                    {/* Custom time range */}
+                    {availScope === "custom" && (
+                      <View style={{ gap: 8 }}>
+                        <Text style={styles.fieldLabel}>Unavailable from</Text>
+                        <TimePicker value={availStart} onChange={setAvailStart} />
+                        <Text style={[styles.fieldLabel, { marginTop: 4 }]}>Until</Text>
+                        <TimePicker value={availEnd} onChange={setAvailEnd} />
+                      </View>
+                    )}
+                  </View>
+                )}
+              </View>
+            )}
+          </View>
+
           {/* Save */}
           <TouchableOpacity style={styles.saveBtn} onPress={handleSave} activeOpacity={0.85}>
             <Text style={styles.saveBtnText}>{selectedId ? "Save changes" : "Add appointment"}</Text>
@@ -1169,6 +1383,12 @@ export default function AppointmentsScreen() {
           {selected.isDone && <StatusChip label="Done ✓" color="#2A8F88" />}
           {selected.reminderEnabled && <StatusChip label="Reminder on" color={PLUM} />}
           {selected.recurringEnabled && <StatusChip label="Recurring" color={GOLD} />}
+          {selected.appointmentCost && selected.appointmentCost > 0 && (
+            <StatusChip label={`Cost $${selected.appointmentCost.toFixed(0)}`} color={GOLD} />
+          )}
+          {selected.availabilityBlock && selected.availabilityBlock.personIds.length > 0 && (
+            <StatusChip label="Availability flagged" color={TEAL} />
+          )}
         </View>
 
         {(selected.locationName || selected.suburb) ? (
@@ -1176,6 +1396,26 @@ export default function AppointmentsScreen() {
             <Text style={styles.detailSectionLabel}>LOCATION</Text>
             <Text style={styles.detailBody}>
               {[selected.locationName, selected.suburb].filter(Boolean).join(", ")}
+            </Text>
+          </View>
+        ) : null}
+
+        {selected.appointmentCost && selected.appointmentCost > 0 ? (
+          <View style={styles.detailSection}>
+            <Text style={styles.detailSectionLabel}>COST</Text>
+            <Text style={styles.detailBody}>${selected.appointmentCost.toFixed(2)} — one-off cost for this appointment.</Text>
+          </View>
+        ) : null}
+
+        {selected.availabilityBlock && selected.availabilityBlock.personIds.length > 0 ? (
+          <View style={[styles.detailSection, { backgroundColor: TEAL_TINT }]}>
+            <Text style={[styles.detailSectionLabel, { color: TEAL }]}>AVAILABILITY</Text>
+            <Text style={styles.detailBody}>
+              {selected.availabilityBlock.scope === "appointment"
+                ? "Unavailable during this appointment."
+                : selected.availabilityBlock.scope === "allday"
+                  ? "Unavailable all day."
+                  : `Unavailable ${selected.availabilityBlock.startTime ?? ""}–${selected.availabilityBlock.endTime ?? ""}.`}
             </Text>
           </View>
         ) : null}
@@ -1494,6 +1734,22 @@ const styles = StyleSheet.create({
   apptMeta: { fontSize: 12, fontFamily: "Inter_400Regular", color: MUTED },
   apptLocation: { fontSize: 12, fontFamily: "Inter_400Regular", color: MUTED, marginTop: 1 },
   apptBusy: { fontSize: 12, fontFamily: "Inter_400Regular", color: GOLD, fontStyle: "italic", marginTop: 3 },
+
+  apptFlagChip: {
+    backgroundColor: "#F6E6BA", borderRadius: 20, paddingHorizontal: 9, paddingVertical: 3, alignSelf: "flex-start",
+  },
+  apptFlagText: { fontSize: 11, fontFamily: "Inter_600SemiBold", color: "#8A6010" },
+
+  // More details toggle
+  moreDetailsToggle: {
+    flexDirection: "row", alignItems: "center", gap: 10, paddingVertical: 8,
+  },
+  moreDetailsLink: { fontSize: 14, fontFamily: "Inter_500Medium", color: TEAL },
+  moreDetailsBadge: {
+    backgroundColor: TEAL_TINT, borderRadius: 20, paddingHorizontal: 10, paddingVertical: 3,
+    borderWidth: 1, borderColor: TEAL + "30",
+  },
+  moreDetailsBadgeText: { fontSize: 11, fontFamily: "Inter_600SemiBold", color: TEAL },
 
   // Calendar event card
   calCard: {
