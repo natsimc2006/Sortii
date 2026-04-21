@@ -2,6 +2,8 @@ import RECIPES_DATA from "../data/recipes.json";
 import { getKidFriendlyScore } from "./kidFriendlyRules";
 export { getKidFriendlyScore };
 
+export const EASY_NIGHT_ID = "__easy_night__";
+
 export interface RecipeIngredient {
   name: string;
   quantity: number;

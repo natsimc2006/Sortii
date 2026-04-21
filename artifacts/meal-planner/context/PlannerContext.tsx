@@ -11,6 +11,7 @@ import {
   DAYS,
   DEFAULT_PREFERENCES,
   DEFAULT_WEEKEND_OVERRIDES,
+  EASY_NIGHT_ID,
   MealPlanEntry,
   MealSlot,
   PANTRY_STAPLES,
@@ -30,6 +31,10 @@ import {
   getHouseholdProfile,
   isCompatibleWithNeeds,
 } from "@/utils/householdProfile";
+import { loadAppointments } from "@/utils/appointmentStore";
+import { loadFamilyState } from "@/utils/familyStore";
+import { loadBills } from "@/utils/billStore";
+import { computeBusynessData } from "@/utils/busynessScore";
 
 export interface SavedPlan {
   id: string;
@@ -107,7 +112,7 @@ function calculateWeeklyCost(
   recipes: Recipe[],
   currencySymbol: string
 ): string {
-  const filledMeals = plan.filter((m) => m.recipeId);
+  const filledMeals = plan.filter((m) => m.recipeId && m.recipeId !== EASY_NIGHT_ID);
   const totalCost = filledMeals.reduce((sum, meal) => {
     const recipe = recipes.find((r) => r.id === meal.recipeId);
     const costPerServe =
@@ -244,7 +249,7 @@ export function PlannerProvider({ children }: { children: React.ReactNode }) {
     setCurrentPlan(updatedPlan);
   }, [currentPlan, preferences, hiddenRecipes, appRecipes, setCurrentPlan]);
 
-  const autoGeneratePlan = useCallback((newPrefs?: PlanPreferences) => {
+  const autoGeneratePlan = useCallback(async (newPrefs?: PlanPreferences) => {
     const p = newPrefs ?? preferences;
     const fresh = buildEmptyPlan(p);
     const usedIds: string[] = [];
@@ -258,6 +263,25 @@ export function PlannerProvider({ children }: { children: React.ReactNode }) {
     // Persona tracking — cap "medium-time" slots per week
     const persona = p.cookingPersona ?? "moderate";
     let personaMediumSlotsUsed = 0; // 26-40 (quick) or 46-60 (moderate) slots used
+
+    // ── Busyness data ───────────────────────────────────────────────────────
+    let weekScore = 0;
+    let dayScores: Record<string, number> = {};
+    let easyNightDay: string | null = null;
+    let highCookUsed = 0; // tracks meals >45 min for weekScore 3-4 cap (max 1)
+    try {
+      const [rawAppts, rawFamily, rawBills] = await Promise.all([
+        loadAppointments(),
+        loadFamilyState(),
+        loadBills(),
+      ]);
+      const bd = computeBusynessData(rawAppts, rawFamily, rawBills);
+      weekScore = bd.weekScore;
+      dayScores = bd.dayScores;
+      easyNightDay = bd.easyNightDay;
+    } catch {
+      // Silently fall back to no busyness adjustments
+    }
 
     const scoreRecipe = (r: Recipe): number => {
       let score = 0;
@@ -379,6 +403,13 @@ export function PlannerProvider({ children }: { children: React.ReactNode }) {
       // Leave days beyond active set as empty — user adds manually
       if (!daysToFill.has(entry.day)) return entry;
 
+      // ── Easy night sentinel ───────────────────────────────────────────────
+      // Assign easy night to the busiest dinner slot when weekScore >= 5.
+      // This is invisible to the user except for a single quiet summary line.
+      if (weekScore >= 5 && entry.slot === "dinner" && entry.day === easyNightDay) {
+        return { ...entry, recipeId: EASY_NIGHT_ID };
+      }
+
       const rawPool = filterRecipes(p, entry.slot, entry.day, hiddenRecipes, appRecipes);
       let pool = rawPool;
       if (householdProfile.dietary_needs.length > 0) {
@@ -409,10 +440,41 @@ export function PlannerProvider({ children }: { children: React.ReactNode }) {
         }
       }
 
+      // ── Week-level busyness ceiling ────────────────────────────────────────
+      if (weekScore >= 5) {
+        // Hard limit: all meals must be <= 25 min
+        const fast = pool.filter((r) => r.cookTimeMinutes <= 25);
+        if (fast.length >= 3) pool = fast;
+      } else if (weekScore >= 3) {
+        // Soft cap: no more than 1 meal > 45 min per week
+        if (highCookUsed >= 1) {
+          const capped = pool.filter((r) => r.cookTimeMinutes <= 45);
+          if (capped.length >= 3) pool = capped;
+        }
+      }
+
+      // ── Day-level busyness ceiling ─────────────────────────────────────────
+      const dayScore = dayScores[entry.day] ?? 0;
+      if (dayScore >= 3) {
+        // Hard limit for very busy days: <= 20 min
+        const veryFast = pool.filter((r) => r.cookTimeMinutes <= 20);
+        if (veryFast.length >= 3) pool = veryFast;
+      }
+
       // Score all candidates with small random tie-breaker for variety
-      const scored = pool
+      let scored = pool
         .map((r) => ({ r, score: scoreRecipe(r) + Math.random() * 3 }))
         .sort((a, b) => b.score - a.score);
+
+      // Day-score-2 soft preference: bonus for <= 30 min meals on moderately busy days
+      if (dayScore === 2) {
+        scored = scored
+          .map((item) => ({
+            ...item,
+            score: item.score + (item.r.cookTimeMinutes <= 30 ? 12 : 0),
+          }))
+          .sort((a, b) => b.score - a.score);
+      }
 
       const isDinner = entry.slot === "dinner";
 
@@ -450,6 +512,10 @@ export function PlannerProvider({ children }: { children: React.ReactNode }) {
           personaMediumSlotsUsed++;
         } else if (persona === "moderate" && picked.cookTimeMinutes > 45 && picked.cookTimeMinutes <= 60) {
           personaMediumSlotsUsed++;
+        }
+        // Track high-cook-time usage for weekScore 3-4 cap (max 1 meal > 45 min)
+        if (weekScore >= 3 && weekScore < 5 && picked.cookTimeMinutes > 45) {
+          highCookUsed++;
         }
         return { ...entry, recipeId: picked.id };
       }

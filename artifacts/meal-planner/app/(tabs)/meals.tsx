@@ -18,6 +18,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Colors from "@/constants/Colors";
 import {
   DAYS,
+  EASY_NIGHT_ID,
   MealPlanEntry,
   MealSlot,
   PANTRY_STAPLES,
@@ -410,6 +411,7 @@ export default function MealsScreen() {
   };
 
   const filledCount = currentPlan.filter((m) => m.recipeId).length;
+  const planHasEasyNight = currentPlan.some((e) => e.recipeId === EASY_NIGHT_ID);
   const totalSlots = currentPlan.length;
   const isWeekEmpty = filledCount === 0;
   const isWeekFull = filledCount === totalSlots && totalSlots > 0;
@@ -780,7 +782,8 @@ export default function MealsScreen() {
               ? getEntry(day, "lunch")
               : null;
 
-          const dinnerRecipe = dinnerEntry?.recipeId
+          const isEasyNight = dinnerEntry?.recipeId === EASY_NIGHT_ID;
+          const dinnerRecipe = !isEasyNight && dinnerEntry?.recipeId
             ? getRecipeById(dinnerEntry.recipeId) ?? null
             : null;
           const lunchRecipe = lunchEntry?.recipeId
@@ -826,26 +829,66 @@ export default function MealsScreen() {
                   )}
                 </>
               )}
-              <MealSlotCard
-                day={day}
-                slot="dinner"
-                recipe={dinnerRecipe}
-                onAdd={() => openSearch(day, "dinner")}
-                onRemove={() => handleMealRemove(day, "dinner")}
-                onSwap={() => handleMealSwap(day, "dinner")}
-                onViewRecipe={dinnerRecipe ? () => setDetailRecipe(dinnerRecipe) : undefined}
-                onAutoSwap={dinnerRecipe ? () => handleMealAutoSwap(day, "dinner") : undefined}
-                onHideRecipe={dinnerRecipe ? () => handleMealHide(dinnerRecipe) : undefined}
-                onAutoFill={!dinnerRecipe ? () => handleAutoFillSlot(day, "dinner") : undefined}
-                seasonalMode={preferences.seasonalMode ?? false}
-                kidFriendlyFilter={preferences.kidFriendly ?? false}
-              />
-              {dinnerRecipe && (
-                <SwapTips ingredientNames={dinnerRecipe.ingredients.map((i) => i.name)} />
+              {isEasyNight ? (
+                <View style={styles.easyNightCard}>
+                  <View style={styles.easyNightHeader}>
+                    <View style={styles.easyNightBadge}>
+                      <Text style={styles.easyNightBadgeText}>DINNER</Text>
+                    </View>
+                    <TouchableOpacity
+                      onPress={() => {
+                        setMealSlot(day, "dinner", null);
+                        openSearch(day, "dinner");
+                      }}
+                      style={styles.easyNightSwapBtn}
+                      hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                    >
+                      <Feather name="refresh-cw" size={13} color="#999" />
+                    </TouchableOpacity>
+                  </View>
+                  <View style={styles.easyNightBody}>
+                    <View style={styles.easyNightIconBox}>
+                      <Text style={styles.easyNightEmoji}>🛋️</Text>
+                    </View>
+                    <View style={styles.easyNightInfo}>
+                      <Text style={styles.easyNightTitle}>Easy night</Text>
+                      <Text style={styles.easyNightSub}>
+                        Freezer, leftovers, or whatever's there.
+                      </Text>
+                    </View>
+                  </View>
+                </View>
+              ) : (
+                <>
+                  <MealSlotCard
+                    day={day}
+                    slot="dinner"
+                    recipe={dinnerRecipe}
+                    onAdd={() => openSearch(day, "dinner")}
+                    onRemove={() => handleMealRemove(day, "dinner")}
+                    onSwap={() => handleMealSwap(day, "dinner")}
+                    onViewRecipe={dinnerRecipe ? () => setDetailRecipe(dinnerRecipe) : undefined}
+                    onAutoSwap={dinnerRecipe ? () => handleMealAutoSwap(day, "dinner") : undefined}
+                    onHideRecipe={dinnerRecipe ? () => handleMealHide(dinnerRecipe) : undefined}
+                    onAutoFill={!dinnerRecipe ? () => handleAutoFillSlot(day, "dinner") : undefined}
+                    seasonalMode={preferences.seasonalMode ?? false}
+                    kidFriendlyFilter={preferences.kidFriendly ?? false}
+                  />
+                  {dinnerRecipe && (
+                    <SwapTips ingredientNames={dinnerRecipe.ingredients.map((i) => i.name)} />
+                  )}
+                </>
               )}
             </View>
           );
         })}
+
+        {/* Easy night quiet confirmation line */}
+        {planHasEasyNight && (
+          <Text style={styles.easyNightNote}>
+            One easy night built in — busy week sorted.
+          </Text>
+        )}
 
         {/* Shared ingredients panel */}
         {sharedIngredients.length > 0 && (
@@ -1685,4 +1728,81 @@ const styles = StyleSheet.create({
   },
   costActionLabel: { fontSize: 14, fontFamily: "Inter_600SemiBold", marginBottom: 2 },
   costActionDesc: { fontSize: 12, fontFamily: "Inter_400Regular" },
+  // ── Easy night card ──────────────────────────────────────────────────────
+  easyNightCard: {
+    borderRadius: 14,
+    borderWidth: 1.5,
+    borderColor: "#E0E0E0",
+    backgroundColor: "#F8F8F8",
+    padding: 12,
+    gap: 10,
+  },
+  easyNightHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  easyNightBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 8,
+    backgroundColor: "#EBEBEB",
+  },
+  easyNightBadgeText: {
+    fontSize: 11,
+    fontFamily: "Inter_600SemiBold",
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
+    color: "#999",
+  },
+  easyNightSwapBtn: {
+    width: 28,
+    height: 28,
+    borderRadius: 8,
+    backgroundColor: "#EBEBEB",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  easyNightBody: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+  },
+  easyNightIconBox: {
+    width: 52,
+    height: 52,
+    borderRadius: 10,
+    backgroundColor: "#EBEBEB",
+    alignItems: "center",
+    justifyContent: "center",
+    flexShrink: 0,
+  },
+  easyNightEmoji: {
+    fontSize: 24,
+    lineHeight: 30,
+    textAlign: "center",
+  },
+  easyNightInfo: {
+    flex: 1,
+    gap: 3,
+  },
+  easyNightTitle: {
+    fontSize: 14,
+    fontFamily: "Inter_600SemiBold",
+    color: "#999",
+  },
+  easyNightSub: {
+    fontSize: 12,
+    fontFamily: "Inter_400Regular",
+    color: "#BBB",
+  },
+  easyNightNote: {
+    fontSize: 13,
+    fontFamily: "Inter_400Regular",
+    fontStyle: "italic",
+    color: "#2A8F88",
+    textAlign: "center",
+    marginTop: 4,
+    marginBottom: 8,
+  },
 });
