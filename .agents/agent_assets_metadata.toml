@@ -35,3 +35,9 @@ id = "SQ7Tb71uHAe__IQ4NgsyQ"
 uri = "file://.local/exports/sortii-money-page-rules.md"
 type = "text"
 title = "Sortii — Money Page Rules & Logic"
+
+[[outputs]]
+id = "TUhJi6Cd18-8t_Jub9Zg8"
+uri = "file://artifacts/meal-planner/data/image_url_checklist.csv"
+type = "table"
+title = "Recipe Image URL Checklist"
