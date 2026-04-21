@@ -1,0 +1,333 @@
+## SORTII — Connected intelligence layer: Money states, Bills, 
+## Appointments, Family Juggle + Home screen synthesis
+
+This is an architectural pass connecting the Bills, Appointments, 
+Family, and Money modules into a unified weekly output. Work through 
+each phase in order. Stop and confirm between phases.
+
+---
+
+## PHASE 1 — Bills: add Regular / One-off toggle
+
+On the bill entry screen (Add bill flow), add a type selector 
+at the top of the form.
+
+Selector: "What kind of expense is this?"
+
+Option 1: "Regular bill"
+- Teal pill when selected (#2A8F88 background, white text)
+- Subtext: "Happens every month — rent, utilities, subscriptions."
+- Bills tagged as Regular feed into the monthly budget baseline only.
+  They do not surface as alerts on the Home screen or Money tab
+  (they are already accounted for in the budget setup).
+
+Option 2: "One-off expense"  
+- Gold pill when selected (#D29A22 background, white text)
+- Subtext: "Outside your normal budget — rego, school fees, 
+  repairs, anything unexpected."
+- Bills tagged as One-off are treated as irregular costs and 
+  surface as pressure signals in the Money tab and Home screen.
+
+Store this as billType: 'regular' | 'oneoff' on each bill record.
+
+One-off bills also require a due date — make this field required 
+when One-off is selected, optional for Regular.
+
+Display in the Bills list:
+- Regular bills: show with a teal dot indicator
+- One-off expenses: show with a gold dot indicator
+- Sort: One-off expenses due soonest appear at the top
+
+---
+
+## PHASE 2 — Appointments: add cost and availability flags
+
+On the appointment entry screen (Add appointment flow), add two 
+optional flags below the standard fields (title, date, time, who):
+
+FLAG 1: "Does this have a cost?"
+- Toggle: off by default
+- When toggled on: show a currency input field
+  Label: "Estimated cost"
+  Placeholder: $0
+  Frequency: one-off (no frequency selector needed)
+- Store as: appointmentCost: number | null
+
+FLAG 2: "Does this affect who's available?"
+- Toggle: off by default  
+- When toggled on: show two fields:
+  Field 1: "Who's unavailable?" 
+  — shows family member selector (pulls from Family members list)
+  — multi-select: can flag multiple people
+  Field 2: "For how long?"
+  — options: "This appointment only" | "All day" | "Custom hours"
+  — if Custom hours: show time range picker
+- Store as: availabilityBlock: { 
+    personIds: string[], 
+    scope: 'appointment' | 'allday' | 'custom',
+    startTime?: string,
+    endTime?: string
+  } | null
+
+These flags are optional — most appointments won't need them.
+Show them collapsed under a "More details" expand link to avoid
+overwhelming the entry form.
+
+---
+
+## PHASE 3 — Money tab: three rendered states
+
+Replace the current single Money tab layout with three distinct 
+rendered states. The correct state is determined at render time 
+from the user's financial data.
+
+### State determination logic:
+
+Calculate weeklyPressureScore:
+
+Start with weeklyBreathingRoom (from existing budget calculation).
+
+Then add pressure from:
+- Any one-off bills due within the next 7 days: 
+  add their cost to this week's outgoings
+- Any appointments with cost flag due within the next 7 days:
+  add appointmentCost to this week's outgoings
+
+Recalculate:
+adjustedBreathingRoom = weeklyBreathingRoom 
+  - sum(oneOffBillsDueThisWeek) 
+  - sum(appointmentCostsDueThisWeek)
+
+State rules:
+- adjustedBreathingRoom > 50: STATE 1 (calm)
+- adjustedBreathingRoom 1–50: STATE 2 (tight)
+- adjustedBreathingRoom <= 0: STATE 3 (stretched)
+- If no budget has been set up yet: show setup prompt (existing)
+
+---
+
+### STATE 1 — Calm week
+
+Background: white. Minimal layout. No hero card needed.
+
+Show:
+- Large teal checkmark icon
+- Heading (20px, bold): "This week looks fine."
+- Subtext (14px, grey): "Nothing unexpected coming. 
+  Dinner's already covered."
+- If weeklyBreathingRoom > 0: small teal line:
+  "~$[adjustedBreathingRoom] breathing room this week."
+- If no one-off bills or appointment costs this week: 
+  show nothing else. Silence is the message.
+
+Do NOT show: budget breakdown, quick wins, savings goal card 
+in this state — save those for when they're relevant.
+
+At the bottom: small grey text link "See full picture →" 
+which expands to the full budget breakdown for users who want it.
+
+---
+
+### STATE 2 — Tight week
+
+Show:
+- Gold/amber warning icon (use #D29A22)
+- Heading (20px, bold): "Tighter than usual this week."
+- List of pressure items — render each one-off bill or 
+  appointment cost due this week as a line item:
+  Format: "· [Name] — $[amount] due [day]"
+  Example: "· Car rego — $189 due Thursday"
+  Example: "· Dental — $180 due Friday"
+  Line item text: #2B2B2B, 14px
+- Gap line (1px, #E6E1D7)
+- Teal line: "Dinner plan saves ~$[mealPlanSaving] vs eating out. 
+  That helps."
+- Final line in grey: 
+  "Breathing room this week: ~$[adjustedBreathingRoom]"
+  If adjustedBreathingRoom < 20: render this in gold (#D29A22)
+
+Below the main card:
+- Collapsible "The quick version" (existing budget snapshot)
+- "A few quick wins" section (existing, if tips available)
+- Savings goal card (existing, if goal is set)
+
+---
+
+### STATE 3 — Stretched week
+
+Tone shifts. Layout is quieter, more focused.
+
+Show:
+- No icons, no colour blocks — white background, calm
+- Heading (22px, bold): "This week is stretched."
+- Subtext (14px, grey, italic): 
+  "Here's what's hitting all at once."
+- List of ALL pressure items this week (one-off bills + 
+  appointment costs + any overdue bills):
+  Format: "· [Name] — $[amount] — [day]"
+  Max 4 items. If more than 4 exist, show top 4 by date 
+  and add "· +[n] more" as final line in grey.
+- Gap line
+- Single reassurance line in teal:
+  "Dinner is already sorted — that's one less thing."
+- Final line, small, grey:
+  "Breathing room: −$[abs(adjustedBreathingRoom)] over 
+  — tighter than usual."
+  Render the amount in red (#B86557)
+
+At the bottom — the overwhelm mode entry point:
+- Teal text link (not a button): 
+  "Want to see what can wait? →"
+- This triggers Overwhelm Mode (Phase 4)
+
+Do NOT show: quick wins, savings goal, budget breakdown 
+in State 3. This is not the moment for suggestions.
+
+---
+
+## PHASE 4 — Overwhelm mode
+
+Overwhelm mode is a full-screen overlay triggered by:
+- Tapping "Want to see what can wait? →" in State 3
+- Tapping "Help me sort this" button on Home screen
+
+### Layout
+
+White background. No nav bar visible. No cards. Calm.
+
+Top: small teal text, centred, 12px:
+"FOCUS MODE"
+
+Heading (24px, bold, centred):
+"Right now, just focus on this."
+
+Then render a maximum of 3 items, selected by this priority:
+1. Any bill or one-off expense due today or tomorrow (most urgent)
+2. Any appointment today or tomorrow
+3. One thing that is already handled — the highest-priority item 
+   from Meals (tonight's dinner) or Family (sorted events)
+
+Always include at least one "already handled" item. 
+The user needs to feel the ground.
+
+Render each item as a simple row:
+- Icon: ⚠️ for urgent money/bill items, 📅 for appointments, 
+  ✅ for handled items
+- Text: one line only, plain language
+  Examples:
+  "Rego payment — $189 due Thursday"
+  "Dental — Friday 2pm"
+  "✅ Dinner tonight — Lamb Stew. Sorted."
+
+Below the 3 items:
+- Grey line (1px)
+- Small grey text, centred, 13px: "Everything else can wait."
+
+Bottom of screen (not a nav bar — just two text links, centred):
+"I'm back  →" — exits overwhelm mode, returns to Home
+"See everything →" — exits overwhelm mode, goes to Home 
+  with all cards visible
+
+### Tone rules for overwhelm mode
+- No dollar totals unless actionable right now
+- No suggestions, no "you could save X"
+- No comparisons
+- Short sentences only
+- Never more than 3 items, ever
+- Always end on something that is handled
+
+---
+
+## PHASE 5 — Home screen synthesis
+
+The Home screen "What's Coming Up" card and the Money card 
+must now draw from all connected data layers.
+
+### Money card on Home screen
+
+Pull from the Money tab state (Phase 3) and render one line:
+
+State 1: "Money looks fine this week." — grey text, no icon
+State 2: "Tighter than usual — [top pressure item] coming up." 
+  — gold left border, teal "Set it up →" if no budget set
+State 3: "Stretched week. [count] costs landing." 
+  — red left border (#B86557)
+No budget set: existing "Curious how this week looks?" card
+
+### What's Coming Up card on Home screen
+
+This card should synthesise across all modules. 
+
+Pull and prioritise in this order:
+1. One-off bills due this week or next (gold indicator)
+2. Appointments with cost flag this week (gold indicator)  
+3. Appointments with availability block (teal indicator — 
+   logistics signal, not financial)
+4. Family juggle conflicts already detected (teal indicator)
+5. Meals coverage summary (last item, always reassuring)
+
+Render as a simple list, max 4 items:
+"· Car rego — $189 — Thursday"
+"· Dental — Friday 2pm (Mum)"  
+"· Mum unavailable Thursday — school run needs cover"
+"· ✅ 7 dinners sorted this week"
+
+If only meals are planned and nothing else is flagged:
+"A quiet one. 7 dinners sorted. Not much to worry about."
+
+### Family Juggle conflict detection
+
+When rendering the Family Juggle for the current week:
+
+For each event that has an assigned responsible person:
+- Check if that person has an availability block that overlaps 
+  with the event time
+- If overlap found: flag as a conflict
+
+Conflict display on Family screen:
+- Show a red tint (#F7E9E8) warning card above the event:
+  "⚠️ [Person] is unavailable at this time — needs cover."
+- On Home screen What's Coming Up card: include as a line item
+  with the format:
+  "[Person] unavailable [day] — [event] needs cover"
+
+This covers the "Mum's away for work, can't do the school run" 
+scenario automatically once her work trip is entered as an 
+appointment with availability block flagged.
+
+### Appointment reminders on Home screen
+
+Appointments due in the next 7 days surface on Home screen if:
+- They have a cost flag (financial awareness)
+- They have an availability block (logistics awareness)
+- They are within 48 hours (time urgency)
+
+Standard appointments with no flags and more than 48 hours away 
+do not surface on the Home screen — they live in Appointments 
+tab only. Silence for low-priority items is correct behaviour.
+
+---
+
+## FINAL CHECK
+
+Once all phases complete, verify:
+
+1. Bills entry has Regular / One-off toggle with correct colours
+2. One-off bills surface in Money tab pressure calculation
+3. One-off bills with due dates appear in State 2 and State 3
+4. Appointments cost flag feeds into weekly pressure score
+5. Appointments availability flag feeds into Family Juggle
+6. Money tab renders correct state based on adjustedBreathingRoom
+7. State 1 is calm and minimal — no unnecessary cards
+8. State 2 names the specific pressure items
+9. State 3 is quiet in tone, no suggestions, overwhelm entry point visible
+10. Overwhelm mode shows maximum 3 items, always includes 
+    one handled item, exits cleanly
+11. Home screen Money card reflects current Money tab state
+12. Home screen What's Coming Up synthesises from all layers
+13. Family Juggle detects availability conflicts automatically
+14. Appointments only surface on Home if flagged or within 48hrs
+15. No module shows empty state cards when there is nothing to show
+    — silence is the correct output for a calm week
+
+Report any issues before closing.

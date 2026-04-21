@@ -84,3 +84,12 @@ export async function getTotalDueThisWeek(): Promise<number> {
     return bills.reduce((sum, b) => sum + b.amount, 0);
   } catch { return 0; }
 }
+
+export async function getOneOffBillsDueThisWeek(): Promise<Bill[]> {
+  try {
+    const bills = await loadBills();
+    return bills
+      .filter((b) => !b.isPaid && b.billType === "oneOff" && daysUntilDue(b) >= 0 && daysUntilDue(b) <= 7)
+      .sort((a, b) => a.dueDate.localeCompare(b.dueDate));
+  } catch { return []; }
+}
