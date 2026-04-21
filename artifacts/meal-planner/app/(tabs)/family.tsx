@@ -2454,25 +2454,6 @@ export default function FamilyScreen() {
                   })}
                 </View>
               )}
-
-              {/* Appointments this week */}
-              {thisWeekAppts.length > 0 && (
-                <View style={{ gap: 6, marginTop: 8 }}>
-                  <Text style={[styles.sectionLabel, { fontSize: 10, color: PLUM }]}>APPOINTMENTS THIS WEEK</Text>
-                  {thisWeekAppts.map((a) => (
-                    <View key={a.id} style={styles.calPushedCard}>
-                      <View style={styles.calPushedTimePill}>
-                        <Text style={styles.calPushedTimeText}>{formatTime(a.startTime)}</Text>
-                      </View>
-                      <Text>📌</Text>
-                      <View style={{ flex: 1 }}>
-                        <Text style={styles.calPushedTitle} numberOfLines={1}>{a.title}</Text>
-                        {a.person ? <Text style={styles.calPushedSource}>{a.person}</Text> : null}
-                      </View>
-                    </View>
-                  ))}
-                </View>
-              )}
             </View>
 
             {/* Recurring note */}
