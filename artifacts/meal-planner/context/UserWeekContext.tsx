@@ -22,6 +22,8 @@ export interface MoneyInput {
   otherWeeklySpend?: number;
   rawIncome?: number;
   incomePeriod?: string;
+  rawMortgageRent?: number;
+  rawBillsLoans?: number;
 }
 
 interface UserWeekContextType {
@@ -102,6 +104,8 @@ export function UserWeekProvider({ children }: { children: React.ReactNode }) {
           otherWeeklySpend: m.otherWeeklySpend,
           rawIncome: m.rawIncome,
           incomePeriod: m.incomePeriod,
+          rawMortgageRent: m.rawMortgageRent,
+          rawBillsLoans: m.rawBillsLoans,
         });
       } else {
         setHasMoneySetupState(state.hasMoneySetup);
@@ -145,6 +149,8 @@ export function UserWeekProvider({ children }: { children: React.ReactNode }) {
         otherWeeklySpend: m.otherWeeklySpend,
         rawIncome: m.rawIncome,
         incomePeriod: m.incomePeriod,
+        rawMortgageRent: m.rawMortgageRent,
+        rawBillsLoans: m.rawBillsLoans,
       },
     });
   };
@@ -205,6 +211,8 @@ export function UserWeekProvider({ children }: { children: React.ReactNode }) {
         otherWeeklySpend: m.otherWeeklySpend,
         rawIncome: m.rawIncome,
         incomePeriod: m.incomePeriod,
+        rawMortgageRent: m.rawMortgageRent,
+        rawBillsLoans: m.rawBillsLoans,
       },
       lifestyleSpend: lifestyle,
       goal: g,

@@ -232,6 +232,10 @@ export default function MoneySetupScreen() {
         setIncomeFreq(savedMoney.incomePeriod as IncomeFreq);
       }
       if (savedMoney.groceriesWeekly > 0) setGroceries(String(savedMoney.groceriesWeekly));
+      if (savedMoney.rawMortgageRent !== undefined && savedMoney.rawMortgageRent > 0)
+        setMortgageRent(String(savedMoney.rawMortgageRent));
+      if (savedMoney.rawBillsLoans !== undefined && savedMoney.rawBillsLoans > 0)
+        setBillsLoans(String(savedMoney.rawBillsLoans));
     }
     if (savedLifestyle) {
       if (savedLifestyle.streaming > 0)    setSubscriptions(String(savedLifestyle.streaming));
@@ -287,8 +291,10 @@ export default function MoneySetupScreen() {
         otherWeeklySpend: hasAnyLifestyle
           ? w_coffee + w_takeaway + w_entertain
           : undefined,
-        rawIncome:    incomeVal,
-        incomePeriod: incomeFreq,
+        rawIncome:       incomeVal,
+        incomePeriod:    incomeFreq,
+        rawMortgageRent: safeNum(mortgageRent) > 0 ? safeNum(mortgageRent) : undefined,
+        rawBillsLoans:   safeNum(billsLoans)   > 0 ? safeNum(billsLoans)   : undefined,
       },
       {
         streaming:    safeNum(subscriptions),

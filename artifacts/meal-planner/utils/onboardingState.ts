@@ -11,6 +11,8 @@ export interface MoneySetupData {
   otherWeeklySpend?: number;
   rawIncome?: number;
   incomePeriod?: string;
+  rawMortgageRent?: number;
+  rawBillsLoans?: number;
 }
 
 export interface LifestyleSpendData {
