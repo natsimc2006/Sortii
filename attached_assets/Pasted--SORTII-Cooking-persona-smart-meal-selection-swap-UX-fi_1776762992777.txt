@@ -1,0 +1,348 @@
+## SORTII — Cooking persona, smart meal selection + swap UX fix
+
+Three connected improvements to the meal planning layer.
+Work through each phase in order, confirm before moving on.
+
+---
+
+## PHASE 1 — Cooking persona: add to onboarding
+
+Add a new onboarding step after the dietary needs question 
+(Step 3) and before the plan is generated.
+
+This becomes Step 4 of onboarding.
+
+---
+
+**Screen layout:**
+
+Progress dots: update to show 4 steps total
+
+Step label: "STEP 4"
+
+Heading: "On a typical weeknight, what are you working with?"
+
+Subtext: "We'll match meals to your real life — not a 
+cooking show."
+
+Three option cards (full-width, tappable, single select):
+
+Option A:
+Icon: ⚡
+Label: "Whatever's quickest"
+Subtext: "20 mins max. Minimal faff. Just needs to be done."
+Value: 'quick'
+
+Option B:
+Icon: 🍳
+Label: "Something decent"
+Subtext: "30–45 mins. Not complicated. Tastes like effort."
+Value: 'moderate'
+
+Option C:
+Icon: 👨‍🍳
+Label: "Happy to cook"
+Subtext: "I actually enjoy it. Time isn't really the issue."
+Value: 'cook'
+
+Selected state: teal border (#2A8F88), teal tint background 
+(#E6F3F0), teal label text
+Unselected state: white background, #E6E1D7 border
+
+Default selection: none — user must actively choose.
+If user taps "Skip for now →": default to 'quick' silently.
+Store as: cookingPersona: 'quick' | 'moderate' | 'cook'
+
+CTA button (gold, full width): "Sort my meals →"
+Below: "Skip for now →" — small grey text link
+
+---
+
+**Base recipe pool filtering by persona:**
+
+Apply these filters to the recipe pool on every plan generation:
+
+cookingPersona === 'quick':
+- Strongly prefer: cookTime <= 25 mins
+- Include: cookTime 26–40 mins (up to 2 per week maximum)
+- Suppress entirely: cookTime > 45 mins
+- Prefer tags: 'quick', 'one-pan', 'batch', 'freezer-friendly'
+
+cookingPersona === 'moderate':
+- Prefer: cookTime <= 45 mins
+- Include: cookTime 46–60 mins (up to 2 per week)
+- Suppress: cookTime > 75 mins
+- No tag preference
+
+cookingPersona === 'cook':
+- Full recipe pool, no time suppression
+- No tag preference
+
+Store persona in user profile. Apply on every plan generation,
+including re-sorts. Never override the hard no's or dietary 
+filters — persona filtering sits on top of those.
+
+---
+
+When Phase 1 is complete, confirm: "Phase 1 done — cooking 
+persona added to onboarding and wired to recipe pool."
+Stop and wait.
+
+---
+
+## PHASE 2 — Busyness score: wire family events to meal 
+## complexity
+
+On each weekly plan generation (and re-sort), calculate a 
+busyness score from the current week's data before selecting 
+recipes.
+
+---
+
+**Busyness score calculation:**
+
+busyWeekScore = 0
+
+Add 1 for each:
+- Family event scheduled this week
+- Appointment scheduled this week (any type)
+- Availability conflict detected (person flagged unavailable 
+  during an assigned event)
+- Any one-off bill due this week (financial pressure 
+  adds cognitive load)
+
+Add 2 for each:
+- Day where 3 or more events overlap for the same person
+- Appointment with both cost flag AND availability block
+
+busyWeekScore is calculated fresh on every plan generation.
+
+---
+
+**Complexity ceiling by busyness score:**
+
+Apply these rules ON TOP of the cookingPersona filters.
+Busyness overrides persona upward only — never downward.
+(A 'cook' persona user on a manic week still gets quick meals.
+A 'quick' persona user on a quiet week stays on quick meals.)
+
+busyWeekScore >= 5 — HIGH BUSY:
+- All meals this week: cookTime <= 25 mins only
+- Suppress cookTime > 25 mins entirely for this week
+- Automatically include at least 1 "easy night" slot 
+  (see Easy Night spec below)
+- Apply silently — no announcement to user
+
+busyWeekScore 3–4 — MODERATE BUSY:
+- Prefer cookTime <= 30 mins
+- Maximum 1 meal per week with cookTime > 45 mins
+- No easy night unless user requests
+
+busyWeekScore 1–2 — LIGHT:
+- Apply cookingPersona filters only, no additional ceiling
+
+busyWeekScore 0 — QUIET:
+- Full persona-filtered pool, no restrictions
+
+---
+
+**Day-level busyness:**
+
+For each day of the week, also calculate a dayScore:
+
+dayScore = count of events on that specific day
+         + 1 if any family member has availability block 
+           on that day
+
+Apply to individual day meal selection:
+dayScore >= 3: assign cookTime <= 20 mins meal for that day
+dayScore 2: prefer cookTime <= 30 mins for that day
+dayScore 0–1: no day-level restriction
+
+Day-level rules apply within whatever the week-level 
+ceiling already is.
+
+---
+
+**"Easy night" slot:**
+
+When busyWeekScore >= 5, automatically insert one 
+"Easy night" into the weekly plan.
+
+Easy night is a first-class plan entry — not a gap.
+
+Meal card for Easy night:
+- Title: "Easy night"
+- Subtitle: "Freezer, leftovers, or whatever's there."
+- Cook time: shown as "0 mins"
+- Cost: shown as "~$0" or suppress cost entirely
+- Tags: none
+- No recipe link — no instructions needed
+- Card style: light grey tint background (#F5F5F5), 
+  same card dimensions as regular meal cards
+
+Easy night counts as a planned meal in all summaries 
+("7 dinners sorted") but contributes $0 to grocery cost 
+calculations.
+
+Position: assign Easy night to the highest dayScore day 
+of the week automatically.
+
+---
+
+**Invisible operation — nothing is announced:**
+
+Do not show busyneessScore to the user.
+Do not say "busy week mode activated."
+Do not add any badge or label to the plan.
+
+The only visible output is that the meals surfaced are 
+appropriately quick. The intelligence is shown through 
+outcomes, not explained.
+
+Exception: if Easy night is inserted, a single quiet 
+line appears below the meal plan summary on the Meals tab:
+"One easy night built in — busy week sorted."
+Teal text, 13px, italic. No further explanation.
+
+---
+
+When Phase 2 is complete, confirm: "Phase 2 done — busyness 
+score wired to meal complexity ceiling."
+Stop and wait.
+
+---
+
+## PHASE 3 — Meal card swap UX: consolidate toggle buttons
+
+Currently meal cards show two separate icon buttons:
+- A switch/swap icon (manually pick a replacement)
+- A zap/lightning icon (auto-change the meal)
+
+The zap icon's purpose is not clear to users and the 
+auto-swap feature is being missed. Consolidate into a 
+single "Switch meal" entry point that then offers the 
+choice between auto and manual.
+
+---
+
+**Remove from meal cards:**
+
+Remove the zap/lightning icon button entirely from all 
+meal cards. Remove the existing separate swap icon button.
+
+---
+
+**Add to meal cards:**
+
+Add a single text button to each meal card:
+
+Label: "Switch meal"
+Style: 
+- Small pill button
+- White background
+- Teal border (#2A8F88, 1px)
+- Teal text (#2A8F88)
+- Font size: 12px
+- Font weight: 600
+- Border radius: 20px
+- Padding: 4px 12px
+- Position: bottom-left of meal card, replacing existing 
+  toggle buttons
+
+---
+
+**Switch meal bottom sheet:**
+
+When "Switch meal" is tapped, open a bottom sheet modal.
+
+Bottom sheet header:
+- Title: "Switch this meal" (16px, bold)
+- Subtitle: "[Current meal name]" (13px, grey)
+- Close handle at top (standard)
+
+Two options, rendered as full-width tappable cards:
+
+Option A — Auto pick:
+Icon: ⚡
+Label: "Pick one for me"
+Subtext: "We'll find the best fit for your week."
+Style: teal tint (#E6F3F0) background, teal border
+
+Option B — Choose yourself:
+Icon: 📋
+Label: "Let me choose"
+Subtext: "Browse what's available and pick your own."
+Style: white background, #E6E1D7 border
+
+---
+
+**Option A behaviour — Auto pick:**
+
+Immediately selects a replacement recipe using these rules:
+- Must not be a recipe already in this week's plan
+- Must respect cookingPersona filter
+- Must respect current day's dayScore ceiling
+- Must respect hard no's and dietary filters
+- Prefer recipes not used in the last 2 weeks if history 
+  is available
+
+On selection: meal card updates immediately.
+Brief confirmation line below the card (2 seconds, 
+then fades):
+"Swapped. That's better." — teal, 13px
+
+---
+
+**Option B behaviour — Let me choose:**
+
+Opens the existing recipe browser/picker filtered to:
+- Recipes that pass cookingPersona filter
+- Recipes that pass current day's complexity ceiling
+- Excludes recipes already in this week's plan
+- Excludes hard no's and dietary exclusions
+
+User selects a recipe. Meal card updates.
+Same confirmation: "Swapped. That's better."
+
+---
+
+**Preserve all other meal card actions:**
+
+All other existing meal card icon buttons (recipe view, 
+batch indicator, hide, remove) remain exactly as they are.
+Only the swap/zap buttons are affected by this change.
+
+---
+
+When Phase 3 is complete, confirm: "Phase 3 done — meal 
+card swap UX consolidated."
+
+---
+
+## FINAL CHECK
+
+Once all three phases confirmed, verify:
+
+1. Onboarding has 4 steps — cooking persona is Step 4
+2. Persona options are clearly labelled with honest subtext
+3. Skip defaults silently to 'quick' persona
+4. Recipe pool filters correctly by persona on plan generation
+5. busyWeekScore calculates on every plan generation and re-sort
+6. High busy weeks (score >= 5) only surface meals <= 25 mins
+7. Day-level busyness assigns quick meals to packed days
+8. Easy night appears automatically on highest-score day 
+   when busyWeekScore >= 5
+9. Easy night shows $0 cost and counts in "dinners sorted" total
+10. No busyness logic is announced or visible to user —
+    only the quiet "One easy night built in" line if applicable
+11. Zap/lightning button removed from all meal cards
+12. Separate swap icon removed from all meal cards
+13. Single "Switch meal" pill button appears on each meal card
+14. Tapping "Switch meal" opens bottom sheet with two options
+15. "Pick one for me" respects all filters and confirms 
+    with "Swapped. That's better."
+16. "Let me choose" opens filtered recipe browser
+17. All other meal card actions unchanged
+
+Report any issues before closing.

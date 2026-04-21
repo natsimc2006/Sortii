@@ -17,7 +17,7 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import Colors from "@/constants/Colors";
-import { DEFAULT_PREFERENCES, DEFAULT_WEEKEND_OVERRIDES, PlanPreferences } from "@/constants/recipes";
+import { CookingPersona, DEFAULT_PREFERENCES, DEFAULT_WEEKEND_OVERRIDES, PlanPreferences } from "@/constants/recipes";
 import { usePlanner } from "@/context/PlannerContext";
 import { useUserWeek } from "@/context/UserWeekContext";
 import { updateOnboardingState } from "@/utils/onboardingState";
@@ -61,7 +61,28 @@ const DIETARY_OPTIONS: { id: DietaryNeed; label: string }[] = [
   { id: "dairy-free",  label: "🥛  Dairy-free" },
 ];
 
-type Step = 0 | 1 | 2 | 3 | 4;
+const PERSONA_OPTIONS: { value: CookingPersona; icon: string; label: string; sub: string }[] = [
+  {
+    value: "quick",
+    icon: "⚡",
+    label: "Whatever's quickest",
+    sub: "20 mins max. Minimal faff. Just needs to be done.",
+  },
+  {
+    value: "moderate",
+    icon: "🍳",
+    label: "Something decent",
+    sub: "30–45 mins. Not complicated. Tastes like effort.",
+  },
+  {
+    value: "cook",
+    icon: "👨‍🍳",
+    label: "Happy to cook",
+    sub: "I actually enjoy it. Time isn't really the issue.",
+  },
+];
+
+type Step = 0 | 1 | 2 | 3 | 4 | 5;
 
 function ProgressDots({ filled, total }: { filled: number; total: number }) {
   return (
@@ -94,10 +115,11 @@ export default function OnboardingScreen() {
   const [step, setStep] = useState<Step>(0);
 
   // ── Collected data ────────────────────────────────────────────────
-  const [householdSize,  setHouseholdSize]  = useState(4);
-  const [exclusionText,  setExclusionText]  = useState("");
-  const [dietaryNeeds,   setDietaryNeeds]   = useState<DietaryNeed[]>([]);
-  const [noneSelected,   setNoneSelected]   = useState(false);
+  const [householdSize,   setHouseholdSize]   = useState(4);
+  const [exclusionText,   setExclusionText]   = useState("");
+  const [dietaryNeeds,    setDietaryNeeds]    = useState<DietaryNeed[]>([]);
+  const [noneSelected,    setNoneSelected]    = useState(false);
+  const [cookingPersona,  setCookingPersona]  = useState<CookingPersona | null>(null);
 
   // ── Generating state ──────────────────────────────────────────────
   const [generatingMsg,  setGeneratingMsg]  = useState(ROTATING_MESSAGES[0]);
@@ -144,9 +166,9 @@ export default function OnboardingScreen() {
     return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); };
   }, [step]);
 
-  // ── Screen 5: generating animation ───────────────────────────────
+  // ── Screen 6: generating animation ───────────────────────────────
   useEffect(() => {
-    if (step !== 4) return;
+    if (step !== 5) return;
 
     // Pulse ring
     const pulse = Animated.loop(
@@ -182,11 +204,13 @@ export default function OnboardingScreen() {
   }, [step]);
 
   // ── startGenerating — saves all data then transitions ─────────────
-  const startGenerating = async () => {
+  const startGenerating = async (personaOverride?: CookingPersona) => {
     const exclusions = exclusionText
       .split(/,|\n/)
       .map((s) => s.trim())
       .filter(Boolean);
+
+    const resolvedPersona: CookingPersona = personaOverride ?? cookingPersona ?? "quick";
 
     const newPrefs: PlanPreferences = {
       ...DEFAULT_PREFERENCES,
@@ -196,6 +220,7 @@ export default function OnboardingScreen() {
       mealVariety: 7,
       dietType: "no-preference",
       exclusions,
+      cookingPersona: resolvedPersona,
       weekendOverrides: { ...DEFAULT_WEEKEND_OVERRIDES },
     };
 
@@ -218,7 +243,7 @@ export default function OnboardingScreen() {
     setContextHasMealsSetup(true);
     updateWeekKey();
     autoGeneratePlan(newPrefs);
-    setStep(4);
+    setStep(5);
   };
 
   const toggleDietaryNeed = (id: DietaryNeed) => {
@@ -291,9 +316,9 @@ export default function OnboardingScreen() {
   }
 
   // ═══════════════════════════════════════════════════════════════════
-  // SCREEN 5 — GENERATING
+  // SCREEN 6 — GENERATING
   // ═══════════════════════════════════════════════════════════════════
-  if (step === 4) {
+  if (step === 5) {
     return (
       <View style={[styles.screen, { backgroundColor: "#FFFFFF", paddingTop, paddingBottom }]}>
         <View style={styles.generatingCenter}>
@@ -331,11 +356,12 @@ export default function OnboardingScreen() {
   }
 
   // ═══════════════════════════════════════════════════════════════════
-  // SCREENS 2–4 — shared shell with header + scroll + footer
+  // SCREENS 2–5 — shared shell with header + scroll + footer
   // ═══════════════════════════════════════════════════════════════════
   const isScreen2 = step === 1;
   const isScreen3 = step === 2;
   const isScreen4 = step === 3;
+  const isScreen5 = step === 4;
 
   return (
     <KeyboardAvoidingView
@@ -353,7 +379,7 @@ export default function OnboardingScreen() {
             <Text style={styles.backLinkText}>← Back</Text>
           </TouchableOpacity>
         )}
-        <ProgressDots filled={step} total={3} />
+        <ProgressDots filled={step} total={4} />
       </View>
 
       {/* ── Body ── */}
@@ -471,6 +497,44 @@ export default function OnboardingScreen() {
             </Text>
           </>
         )}
+
+        {/* ── SCREEN 5: COOKING PERSONA ── */}
+        {isScreen5 && (
+          <>
+            <Text style={styles.stepLabel}>STEP 4</Text>
+            <Text style={styles.stepHeadline}>
+              On a typical weeknight, what are you working with?
+            </Text>
+            <Text style={styles.stepSub}>
+              We'll match meals to your real life — not a cooking show.
+            </Text>
+
+            <View style={styles.personaList}>
+              {PERSONA_OPTIONS.map((opt) => {
+                const active = cookingPersona === opt.value;
+                return (
+                  <TouchableOpacity
+                    key={opt.value}
+                    onPress={() => {
+                      Haptics.selectionAsync();
+                      setCookingPersona(opt.value);
+                    }}
+                    style={[styles.personaCard, active && styles.personaCardActive]}
+                    activeOpacity={0.8}
+                  >
+                    <Text style={styles.personaIcon}>{opt.icon}</Text>
+                    <View style={styles.personaText}>
+                      <Text style={[styles.personaLabel, active && styles.personaLabelActive]}>
+                        {opt.label}
+                      </Text>
+                      <Text style={styles.personaSub}>{opt.sub}</Text>
+                    </View>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+          </>
+        )}
       </ScrollView>
 
       {/* ── Footer ── */}
@@ -514,7 +578,7 @@ export default function OnboardingScreen() {
             <TouchableOpacity
               onPress={() => {
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-                startGenerating();
+                setStep(4);
               }}
               activeOpacity={0.85}
               style={styles.primaryBtn}
@@ -522,7 +586,30 @@ export default function OnboardingScreen() {
               <Text style={styles.primaryBtnText}>Nearly there →</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              onPress={() => { setDietaryNeeds([]); setNoneSelected(false); startGenerating(); }}
+              onPress={() => { setDietaryNeeds([]); setNoneSelected(false); setStep(4); }}
+              style={styles.skipLink}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.skipLinkText}>Skip for now →</Text>
+            </TouchableOpacity>
+          </>
+        )}
+
+        {isScreen5 && (
+          <>
+            <TouchableOpacity
+              onPress={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                startGenerating();
+              }}
+              activeOpacity={0.85}
+              style={[styles.primaryBtn, styles.primaryBtnGold]}
+              disabled={cookingPersona === null}
+            >
+              <Text style={styles.primaryBtnText}>Sort my meals →</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => { startGenerating("quick"); }}
               style={styles.skipLink}
               activeOpacity={0.7}
             >
@@ -660,10 +747,55 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
+  primaryBtnGold: {
+    backgroundColor: "#D29A22",
+  },
   primaryBtnText: {
     fontSize: 17,
     fontFamily: "Inter_700Bold",
     color: "#FFFFFF",
+  },
+
+  // ── Screen 5: Cooking Persona ─────────────────────────────────────
+  personaList: {
+    gap: 12,
+  },
+  personaCard: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: 14,
+    backgroundColor: "#FFFFFF",
+    borderWidth: 1.5,
+    borderColor: "#E6E1D7",
+    borderRadius: 14,
+    padding: 16,
+  },
+  personaCardActive: {
+    borderColor: TEAL,
+    backgroundColor: "#E6F3F0",
+  },
+  personaIcon: {
+    fontSize: 24,
+    marginTop: 1,
+  },
+  personaText: {
+    flex: 1,
+    gap: 4,
+  },
+  personaLabel: {
+    fontSize: 16,
+    fontFamily: "Inter_600SemiBold",
+    color: "#2B2B2B",
+    lineHeight: 22,
+  },
+  personaLabelActive: {
+    color: TEAL,
+  },
+  personaSub: {
+    fontSize: 13,
+    fontFamily: "Inter_400Regular",
+    color: "#888",
+    lineHeight: 18,
   },
 
   // ── Screen 2: Stepper ─────────────────────────────────────────────

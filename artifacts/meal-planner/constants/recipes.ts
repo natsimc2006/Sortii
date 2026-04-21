@@ -81,6 +81,8 @@ export interface WeekendOverrides {
   budgetLevel: "super-budget" | "budget" | "standard" | "premium";
 }
 
+export type CookingPersona = "quick" | "moderate" | "cook";
+
 export interface PlanPreferences {
   planningMode: "manual" | "mixed" | "auto";
   householdSize: number;
@@ -99,6 +101,7 @@ export interface PlanPreferences {
   seasonalMode: boolean;
   dietType: "no-preference" | "omnivore" | "vegetarian" | "vegan" | "pescatarian";
   kidFriendly: boolean;
+  cookingPersona?: CookingPersona;
 }
 
 export const DEFAULT_WEEKEND_OVERRIDES: WeekendOverrides = {

@@ -255,6 +255,10 @@ export function PlannerProvider({ children }: { children: React.ReactNode }) {
     let lastCuisineType: string | null = null;
     let hadToRepeat = false;
 
+    // Persona tracking — cap "medium-time" slots per week
+    const persona = p.cookingPersona ?? "moderate";
+    let personaMediumSlotsUsed = 0; // 26-40 (quick) or 46-60 (moderate) slots used
+
     const scoreRecipe = (r: Recipe): number => {
       let score = 0;
 
@@ -292,6 +296,20 @@ export function PlannerProvider({ children }: { children: React.ReactNode }) {
       else if (effort === "balanced" && r.cookTimeMinutes <= 35) score += 20;
       else if (effort === "any") score += 20;
       else if (r.cookTimeMinutes <= 35) score += 10;
+
+      // Cooking persona scoring
+      if (persona === "quick") {
+        if (r.cookTimeMinutes <= 25) score += 18;
+        else if (r.cookTimeMinutes <= 40) score += 6;
+        // Prefer one-pan, batch, quick-assembly
+        if (r.cookingStyle === "one-pan") score += 4;
+        if (r.batchCook || r.leftoversFriendly) score += 3;
+        if (r.quickAssembly) score += 3;
+      } else if (persona === "moderate") {
+        if (r.cookTimeMinutes <= 45) score += 18;
+        else if (r.cookTimeMinutes <= 60) score += 6;
+      }
+      // 'cook': no persona score adjustment — full pool
 
       // Health style: 20 pts
       const health = p.healthStyle ?? "standard";
@@ -370,6 +388,27 @@ export function PlannerProvider({ children }: { children: React.ReactNode }) {
         if (dietFiltered.length >= 3) pool = dietFiltered;
       }
 
+      // Persona hard suppression
+      if (persona === "quick") {
+        // Suppress cookTime > 45 entirely
+        const quickFiltered = pool.filter((r) => r.cookTimeMinutes <= 45);
+        if (quickFiltered.length >= 3) pool = quickFiltered;
+        // If we've used up the 2 medium-time slots, restrict to <= 25
+        if (personaMediumSlotsUsed >= 2) {
+          const veryQuick = pool.filter((r) => r.cookTimeMinutes <= 25);
+          if (veryQuick.length >= 3) pool = veryQuick;
+        }
+      } else if (persona === "moderate") {
+        // Suppress cookTime > 75 entirely
+        const moderateFiltered = pool.filter((r) => r.cookTimeMinutes <= 75);
+        if (moderateFiltered.length >= 3) pool = moderateFiltered;
+        // If we've used up the 2 longer slots, restrict to <= 45
+        if (personaMediumSlotsUsed >= 2) {
+          const capped = pool.filter((r) => r.cookTimeMinutes <= 45);
+          if (capped.length >= 3) pool = capped;
+        }
+      }
+
       // Score all candidates with small random tie-breaker for variety
       const scored = pool
         .map((r) => ({ r, score: scoreRecipe(r) + Math.random() * 3 }))
@@ -405,6 +444,12 @@ export function PlannerProvider({ children }: { children: React.ReactNode }) {
         if (isDinner) {
           lastProteinType = picked.proteinType ?? null;
           lastCuisineType = picked.cuisineType ?? null;
+        }
+        // Track medium-time slot usage for persona caps
+        if (persona === "quick" && picked.cookTimeMinutes > 25 && picked.cookTimeMinutes <= 40) {
+          personaMediumSlotsUsed++;
+        } else if (persona === "moderate" && picked.cookTimeMinutes > 45 && picked.cookTimeMinutes <= 60) {
+          personaMediumSlotsUsed++;
         }
         return { ...entry, recipeId: picked.id };
       }
