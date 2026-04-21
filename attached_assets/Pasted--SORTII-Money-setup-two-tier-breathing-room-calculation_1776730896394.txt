@@ -1,0 +1,88 @@
+## SORTII — Money setup: two-tier breathing room calculation
+
+Restructure the budget setup screen calculation and layout to show 
+breathing room in two stages. This replaces the single "Weekly breathing 
+room" card with two sequential calculation results.
+
+---
+
+### Input grouping changes
+
+Move "Streaming & subscriptions" out of the "Lifestyle spending" section 
+and into the committed/fixed section of the form, positioned after 
+"Groceries (rough weekly spend)" and before the lifestyle section.
+
+Relabel the input section headers:
+
+Section 1 — committed spend inputs (in this order):
+- Weekly income (/ week)
+- Fixed weekly costs (/ week) — rent, mortgage, bills, loans
+- Groceries rough weekly spend (/ week)
+- Streaming & subscriptions (/ month) — change label to / month, 
+  divide by 4.3 in all calculations
+  Helper text below: "We'll work out your weekly share."
+
+Section 2 — lifestyle spend inputs (in this order):
+- Coffee & café (/ week)
+- Takeaway (/ week) — if not already a separate field, add it, 
+  separate from "eating out" — placeholder $0, optional
+- Entertainment (/ month) — change label to / month, divide by 4.3
+  Helper text below: "We'll work out your weekly share."
+
+---
+
+### Two-tier breathing room display
+
+Replace the single "Weekly breathing room" card with two sequential 
+result cards, displayed after all inputs, before the CTA button.
+
+**Card 1 — Committed breathing room**
+
+Background: teal tint (#E6F3F0), border #2A8F88
+
+Label (small, uppercase, teal): "AFTER COMMITTED SPEND"
+
+Formula:
+committedBreathingRoom = weeklyIncome 
+  - fixedWeeklyCosts 
+  - groceries 
+  - (subscriptions / 4.3)
+
+Display: large number in teal (#2A8F88)
+If positive: "$[X] left before lifestyle spend"
+If negative: "−$[X] over before lifestyle spend" — number in red (#B86557)
+
+Small grey subtext below (12px):
+"Income minus fixed costs, groceries and subscriptions."
+
+---
+
+**Card 2 — After lifestyle spend**
+
+Background: gold tint (#F6E6BA), border #D29A22
+
+Label (small, uppercase, gold text): "AFTER LIFESTYLE SPEND"
+
+Formula:
+finalBreathingRoom = committedBreathingRoom 
+  - coffee 
+  - takeaway 
+  - (entertainment / 4.3)
+
+Display: large number
+If positive: "$[X] breathing room" — number in teal (#2A8F88)
+If negative: "−$[X] over" — number in red (#B86557)
+
+Small grey subtext below (12px):
+"This is what's left after everything — including coffee and takeaways."
+
+---
+
+### Safety rules
+- Never render $0 in either card unless the calculated result is 
+  exactly zero
+- Never render $NaN or null — if any input is empty treat it as 0 
+  in the calculation
+- Both cards must update in real time as the user types into any field
+- If lifestyle inputs are all empty/zero, suppress Card 2 entirely 
+  and show only Card 1

@@ -19,11 +19,15 @@ import { useLocale } from "@/context/LocaleContext";
 import { usePlanner } from "@/context/PlannerContext";
 import { useUserWeek } from "@/context/UserWeekContext";
 import { WeekGoal } from "@/utils/yourWeekEngine";
-import {
-  getOnboardingState,
-} from "@/utils/onboardingState";
+import { getOnboardingState } from "@/utils/onboardingState";
 
 const C = Colors.light;
+
+const TEAL      = "#2A8F88";
+const TEAL_TINT = "#E6F3F0";
+const GOLD      = "#D29A22";
+const GOLD_TINT = "#F6E6BA";
+const RED       = "#B86557";
 
 function MoneyField({
   label,
@@ -32,6 +36,7 @@ function MoneyField({
   onChange,
   optional,
   currencySymbol,
+  suffix = "/ week",
 }: {
   label: string;
   helper?: string;
@@ -39,6 +44,7 @@ function MoneyField({
   onChange: (v: string) => void;
   optional?: boolean;
   currencySymbol: string;
+  suffix?: string;
 }) {
   return (
     <View style={styles.fieldBlock}>
@@ -62,93 +68,107 @@ function MoneyField({
           style={[styles.inputField, { color: C.text }]}
           returnKeyType="done"
         />
-        <Text style={[styles.inputSuffix, { color: C.textMuted }]}>/ week</Text>
+        <Text style={[styles.inputSuffix, { color: C.textMuted }]}>{suffix}</Text>
       </View>
     </View>
   );
 }
 
 const GOAL_OPTIONS: { value: WeekGoal; label: string; emoji: string }[] = [
-  { value: 'holiday', label: 'Holiday', emoji: '✈️' },
-  { value: 'house',   label: 'House deposit', emoji: '🏠' },
-  { value: 'wedding', label: 'Wedding', emoji: '💍' },
-  { value: 'general', label: 'Just saving', emoji: '🐷' },
+  { value: "holiday", label: "Holiday",       emoji: "✈️" },
+  { value: "house",   label: "House deposit", emoji: "🏠" },
+  { value: "wedding", label: "Wedding",       emoji: "💍" },
+  { value: "general", label: "Just saving",   emoji: "🐷" },
 ];
 
 export default function MoneySetupScreen() {
-  const router = useRouter();
-  const { flow } = useLocalSearchParams<{ flow?: string }>();
-  const isFreshFlow = flow === "fresh";
+  const router        = useRouter();
+  const { flow }      = useLocalSearchParams<{ flow?: string }>();
+  const isFreshFlow   = flow === "fresh";
   const { autoGeneratePlan } = usePlanner();
-  const insets = useSafeAreaInsets();
-  const { currencySymbol, locale } = useLocale();
-  const { money: savedMoney, lifestyleSpend: savedLifestyle, saveMoneySetup, isLoaded } = useUserWeek();
+  const insets        = useSafeAreaInsets();
+  const { currencySymbol } = useLocale();
+  const { money: savedMoney, lifestyleSpend: savedLifestyle, saveMoneySetup, isLoaded } =
+    useUserWeek();
 
+  // ── Committed inputs ──────────────────────────────────────────────────────
   const [weeklyIncome, setWeeklyIncome] = useState("");
-  const [fixedCosts, setFixedCosts] = useState("");
-  const [groceries, setGroceries] = useState("");
-  const [eatingOut, setEatingOut] = useState("");
-  const [streaming, setStreaming] = useState("");
-  const [coffeeSpend, setCoffeeSpend] = useState("");
-  const [entertainment, setEntertainment] = useState("");
-  const [selectedGoal, setSelectedGoal] = useState<WeekGoal>('none');
-  const [saving, setSaving] = useState(false);
+  const [fixedCosts,   setFixedCosts]   = useState("");
+  const [groceries,    setGroceries]    = useState("");
+  const [streaming,    setStreaming]    = useState("");   // monthly
+
+  // ── Lifestyle inputs ──────────────────────────────────────────────────────
+  const [coffeeSpend,    setCoffeeSpend]    = useState("");
+  const [takeaway,       setTakeaway]       = useState("");
+  const [entertainment,  setEntertainment]  = useState("");  // monthly
+
+  const [selectedGoal, setSelectedGoal] = useState<WeekGoal>("none");
+  const [saving,       setSaving]        = useState(false);
   const [hasMealsSetup, setHasMealsSetup] = useState(false);
 
   useEffect(() => {
-    getOnboardingState().then((state) => {
-      setHasMealsSetup(state.hasMealsSetup);
-    });
+    getOnboardingState().then((state) => setHasMealsSetup(state.hasMealsSetup));
   }, []);
 
   useEffect(() => {
     if (savedMoney) {
-      if (savedMoney.weeklyIncome > 0) setWeeklyIncome(String(savedMoney.weeklyIncome));
+      if (savedMoney.weeklyIncome > 0)     setWeeklyIncome(String(savedMoney.weeklyIncome));
       if (savedMoney.fixedWeeklyCosts > 0) setFixedCosts(String(savedMoney.fixedWeeklyCosts));
-      if (savedMoney.groceriesWeekly > 0) setGroceries(String(savedMoney.groceriesWeekly));
-      if (savedMoney.eatingOutWeekly && savedMoney.eatingOutWeekly > 0)
-        setEatingOut(String(savedMoney.eatingOutWeekly));
+      if (savedMoney.groceriesWeekly > 0)  setGroceries(String(savedMoney.groceriesWeekly));
     }
     if (savedLifestyle) {
-      if (savedLifestyle.streaming > 0) setStreaming(String(savedLifestyle.streaming));
-      if (savedLifestyle.coffee > 0) setCoffeeSpend(String(savedLifestyle.coffee));
+      if (savedLifestyle.streaming > 0)    setStreaming(String(savedLifestyle.streaming));
+      if (savedLifestyle.coffee > 0)       setCoffeeSpend(String(savedLifestyle.coffee));
       if (savedLifestyle.entertainment > 0) setEntertainment(String(savedLifestyle.entertainment));
+      if ((savedLifestyle.takeaway ?? 0) > 0) setTakeaway(String(savedLifestyle.takeaway));
     }
   }, []);
 
-  const income = parseFloat(weeklyIncome) || 0;
-  const fixed = parseFloat(fixedCosts) || 0;
-  const grocery = parseFloat(groceries) || 0;
-  const eating = parseFloat(eatingOut) || 0;
-  const streamingVal = parseFloat(streaming) || 0;
-  const coffeeVal = parseFloat(coffeeSpend) || 0;
-  const entertainmentVal = parseFloat(entertainment) || 0;
-  const lifestyleTotal = streamingVal + coffeeVal + entertainmentVal;
-  const discretionary = income > 0
-    ? Math.max(0, income - fixed - grocery - eating - lifestyleTotal)
-    : null;
+  // ── Parsed numbers (empty → 0) ────────────────────────────────────────────
+  const income         = parseFloat(weeklyIncome)  || 0;
+  const fixed          = parseFloat(fixedCosts)    || 0;
+  const grocery        = parseFloat(groceries)     || 0;
+  const streamingVal   = parseFloat(streaming)     || 0;   // monthly input
+  const coffeeVal      = parseFloat(coffeeSpend)   || 0;
+  const takeawayVal    = parseFloat(takeaway)      || 0;
+  const entertainVal   = parseFloat(entertainment) || 0;   // monthly input
 
+  // ── Two-tier calculation ──────────────────────────────────────────────────
+  const committedBreathingRoom =
+    income - fixed - grocery - (streamingVal / 4.3);
+
+  const hasLifestyleInput = coffeeVal > 0 || takeawayVal > 0 || entertainVal > 0;
+
+  const finalBreathingRoom =
+    committedBreathingRoom - coffeeVal - takeawayVal - (entertainVal / 4.3);
+
+  const showCard1 = weeklyIncome !== "" || fixedCosts !== "" || groceries !== "" || streaming !== "";
+  const showCard2 = showCard1 && hasLifestyleInput;
+
+  // ── Save ──────────────────────────────────────────────────────────────────
   const handleSave = async () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     setSaving(true);
     saveMoneySetup(
       {
-        weeklyIncome: income,
+        weeklyIncome:    income,
         fixedWeeklyCosts: fixed,
         groceriesWeekly: grocery,
-        eatingOutWeekly: eating,
-        otherWeeklySpend: lifestyleTotal > 0 ? lifestyleTotal : undefined,
+        eatingOutWeekly: takeawayVal,
+        otherWeeklySpend: hasLifestyleInput
+          ? coffeeVal + takeawayVal + entertainVal / 4.3
+          : undefined,
       },
       {
-        streaming: streamingVal,
-        coffee: coffeeVal,
-        entertainment: entertainmentVal,
+        streaming:    streamingVal,
+        coffee:       coffeeVal,
+        entertainment: entertainVal,
+        takeaway:     takeawayVal,
       },
       selectedGoal,
     );
     setTimeout(() => {
-      if (selectedGoal === 'none') {
-        // User skipped savings goal — go straight to destination
+      if (selectedGoal === "none") {
         if (isFreshFlow) {
           autoGeneratePlan();
           router.replace("/(tabs)/planner");
@@ -164,20 +184,12 @@ export default function MoneySetupScreen() {
 
   const canSave = weeklyIncome !== "" || groceries !== "";
 
-  const paddingTop = Platform.OS === "web" ? 60 : insets.top;
+  const paddingTop    = Platform.OS === "web" ? 60 : insets.top;
   const paddingBottom = Platform.OS === "web" ? 40 : insets.bottom + 24;
 
   if (!isLoaded) {
     return (
-      <View
-        style={{
-          flex: 1,
-          backgroundColor: C.background,
-          alignItems: "center",
-          justifyContent: "center",
-          paddingTop,
-        }}
-      >
+      <View style={{ flex: 1, backgroundColor: C.background, alignItems: "center", justifyContent: "center", paddingTop }}>
         <ActivityIndicator color={C.primary} size="large" />
       </View>
     );
@@ -188,15 +200,7 @@ export default function MoneySetupScreen() {
       style={{ flex: 1, backgroundColor: C.background }}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
-      <View
-        style={[
-          styles.header,
-          {
-            paddingTop,
-            borderBottomColor: "rgba(37,133,127,0.18)",
-          },
-        ]}
-      >
+      <View style={[styles.header, { paddingTop, borderBottomColor: "rgba(37,133,127,0.18)" }]}>
         <TouchableOpacity
           onPress={() => router.canGoBack() ? router.back() : router.navigate("/(tabs)/home")}
           style={[styles.backBtn, { backgroundColor: C.chipBg }]}
@@ -224,6 +228,8 @@ export default function MoneySetupScreen() {
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
+        {/* ── Section 1: Committed spend ── */}
+        <Text style={styles.sectionLabel}>COMMITTED SPEND</Text>
         <View style={[styles.setupCard, { borderColor: "rgba(37,133,127,0.28)" }]}>
           <MoneyField
             label="Weekly income"
@@ -249,33 +255,29 @@ export default function MoneySetupScreen() {
           />
           <View style={[styles.divider, { backgroundColor: C.border }]} />
           <MoneyField
-            label="Eating out / takeaway"
-            helper="Optional, but helpful."
-            value={eatingOut}
-            onChange={setEatingOut}
-            optional
-            currencySymbol={currencySymbol}
-          />
-        </View>
-
-        <View style={[styles.lifestyleCard, { borderColor: "rgba(37,133,127,0.22)" }]}>
-          <View style={styles.lifestyleHeader}>
-            <Feather name="coffee" size={14} color={C.primary} />
-            <Text style={[styles.lifestyleTitle, { color: C.text }]}>Lifestyle spending</Text>
-            <Text style={[styles.lifestyleOptionalBadge, { color: C.textMuted, backgroundColor: C.chipBg }]}>optional</Text>
-          </View>
-          <Text style={[styles.lifestyleSubtitle, { color: C.textMuted }]}>
-            Adding these gives you a more realistic picture of your week.
-          </Text>
-          <MoneyField
             label="Streaming & subscriptions"
-            helper="Netflix, Spotify, apps, memberships"
+            helper="We'll work out your weekly share."
             value={streaming}
             onChange={setStreaming}
             optional
             currencySymbol={currencySymbol}
+            suffix="/ month"
           />
-          <View style={[styles.divider, { backgroundColor: C.border }]} />
+        </View>
+
+        {/* ── Section 2: Lifestyle spend ── */}
+        <Text style={[styles.sectionLabel, { marginTop: 4 }]}>LIFESTYLE SPEND</Text>
+        <View style={[styles.lifestyleCard, { borderColor: "rgba(37,133,127,0.22)" }]}>
+          <View style={styles.lifestyleHeader}>
+            <Feather name="coffee" size={14} color={C.primary} />
+            <Text style={[styles.lifestyleTitle, { color: C.text }]}>Day-to-day extras</Text>
+            <Text style={[styles.lifestyleOptionalBadge, { color: C.textMuted, backgroundColor: C.chipBg }]}>
+              optional
+            </Text>
+          </View>
+          <Text style={[styles.lifestyleSubtitle, { color: C.textMuted }]}>
+            Adding these gives you a more realistic picture of your week.
+          </Text>
           <MoneyField
             label="Coffee & café"
             helper="Coffee runs, snacks, extra café spend"
@@ -286,27 +288,64 @@ export default function MoneySetupScreen() {
           />
           <View style={[styles.divider, { backgroundColor: C.border }]} />
           <MoneyField
+            label="Takeaway"
+            helper="Delivery, drive-through, kebab runs"
+            value={takeaway}
+            onChange={setTakeaway}
+            optional
+            currencySymbol={currencySymbol}
+          />
+          <View style={[styles.divider, { backgroundColor: C.border }]} />
+          <MoneyField
             label="Entertainment"
-            helper="Movies, drinks, weekend fun"
+            helper="We'll work out your weekly share."
             value={entertainment}
             onChange={setEntertainment}
             optional
             currencySymbol={currencySymbol}
+            suffix="/ month"
           />
         </View>
 
-        {discretionary !== null && (
-          <View style={[styles.summaryCard, { backgroundColor: C.tealTint, borderColor: C.primary }]}>
-            <Text style={[styles.summaryLabel, { color: C.primary }]}>Weekly breathing room</Text>
-            <Text style={[styles.summaryAmount, { color: C.primary }]}>
-              {currencySymbol}{Math.round(discretionary)}
-            </Text>
-            <Text style={[styles.summaryNote, { color: C.textSecondary }]}>
-              After your fixed costs and food spend — this is yours to work with.
+        {/* ── Card 1: Committed breathing room ── */}
+        {showCard1 && (
+          <View style={[styles.breathingCard, { backgroundColor: TEAL_TINT, borderColor: TEAL }]}>
+            <Text style={styles.breathingCardLabel}>AFTER COMMITTED SPEND</Text>
+            {committedBreathingRoom >= 0 ? (
+              <Text style={[styles.breathingCardAmount, { color: TEAL }]}>
+                {currencySymbol}{Math.round(committedBreathingRoom)} left before lifestyle spend
+              </Text>
+            ) : (
+              <Text style={[styles.breathingCardAmount, { color: RED }]}>
+                −{currencySymbol}{Math.round(Math.abs(committedBreathingRoom))} over before lifestyle spend
+              </Text>
+            )}
+            <Text style={styles.breathingCardNote}>
+              Income minus fixed costs, groceries and subscriptions.
             </Text>
           </View>
         )}
 
+        {/* ── Card 2: After lifestyle spend ── */}
+        {showCard2 && (
+          <View style={[styles.breathingCard, { backgroundColor: GOLD_TINT, borderColor: GOLD }]}>
+            <Text style={[styles.breathingCardLabel, { color: GOLD }]}>AFTER LIFESTYLE SPEND</Text>
+            {finalBreathingRoom >= 0 ? (
+              <Text style={[styles.breathingCardAmount, { color: TEAL }]}>
+                {currencySymbol}{Math.round(finalBreathingRoom)} breathing room
+              </Text>
+            ) : (
+              <Text style={[styles.breathingCardAmount, { color: RED }]}>
+                −{currencySymbol}{Math.round(Math.abs(finalBreathingRoom))} over
+              </Text>
+            )}
+            <Text style={styles.breathingCardNote}>
+              This is what's left after everything — including coffee and takeaways.
+            </Text>
+          </View>
+        )}
+
+        {/* ── Savings goal ── */}
         <View style={[styles.goalCard, { borderColor: "rgba(37,133,127,0.20)" }]}>
           <Text style={[styles.goalHeading, { color: C.text }]}>
             Got something you're saving for?
@@ -319,37 +358,27 @@ export default function MoneySetupScreen() {
                   key={opt.value}
                   onPress={() => {
                     Haptics.selectionAsync();
-                    setSelectedGoal(selected ? 'none' : opt.value);
+                    setSelectedGoal(selected ? "none" : opt.value);
                   }}
                   activeOpacity={0.75}
                   style={[
                     styles.goalChip,
                     {
-                      borderColor: selected ? C.primary : C.border,
+                      borderColor:     selected ? C.primary : C.border,
                       backgroundColor: selected ? C.tealTint : C.card,
                     },
                   ]}
                 >
                   <Text style={styles.goalEmoji}>{opt.emoji}</Text>
-                  <Text
-                    style={[
-                      styles.goalLabel,
-                      { color: selected ? C.primary : C.text },
-                    ]}
-                  >
+                  <Text style={[styles.goalLabel, { color: selected ? C.primary : C.text }]}>
                     {opt.label}
                   </Text>
                 </TouchableOpacity>
               );
             })}
           </View>
-          {selectedGoal !== 'none' && (
-            <TouchableOpacity
-              onPress={() => {
-                Haptics.selectionAsync();
-                setSelectedGoal('none');
-              }}
-            >
+          {selectedGoal !== "none" && (
+            <TouchableOpacity onPress={() => { Haptics.selectionAsync(); setSelectedGoal("none"); }}>
               <Text style={[styles.goalSkip, { color: C.textMuted }]}>
                 Skip — no goal for now
               </Text>
@@ -365,11 +394,7 @@ export default function MoneySetupScreen() {
       <View
         style={[
           styles.footer,
-          {
-            paddingBottom: paddingBottom,
-            backgroundColor: C.background,
-            borderTopColor: C.cardBorder,
-          },
+          { paddingBottom, backgroundColor: C.background, borderTopColor: C.cardBorder },
         ]}
       >
         {!canSave && (
@@ -426,36 +451,27 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
   },
   backBtn: {
-    width: 40,
-    height: 40,
-    borderRadius: 12,
-    alignItems: "center",
-    justifyContent: "center",
-    marginTop: 2,
+    width: 40, height: 40, borderRadius: 12,
+    alignItems: "center", justifyContent: "center", marginTop: 2,
   },
   closeBtn: {
-    width: 32,
-    height: 32,
-    alignItems: "center",
-    justifyContent: "center",
-    marginTop: 2,
+    width: 32, height: 32,
+    alignItems: "center", justifyContent: "center", marginTop: 2,
   },
-  pageTitle: {
-    fontSize: 22,
-    fontFamily: "Inter_700Bold",
-    lineHeight: 28,
+  pageTitle: { fontSize: 22, fontFamily: "Inter_700Bold", lineHeight: 28 },
+  pageHelper: { fontSize: 14, fontFamily: "Inter_400Regular", lineHeight: 20, marginTop: 3 },
+
+  container: { paddingHorizontal: 24, paddingTop: 20, gap: 12 },
+
+  sectionLabel: {
+    fontSize: 11,
+    fontFamily: "Inter_600SemiBold",
+    letterSpacing: 1.1,
+    color: "#999",
+    marginBottom: -4,
+    paddingLeft: 2,
   },
-  pageHelper: {
-    fontSize: 14,
-    fontFamily: "Inter_400Regular",
-    lineHeight: 20,
-    marginTop: 3,
-  },
-  container: {
-    paddingHorizontal: 24,
-    paddingTop: 24,
-    gap: 16,
-  },
+
   setupCard: {
     borderRadius: 18,
     borderWidth: 1.5,
@@ -471,126 +487,23 @@ const styles = StyleSheet.create({
       },
     }),
   },
-  divider: {
-    height: 1,
-    marginHorizontal: 0,
-  },
-  fieldBlock: {
-    padding: 18,
-    gap: 6,
-    backgroundColor: "#fff",
-  },
-  fieldLabelRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-  fieldLabel: {
-    fontSize: 15,
-    fontFamily: "Inter_600SemiBold",
-  },
-  fieldOptional: {
-    fontSize: 12,
-    fontFamily: "Inter_400Regular",
-  },
-  fieldHelper: {
-    fontSize: 12,
-    fontFamily: "Inter_400Regular",
-    lineHeight: 17,
-    marginBottom: 2,
-  },
+
+  divider: { height: 1, marginHorizontal: 0 },
+
+  fieldBlock: { padding: 18, gap: 6, backgroundColor: "#fff" },
+  fieldLabelRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
+  fieldLabel:    { fontSize: 15, fontFamily: "Inter_600SemiBold" },
+  fieldOptional: { fontSize: 12, fontFamily: "Inter_400Regular" },
+  fieldHelper:   { fontSize: 12, fontFamily: "Inter_400Regular", lineHeight: 17, marginBottom: 2 },
+
   inputRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    borderWidth: 1.5,
-    borderRadius: 12,
-    paddingHorizontal: 14,
-    height: 48,
+    flexDirection: "row", alignItems: "center",
+    borderWidth: 1.5, borderRadius: 12, paddingHorizontal: 14, height: 48,
   },
-  inputPrefix: {
-    fontSize: 16,
-    fontFamily: "Inter_600SemiBold",
-    marginRight: 4,
-  },
-  inputField: {
-    flex: 1,
-    fontSize: 18,
-    fontFamily: "Inter_600SemiBold",
-    height: 48,
-  },
-  inputSuffix: {
-    fontSize: 13,
-    fontFamily: "Inter_400Regular",
-    marginLeft: 4,
-  },
-  summaryCard: {
-    borderRadius: 16,
-    borderWidth: 1.5,
-    padding: 20,
-    gap: 4,
-  },
-  summaryLabel: {
-    fontSize: 12,
-    fontFamily: "Inter_600SemiBold",
-    letterSpacing: 1,
-    textTransform: "uppercase",
-    marginBottom: 4,
-  },
-  summaryAmount: {
-    fontSize: 36,
-    fontFamily: "Inter_700Bold",
-    lineHeight: 40,
-  },
-  summaryNote: {
-    fontSize: 13,
-    fontFamily: "Inter_400Regular",
-    lineHeight: 18,
-    marginTop: 4,
-  },
-  footNote: {
-    fontSize: 12,
-    fontFamily: "Inter_400Regular",
-    textAlign: "center",
-    lineHeight: 18,
-  },
-  footer: {
-    paddingHorizontal: 24,
-    paddingTop: 16,
-    borderTopWidth: 1,
-    gap: 8,
-  },
-  disabledHint: {
-    fontSize: 12.5,
-    fontFamily: "Inter_400Regular",
-    textAlign: "center",
-    marginBottom: 8,
-  },
-  primaryCta: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 10,
-    paddingVertical: 18,
-    borderRadius: 18,
-    shadowColor: "#F0AC2E",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.32,
-    shadowRadius: 16,
-    elevation: 6,
-  },
-  primaryCtaText: {
-    fontSize: 17,
-    fontFamily: "Inter_700Bold",
-    color: "#fff",
-  },
-  skipBtn: {
-    alignItems: "center",
-    paddingVertical: 10,
-  },
-  skipText: {
-    fontSize: 13,
-    fontFamily: "Inter_400Regular",
-  },
+  inputPrefix: { fontSize: 16, fontFamily: "Inter_600SemiBold", marginRight: 4 },
+  inputField:  { flex: 1, fontSize: 18, fontFamily: "Inter_600SemiBold", height: 48 },
+  inputSuffix: { fontSize: 13, fontFamily: "Inter_400Regular", marginLeft: 4 },
+
   lifestyleCard: {
     borderRadius: 18,
     borderWidth: 1.5,
@@ -608,73 +521,69 @@ const styles = StyleSheet.create({
     }),
   },
   lifestyleHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-    paddingHorizontal: 18,
-    paddingTop: 16,
-    paddingBottom: 6,
+    flexDirection: "row", alignItems: "center", gap: 8,
+    paddingHorizontal: 18, paddingTop: 16, paddingBottom: 6,
   },
-  lifestyleTitle: {
-    fontSize: 15,
-    fontFamily: "Inter_600SemiBold",
-    flex: 1,
-  },
+  lifestyleTitle: { fontSize: 15, fontFamily: "Inter_600SemiBold", flex: 1 },
   lifestyleOptionalBadge: {
-    fontSize: 11,
-    fontFamily: "Inter_400Regular",
-    borderRadius: 8,
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    overflow: "hidden",
+    fontSize: 11, fontFamily: "Inter_400Regular",
+    borderRadius: 8, paddingHorizontal: 8, paddingVertical: 2, overflow: "hidden",
   },
   lifestyleSubtitle: {
-    fontSize: 12,
-    fontFamily: "Inter_400Regular",
-    lineHeight: 17,
-    paddingHorizontal: 18,
-    paddingBottom: 8,
+    fontSize: 12, fontFamily: "Inter_400Regular", lineHeight: 17,
+    paddingHorizontal: 18, paddingBottom: 8,
   },
+
+  // Two-tier breathing room cards
+  breathingCard: {
+    borderRadius: 16, borderWidth: 1.5, padding: 18, gap: 6,
+  },
+  breathingCardLabel: {
+    fontSize: 11, fontFamily: "Inter_600SemiBold",
+    letterSpacing: 1, textTransform: "uppercase", color: TEAL,
+    marginBottom: 2,
+  },
+  breathingCardAmount: {
+    fontSize: 26, fontFamily: "Inter_700Bold", lineHeight: 30,
+  },
+  breathingCardNote: {
+    fontSize: 12, fontFamily: "Inter_400Regular", color: "#888", lineHeight: 17, marginTop: 2,
+  },
+
   goalCard: {
-    borderRadius: 18,
-    borderWidth: 1.5,
-    padding: 20,
-    gap: 14,
-    backgroundColor: "#fff",
+    borderRadius: 18, borderWidth: 1.5, padding: 20, gap: 14, backgroundColor: "#fff",
   },
-  goalHeading: {
-    fontSize: 16,
-    fontFamily: "Inter_600SemiBold",
-    lineHeight: 22,
-  },
-  goalGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 10,
-  },
+  goalHeading: { fontSize: 16, fontFamily: "Inter_600SemiBold", lineHeight: 22 },
+  goalGrid:    { flexDirection: "row", flexWrap: "wrap", gap: 10 },
   goalChip: {
-    flexBasis: "47%",
-    flexGrow: 1,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-    paddingVertical: 14,
-    paddingHorizontal: 14,
-    borderRadius: 14,
-    borderWidth: 1.5,
+    flexBasis: "47%", flexGrow: 1,
+    flexDirection: "row", alignItems: "center", gap: 8,
+    paddingVertical: 14, paddingHorizontal: 14,
+    borderRadius: 14, borderWidth: 1.5,
   },
-  goalEmoji: {
-    fontSize: 20,
-  },
-  goalLabel: {
-    fontSize: 14,
-    fontFamily: "Inter_600SemiBold",
-    flex: 1,
-  },
+  goalEmoji: { fontSize: 20 },
+  goalLabel: { fontSize: 14, fontFamily: "Inter_600SemiBold", flex: 1 },
   goalSkip: {
-    fontSize: 13,
-    fontFamily: "Inter_400Regular",
-    textAlign: "center",
-    textDecorationLine: "underline",
+    fontSize: 13, fontFamily: "Inter_400Regular",
+    textAlign: "center", textDecorationLine: "underline",
   },
+
+  footNote: {
+    fontSize: 12, fontFamily: "Inter_400Regular", textAlign: "center", lineHeight: 18,
+  },
+
+  footer: { paddingHorizontal: 24, paddingTop: 16, borderTopWidth: 1, gap: 8 },
+  disabledHint: {
+    fontSize: 12.5, fontFamily: "Inter_400Regular", textAlign: "center", marginBottom: 8,
+  },
+  primaryCta: {
+    flexDirection: "row", alignItems: "center", justifyContent: "center",
+    gap: 10, paddingVertical: 18, borderRadius: 18,
+    shadowColor: "#F0AC2E",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.32, shadowRadius: 16, elevation: 6,
+  },
+  primaryCtaText: { fontSize: 17, fontFamily: "Inter_700Bold", color: "#fff" },
+  skipBtn:  { alignItems: "center", paddingVertical: 10 },
+  skipText: { fontSize: 13, fontFamily: "Inter_400Regular" },
 });

@@ -15,6 +15,7 @@ export interface LifestyleSpendData {
   streaming: number;
   coffee: number;
   entertainment: number;
+  takeaway?: number;
 }
 
 export interface SavingsGoal {
