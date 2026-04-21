@@ -150,7 +150,7 @@ function AddTabButton({
   style?: any;
   onPress: () => void;
 }) {
-  const bottomPad = Platform.OS === "web" ? 6 : 2;
+  const bottomPad = Platform.OS === "web" ? 10 : 5;
 
   return (
     <TouchableOpacity
@@ -238,7 +238,8 @@ export default function TabLayout() {
             borderTopWidth: StyleSheet.hairlineWidth,
             borderTopColor: isDark ? "#2A2A2A" : "#E4E0DA",
             elevation: 0,
-            height: Platform.OS === "web" ? 72 : undefined,
+            height: Platform.OS === "web" ? 76 : undefined,
+            overflow: "visible" as any,
           },
           tabBarItemStyle: {
             paddingBottom: Platform.OS === "web" ? 6 : 2,

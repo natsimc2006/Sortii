@@ -1,4 +1,4 @@
-import { Feather } from "@expo/vector-icons";
+import { Feather, Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import React, { useRef, useState } from "react";
 import {
@@ -54,6 +54,8 @@ interface MealSlotCardProps {
   kidFriendlyFilter?: boolean;
   householdProfile?: HouseholdProfile;
   onSwapBadgePress?: (need: string) => void;
+  isFavorite?: boolean;
+  onToggleFavorite?: () => void;
 }
 
 export function MealSlotCard({
@@ -70,6 +72,8 @@ export function MealSlotCard({
   kidFriendlyFilter = false,
   householdProfile,
   onSwapBadgePress,
+  isFavorite = false,
+  onToggleFavorite,
 }: MealSlotCardProps) {
   const [imgError, setImgError] = useState(false);
   const { src: imgSrc } = useRecipeImage(recipe?.id ?? "", recipe?.name ?? "", recipe?.imageUrl);
@@ -205,6 +209,27 @@ export function MealSlotCard({
               hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
             >
               <Feather name="eye-off" size={13} color={ICON.hide.icon} />
+            </TouchableOpacity>
+          )}
+
+          {/* Favourite — amber star */}
+          {onToggleFavorite && (
+            <TouchableOpacity
+              onPress={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                onToggleFavorite();
+              }}
+              style={[
+                styles.actionBtn,
+                { backgroundColor: isFavorite ? "#FFF3CD" : "#F5F1EB" },
+              ]}
+              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+            >
+              <Ionicons
+                name={isFavorite ? "star" : "star-outline"}
+                size={14}
+                color={isFavorite ? "#D29A22" : "#ABABAB"}
+              />
             </TouchableOpacity>
           )}
 

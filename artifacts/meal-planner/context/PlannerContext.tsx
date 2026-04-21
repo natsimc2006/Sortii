@@ -35,6 +35,7 @@ import { loadAppointments } from "@/utils/appointmentStore";
 import { loadFamilyState } from "@/utils/familyStore";
 import { loadBills } from "@/utils/billStore";
 import { computeBusynessData } from "@/utils/busynessScore";
+import { loadFavorites, saveFavorites } from "@/utils/favoritesStore";
 
 export interface SavedPlan {
   id: string;
@@ -72,6 +73,8 @@ interface PlannerContextType {
   planHasLimitedVariety: boolean;
   householdProfile: HouseholdProfile;
   reloadHouseholdProfile: () => Promise<void>;
+  favoriteIds: string[];
+  toggleFavorite: (id: string) => Promise<void>;
 }
 
 const PlannerContext = createContext<PlannerContextType | null>(null);
@@ -140,10 +143,20 @@ export function PlannerProvider({ children }: { children: React.ReactNode }) {
   const [hiddenRecipes, setHiddenRecipes] = useState<string[]>([]);
   const [planHasLimitedVariety, setPlanHasLimitedVariety] = useState(false);
   const [householdProfile, setHouseholdProfile] = useState<HouseholdProfile>(DEFAULT_HOUSEHOLD_PROFILE);
+  const [favoriteIds, setFavoriteIds] = useState<string[]>([]);
 
   const reloadHouseholdProfile = useCallback(async () => {
     const profile = await getHouseholdProfile();
     setHouseholdProfile(profile);
+  }, []);
+
+  const toggleFavorite = useCallback(async (id: string) => {
+    setFavoriteIds((prev) => {
+      const idx = prev.indexOf(id);
+      const updated = idx >= 0 ? prev.filter((x) => x !== id) : [...prev, id];
+      saveFavorites(updated);
+      return updated;
+    });
   }, []);
 
   useEffect(() => {
@@ -170,6 +183,8 @@ export function PlannerProvider({ children }: { children: React.ReactNode }) {
         if (hiddenStr) setHiddenRecipes(JSON.parse(hiddenStr));
         const loadedProfile = await getHouseholdProfile();
         setHouseholdProfile(loadedProfile);
+        const favs = await loadFavorites();
+        setFavoriteIds(favs);
       } catch (_) {} finally {
         setIsContextLoaded(true);
       }
@@ -222,7 +237,7 @@ export function PlannerProvider({ children }: { children: React.ReactNode }) {
     const updatedPlan = currentPlan.map((entry) => {
       if (entry.recipeId) return entry;
       const pool = filterRecipes(preferences, entry.slot, entry.day, hiddenRecipes, appRecipes);
-      const picks = pickRecipes(pool, 1, preferences.mealVariety, filledIds);
+      const picks = pickRecipes(pool, 1, preferences.mealVariety, filledIds, favoriteIds);
       if (picks.length > 0) {
         if (preferences.leftoversMode === "none") filledIds.push(picks[0].id);
         return { ...entry, recipeId: picks[0].id };
@@ -230,7 +245,7 @@ export function PlannerProvider({ children }: { children: React.ReactNode }) {
       return entry;
     });
     setCurrentPlan(updatedPlan);
-  }, [currentPlan, preferences, hiddenRecipes, appRecipes, setCurrentPlan]);
+  }, [currentPlan, preferences, hiddenRecipes, appRecipes, setCurrentPlan, favoriteIds]);
 
   const fillSingleSlot = useCallback((targetDay: string, targetSlot: MealSlot) => {
     const filledIds = currentPlan
@@ -240,14 +255,14 @@ export function PlannerProvider({ children }: { children: React.ReactNode }) {
     const updatedPlan = currentPlan.map((entry) => {
       if (entry.day !== targetDay || entry.slot !== targetSlot || entry.recipeId) return entry;
       const pool = filterRecipes(preferences, entry.slot, entry.day, hiddenRecipes, appRecipes);
-      const picks = pickRecipes(pool, 1, preferences.mealVariety, filledIds);
+      const picks = pickRecipes(pool, 1, preferences.mealVariety, filledIds, favoriteIds);
       if (picks.length > 0) {
         return { ...entry, recipeId: picks[0].id };
       }
       return entry;
     });
     setCurrentPlan(updatedPlan);
-  }, [currentPlan, preferences, hiddenRecipes, appRecipes, setCurrentPlan]);
+  }, [currentPlan, preferences, hiddenRecipes, appRecipes, setCurrentPlan, favoriteIds]);
 
   const autoGeneratePlan = useCallback(async (newPrefs?: PlanPreferences) => {
     const p = newPrefs ?? preferences;
@@ -461,9 +476,18 @@ export function PlannerProvider({ children }: { children: React.ReactNode }) {
         if (veryFast.length >= 3) pool = veryFast;
       }
 
+      // Favourite boost: ~40% of slots get a +30 bonus for favourite recipes
+      const favBoost = favoriteIds.length > 0 && Math.random() < 0.4;
+
       // Score all candidates with small random tie-breaker for variety
       let scored = pool
-        .map((r) => ({ r, score: scoreRecipe(r) + Math.random() * 3 }))
+        .map((r) => ({
+          r,
+          score:
+            scoreRecipe(r) +
+            Math.random() * 3 +
+            (favBoost && favoriteIds.includes(r.id) ? 30 : 0),
+        }))
         .sort((a, b) => b.score - a.score);
 
       // Day-score-2 soft preference: bonus for <= 30 min meals on moderately busy days
@@ -525,7 +549,7 @@ export function PlannerProvider({ children }: { children: React.ReactNode }) {
     setPlanHasLimitedVariety(hadToRepeat);
     setCurrentPlan(generated);
     setPreferencesDirtyState(false);
-  }, [preferences, currentPlan, hiddenRecipes, appRecipes, setCurrentPlan, householdProfile]);
+  }, [preferences, currentPlan, hiddenRecipes, appRecipes, setCurrentPlan, householdProfile, favoriteIds]);
 
   const clearPlan = useCallback(() => {
     setCurrentPlan(buildEmptyPlan(preferences));
@@ -603,7 +627,7 @@ export function PlannerProvider({ children }: { children: React.ReactNode }) {
         .map((m) => m.recipeId as string);
       let pool = filterRecipes(preferences, slot, day, hiddenRecipes, appRecipes);
       if (currentId) pool = pool.filter((r) => r.id !== currentId);
-      const picks = pickRecipes(pool, 1, preferences.mealVariety, filledIds);
+      const picks = pickRecipes(pool, 1, preferences.mealVariety, filledIds, favoriteIds);
       if (picks.length === 0) return prev;
       const newPlan = prev.map((e) =>
         e.day === day && e.slot === slot ? { ...e, recipeId: picks[0].id } : e
@@ -644,6 +668,8 @@ export function PlannerProvider({ children }: { children: React.ReactNode }) {
         planHasLimitedVariety,
         householdProfile,
         reloadHouseholdProfile,
+        favoriteIds,
+        toggleFavorite,
       }}
     >
       {children}

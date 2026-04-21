@@ -150,6 +150,8 @@ export default function MealsScreen() {
     estimatedCostBand,
     hideRecipe,
     planHasLimitedVariety,
+    favoriteIds,
+    toggleFavorite,
   } = usePlanner();
   const router = useRouter();
   const insets = useSafeAreaInsets();
@@ -821,6 +823,8 @@ export default function MealsScreen() {
                     onAutoFill={!lunchRecipe ? () => handleAutoFillSlot(day, "lunch") : undefined}
                     seasonalMode={preferences.seasonalMode ?? false}
                     kidFriendlyFilter={preferences.kidFriendly ?? false}
+                    isFavorite={lunchRecipe ? favoriteIds.includes(lunchRecipe.id) : false}
+                    onToggleFavorite={lunchRecipe ? () => toggleFavorite(lunchRecipe.id) : undefined}
                   />
                   {lunchRecipe && (
                     <SwapTips ingredientNames={lunchRecipe.ingredients.map((i) => i.name)} />
@@ -870,6 +874,8 @@ export default function MealsScreen() {
                     onAutoFill={!dinnerRecipe ? () => handleAutoFillSlot(day, "dinner") : undefined}
                     seasonalMode={preferences.seasonalMode ?? false}
                     kidFriendlyFilter={preferences.kidFriendly ?? false}
+                    isFavorite={dinnerRecipe ? favoriteIds.includes(dinnerRecipe.id) : false}
+                    onToggleFavorite={dinnerRecipe ? () => toggleFavorite(dinnerRecipe.id) : undefined}
                   />
                   {dinnerRecipe && (
                     <SwapTips ingredientNames={dinnerRecipe.ingredients.map((i) => i.name)} />

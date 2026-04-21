@@ -415,10 +415,24 @@ export function pickRecipes(
   pool: Recipe[],
   count: number,
   variety: number,
-  existing: string[]
+  existing: string[],
+  favoriteIds?: string[]
 ): Recipe[] {
   const uniquePool = pool.filter((r) => !existing.includes(r.id));
-  const shuffled = [...uniquePool].sort(() => Math.random() - 0.5);
+
+  // With 40% probability, front-load a favourite so it appears more regularly
+  const favesAvail =
+    favoriteIds && favoriteIds.length > 0
+      ? uniquePool.filter((r) => favoriteIds.includes(r.id))
+      : [];
+  let shuffled: Recipe[];
+  if (favesAvail.length > 0 && Math.random() < 0.4) {
+    const fav = favesAvail[Math.floor(Math.random() * favesAvail.length)]!;
+    const rest = uniquePool.filter((r) => r.id !== fav.id).sort(() => Math.random() - 0.5);
+    shuffled = [fav, ...rest];
+  } else {
+    shuffled = [...uniquePool].sort(() => Math.random() - 0.5);
+  }
   const uniqueIds = new Set<string>();
   const result: Recipe[] = [];
   const repeatable = pool.filter((r) => r.leftoversFriendly);

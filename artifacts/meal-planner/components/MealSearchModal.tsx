@@ -1,6 +1,6 @@
-import { Feather } from "@expo/vector-icons";
+import { Feather, Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   FlatList,
   Modal,
@@ -17,6 +17,7 @@ import { MealSlot, Recipe, filterRecipes } from "@/constants/recipes";
 import { useLocale } from "@/context/LocaleContext";
 import { usePlanner } from "@/context/PlannerContext";
 import { RecipeCard } from "./RecipeCard";
+import { loadFavorites } from "@/utils/favoritesStore";
 
 interface MealSearchModalProps {
   visible: boolean;
@@ -35,13 +36,22 @@ export function MealSearchModal({
   const { appRecipes } = useLocale();
   const [search, setSearch] = useState("");
   const [showAll, setShowAll] = useState(false);
+  const [showFavesOnly, setShowFavesOnly] = useState(false);
+  const [favoriteIds, setFavoriteIds] = useState<string[]>([]);
   const insets = useSafeAreaInsets();
+
+  useEffect(() => {
+    if (visible) loadFavorites().then(setFavoriteIds);
+  }, [visible]);
   const C = Colors.light;
 
   const filteredRecipes = useMemo(() => {
-    const base = showAll
+    let base = showAll
       ? appRecipes
       : filterRecipes(preferences, slot, day, undefined, appRecipes);
+    if (showFavesOnly && favoriteIds.length > 0) {
+      base = base.filter((r) => favoriteIds.includes(r.id));
+    }
     if (!search.trim()) return base;
     const q = search.toLowerCase();
     return base.filter(
@@ -50,7 +60,7 @@ export function MealSearchModal({
         r.description.toLowerCase().includes(q) ||
         r.ingredients.some((i) => i.name.toLowerCase().includes(q))
     );
-  }, [search, preferences, slot, showAll, appRecipes]);
+  }, [search, preferences, slot, showAll, appRecipes, showFavesOnly, favoriteIds]);
 
   const handleSelect = (recipe: Recipe) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
@@ -103,18 +113,43 @@ export function MealSearchModal({
             />
           </View>
 
-          <TouchableOpacity
-            onPress={() => setShowAll(!showAll)}
-            style={styles.toggleRow}
-          >
-            <View style={[styles.toggleDot, { backgroundColor: showAll ? C.accent : C.primary }]} />
-            <Text style={[styles.toggleText, { color: C.textSecondary }]}>
-              {showAll ? "Showing all recipes" : "Showing recipes matching your filters"}
-            </Text>
-            <Text style={[styles.toggleAction, { color: C.primary }]}>
-              {showAll ? "Apply filters" : "Show all"}
-            </Text>
-          </TouchableOpacity>
+          <View style={styles.filterRow}>
+            <TouchableOpacity
+              onPress={() => setShowAll(!showAll)}
+              style={[
+                styles.filterChip,
+                { borderColor: showAll ? C.accent : C.primary, backgroundColor: showAll ? C.accent + "18" : C.primary + "12" },
+              ]}
+            >
+              <Text style={[styles.filterChipText, { color: showAll ? C.accent : C.primary }]}>
+                {showAll ? "All recipes" : "Filtered"}
+              </Text>
+            </TouchableOpacity>
+
+            {favoriteIds.length > 0 && (
+              <TouchableOpacity
+                onPress={() => setShowFavesOnly(!showFavesOnly)}
+                style={[
+                  styles.filterChip,
+                  {
+                    borderColor: "#D29A22",
+                    backgroundColor: showFavesOnly ? "#FFF3CD" : "transparent",
+                    flexDirection: "row",
+                    gap: 4,
+                  },
+                ]}
+              >
+                <Ionicons
+                  name={showFavesOnly ? "star" : "star-outline"}
+                  size={13}
+                  color="#D29A22"
+                />
+                <Text style={[styles.filterChipText, { color: "#D29A22" }]}>
+                  Favourites
+                </Text>
+              </TouchableOpacity>
+            )}
+          </View>
         </View>
 
         <FlatList
@@ -193,22 +228,21 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontFamily: "Inter_400Regular",
   },
-  toggleRow: {
+  filterRow: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 6,
+    gap: 8,
+    flexWrap: "wrap",
   },
-  toggleDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
+  filterChip: {
+    borderWidth: 1,
+    borderRadius: 20,
+    paddingHorizontal: 12,
+    paddingVertical: 5,
+    flexDirection: "row",
+    alignItems: "center",
   },
-  toggleText: {
-    flex: 1,
-    fontSize: 13,
-    fontFamily: "Inter_400Regular",
-  },
-  toggleAction: {
+  filterChipText: {
     fontSize: 13,
     fontFamily: "Inter_600SemiBold",
   },
