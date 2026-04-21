@@ -110,6 +110,13 @@ Expo / React Native mobile app — **Sortii**, a weekly household meal planner f
 - `app/(tabs)/shopping.tsx` — grouped shopping list with copy/share
 - `app/home.tsx` — info/about screen with Sortii logo and how-it-works
 
+**Connected Intelligence Layer (5 phases — all complete):**
+- Phase 1: Bills Regular/One-off toggle (UI + `billType` field, colour coding)
+- Phase 2: Appointment cost flag + availability block (`appointmentCost`, `availabilityBlock`) surfaced in Family tab
+- Phase 3: Money tab 3 states — Calm/Tight/Stretched — driven by `adjustedBreathingRoom = weeklyBreathingRoom - pressureTotal`; `pressureTotal` aggregates one-off bills + appointment costs this week
+- Phase 4: Overwhelm Mode — `components/OverwhelmModal.tsx`; full-screen FOCUS MODE overlay with max 3 prioritised items (urgent bills → urgent appointments → tonight's dinner); triggered from money.tsx State 3 AND "Help me sort this" button on Home
+- Phase 5: Home screen synthesis — `home.tsx` Money card reflects 3 states; "What's Coming Up" card synthesises one-off bills (0–14d) + cost appointments + availability blocks + family juggle conflicts + meals coverage; availability conflict auto-detection (appointment `availabilityBlock.personIds` cross-referenced against family events same day/person); "Help me sort this" now triggers OverwhelmModal with live data
+
 **Cross-module layer (v3 additions):**
 - `utils/weeklyAggregate.ts` — pure aggregation layer: `buildTimelineItems`, `groupByBucket`, `generateWeeklySummary`, `deriveReminders`, `filterItems`, shared types `TimelineItem`, `ReminderItem`, `SourceType`, `DateBucket`
 - `app/(tabs)/upcoming.tsx` — "What's Coming Up" unified timeline screen; also exports `WeeklyGlanceCard` and `ReminderStrip` components for home.tsx

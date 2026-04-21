@@ -1,8 +1,8 @@
 import { Feather } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
+import OverwhelmModal, { PressureItem } from "@/components/OverwhelmModal";
 import {
-  Animated,
   Platform,
   Pressable,
   ScrollView,
@@ -126,87 +126,14 @@ function NudgeBanner({ nudge, onDismiss }: { nudge: Nudge; onDismiss: () => void
   );
 }
 
-// ── "Help me sort this" overlay — auto relief sequence ───────────────────────
-const RELIEF_LINES = [
-  { text: "Dinner's handled.", check: true },
-  { text: "Tomorrow's behaving.", check: true },
-  { text: "Nothing's falling apart.", check: false },
-];
-
-function HelpOverlay({
-  visible,
-  onDismiss,
-}: {
-  visible: boolean;
-  onDismiss: () => void;
-}) {
-  const op0 = useRef(new Animated.Value(0)).current;
-  const op1 = useRef(new Animated.Value(0)).current;
-  const op2 = useRef(new Animated.Value(0)).current;
-  const opDismiss = useRef(new Animated.Value(0)).current;
-  const opacities = [op0, op1, op2];
-
-  useEffect(() => {
-    if (!visible) {
-      op0.setValue(0); op1.setValue(0); op2.setValue(0); opDismiss.setValue(0);
-      return;
-    }
-    const fade = (val: Animated.Value, delay: number) =>
-      setTimeout(() => Animated.timing(val, { toValue: 1, duration: 380, useNativeDriver: true }).start(), delay);
-
-    const t0 = fade(op0, 450);
-    const t1 = fade(op1, 1600);
-    const t2 = fade(op2, 2750);
-    const t3 = fade(opDismiss, 3700);
-    return () => { clearTimeout(t0); clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); };
-  }, [visible]);
-
-  if (!visible) return null;
-
-  return (
-    <Pressable style={styles.helpBackdrop} onPress={onDismiss}>
-      <Pressable style={styles.helpCard} onPress={(e) => e.stopPropagation()}>
-        <Text style={styles.helpTitle}>Right. Let's keep this simple.</Text>
-
-        <View style={styles.helpItems}>
-          {RELIEF_LINES.map((line, i) => (
-            <Animated.View
-              key={i}
-              style={[styles.helpItem, { opacity: opacities[i] }]}
-            >
-              {line.check && (
-                <Feather name="check" size={15} color={TEAL} />
-              )}
-              {!line.check && (
-                <View style={{ width: 15 }} />
-              )}
-              <Text style={styles.helpItemText}>{line.text}</Text>
-            </Animated.View>
-          ))}
-        </View>
-
-        <Animated.View style={{ opacity: opDismiss }}>
-          <TouchableOpacity
-            style={styles.helpDismiss}
-            onPress={onDismiss}
-            activeOpacity={0.8}
-          >
-            <Text style={styles.helpDismissText}>That'll do.</Text>
-          </TouchableOpacity>
-        </Animated.View>
-      </Pressable>
-    </Pressable>
-  );
-}
-
 // ── Main screen ───────────────────────────────────────────────────
 export default function HomeTab() {
   const router = useRouter();
   const { currentPlan } = usePlanner();
   const { money, hasMoneySetup } = useUserWeek();
-  const { currencySymbol } = useLocale();
+  const { currencySymbol, formatMoneyRound } = useLocale();
 
-  const [helpVisible, setHelpVisible]       = useState(false);
+  const [showOverwhelm, setShowOverwhelm]   = useState(false);
   const [settingsVisible, setSettingsVisible] = useState(false);
   const [nudge, setNudge]               = useState<Nudge | null>(null);
   const [familyLine, setFamilyLine]     = useState<string>("Nothing on the family radar this week.");
@@ -216,6 +143,10 @@ export default function HomeTab() {
   const [nextAppt, setNextAppt]               = useState<Appointment | null>(null);
   const [billsData, setBillsData]             = useState<{ overdue: number; dueSoon: number; total: number } | null>(null);
   const [allBills,  setAllBills]              = useState<Bill[]>([]);
+  const [allAppts,  setAllAppts]              = useState<Appointment[]>([]);
+  const [pressureItems, setPressureItems]     = useState<PressureItem[]>([]);
+  const [apptsTodayTomorrow, setApptsTodayTomorrow] = useState<Appointment[]>([]);
+  const [conflictLines, setConflictLines]     = useState<string[]>([]);
   const [welcomeTipDismissed, setWelcomeTipDismissed] = useState(true);
   const [allItems,  setAllItems]        = useState<TimelineItem[]>([]);
   const [reminders, setReminders]       = useState<ReminderItem[]>([]);
@@ -238,6 +169,17 @@ export default function HomeTab() {
         (money.eatingOutWeekly ?? 0) - (money.otherWeeklySpend ?? 0)
       )
     : 0;
+
+  const pressureTotal = pressureItems.reduce((s, p) => s + p.amount, 0);
+  const adjustedBreathingRoom = weeklyBreathingRoom - pressureTotal;
+  type MoneyTabState = "none" | "calm" | "tight" | "stretched";
+  const moneyTabState: MoneyTabState = !hasMoneySetup
+    ? "none"
+    : adjustedBreathingRoom > 50
+      ? "calm"
+      : adjustedBreathingRoom >= 1
+        ? "tight"
+        : "stretched";
 
   const greeting = useMemo(() => getGreeting(), []);
   const summary  = useMemo(() => getWeeklySummary(plannedCount), [plannedCount]);
@@ -279,6 +221,54 @@ export default function HomeTab() {
       const total    = bills.filter((b) => !b.isPaid).reduce((s, b) => s + b.amount, 0);
       setBillsData(bills.length > 0 ? { overdue, dueSoon, total } : null);
       setAllBills(bills);
+      setAllAppts(appts);
+
+      // ── Phase 5: Pressure items (one-off bills + appointment costs) ──
+      const todayMidnight = new Date(); todayMidnight.setHours(0,0,0,0);
+      const todayIso    = todayMidnight.toISOString().split("T")[0]!;
+      const tomorrowIso = new Date(todayMidnight.getTime() + 86_400_000).toISOString().split("T")[0]!;
+
+      const billPressure: PressureItem[] = bills
+        .filter((b) => !b.isPaid && b.billType === "oneOff" && daysUntilDue(b) >= 0 && daysUntilDue(b) <= 7)
+        .map((b) => ({ name: b.title, amount: b.amount, dateStr: b.dueDate }));
+      const apptPressure: PressureItem[] = appts
+        .filter((a) => {
+          if (a.isDone || a.isCancelled || !(a.appointmentCost && a.appointmentCost > 0)) return false;
+          const [ay, am, ad] = a.date.split("-").map(Number);
+          const diff = Math.floor((new Date(ay!, (am!-1), ad!).getTime() - todayMidnight.getTime()) / 86_400_000);
+          return diff >= 0 && diff <= 7;
+        })
+        .map((a) => ({ name: a.title, amount: a.appointmentCost!, dateStr: a.date }));
+      setPressureItems([...billPressure, ...apptPressure]);
+      setApptsTodayTomorrow(appts.filter((a) => !a.isDone && !a.isCancelled && (a.date === todayIso || a.date === tomorrowIso)));
+
+      // ── Phase 5: Availability conflict detection ──────────────────
+      const WEEK_DAYS = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
+      const weekStart = new Date(todayMidnight);
+      const jsDay = weekStart.getDay();
+      weekStart.setDate(weekStart.getDate() - (jsDay === 0 ? 6 : jsDay - 1));
+      const detected: string[] = [];
+      for (const appt of appts) {
+        if (appt.isDone || appt.isCancelled || !appt.availabilityBlock) continue;
+        const blockedIds = appt.availabilityBlock.personIds;
+        if (!blockedIds.length) continue;
+        const [ay, am, ad] = appt.date.split("-").map(Number);
+        const apptDate = new Date(ay!, (am!-1), ad!);
+        const dayOffset = Math.round((apptDate.getTime() - weekStart.getTime()) / 86_400_000);
+        const dayName = WEEK_DAYS[dayOffset];
+        if (!dayName) continue;
+        for (const evt of familyState.events) {
+          if (evt.day !== dayName) continue;
+          const conflictPid = blockedIds.find((pid) => evt.personIds.includes(pid) || evt.driverId === pid);
+          if (!conflictPid) continue;
+          const member = familyState.members.find((m) => m.id === conflictPid);
+          const personName = member ? member.name : "Someone";
+          const line = `${personName} unavailable ${dayName} — ${evt.title} needs cover`;
+          if (!detected.includes(line)) detected.push(line);
+        }
+      }
+      setConflictLines(detected);
+
       // Cross-module timeline
       const builtItems = buildTimelineItems({
         plan:         currentPlan,
@@ -311,7 +301,7 @@ export default function HomeTab() {
             <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
               <TouchableOpacity
                 style={styles.helpBtn}
-                onPress={() => setHelpVisible(true)}
+                onPress={() => setShowOverwhelm(true)}
                 activeOpacity={0.75}
               >
                 <Feather name="zap" size={13} color={TEAL} />
@@ -448,84 +438,190 @@ export default function HomeTab() {
             );
           })()}
 
-          {/* D — Money */}
-          {hasMoneySetup && weeklyBreathingRoom > 0 ? (
-            <TouchableOpacity
-              onPress={() => router.push("/(tabs)/money")}
-              activeOpacity={0.8}
-              style={[styles.card, styles.cardNeutral, styles.cardRailGold]}
-            >
-              <View style={styles.cardRow}>
-                <View style={{ flex: 1 }}>
-                  <Text style={[styles.cardLabel, { color: GOLD }]}>MONEY</Text>
-                  <Text style={styles.cardTitle}>
-                    {currencySymbol}{weeklyBreathingRoom} breathing room this week.
-                  </Text>
-                  <Text style={[styles.cardSub, { color: TEXT_MUTED }]}>
-                    After meals and fixed costs.
-                  </Text>
-                </View>
-                <View style={[styles.cardChevron, { backgroundColor: GOLD + "12" }]}>
-                  <Feather name="chevron-right" size={16} color={GOLD} />
-                </View>
-              </View>
-            </TouchableOpacity>
-          ) : (
-            <TouchableOpacity
-              onPress={() => router.push("/(tabs)/money")}
-              activeOpacity={0.8}
-              style={[styles.card, styles.cardNeutral, styles.cardRailGold]}
-            >
-              <View style={styles.cardRow}>
-                <View style={{ flex: 1 }}>
-                  <Text style={[styles.cardLabel, { color: GOLD }]}>MONEY</Text>
-                  <Text style={styles.cardTitle}>
-                    Curious how this week looks financially?
-                  </Text>
-                  <Text style={[styles.cardSub, { color: TEAL }]}>Set it up →</Text>
-                </View>
-                <View style={[styles.cardChevron, { backgroundColor: GOLD + "12" }]}>
-                  <Feather name="chevron-right" size={16} color={GOLD} />
-                </View>
-              </View>
-            </TouchableOpacity>
-          )}
-
-          {/* D2 — COMING UP: bills due this week */}
+          {/* D — Money (Phase 5: 3-state card) */}
           {(() => {
-            const dueSoon = allBills
-              .filter((b) => !b.isPaid && daysUntilDue(b) >= 0 && daysUntilDue(b) <= 7)
-              .sort((a, b) => a.dueDate.localeCompare(b.dueDate));
-            if (dueSoon.length === 0) return null;
-            const shown = dueSoon.slice(0, 2);
-            const extra = dueSoon.length - 2;
+            if (moneyTabState === "none") {
+              return (
+                <TouchableOpacity
+                  onPress={() => router.push("/(tabs)/money")}
+                  activeOpacity={0.8}
+                  style={[styles.card, styles.cardNeutral, styles.cardRailGold]}
+                >
+                  <View style={styles.cardRow}>
+                    <View style={{ flex: 1 }}>
+                      <Text style={[styles.cardLabel, { color: GOLD }]}>MONEY</Text>
+                      <Text style={styles.cardTitle}>Curious how this week looks financially?</Text>
+                      <Text style={[styles.cardSub, { color: TEAL }]}>Set it up →</Text>
+                    </View>
+                    <View style={[styles.cardChevron, { backgroundColor: GOLD + "12" }]}>
+                      <Feather name="chevron-right" size={16} color={GOLD} />
+                    </View>
+                  </View>
+                </TouchableOpacity>
+              );
+            }
+            if (moneyTabState === "stretched") {
+              const RED = "#B86557";
+              return (
+                <TouchableOpacity
+                  onPress={() => router.push("/(tabs)/money")}
+                  activeOpacity={0.8}
+                  style={[styles.card, styles.cardNeutral, { borderLeftColor: RED, borderLeftWidth: 3 }]}
+                >
+                  <View style={styles.cardRow}>
+                    <View style={{ flex: 1 }}>
+                      <Text style={[styles.cardLabel, { color: RED }]}>MONEY</Text>
+                      <Text style={styles.cardTitle}>
+                        Stretched week. {pressureItems.length} cost{pressureItems.length !== 1 ? "s" : ""} landing.
+                      </Text>
+                      <Text style={[styles.cardSub, { color: RED, fontStyle: "italic" }]}>Tap to see what's coming →</Text>
+                    </View>
+                    <View style={[styles.cardChevron, { backgroundColor: RED + "12" }]}>
+                      <Feather name="chevron-right" size={16} color={RED} />
+                    </View>
+                  </View>
+                </TouchableOpacity>
+              );
+            }
+            if (moneyTabState === "tight") {
+              const topItem = [...pressureItems].sort((a, b) => a.dateStr.localeCompare(b.dateStr))[0];
+              return (
+                <TouchableOpacity
+                  onPress={() => router.push("/(tabs)/money")}
+                  activeOpacity={0.8}
+                  style={[styles.card, styles.cardNeutral, { borderLeftColor: GOLD, borderLeftWidth: 3 }]}
+                >
+                  <View style={styles.cardRow}>
+                    <View style={{ flex: 1 }}>
+                      <Text style={[styles.cardLabel, { color: GOLD }]}>MONEY</Text>
+                      <Text style={styles.cardTitle}>
+                        Tighter than usual{topItem ? ` — ${topItem.name} coming up` : ""}.
+                      </Text>
+                      <Text style={[styles.cardSub, { color: TEAL, fontStyle: "italic" }]}>Tap to see more →</Text>
+                    </View>
+                    <View style={[styles.cardChevron, { backgroundColor: GOLD + "12" }]}>
+                      <Feather name="chevron-right" size={16} color={GOLD} />
+                    </View>
+                  </View>
+                </TouchableOpacity>
+              );
+            }
+            // State 1 — calm
             return (
-              <View style={{ gap: 6 }}>
-                <Text style={[styles.sectionLabel, { color: GOLD }]}>COMING UP</Text>
-                {shown.map((bill) => {
-                  const days = daysUntilDue(bill);
-                  const dueLabel = days === 0 ? "Due today" : days === 1 ? "Due tomorrow" : `Due in ${days} days`;
-                  const dueColor = days <= 1 ? "#B86557" : days <= 3 ? GOLD : TEXT_MUTED;
-                  return (
-                    <TouchableOpacity
-                      key={bill.id}
-                      onPress={() => router.push("/(tabs)/bills")}
-                      activeOpacity={0.8}
-                      style={styles.comingUpCard}
-                    >
-                      <View style={{ flex: 1 }}>
-                        <Text style={styles.comingUpName} numberOfLines={1}>{bill.title}</Text>
-                        <Text style={[styles.comingUpDue, { color: dueColor }]}>{dueLabel}</Text>
-                      </View>
-                      <Text style={styles.comingUpAmount}>{currencySymbol}{bill.amount.toFixed(0)}</Text>
+              <TouchableOpacity
+                onPress={() => router.push("/(tabs)/money")}
+                activeOpacity={0.8}
+                style={[styles.card, styles.cardNeutral, { borderLeftColor: BORDER, borderLeftWidth: 3 }]}
+              >
+                <View style={styles.cardRow}>
+                  <View style={{ flex: 1 }}>
+                    <Text style={[styles.cardLabel, { color: TEXT_MUTED }]}>MONEY</Text>
+                    <Text style={styles.cardTitle}>Money looks fine this week.</Text>
+                    <Text style={[styles.cardSub, { color: TEXT_MUTED, fontStyle: "italic" }]}>After meals, bills and fixed costs.</Text>
+                  </View>
+                  <View style={[styles.cardChevron, { backgroundColor: BORDER }]}>
+                    <Feather name="chevron-right" size={16} color={TEXT_MUTED} />
+                  </View>
+                </View>
+              </TouchableOpacity>
+            );
+          })()}
+
+          {/* D2 — What's Coming Up (Phase 5 synthesis) */}
+          {(() => {
+            // ── Helpers ──────────────────────────────────────────────
+            const todayD = new Date(); todayD.setHours(0,0,0,0);
+            const todayS = todayD.toISOString().split("T")[0]!;
+            const tomS   = new Date(todayD.getTime() + 86_400_000).toISOString().split("T")[0]!;
+            function dayLabelFrom(dateStr: string): string {
+              if (dateStr === todayS) return "today";
+              if (dateStr === tomS) return "tomorrow";
+              const [y, m, d] = dateStr.split("-").map(Number);
+              return new Date(y!, (m!-1), d!).toLocaleDateString("en-AU", { weekday: "long" });
+            }
+            function fmtTime(hhmm: string): string {
+              const [hStr, mStr] = hhmm.split(":");
+              const h = parseInt(hStr ?? "0", 10);
+              const m = mStr ?? "00";
+              const period = h < 12 ? "am" : "pm";
+              const hr = h % 12 || 12;
+              return m === "00" ? `${hr}${period}` : `${hr}:${m}${period}`;
+            }
+
+            // ── Build ordered items (max 4 non-meals, then always meals) ──
+            interface SynthLine { text: string; color: string; key: string; route?: string }
+            const lines: SynthLine[] = [];
+
+            // P1: one-off bills due this week or next (0–14 days)
+            const upcomingOneOff = allBills
+              .filter((b) => !b.isPaid && b.billType === "oneOff" && daysUntilDue(b) >= 0 && daysUntilDue(b) <= 14)
+              .sort((a, b) => a.dueDate.localeCompare(b.dueDate));
+            for (const b of upcomingOneOff) {
+              if (lines.length >= 3) break;
+              lines.push({ text: `· ${b.title} — ${currencySymbol}${Math.round(b.amount)} — ${dayLabelFrom(b.dueDate)}`, color: GOLD, key: `bill-${b.id}`, route: "/(tabs)/bills" });
+            }
+
+            // P2: appointments with cost flag this week (0–7 days)
+            const costAppts = allAppts
+              .filter((a) => {
+                if (a.isDone || a.isCancelled || !(a.appointmentCost && a.appointmentCost > 0)) return false;
+                const [ay, am, ad] = a.date.split("-").map(Number);
+                const diff = Math.floor((new Date(ay!, (am!-1), ad!).getTime() - todayD.getTime()) / 86_400_000);
+                return diff >= 0 && diff <= 7;
+              })
+              .sort((a, b) => a.date.localeCompare(b.date));
+            for (const a of costAppts) {
+              if (lines.length >= 3) break;
+              const personLabel = a.person ? ` (${a.person})` : "";
+              lines.push({ text: `· ${a.title} — ${dayLabelFrom(a.date)} ${fmtTime(a.startTime)}${personLabel}`, color: GOLD, key: `appt-cost-${a.id}`, route: "/(tabs)/appointments" });
+            }
+
+            // P3: appointments with availability block, within 7 days
+            const blockAppts = allAppts
+              .filter((a) => {
+                if (a.isDone || a.isCancelled || !a.availabilityBlock) return false;
+                const [ay, am, ad] = a.date.split("-").map(Number);
+                const diff = Math.floor((new Date(ay!, (am!-1), ad!).getTime() - todayD.getTime()) / 86_400_000);
+                return diff >= 0 && diff <= 7;
+              })
+              .sort((a, b) => a.date.localeCompare(b.date));
+            for (const a of blockAppts) {
+              if (lines.length >= 3) break;
+              lines.push({ text: `· ${a.person || "Someone"} unavailable ${dayLabelFrom(a.date)} — logistics flag`, color: TEAL, key: `appt-block-${a.id}`, route: "/(tabs)/appointments" });
+            }
+
+            // P4: family juggle auto-detected conflicts
+            for (const cl of conflictLines) {
+              if (lines.length >= 3) break;
+              lines.push({ text: `· ${cl}`, color: TEAL, key: `conflict-${cl}`, route: "/(tabs)/family" });
+            }
+
+            // Always last: meals coverage
+            const mealsText = `· ✅ ${plannedCount} dinner${plannedCount !== 1 ? "s" : ""} sorted this week`;
+
+            // ── Render ────────────────────────────────────────────────
+            if (lines.length === 0) {
+              return (
+                <View style={[styles.comingUpCard, { padding: 14 }]}>
+                  <Text style={[styles.cardLabel, { color: TEXT_MUTED, marginBottom: 6 }]}>WHAT'S COMING UP</Text>
+                  <Text style={[styles.comingUpLine, { color: TEXT_MUTED }]}>
+                    A quiet one. {plannedCount} dinner{plannedCount !== 1 ? "s" : ""} sorted. Not much to worry about.
+                  </Text>
+                </View>
+              );
+            }
+
+            return (
+              <View style={{ gap: 4 }}>
+                <Text style={[styles.sectionLabel, { color: GOLD, marginBottom: 2 }]}>WHAT'S COMING UP</Text>
+                <View style={[styles.comingUpCard, { padding: 14, gap: 8 }]}>
+                  {lines.slice(0, 4).map((item) => (
+                    <TouchableOpacity key={item.key} onPress={item.route ? () => router.push(item.route as any) : undefined} activeOpacity={0.75}>
+                      <Text style={[styles.comingUpLine, { color: item.color }]}>{item.text}</Text>
                     </TouchableOpacity>
-                  );
-                })}
-                {extra > 0 && (
-                  <TouchableOpacity onPress={() => router.push("/(tabs)/bills")} activeOpacity={0.7}>
-                    <Text style={styles.comingUpMore}>{extra} more →</Text>
-                  </TouchableOpacity>
-                )}
+                  ))}
+                  <Text style={[styles.comingUpLine, { color: TEAL }]}>{mealsText}</Text>
+                </View>
               </View>
             );
           })()}
@@ -666,10 +762,15 @@ export default function HomeTab() {
           <View style={{ paddingBottom: 90 }} />
         </ScrollView>
 
-        {/* Help me sort this — rendered above scroll */}
-        <HelpOverlay
-          visible={helpVisible}
-          onDismiss={() => setHelpVisible(false)}
+        {/* Overwhelm mode — triggered by "Help me sort this" button */}
+        <OverwhelmModal
+          visible={showOverwhelm}
+          pressureItems={pressureItems}
+          apptsTodayTomorrow={apptsTodayTomorrow}
+          tonightsDinner={tonightRecipe?.name ?? null}
+          formatMoney={formatMoneyRound}
+          onBack={() => setShowOverwhelm(false)}
+          onSeeEverything={() => { setShowOverwhelm(false); router.push("/(tabs)" as any); }}
         />
 
         {/* Settings sheet */}
@@ -959,9 +1060,14 @@ const styles = StyleSheet.create({
     borderColor: BORDER,
     padding: 12,
     paddingLeft: 14,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
+    flexDirection: "column",
+    gap: 4,
+  },
+  comingUpLine: {
+    fontSize: 13,
+    fontFamily: "Inter_400Regular",
+    color: TEXT,
+    lineHeight: 19,
   },
   comingUpName: {
     fontSize: 14,
