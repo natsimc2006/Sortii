@@ -1,25 +1,15 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import {
-  SortiiCalEvent,
-  CalendarSettings,
-  CACHED_EVENTS_KEY,
-  APPLE_CONNECTED_KEY,
-  APPLE_CALENDAR_IDS_KEY,
-  GOOGLE_CONNECTED_KEY,
-  GOOGLE_TOKEN_KEY,
-  GOOGLE_CALENDAR_IDS_KEY,
-  FAMILY_PUSHED_KEY,
-} from "./calendarTypes";
+import { SortiiCalEvent, CalendarSettings, calKeys } from "./calendarTypes";
 import { getUpcomingAppleEvents } from "./appleCalendar";
 import { getValidGoogleToken, getUpcomingGoogleEvents } from "./googleCalendar";
 
 export async function loadCalendarSettings(): Promise<CalendarSettings> {
   const [appleConn, appleIds, googleConn, googleToken, googleIds] = await Promise.all([
-    AsyncStorage.getItem(APPLE_CONNECTED_KEY),
-    AsyncStorage.getItem(APPLE_CALENDAR_IDS_KEY),
-    AsyncStorage.getItem(GOOGLE_CONNECTED_KEY),
-    AsyncStorage.getItem(GOOGLE_TOKEN_KEY),
-    AsyncStorage.getItem(GOOGLE_CALENDAR_IDS_KEY),
+    AsyncStorage.getItem(calKeys.appleConn()),
+    AsyncStorage.getItem(calKeys.appleIds()),
+    AsyncStorage.getItem(calKeys.googleConn()),
+    AsyncStorage.getItem(calKeys.googleToken()),
+    AsyncStorage.getItem(calKeys.googleIds()),
   ]);
   return {
     appleConnected: appleConn === "true",
@@ -66,23 +56,23 @@ export async function getAllCalendarEvents(
 }
 
 export async function cacheCalendarEvents(events: SortiiCalEvent[]): Promise<void> {
-  await AsyncStorage.setItem(CACHED_EVENTS_KEY, JSON.stringify(events));
+  await AsyncStorage.setItem(calKeys.cachedEvents(), JSON.stringify(events));
 }
 
 export async function loadCachedCalendarEvents(): Promise<SortiiCalEvent[]> {
-  const raw = await AsyncStorage.getItem(CACHED_EVENTS_KEY);
+  const raw = await AsyncStorage.getItem(calKeys.cachedEvents());
   if (!raw) return [];
   try { return JSON.parse(raw) as SortiiCalEvent[]; } catch { return []; }
 }
 
 export async function loadFamilyPushedEvents(): Promise<SortiiCalEvent[]> {
-  const raw = await AsyncStorage.getItem(FAMILY_PUSHED_KEY);
+  const raw = await AsyncStorage.getItem(calKeys.pushedEvents());
   if (!raw) return [];
   try { return JSON.parse(raw) as SortiiCalEvent[]; } catch { return []; }
 }
 
 export async function saveFamilyPushedEvents(events: SortiiCalEvent[]): Promise<void> {
-  await AsyncStorage.setItem(FAMILY_PUSHED_KEY, JSON.stringify(events));
+  await AsyncStorage.setItem(calKeys.pushedEvents(), JSON.stringify(events));
 }
 
 export async function pushEventToFamily(event: SortiiCalEvent): Promise<void> {

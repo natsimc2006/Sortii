@@ -1,4 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { SK } from './storageKeys';
+import { getCurrentUserId } from './currentUser';
 
 export type OnboardingScope = 'meals' | 'money' | 'both';
 export type WeeklyMode = 'easy' | 'balanced' | 'budget';
@@ -43,7 +45,7 @@ export interface OnboardingState {
   lastUpdatedAt: string | null;
 }
 
-const KEY = '@sortii_onboarding_v2';
+function key(): string { return SK.onboarding(getCurrentUserId()); }
 
 const DEFAULT_STATE: OnboardingState = {
   scope: null,
@@ -60,7 +62,7 @@ const DEFAULT_STATE: OnboardingState = {
 
 export async function getOnboardingState(): Promise<OnboardingState> {
   try {
-    const raw = await AsyncStorage.getItem(KEY);
+    const raw = await AsyncStorage.getItem(key());
     if (!raw) return { ...DEFAULT_STATE };
     return { ...DEFAULT_STATE, ...JSON.parse(raw) };
   } catch {
@@ -72,12 +74,12 @@ export async function updateOnboardingState(updates: Partial<OnboardingState>): 
   try {
     const current = await getOnboardingState();
     const next = { ...current, ...updates };
-    await AsyncStorage.setItem(KEY, JSON.stringify(next));
+    await AsyncStorage.setItem(key(), JSON.stringify(next));
   } catch {}
 }
 
 export async function clearOnboardingState(): Promise<void> {
   try {
-    await AsyncStorage.removeItem(KEY);
+    await AsyncStorage.removeItem(key());
   } catch {}
 }

@@ -33,15 +33,10 @@ import { loadFamilyState } from "@/utils/familyStore";
 import { FamilyMember } from "@/utils/familyTypes";
 import { getAppleCalendars, getUpcomingAppleEvents, requestCalendarPermission } from "@/utils/appleCalendar";
 import {
-  APPLE_CALENDAR_IDS_KEY,
-  APPLE_CONNECTED_KEY,
   AppleCalendarMeta,
-  CACHED_EVENTS_KEY,
-  FAMILY_PUSHED_KEY,
-  GOOGLE_CALENDAR_IDS_KEY,
-  GOOGLE_CONNECTED_KEY,
   GoogleCalendarMeta,
   SortiiCalEvent,
+  calKeys,
   isNoisyCalendar,
 } from "@/utils/calendarTypes";
 import {
@@ -693,8 +688,8 @@ export default function AppointmentsScreen() {
     const selectedIds = [...selectedAppleCals.entries()]
       .filter(([, on]) => on)
       .map(([id]) => id);
-    await AsyncStorage.setItem(APPLE_CONNECTED_KEY, "true");
-    await AsyncStorage.setItem(APPLE_CALENDAR_IDS_KEY, JSON.stringify(selectedIds));
+    await AsyncStorage.setItem(calKeys.appleConn(), "true");
+    await AsyncStorage.setItem(calKeys.appleIds(), JSON.stringify(selectedIds));
     setAppleConnected(true);
     setShowAppleSelector(false);
     await loadCalendarData(false);
@@ -752,8 +747,8 @@ export default function AppointmentsScreen() {
     const selectedIds = [...selectedGoogleCals.entries()]
       .filter(([, on]) => on)
       .map(([id]) => id);
-    await AsyncStorage.setItem(GOOGLE_CONNECTED_KEY, "true");
-    await AsyncStorage.setItem(GOOGLE_CALENDAR_IDS_KEY, JSON.stringify(selectedIds));
+    await AsyncStorage.setItem(calKeys.googleConn(), "true");
+    await AsyncStorage.setItem(calKeys.googleIds(), JSON.stringify(selectedIds));
     setGoogleConnected(true);
     setShowGoogleSelector(false);
     await loadCalendarData(false);

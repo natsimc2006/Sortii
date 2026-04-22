@@ -1,36 +1,32 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Animated,
-  Image,
-  KeyboardAvoidingView,
   Platform,
   ScrollView,
   StyleSheet,
   Text,
-  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import Colors from "@/constants/Colors";
-import { CookingPersona, DEFAULT_PREFERENCES, DEFAULT_WEEKEND_OVERRIDES, PlanPreferences } from "@/constants/recipes";
+import { DEFAULT_PREFERENCES, DEFAULT_WEEKEND_OVERRIDES, PlanPreferences } from "@/constants/recipes";
 import { usePlanner } from "@/context/PlannerContext";
 import { useUserWeek } from "@/context/UserWeekContext";
 import { updateOnboardingState } from "@/utils/onboardingState";
 import { DietaryNeed, saveHouseholdProfile } from "@/utils/householdProfile";
 
-const C = Colors.light;
-const TEAL  = "#2A8F88";
-const PLUM  = "#5E3A4C";
-const TEXT  = "#2B2B2B";
-const MUTED = "#888888";
-const BORDER= "#EDE9E3";
-
-const sortiiLogo = require("@/assets/images/sortii-logo-v2-landing.png");
+const TEAL       = "#2A8F88";
+const TEAL_TINT  = "#E6F3F0";
+const CREAM      = "#F8F4EE";
+const INK        = "#1A1410";
+const MUTED      = "#8A7968";
+const GOLD       = "#D29A22";
+const PLUM       = "#5E3A4C";
+const PLUM_TINT  = "#F3E8EE";
+const BORDER     = "#EDE9E3";
 
 const ROTATING_MESSAGES = [
   "Sorting your first week…",
@@ -50,52 +46,14 @@ const HOUSEHOLD_HINTS: Record<number, string> = {
   8: "Big household. We've got you.",
 };
 
-const EXCLUSION_CHIPS = [
-  "Shellfish", "Mushrooms", "Lamb", "Spicy food", "Tofu", "Anchovies",
+const DIETARY_OPTIONS: { id: DietaryNeed; label: string; bg: string; color: string }[] = [
+  { id: "vegan",       label: "🌱  Vegan",       bg: PLUM_TINT,  color: PLUM },
+  { id: "vegetarian",  label: "🥚  Vegetarian",  bg: PLUM_TINT,  color: PLUM },
+  { id: "gluten-free", label: "🌾  Gluten-free", bg: TEAL_TINT,  color: TEAL },
+  { id: "dairy-free",  label: "🥛  Dairy-free",  bg: TEAL_TINT,  color: TEAL },
 ];
 
-const DIETARY_OPTIONS: { id: DietaryNeed; label: string }[] = [
-  { id: "vegan",       label: "🌱  Vegan" },
-  { id: "vegetarian",  label: "🥚  Vegetarian" },
-  { id: "gluten-free", label: "🌾  Gluten-free" },
-  { id: "dairy-free",  label: "🥛  Dairy-free" },
-];
-
-const PERSONA_OPTIONS: { value: CookingPersona; icon: string; label: string; sub: string }[] = [
-  {
-    value: "quick",
-    icon: "⚡",
-    label: "Whatever's quickest",
-    sub: "20 mins max. Minimal faff. Just needs to be done.",
-  },
-  {
-    value: "moderate",
-    icon: "🍳",
-    label: "Something decent",
-    sub: "30–45 mins. Not complicated. Tastes like effort.",
-  },
-  {
-    value: "cook",
-    icon: "👨‍🍳",
-    label: "Happy to cook",
-    sub: "I actually enjoy it. Time isn't really the issue.",
-  },
-];
-
-type Step = 0 | 1 | 2 | 3 | 4 | 5;
-
-function ProgressDots({ filled, total }: { filled: number; total: number }) {
-  return (
-    <View style={styles.progressDots}>
-      {Array.from({ length: total }).map((_, i) => (
-        <View
-          key={i}
-          style={[styles.dot, { backgroundColor: i < filled ? TEAL : "#E6E1D7" }]}
-        />
-      ))}
-    </View>
-  );
-}
+type Step = 0 | 1 | 2; // 0 = welcome, 1 = household, 2 = generating
 
 export default function OnboardingScreen() {
   const router = useRouter();
@@ -112,32 +70,27 @@ export default function OnboardingScreen() {
   } = useUserWeek();
   const insets = useSafeAreaInsets();
 
-  const [step, setStep] = useState<Step>(0);
-
-  // ── Collected data ────────────────────────────────────────────────
-  const [householdSize,   setHouseholdSize]   = useState(4);
-  const [exclusionText,   setExclusionText]   = useState("");
-  const [dietaryNeeds,    setDietaryNeeds]    = useState<DietaryNeed[]>([]);
-  const [noneSelected,    setNoneSelected]    = useState(false);
-  const [cookingPersona,  setCookingPersona]  = useState<CookingPersona | null>(null);
-
-  // ── Generating state ──────────────────────────────────────────────
-  const [generatingMsg,  setGeneratingMsg]  = useState(ROTATING_MESSAGES[0]);
+  const [step,          setStep]          = useState<Step>(0);
+  const [householdSize, setHouseholdSize] = useState(4);
+  const [dietaryNeeds,  setDietaryNeeds]  = useState<DietaryNeed[]>([]);
+  const [generatingMsg, setGeneratingMsg] = useState(ROTATING_MESSAGES[0]);
   const [generatingDone, setGeneratingDone] = useState(false);
-  const fadeAnim   = useRef(new Animated.Value(1)).current;
-  const pulseAnim  = useRef(new Animated.Value(1)).current;
-  const msgIndex   = useRef(0);
+
+  const fadeAnim  = useRef(new Animated.Value(1)).current;
+  const pulseAnim = useRef(new Animated.Value(1)).current;
+  const msgIndex  = useRef(0);
   const isInGeneratingFlow = useRef(false);
 
-  // ── Screen 1 stagger anims ────────────────────────────────────────
+  // Welcome screen stagger
   const line1 = useRef(new Animated.Value(0)).current;
   const line2 = useRef(new Animated.Value(0)).current;
   const line3 = useRef(new Animated.Value(0)).current;
+  const ctaAnim = useRef(new Animated.Value(0)).current;
 
   const paddingBottom = Platform.OS === "web" ? 40 : insets.bottom + 16;
-  const paddingTop    = Platform.OS === "web" ? 60 : insets.top;
+  const paddingTop    = Platform.OS === "web" ? 60 : insets.top + 8;
 
-  // ── Returning user gate (UNCHANGED logic) ─────────────────────────
+  // ── Returning user gate ──────────────────────────────────────────
   useEffect(() => {
     if (!isContextLoaded || !isWeekLoaded) return;
     if (isInGeneratingFlow.current) return;
@@ -153,24 +106,28 @@ export default function OnboardingScreen() {
     }
   }, [isContextLoaded, isWeekLoaded, isOnboarded]);
 
-  // ── Screen 1: stagger copy lines ─────────────────────────────────
+  // ── Welcome stagger ──────────────────────────────────────────────
   useEffect(() => {
     if (step !== 0) return;
-    line1.setValue(0); line2.setValue(0); line3.setValue(0);
-    const t1 = setTimeout(() =>
-      Animated.timing(line1, { toValue: 1, duration: 400, useNativeDriver: true }).start(), 300);
-    const t2 = setTimeout(() =>
-      Animated.timing(line2, { toValue: 1, duration: 400, useNativeDriver: true }).start(), 500);
-    const t3 = setTimeout(() =>
-      Animated.timing(line3, { toValue: 1, duration: 400, useNativeDriver: true }).start(), 700);
-    return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); };
+    line1.setValue(0); line2.setValue(0); line3.setValue(0); ctaAnim.setValue(0);
+    const seq = [
+      { anim: line1,   delay: 300 },
+      { anim: line2,   delay: 500 },
+      { anim: line3,   delay: 700 },
+      { anim: ctaAnim, delay: 1100 },
+    ];
+    const timers = seq.map(({ anim, delay }) =>
+      setTimeout(() =>
+        Animated.timing(anim, { toValue: 1, duration: 400, useNativeDriver: true }).start(),
+        delay
+      )
+    );
+    return () => timers.forEach(clearTimeout);
   }, [step]);
 
-  // ── Screen 6: generating animation ───────────────────────────────
+  // ── Generating animation ─────────────────────────────────────────
   useEffect(() => {
-    if (step !== 5) return;
-
-    // Pulse ring
+    if (step !== 2) return;
     const pulse = Animated.loop(
       Animated.sequence([
         Animated.timing(pulseAnim, { toValue: 1.18, duration: 800, useNativeDriver: true }),
@@ -178,8 +135,6 @@ export default function OnboardingScreen() {
       ])
     );
     pulse.start();
-
-    // Rotate text
     const tick = () => {
       Animated.timing(fadeAnim, { toValue: 0, duration: 300, useNativeDriver: true }).start(() => {
         msgIndex.current = (msgIndex.current + 1) % ROTATING_MESSAGES.length;
@@ -188,14 +143,12 @@ export default function OnboardingScreen() {
       });
     };
     const interval = setInterval(tick, 2000);
-
     const doneTimer = setTimeout(() => {
       clearInterval(interval);
       pulse.stop();
       setGeneratingDone(true);
       setTimeout(() => router.replace("/(tabs)/home"), 900);
     }, 5500);
-
     return () => {
       clearInterval(interval);
       clearTimeout(doneTimer);
@@ -203,24 +156,17 @@ export default function OnboardingScreen() {
     };
   }, [step]);
 
-  // ── startGenerating — saves all data then transitions ─────────────
-  const startGenerating = async (personaOverride?: CookingPersona) => {
-    const exclusions = exclusionText
-      .split(/,|\n/)
-      .map((s) => s.trim())
-      .filter(Boolean);
-
-    const resolvedPersona: CookingPersona = personaOverride ?? cookingPersona ?? "quick";
-
+  // ── Start generating ─────────────────────────────────────────────
+  const startGenerating = async () => {
     const newPrefs: PlanPreferences = {
       ...DEFAULT_PREFERENCES,
-      planningMode: "auto",
+      planningMode:     "auto",
       householdSize,
-      budgetLevel: "standard",
-      mealVariety: 7,
-      dietType: "no-preference",
-      exclusions,
-      cookingPersona: resolvedPersona,
+      budgetLevel:      "standard",
+      mealVariety:      7,
+      dietType:         "no-preference",
+      exclusions:       [],
+      cookingPersona:   "quick",
       weekendOverrides: { ...DEFAULT_WEEKEND_OVERRIDES },
     };
 
@@ -243,707 +189,405 @@ export default function OnboardingScreen() {
     setContextHasMealsSetup(true);
     updateWeekKey();
     autoGeneratePlan(newPrefs);
-    setStep(5);
+    setStep(2);
   };
 
-  const toggleDietaryNeed = (id: DietaryNeed) => {
+  const toggleDietary = (id: DietaryNeed) => {
     Haptics.selectionAsync();
-    setNoneSelected(false);
     setDietaryNeeds((prev) =>
       prev.includes(id) ? prev.filter((n) => n !== id) : [...prev, id]
     );
   };
 
-  const selectNone = () => {
+  const adjustSize = (delta: number) => {
     Haptics.selectionAsync();
-    setDietaryNeeds([]);
-    setNoneSelected(true);
+    setHouseholdSize((v) => Math.max(1, Math.min(8, v + delta)));
   };
 
-  const appendChip = (chip: string) => {
-    Haptics.selectionAsync();
-    setExclusionText((prev) => {
-      const t = prev.trim();
-      if (!t) return chip;
-      if (t.endsWith(",")) return `${t} ${chip}`;
-      return `${t}, ${chip}`;
-    });
-  };
-
-  // ═══════════════════════════════════════════════════════════════════
-  // SCREEN 1 — THE PROMISE
-  // ═══════════════════════════════════════════════════════════════════
-  if (step === 0) {
+  // ════════════════════════════════════════════════════════════════
+  // SCREEN 2 — GENERATING
+  // ════════════════════════════════════════════════════════════════
+  if (step === 2) {
     return (
-      <View style={{ flex: 1, backgroundColor: "#FFFFFF" }}>
-        {/* Vertically centred content */}
-        <View style={[styles.promiseCenter, { paddingTop }]}>
-          <Image
-            source={sortiiLogo}
-            style={styles.promiseLogo}
-            resizeMode="contain"
-          />
-          <Text style={styles.promiseTagline}>Less to think about.</Text>
-          <View style={styles.promiseLines}>
-            {[
-              { text: "Dinners sorted.",     anim: line1 },
-              { text: "Weekends planned.",   anim: line2 },
-              { text: "Money understood.",   anim: line3 },
-            ].map(({ text, anim }) => (
-              <Animated.Text key={text} style={[styles.promiseLine, { opacity: anim }]}>
-                {text}
-              </Animated.Text>
-            ))}
-          </View>
-        </View>
+      <View style={[styles.genRoot, { paddingTop }]}>
+        <Animated.View style={[styles.genRing, { transform: [{ scale: pulseAnim }] }]} />
+        <Text style={styles.genEmoji}>🥘</Text>
+        <Animated.Text style={[styles.genMsg, { opacity: fadeAnim }]}>
+          {generatingMsg}
+        </Animated.Text>
+        {generatingDone && <Text style={styles.genDone}>All done ✓</Text>}
+      </View>
+    );
+  }
 
-        {/* Fixed bottom CTA */}
-        <View style={[styles.promiseCta, { paddingBottom: paddingBottom + 8 }]}>
+  // ════════════════════════════════════════════════════════════════
+  // SCREEN 1 — HOUSEHOLD SETUP
+  // ════════════════════════════════════════════════════════════════
+  if (step === 1) {
+    return (
+      <View style={[styles.root, { paddingTop }]}>
+        <ScrollView
+          contentContainerStyle={[styles.scroll, { paddingBottom }]}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+        >
+          {/* Back */}
+          <TouchableOpacity
+            onPress={() => setStep(0)}
+            style={styles.backBtn}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.backText}>← Back</Text>
+          </TouchableOpacity>
+
+          <Text style={styles.stepHeading}>Who's in your house?</Text>
+          <Text style={styles.stepSub}>
+            This shapes your portions and meal suggestions.
+          </Text>
+
+          {/* Household size stepper */}
+          <View style={styles.sizeCard}>
+            <View style={styles.sizeRow}>
+              <TouchableOpacity
+                onPress={() => adjustSize(-1)}
+                style={[styles.sizeBtn, householdSize <= 1 && styles.sizeBtnDisabled]}
+                activeOpacity={0.7}
+                disabled={householdSize <= 1}
+              >
+                <Text style={styles.sizeBtnText}>−</Text>
+              </TouchableOpacity>
+              <View style={styles.sizeCenter}>
+                <Text style={styles.sizeNumber}>{householdSize}</Text>
+                <Text style={styles.sizePeople}>people</Text>
+              </View>
+              <TouchableOpacity
+                onPress={() => adjustSize(1)}
+                style={[styles.sizeBtn, householdSize >= 8 && styles.sizeBtnDisabled]}
+                activeOpacity={0.7}
+                disabled={householdSize >= 8}
+              >
+                <Text style={styles.sizeBtnText}>+</Text>
+              </TouchableOpacity>
+            </View>
+            <Text style={styles.sizeHint}>{HOUSEHOLD_HINTS[householdSize]}</Text>
+          </View>
+
+          {/* Dietary needs */}
+          <Text style={styles.sectionLabel}>Dietary needs</Text>
+          <Text style={styles.sectionSub}>Select anything that applies.</Text>
+
+          <View style={styles.pillGrid}>
+            {DIETARY_OPTIONS.map(({ id, label, bg, color }) => {
+              const on = dietaryNeeds.includes(id);
+              return (
+                <TouchableOpacity
+                  key={id}
+                  onPress={() => toggleDietary(id)}
+                  activeOpacity={0.75}
+                  style={[
+                    styles.pill,
+                    on ? { backgroundColor: bg, borderColor: color } : styles.pillOff,
+                  ]}
+                >
+                  <Text style={[styles.pillText, on ? { color } : styles.pillTextOff]}>
+                    {label}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+
           <TouchableOpacity
             onPress={() => {
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-              setStep(1);
+              startGenerating();
             }}
             activeOpacity={0.85}
             style={styles.primaryBtn}
           >
-            <Text style={styles.primaryBtnText}>Let's sort it →</Text>
+            <Text style={styles.primaryBtnText}>Get my plan →</Text>
           </TouchableOpacity>
-          <Text style={styles.promiseSmall}>Takes about 60 seconds.</Text>
-        </View>
+        </ScrollView>
       </View>
     );
   }
 
-  // ═══════════════════════════════════════════════════════════════════
-  // SCREEN 6 — GENERATING
-  // ═══════════════════════════════════════════════════════════════════
-  if (step === 5) {
-    return (
-      <View style={[styles.screen, { backgroundColor: "#FFFFFF", paddingTop, paddingBottom }]}>
-        <View style={styles.generatingCenter}>
-          {/* Small logo mark */}
-          <Image
-            source={sortiiLogo}
-            style={{ width: 120, height: 55, marginBottom: 28 }}
-            resizeMode="contain"
-          />
-
-          {/* Teal pulse circle */}
-          {!generatingDone ? (
-            <>
-              <Animated.View
-                style={[
-                  styles.pulseRing,
-                  { transform: [{ scale: pulseAnim }] },
-                ]}
-              />
-              <View style={styles.pulseCore} />
-              <Animated.Text style={[styles.genMsg, { opacity: fadeAnim, marginTop: 32 }]}>
-                {generatingMsg}
-              </Animated.Text>
-              <Text style={styles.genSub}>We'll have a plan ready in a moment.</Text>
-            </>
-          ) : (
-            <>
-              <View style={[styles.pulseCore, { backgroundColor: TEAL }]} />
-              <Text style={[styles.genMsg, { marginTop: 32 }]}>Done. Your week's sorted.</Text>
-            </>
-          )}
-        </View>
-      </View>
-    );
-  }
-
-  // ═══════════════════════════════════════════════════════════════════
-  // SCREENS 2–5 — shared shell with header + scroll + footer
-  // ═══════════════════════════════════════════════════════════════════
-  const isScreen2 = step === 1;
-  const isScreen3 = step === 2;
-  const isScreen4 = step === 3;
-  const isScreen5 = step === 4;
-
+  // ════════════════════════════════════════════════════════════════
+  // SCREEN 0 — WELCOME
+  // ════════════════════════════════════════════════════════════════
   return (
-    <KeyboardAvoidingView
-      style={{ flex: 1, backgroundColor: "#FFFFFF" }}
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-    >
-      {/* ── Header ── */}
-      <View style={[styles.stepHeader, { paddingTop: paddingTop + 8 }]}>
-        {step > 1 && (
-          <TouchableOpacity
-            onPress={() => setStep((s) => (s - 1) as Step)}
-            style={styles.backLink}
-            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-          >
-            <Text style={styles.backLinkText}>← Back</Text>
-          </TouchableOpacity>
-        )}
-        <ProgressDots filled={step} total={4} />
+    <View style={[styles.root, { paddingTop }]}>
+      {/* ── Wordmark ── */}
+      <View style={styles.welcomeWordmarkRow}>
+        <Text style={styles.welcomeS}>S</Text>
+        <Text style={styles.welcomeOrtii}>ortii</Text>
       </View>
 
-      {/* ── Body ── */}
-      <ScrollView
-        style={{ flex: 1 }}
-        contentContainerStyle={styles.stepBody}
-        keyboardShouldPersistTaps="handled"
-        showsVerticalScrollIndicator={false}
-      >
-        {/* ── SCREEN 2: HOUSEHOLD SIZE ── */}
-        {isScreen2 && (
-          <>
-            <Text style={styles.stepLabel}>STEP 1</Text>
-            <Text style={styles.stepHeadline}>How many are you feeding?</Text>
-            <Text style={styles.stepSub}>Most nights — roughly.</Text>
+      {/* ── Tagline ── */}
+      <Animated.Text style={[styles.welcomeTagline, { opacity: line1 }]}>
+        We take the thinking out of the week.
+      </Animated.Text>
 
-            <View style={styles.stepperRow}>
-              <TouchableOpacity
-                onPress={() => { Haptics.selectionAsync(); setHouseholdSize((n) => Math.max(1, n - 1)); }}
-                style={styles.stepperBtn}
-                activeOpacity={0.7}
-              >
-                <Text style={styles.stepperBtnText}>−</Text>
-              </TouchableOpacity>
-
-              <Text style={styles.stepperNum}>{householdSize}</Text>
-
-              <TouchableOpacity
-                onPress={() => { Haptics.selectionAsync(); setHouseholdSize((n) => Math.min(8, n + 1)); }}
-                style={styles.stepperBtn}
-                activeOpacity={0.7}
-              >
-                <Text style={styles.stepperBtnText}>+</Text>
-              </TouchableOpacity>
-            </View>
-
-            <Text style={styles.stepperHint}>
-              {HOUSEHOLD_HINTS[householdSize] ?? "Big household. We've got you."}
-            </Text>
-          </>
-        )}
-
-        {/* ── SCREEN 3: HARD NO'S ── */}
-        {isScreen3 && (
-          <>
-            <Text style={styles.stepLabel}>STEP 2</Text>
-            <Text style={styles.stepHeadline}>Anything we should never suggest?</Text>
-            <Text style={styles.stepSub}>
-              Allergies, dislikes, things the kids will absolutely riot over.
-            </Text>
-
-            <TextInput
-              style={styles.exclusionInput}
-              value={exclusionText}
-              onChangeText={setExclusionText}
-              placeholder="e.g. shellfish, mushrooms, anything spicy..."
-              placeholderTextColor="#BBBBBB"
-              multiline
-              textAlignVertical="top"
-            />
-
-            <View style={styles.chipRow}>
-              {EXCLUSION_CHIPS.map((chip) => (
-                <TouchableOpacity
-                  key={chip}
-                  onPress={() => appendChip(chip)}
-                  style={styles.exclusionChip}
-                  activeOpacity={0.7}
-                >
-                  <Text style={styles.exclusionChipText}>{chip}</Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-          </>
-        )}
-
-        {/* ── SCREEN 4: DIETARY NEEDS ── */}
-        {isScreen4 && (
-          <>
-            <Text style={styles.stepLabel}>STEP 3</Text>
-            <Text style={styles.stepHeadline}>Any dietary needs in the household?</Text>
-            <Text style={styles.stepSub}>Set once. We'll handle it quietly every week.</Text>
-
-            <View style={styles.dietaryGrid}>
-              {DIETARY_OPTIONS.map(({ id, label }) => {
-                const active = dietaryNeeds.includes(id);
-                return (
-                  <TouchableOpacity
-                    key={id}
-                    onPress={() => toggleDietaryNeed(id)}
-                    style={[styles.dietaryPill, active && styles.dietaryPillActive]}
-                    activeOpacity={0.75}
-                  >
-                    <Text style={[styles.dietaryPillText, active && styles.dietaryPillTextActive]}>
-                      {label}
-                    </Text>
-                  </TouchableOpacity>
-                );
-              })}
-
-              {/* None of these */}
-              <TouchableOpacity
-                onPress={selectNone}
-                style={[styles.dietaryPill, noneSelected && styles.dietaryPillActive]}
-                activeOpacity={0.75}
-              >
-                <Text style={[styles.dietaryPillText, noneSelected && styles.dietaryPillTextActive]}>
-                  None of these
-                </Text>
-              </TouchableOpacity>
-            </View>
-
-            <Text style={styles.dietaryNote}>
-              You can update this anytime in your preferences.
-            </Text>
-          </>
-        )}
-
-        {/* ── SCREEN 5: COOKING PERSONA ── */}
-        {isScreen5 && (
-          <>
-            <Text style={styles.stepLabel}>STEP 4</Text>
-            <Text style={styles.stepHeadline}>
-              On a typical weeknight, what are you working with?
-            </Text>
-            <Text style={styles.stepSub}>
-              We'll match meals to your real life — not a cooking show.
-            </Text>
-
-            <View style={styles.personaList}>
-              {PERSONA_OPTIONS.map((opt) => {
-                const active = cookingPersona === opt.value;
-                return (
-                  <TouchableOpacity
-                    key={opt.value}
-                    onPress={() => {
-                      Haptics.selectionAsync();
-                      setCookingPersona(opt.value);
-                    }}
-                    style={[styles.personaCard, active && styles.personaCardActive]}
-                    activeOpacity={0.8}
-                  >
-                    <Text style={styles.personaIcon}>{opt.icon}</Text>
-                    <View style={styles.personaText}>
-                      <Text style={[styles.personaLabel, active && styles.personaLabelActive]}>
-                        {opt.label}
-                      </Text>
-                      <Text style={styles.personaSub}>{opt.sub}</Text>
-                    </View>
-                  </TouchableOpacity>
-                );
-              })}
-            </View>
-          </>
-        )}
-      </ScrollView>
-
-      {/* ── Footer ── */}
-      <View style={[styles.stepFooter, { paddingBottom: paddingBottom + 4 }]}>
-        {isScreen2 && (
-          <>
-            <TouchableOpacity
-              onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); setStep(2); }}
-              activeOpacity={0.85}
-              style={styles.primaryBtn}
-            >
-              <Text style={styles.primaryBtnText}>That's us →</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => setStep(0)} style={styles.backLinkFooter}>
-              <Text style={styles.backLinkText}>← Back</Text>
-            </TouchableOpacity>
-          </>
-        )}
-
-        {isScreen3 && (
-          <>
-            <TouchableOpacity
-              onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); setStep(3); }}
-              activeOpacity={0.85}
-              style={styles.primaryBtn}
-            >
-              <Text style={styles.primaryBtnText}>Got it →</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => { setExclusionText(""); setStep(3); }}
-              style={styles.skipLink}
-              activeOpacity={0.7}
-            >
-              <Text style={styles.skipLinkText}>Skip — nothing to avoid →</Text>
-            </TouchableOpacity>
-          </>
-        )}
-
-        {isScreen4 && (
-          <>
-            <TouchableOpacity
-              onPress={() => {
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-                setStep(4);
-              }}
-              activeOpacity={0.85}
-              style={styles.primaryBtn}
-            >
-              <Text style={styles.primaryBtnText}>Nearly there →</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => { setDietaryNeeds([]); setNoneSelected(false); setStep(4); }}
-              style={styles.skipLink}
-              activeOpacity={0.7}
-            >
-              <Text style={styles.skipLinkText}>Skip for now →</Text>
-            </TouchableOpacity>
-          </>
-        )}
-
-        {isScreen5 && (
-          <>
-            <TouchableOpacity
-              onPress={() => {
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-                startGenerating();
-              }}
-              activeOpacity={0.85}
-              style={[styles.primaryBtn, styles.primaryBtnGold]}
-              disabled={cookingPersona === null}
-            >
-              <Text style={styles.primaryBtnText}>Sort my meals →</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => { startGenerating("quick"); }}
-              style={styles.skipLink}
-              activeOpacity={0.7}
-            >
-              <Text style={styles.skipLinkText}>Skip for now →</Text>
-            </TouchableOpacity>
-          </>
-        )}
+      {/* ── Value props ── */}
+      <View style={styles.valueProps}>
+        {[
+          { anim: line1, icon: "🥘", text: "Dinners planned — no thinking required" },
+          { anim: line2, icon: "📅", text: "Your week in one clear view" },
+          { anim: line3, icon: "💰", text: "Know where your money actually goes" },
+        ].map(({ anim, icon, text }) => (
+          <Animated.View key={text} style={[styles.valueProp, { opacity: anim }]}>
+            <Text style={styles.valuePropIcon}>{icon}</Text>
+            <Text style={styles.valuePropText}>{text}</Text>
+          </Animated.View>
+        ))}
       </View>
-    </KeyboardAvoidingView>
+
+      {/* ── CTA ── */}
+      <Animated.View style={[styles.ctaWrap, { opacity: ctaAnim, paddingBottom }]}>
+        <TouchableOpacity
+          onPress={() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+            setStep(1);
+          }}
+          activeOpacity={0.85}
+          style={styles.primaryBtn}
+        >
+          <Text style={styles.primaryBtnText}>Set up my week →</Text>
+        </TouchableOpacity>
+        <Text style={styles.welcomeNote}>Takes about 30 seconds. No account required.</Text>
+      </Animated.View>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  screen: {
+  root: {
     flex: 1,
+    backgroundColor: CREAM,
+    paddingHorizontal: 24,
+  },
+  scroll: {
+    flexGrow: 1,
   },
 
-  // ── Screen 1: Promise ──────────────────────────────────────────────
-  promiseCenter: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    paddingHorizontal: 32,
-  },
-  promiseLogo: {
-    width: 220,
-    height: 100,
-  },
-  promiseTagline: {
-    fontSize: 28,
-    fontFamily: "PlayfairDisplay_700Bold",
-    textAlign: "center",
-    color: TEXT,
-    marginTop: 24,
-  },
-  promiseLines: {
-    marginTop: 20,
-    alignItems: "center",
-  },
-  promiseLine: {
-    fontSize: 16,
-    fontFamily: "Inter_400Regular",
-    color: MUTED,
-    textAlign: "center",
-    lineHeight: 32,
-  },
-  promiseCta: {
-    paddingHorizontal: 24,
-    paddingTop: 12,
-    gap: 0,
-  },
-  promiseSmall: {
-    fontSize: 12,
-    fontFamily: "Inter_400Regular",
-    color: MUTED,
-    textAlign: "center",
-    marginTop: 10,
-  },
-
-  // ── Steps 2–4: shared shell ───────────────────────────────────────
-  stepHeader: {
-    paddingHorizontal: 24,
-    paddingBottom: 4,
-    alignItems: "center",
-    gap: 12,
-  },
-  backLink: {
-    alignSelf: "flex-start",
-  },
-  backLinkText: {
-    fontSize: 13,
-    fontFamily: "Inter_400Regular",
-    color: MUTED,
-  },
-  progressDots: {
+  // ── Welcome ─────────────────────────────────────────────────────
+  welcomeWordmarkRow: {
     flexDirection: "row",
-    gap: 8,
-    justifyContent: "center",
-  },
-  dot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-  },
-  stepBody: {
-    paddingHorizontal: 24,
-    paddingTop: 20,
-    paddingBottom: 16,
-  },
-  stepLabel: {
-    fontSize: 11,
-    fontFamily: "Inter_600SemiBold",
-    color: PLUM,
-    letterSpacing: 1.2,
+    alignItems: "baseline",
+    marginTop: 32,
     marginBottom: 8,
   },
-  stepHeadline: {
-    fontSize: 26,
+  welcomeS: {
     fontFamily: "PlayfairDisplay_700Bold",
-    color: TEXT,
-    lineHeight: 34,
+    fontSize: 44,
+    color: TEAL,
+    letterSpacing: -1,
+  },
+  welcomeOrtii: {
+    fontFamily: "PlayfairDisplay_400Regular",
+    fontSize: 38,
+    color: TEAL,
+    letterSpacing: -1,
+  },
+  welcomeTagline: {
+    fontFamily: "Inter_400Regular",
+    fontSize: 16,
+    color: MUTED,
+    marginBottom: 36,
+    lineHeight: 24,
+  },
+  valueProps: {
+    flex: 1,
+    gap: 20,
+    marginBottom: 24,
+  },
+  valueProp: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 16,
+  },
+  valuePropIcon: {
+    fontSize: 28,
+    width: 40,
+    textAlign: "center",
+  },
+  valuePropText: {
+    fontFamily: "Manrope_600SemiBold",
+    fontSize: 17,
+    color: INK,
+    lineHeight: 24,
+    flex: 1,
+  },
+  ctaWrap: {
+    gap: 12,
+  },
+  welcomeNote: {
+    fontFamily: "Inter_400Regular",
+    fontSize: 13,
+    color: MUTED,
+    textAlign: "center",
+  },
+
+  // ── Step 1 ───────────────────────────────────────────────────────
+  backBtn: {
+    paddingVertical: 4,
+    marginBottom: 20,
+    alignSelf: "flex-start",
+  },
+  backText: {
+    fontFamily: "Inter_400Regular",
+    fontSize: 14,
+    color: TEAL,
+  },
+  stepHeading: {
+    fontFamily: "Manrope_700Bold",
+    fontSize: 26,
+    color: INK,
     marginBottom: 8,
   },
   stepSub: {
+    fontFamily: "Inter_400Regular",
     fontSize: 15,
-    fontFamily: "Inter_400Regular",
     color: MUTED,
-    lineHeight: 22,
     marginBottom: 28,
-  },
-  stepFooter: {
-    paddingHorizontal: 24,
-    paddingTop: 12,
-    gap: 10,
-  },
-  backLinkFooter: {
-    alignSelf: "center",
-  },
-  skipLink: {
-    alignSelf: "center",
-    paddingVertical: 4,
-  },
-  skipLinkText: {
-    fontSize: 13,
-    fontFamily: "Inter_400Regular",
-    color: MUTED,
-    textAlign: "center",
-  },
-
-  // ── Primary button ────────────────────────────────────────────────
-  primaryBtn: {
-    backgroundColor: TEAL,
-    height: 54,
-    borderRadius: 14,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  primaryBtnGold: {
-    backgroundColor: "#D29A22",
-  },
-  primaryBtnText: {
-    fontSize: 17,
-    fontFamily: "Inter_700Bold",
-    color: "#FFFFFF",
-  },
-
-  // ── Screen 5: Cooking Persona ─────────────────────────────────────
-  personaList: {
-    gap: 12,
-  },
-  personaCard: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    gap: 14,
-    backgroundColor: "#FFFFFF",
-    borderWidth: 1.5,
-    borderColor: "#E6E1D7",
-    borderRadius: 14,
-    padding: 16,
-  },
-  personaCardActive: {
-    borderColor: TEAL,
-    backgroundColor: "#E6F3F0",
-  },
-  personaIcon: {
-    fontSize: 24,
-    marginTop: 1,
-  },
-  personaText: {
-    flex: 1,
-    gap: 4,
-  },
-  personaLabel: {
-    fontSize: 16,
-    fontFamily: "Inter_600SemiBold",
-    color: "#2B2B2B",
     lineHeight: 22,
   },
-  personaLabelActive: {
-    color: TEAL,
-  },
-  personaSub: {
-    fontSize: 13,
-    fontFamily: "Inter_400Regular",
-    color: "#888",
-    lineHeight: 18,
-  },
 
-  // ── Screen 2: Stepper ─────────────────────────────────────────────
-  stepperRow: {
+  sizeCard: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 28,
+    shadowColor: "#000",
+    shadowOpacity: 0.04,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 2,
+  },
+  sizeRow: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
-    gap: 32,
-    marginVertical: 8,
+    justifyContent: "space-between",
+    marginBottom: 8,
   },
-  stepperBtn: {
+  sizeBtn: {
     width: 48,
     height: 48,
-    borderRadius: 24,
-    borderWidth: 2,
-    borderColor: TEAL,
+    borderRadius: 12,
+    backgroundColor: TEAL_TINT,
     alignItems: "center",
     justifyContent: "center",
   },
-  stepperBtnText: {
-    fontSize: 24,
-    fontFamily: "Inter_400Regular",
-    color: TEAL,
-    lineHeight: 28,
+  sizeBtnDisabled: {
+    opacity: 0.35,
   },
-  stepperNum: {
-    fontSize: 72,
+  sizeBtnText: {
+    fontFamily: "Inter_600SemiBold",
+    fontSize: 22,
+    color: TEAL,
+    lineHeight: 26,
+  },
+  sizeCenter: {
+    alignItems: "center",
+  },
+  sizeNumber: {
     fontFamily: "PlayfairDisplay_700Bold",
-    color: TEAL,
-    lineHeight: 80,
-    minWidth: 80,
-    textAlign: "center",
+    fontSize: 52,
+    color: INK,
+    lineHeight: 58,
   },
-  stepperHint: {
-    fontSize: 14,
+  sizePeople: {
     fontFamily: "Inter_400Regular",
-    fontStyle: "italic",
+    fontSize: 13,
+    color: MUTED,
+  },
+  sizeHint: {
+    fontFamily: "Inter_400Regular",
+    fontSize: 13,
     color: MUTED,
     textAlign: "center",
-    marginTop: 12,
   },
 
-  // ── Screen 3: Hard no's ───────────────────────────────────────────
-  exclusionInput: {
-    height: 120,
-    backgroundColor: "#F8F6F3",
-    borderWidth: 1,
-    borderColor: BORDER,
-    borderRadius: 12,
-    paddingHorizontal: 14,
-    paddingTop: 12,
-    paddingBottom: 12,
-    fontSize: 15,
+  sectionLabel: {
+    fontFamily: "Manrope_700Bold",
+    fontSize: 16,
+    color: INK,
+    marginBottom: 4,
+  },
+  sectionSub: {
     fontFamily: "Inter_400Regular",
-    color: TEXT,
-    marginBottom: 16,
+    fontSize: 13,
+    color: MUTED,
+    marginBottom: 14,
   },
-  chipRow: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 8,
-  },
-  exclusionChip: {
-    backgroundColor: "#FFFFFF",
-    borderWidth: 1,
-    borderColor: BORDER,
-    borderRadius: 20,
-    paddingVertical: 4,
-    paddingHorizontal: 12,
-  },
-  exclusionChipText: {
-    fontSize: 12,
-    fontFamily: "Inter_400Regular",
-    color: TEXT,
-  },
-
-  // ── Screen 4: Dietary needs ───────────────────────────────────────
-  dietaryGrid: {
+  pillGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
     gap: 10,
-    marginBottom: 16,
+    marginBottom: 32,
   },
-  dietaryPill: {
-    backgroundColor: "#FFFFFF",
+  pill: {
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 20,
     borderWidth: 1.5,
+  },
+  pillOff: {
+    backgroundColor: "#FFFFFF",
     borderColor: BORDER,
-    borderRadius: 24,
-    paddingVertical: 12,
-    paddingHorizontal: 20,
   },
-  dietaryPillActive: {
-    backgroundColor: PLUM,
-    borderColor: PLUM,
-  },
-  dietaryPillText: {
-    fontSize: 15,
+  pillText: {
     fontFamily: "Inter_500Medium",
-    color: TEXT,
+    fontSize: 14,
   },
-  dietaryPillTextActive: {
-    color: "#FFFFFF",
-    fontFamily: "Inter_600SemiBold",
-  },
-  dietaryNote: {
-    fontSize: 12,
-    fontFamily: "Inter_400Regular",
+  pillTextOff: {
     color: MUTED,
-    textAlign: "center",
-    marginTop: 8,
   },
 
-  // ── Screen 5: Generating ──────────────────────────────────────────
-  generatingCenter: {
+  // ── Generating ───────────────────────────────────────────────────
+  genRoot: {
     flex: 1,
+    backgroundColor: CREAM,
     alignItems: "center",
     justifyContent: "center",
-    paddingHorizontal: 32,
+    paddingHorizontal: 24,
   },
-  pulseRing: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    borderWidth: 3,
-    borderColor: TEAL,
+  genRing: {
+    width: 88,
+    height: 88,
+    borderRadius: 44,
+    backgroundColor: TEAL_TINT,
     position: "absolute",
-    opacity: 0.35,
   },
-  pulseCore: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    backgroundColor: `${TEAL}22`,
-    borderWidth: 2,
-    borderColor: TEAL,
+  genEmoji: {
+    fontSize: 40,
+    marginBottom: 28,
   },
   genMsg: {
-    fontSize: 18,
-    fontFamily: "Inter_600SemiBold",
-    color: TEXT,
-    textAlign: "center",
-    lineHeight: 26,
-  },
-  genSub: {
-    fontSize: 14,
     fontFamily: "Inter_400Regular",
+    fontSize: 16,
     color: MUTED,
     textAlign: "center",
-    marginTop: 10,
+    lineHeight: 24,
+  },
+  genDone: {
+    fontFamily: "Inter_600SemiBold",
+    fontSize: 15,
+    color: TEAL,
+    marginTop: 16,
+  },
+
+  // ── Shared ───────────────────────────────────────────────────────
+  primaryBtn: {
+    backgroundColor: TEAL,
+    borderRadius: 14,
+    paddingVertical: 17,
+    alignItems: "center",
+  },
+  primaryBtnText: {
+    fontFamily: "Manrope_700Bold",
+    fontSize: 17,
+    color: "#FFFFFF",
+    letterSpacing: 0.2,
   },
 });

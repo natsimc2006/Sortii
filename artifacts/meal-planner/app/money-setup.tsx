@@ -20,6 +20,7 @@ import { usePlanner } from "@/context/PlannerContext";
 import { useUserWeek } from "@/context/UserWeekContext";
 import { WeekGoal } from "@/utils/yourWeekEngine";
 import { getOnboardingState } from "@/utils/onboardingState";
+import { loadBills, Bill } from "@/utils/billStore";
 
 const C = Colors.light;
 
@@ -212,12 +213,32 @@ export default function MoneySetupScreen() {
   const [takeaway,      setTakeaway]      = useState("");   // weekly
   const [entertainment, setEntertainment] = useState("");   // monthly
 
-  const [selectedGoal,  setSelectedGoal]  = useState<WeekGoal>("none");
-  const [saving,        setSaving]        = useState(false);
-  const [hasMealsSetup, setHasMealsSetup] = useState(false);
+  const [selectedGoal,       setSelectedGoal]       = useState<WeekGoal>("none");
+  const [saving,             setSaving]             = useState(false);
+  const [hasMealsSetup,      setHasMealsSetup]      = useState(false);
+  const [billsAutoMonthly,   setBillsAutoMonthly]   = useState<number | null>(null);
+  const [billsAutoOverride,  setBillsAutoOverride]  = useState(false);
 
   useEffect(() => {
     getOnboardingState().then((s) => setHasMealsSetup(s.hasMealsSetup));
+    // Load recurring bills and compute their monthly total
+    loadBills().then((bills) => {
+      const recurringMonthly = bills
+        .filter((b) => b.billType === "recurring")
+        .reduce((sum, b) => {
+          switch (b.recurrenceType) {
+            case "Weekly":      return sum + b.amount * 4.3;
+            case "Fortnightly": return sum + b.amount * 2.15;
+            case "Monthly":     return sum + b.amount;
+            case "Quarterly":   return sum + b.amount / 3;
+            case "Yearly":      return sum + b.amount / 12;
+            default:            return sum + b.amount;
+          }
+        }, 0);
+      if (recurringMonthly > 0) {
+        setBillsAutoMonthly(Math.round(recurringMonthly));
+      }
+    }).catch(() => {});
   }, []);
 
   // Restore saved values
@@ -254,7 +275,11 @@ export default function MoneySetupScreen() {
   const weeklyIncome = monthlyIncome / 4.3;
 
   const w_mortgage  = safeNum(mortgageRent)  / 4.3;
-  const w_bills     = safeNum(billsLoans)    / 4.3;
+  // Bills: use auto-calc from billStore unless user has overridden
+  const effectiveBillsMonthly = (!billsAutoOverride && billsAutoMonthly !== null)
+    ? billsAutoMonthly
+    : safeNum(billsLoans);
+  const w_bills = effectiveBillsMonthly / 4.3;
   const w_subs      = safeNum(subscriptions) / 4.3;
   const w_groceries = safeNum(groceries);
   const w_coffee    = safeNum(coffeeSpend);
@@ -269,7 +294,8 @@ export default function MoneySetupScreen() {
     committedBreathingRoom - w_coffee - w_takeaway - w_entertain;
 
   const hasAnyCommitted =
-    incomeRaw !== "" || mortgageRent !== "" || billsLoans !== "" ||
+    incomeRaw !== "" || mortgageRent !== "" ||
+    billsLoans !== "" || billsAutoMonthly !== null ||
     subscriptions !== "" || groceries !== "";
 
   const hasAnyLifestyle =
@@ -294,7 +320,7 @@ export default function MoneySetupScreen() {
         rawIncome:       incomeVal,
         incomePeriod:    incomeFreq,
         rawMortgageRent: safeNum(mortgageRent) > 0 ? safeNum(mortgageRent) : undefined,
-        rawBillsLoans:   safeNum(billsLoans)   > 0 ? safeNum(billsLoans)   : undefined,
+        rawBillsLoans:   effectiveBillsMonthly > 0 ? effectiveBillsMonthly : undefined,
       },
       {
         streaming:    safeNum(subscriptions),
@@ -402,14 +428,41 @@ export default function MoneySetupScreen() {
           />
           <View style={[styles.divider, { backgroundColor: C.border }]} />
 
-          <MoneyField
-            label="Bills, loans & regular payments"
-            sublabel="Electricity, rates, loan repayments, insurance — monthly total."
-            value={billsLoans}
-            onChange={setBillsLoans}
-            currencySymbol={currencySymbol}
-            frequencyVariant="monthly"
-          />
+          {/* Bills field — auto-fills from bills store when available */}
+          {billsAutoMonthly !== null && !billsAutoOverride ? (
+            <View>
+              <Text style={[styles.fieldLabel, { color: C.text }]}>
+                Bills, loans & regular payments
+              </Text>
+              <View style={styles.autoCalcRow}>
+                <View style={styles.autoCalcPill}>
+                  <Text style={styles.autoCalcPillText}>From your bills ✓</Text>
+                </View>
+                <Text style={styles.autoCalcValue}>
+                  {currencySymbol}{billsAutoMonthly.toLocaleString()} /month
+                </Text>
+                <TouchableOpacity
+                  onPress={() => {
+                    setBillsAutoOverride(true);
+                    setBillsLoans(String(billsAutoMonthly));
+                  }}
+                  activeOpacity={0.7}
+                  style={styles.autoCalcOverrideBtn}
+                >
+                  <Text style={styles.autoCalcOverrideBtnText}>Edit</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          ) : (
+            <MoneyField
+              label="Bills, loans & regular payments"
+              sublabel="Electricity, rates, loan repayments, insurance — monthly total."
+              value={billsLoans}
+              onChange={setBillsLoans}
+              currencySymbol={currencySymbol}
+              frequencyVariant="monthly"
+            />
+          )}
           <View style={[styles.divider, { backgroundColor: C.border }]} />
 
           <MoneyField
@@ -727,6 +780,43 @@ const styles = StyleSheet.create({
   goalSkip:  { fontSize: 13, fontFamily: "Inter_400Regular", textAlign: "center", textDecorationLine: "underline" },
 
   footNote: { fontSize: 12, fontFamily: "Inter_400Regular", textAlign: "center", lineHeight: 18 },
+
+  autoCalcRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    paddingVertical: 12,
+    flexWrap: "wrap",
+  },
+  autoCalcPill: {
+    backgroundColor: "#E6F3F0",
+    borderRadius: 10,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+  },
+  autoCalcPillText: {
+    fontFamily: "Inter_600SemiBold",
+    fontSize: 12,
+    color: "#2A8F88",
+  },
+  autoCalcValue: {
+    fontFamily: "Inter_600SemiBold",
+    fontSize: 16,
+    color: "#1A1410",
+    flex: 1,
+  },
+  autoCalcOverrideBtn: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#D3CCC0",
+  },
+  autoCalcOverrideBtnText: {
+    fontFamily: "Inter_500Medium",
+    fontSize: 13,
+    color: "#8A7968",
+  },
 
   footer:       { paddingHorizontal: 24, paddingTop: 16, borderTopWidth: 1, gap: 8 },
   disabledHint: { fontSize: 12.5, fontFamily: "Inter_400Regular", textAlign: "center", marginBottom: 8 },

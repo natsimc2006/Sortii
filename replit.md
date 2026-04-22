@@ -125,8 +125,37 @@ Expo / React Native mobile app — **Sortii**, a weekly household meal planner f
 - `app/(tabs)/bills.tsx` — full CRUD: 10 categories, recurring bills, auto-advance on mark-paid, status computed from due date
 - `app/(tabs)/more.tsx` — "Organised life" section links to What's Coming Up, Appointments, Bills
 
+**User-scoped storage (v4 — cloud-sync ready):**
+- `utils/storageKeys.ts` — `SK` factory: `sortii:u:{userId}:{domain}` keys for all user data
+- `utils/currentUser.ts` — `getCurrentUserId()` / `setCurrentUserId()` module-level singleton
+- `utils/authStore.ts` — Google OAuth + Apple iOS sign-in with dynamic import; creates `anon_{uuid}` for skip-for-now flow
+- `app/sign-in.tsx` — Sign-in screen with wordmark, Google + Apple buttons, skip option
+- `app/_layout.tsx` — AuthGate on boot: checks `getAuthUser`, sets userId, redirects to /sign-in if unauthenticated
+- All stores migrated to user-scoped keys: billStore, onboardingState, familyStore, appointmentStore, favoritesStore, householdProfile, nudgeEngine, PlannerContext, calendarTypes, googleCalendar, appointmentService, money.tsx, home.tsx, family.tsx, appointments.tsx
+- `SK` domains: `plan`, `prefs`, `savedPlans`, `hiddenRecipes`, `onboarded`, `onboarding`, `family`, `bills`, `appts`, `household`, `snapshotSeen`, `moneyNudge`, `calAppleConn`, `calAppleIds`, `calGoogleConn`, `calGoogleToken`, `calGoogleRefreshToken`, `calGoogleIds`, `calGoogleEmail`, `calEvents`, `calPushed`, `welcomeTip`, `crossSellNudge`, `juggle`, `nudgeDate`, `lastOpened`
+
+**Calendar integration (v4):**
+- `utils/calendarTypes.ts` — `SortiiCalEvent`, `CalendarSettings`, `FAMILY_PUSHED_KEY`, `calKeys` getter
+- `utils/appleCalendar.ts` — `requestPermission`, `getCalendars`, `getUpcomingAppleEvents`
+- `utils/googleCalendar.ts` — OAuth sign-in, calendar list, events fetch, token refresh
+- `utils/appointmentService.ts` — `getAllUpcomingEvents`, merge/dedupe across Apple + Google + manual
+- `app/(tabs)/appointments.tsx` — full calendar layer: source status pills (Apple/Google/+Add), CalendarEventCard with source dot + family push toggle, Apple connection flow (permission → calendar selector), Google connection flow (OAuth), pull-to-refresh, last synced timestamp, bulk Saturday add
+- `app/(tabs)/home.tsx` — CALENDARS section in settings sheet; calendar push count in family card
+- `app/(tabs)/family.tsx` — loads `FAMILY_PUSHED_KEY` events with 📅 badge; included in juggle AI prompt
+
+**Home screen cross-sell nudge (v4):**
+- One-time dismissible nudge at bottom of home screen
+- Priority: money setup → family → bills (only when meals are planned)
+- Saved to `SK.crossSellNudge(uid)` on dismiss
+
+**money-setup.tsx bills auto-calc (v4):**
+- Reads `billStore` recurring bills on mount, computes monthly total
+- Shows "From your bills ✓" auto-fill badge with "Edit" override option
+- `effectiveBillsMonthly` flows through all derived calculations and save
+
 **Data model:**
 - AsyncStorage keys: `@sortii_appointments_v1`, `@sortii_bills_v1`, `@sortii_family_v2`, `@sortii_juggle_result_v1`
+- User-scoped key schema: `sortii:u:{userId}:{domain}` — all new writes use this schema
 - `FamilyState.members` — `{ id, name, role, color }` with `FamilyEvent` having `personIds[]` and optional `driverId`
 - Reminder severities: `important` (red) → `heads_up` (gold) → `gentle` (teal)
 

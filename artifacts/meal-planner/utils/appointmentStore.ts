@@ -1,6 +1,10 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { SK } from "./storageKeys";
+import { getCurrentUserId } from "./currentUser";
 
-export const APPOINTMENTS_KEY = "@sortii_appointments_v1";
+export const APPOINTMENTS_KEY = "@sortii_appointments_v1"; // legacy
+
+function key(): string { return SK.appts(getCurrentUserId()); }
 
 export interface ChecklistItem {
   id: string;
@@ -40,7 +44,7 @@ export interface Appointment {
 
 export async function loadAppointments(): Promise<Appointment[]> {
   try {
-    const raw = await AsyncStorage.getItem(APPOINTMENTS_KEY);
+    const raw = await AsyncStorage.getItem(key());
     if (!raw) return [];
     const parsed = JSON.parse(raw);
     return Array.isArray(parsed) ? parsed : [];
@@ -48,7 +52,7 @@ export async function loadAppointments(): Promise<Appointment[]> {
 }
 
 export async function saveAppointments(items: Appointment[]): Promise<void> {
-  await AsyncStorage.setItem(APPOINTMENTS_KEY, JSON.stringify(items));
+  await AsyncStorage.setItem(key(), JSON.stringify(items));
 }
 
 export function getAppointmentDayStr(appt: Appointment): string {

@@ -1,4 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { SK } from "@/utils/storageKeys";
+import { getCurrentUserId } from "@/utils/currentUser";
 import { getCurrentAustralianSeason, getRecipeSeasonalScore } from "@/utils/seasonUtils";
 import React, {
   createContext,
@@ -79,13 +81,16 @@ interface PlannerContextType {
 
 const PlannerContext = createContext<PlannerContextType | null>(null);
 
-const STORAGE_KEYS = {
-  preferences: "@mealplanner_preferences",
-  savedPlans: "@mealplanner_savedplans",
-  currentPlan: "@mealplanner_currentplan",
-  onboarded: "@mealplanner_onboarded",
-  hiddenRecipes: "@mealplanner_hiddenrecipes",
-};
+function STORAGE_KEYS() {
+  const uid = getCurrentUserId();
+  return {
+    preferences:  SK.prefs(uid),
+    savedPlans:   SK.savedPlans(uid),
+    currentPlan:  SK.plan(uid),
+    onboarded:    SK.onboarded(uid),
+    hiddenRecipes:SK.hiddenRecipes(uid),
+  };
+}
 
 function buildEmptyPlan(prefs: PlanPreferences): MealPlanEntry[] {
   const entries: MealPlanEntry[] = [];
@@ -163,11 +168,11 @@ export function PlannerProvider({ children }: { children: React.ReactNode }) {
     (async () => {
       try {
         const [prefStr, plansStr, planStr, onbStr, hiddenStr] = await Promise.all([
-          AsyncStorage.getItem(STORAGE_KEYS.preferences),
-          AsyncStorage.getItem(STORAGE_KEYS.savedPlans),
-          AsyncStorage.getItem(STORAGE_KEYS.currentPlan),
-          AsyncStorage.getItem(STORAGE_KEYS.onboarded),
-          AsyncStorage.getItem(STORAGE_KEYS.hiddenRecipes),
+          AsyncStorage.getItem(STORAGE_KEYS().preferences),
+          AsyncStorage.getItem(STORAGE_KEYS().savedPlans),
+          AsyncStorage.getItem(STORAGE_KEYS().currentPlan),
+          AsyncStorage.getItem(STORAGE_KEYS().onboarded),
+          AsyncStorage.getItem(STORAGE_KEYS().hiddenRecipes),
         ]);
         if (prefStr) {
           const parsed = JSON.parse(prefStr);
@@ -194,7 +199,7 @@ export function PlannerProvider({ children }: { children: React.ReactNode }) {
   const setPreferences = useCallback(async (prefs: PlanPreferences) => {
     setPreferencesState(prefs);
     setPreferencesDirtyState(true);
-    await AsyncStorage.setItem(STORAGE_KEYS.preferences, JSON.stringify(prefs));
+    await AsyncStorage.setItem(STORAGE_KEYS().preferences, JSON.stringify(prefs));
   }, []);
 
   const setPreferencesDirty = useCallback((v: boolean) => {
@@ -203,12 +208,12 @@ export function PlannerProvider({ children }: { children: React.ReactNode }) {
 
   const setCurrentPlan = useCallback(async (plan: MealPlanEntry[]) => {
     setCurrentPlanState(plan);
-    await AsyncStorage.setItem(STORAGE_KEYS.currentPlan, JSON.stringify(plan));
+    await AsyncStorage.setItem(STORAGE_KEYS().currentPlan, JSON.stringify(plan));
   }, []);
 
   const setIsOnboarded = useCallback(async (val: boolean) => {
     setIsOnboardedState(val);
-    await AsyncStorage.setItem(STORAGE_KEYS.onboarded, val ? "true" : "false");
+    await AsyncStorage.setItem(STORAGE_KEYS().onboarded, val ? "true" : "false");
   }, []);
 
   const getRecipeById = useCallback(
@@ -574,7 +579,7 @@ export function PlannerProvider({ children }: { children: React.ReactNode }) {
       };
       const updated = [newPlan, ...savedPlans];
       setSavedPlans(updated);
-      await AsyncStorage.setItem(STORAGE_KEYS.savedPlans, JSON.stringify(updated));
+      await AsyncStorage.setItem(STORAGE_KEYS().savedPlans, JSON.stringify(updated));
     },
     [currentPlan, preferences, savedPlans]
   );
@@ -583,9 +588,9 @@ export function PlannerProvider({ children }: { children: React.ReactNode }) {
     (plan: SavedPlan) => {
       setCurrentPlanState(plan.meals);
       setPreferencesState(plan.preferences);
-      AsyncStorage.setItem(STORAGE_KEYS.currentPlan, JSON.stringify(plan.meals));
+      AsyncStorage.setItem(STORAGE_KEYS().currentPlan, JSON.stringify(plan.meals));
       AsyncStorage.setItem(
-        STORAGE_KEYS.preferences,
+        STORAGE_KEYS().preferences,
         JSON.stringify(plan.preferences)
       );
     },
@@ -596,7 +601,7 @@ export function PlannerProvider({ children }: { children: React.ReactNode }) {
     async (id: string) => {
       const updated = savedPlans.filter((p) => p.id !== id);
       setSavedPlans(updated);
-      await AsyncStorage.setItem(STORAGE_KEYS.savedPlans, JSON.stringify(updated));
+      await AsyncStorage.setItem(STORAGE_KEYS().savedPlans, JSON.stringify(updated));
     },
     [savedPlans]
   );
@@ -604,7 +609,7 @@ export function PlannerProvider({ children }: { children: React.ReactNode }) {
   const hideRecipe = useCallback(async (id: string) => {
     const updated = [...new Set([...hiddenRecipes, id])];
     setHiddenRecipes(updated);
-    await AsyncStorage.setItem(STORAGE_KEYS.hiddenRecipes, JSON.stringify(updated));
+    await AsyncStorage.setItem(STORAGE_KEYS().hiddenRecipes, JSON.stringify(updated));
     setCurrentPlanState((prev) => {
       const newPlan = prev.map((entry) => {
         if (entry.recipeId !== id) return entry;
@@ -613,7 +618,7 @@ export function PlannerProvider({ children }: { children: React.ReactNode }) {
         const picks = pickRecipes(pool, 1, preferences.mealVariety, filledIds);
         return { ...entry, recipeId: picks[0]?.id ?? null };
       });
-      AsyncStorage.setItem(STORAGE_KEYS.currentPlan, JSON.stringify(newPlan));
+      AsyncStorage.setItem(STORAGE_KEYS().currentPlan, JSON.stringify(newPlan));
       return newPlan;
     });
   }, [hiddenRecipes, preferences, appRecipes]);
@@ -632,7 +637,7 @@ export function PlannerProvider({ children }: { children: React.ReactNode }) {
       const newPlan = prev.map((e) =>
         e.day === day && e.slot === slot ? { ...e, recipeId: picks[0].id } : e
       );
-      AsyncStorage.setItem(STORAGE_KEYS.currentPlan, JSON.stringify(newPlan));
+      AsyncStorage.setItem(STORAGE_KEYS().currentPlan, JSON.stringify(newPlan));
       return newPlan;
     });
   }, [preferences, hiddenRecipes, appRecipes]);

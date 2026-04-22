@@ -60,7 +60,10 @@ const DAY_ABBR: Record<DayOfWeek, string> = {
   Friday: "Fri", Saturday: "Sat", Sunday: "Sun",
 };
 
-const JUGGLE_RESULT_KEY = "@sortii_juggle_result_v1";
+import { SK } from "@/utils/storageKeys";
+import { getCurrentUserId } from "@/utils/currentUser";
+
+function juggleKey() { return SK.juggle(getCurrentUserId()); }
 const HELPERS_KEY       = "@sortii_helpers_v1";
 
 // ── Family helpers ─────────────────────────────────────────────────────────────
@@ -2074,7 +2077,7 @@ export default function FamilyScreen() {
   const load = useCallback(async () => {
     const [s, savedJuggle, savedHelpers, appts] = await Promise.all([
       loadFamilyState(),
-      AsyncStorage.getItem(JUGGLE_RESULT_KEY),
+      AsyncStorage.getItem(juggleKey()),
       AsyncStorage.getItem(HELPERS_KEY),
       loadAppointments(),
     ]);
@@ -2189,7 +2192,7 @@ export default function FamilyScreen() {
       swapOverrides: { ...(juggleResult.swapOverrides ?? {}), [event_id]: adult },
     };
     setJuggleResult(updated);
-    await AsyncStorage.setItem(JUGGLE_RESULT_KEY, JSON.stringify(updated));
+    await AsyncStorage.setItem(juggleKey(), JSON.stringify(updated));
   }
 
   async function handleSortJuggle() {
@@ -2257,7 +2260,7 @@ export default function FamilyScreen() {
       const full: JuggleResult = { ...resultData, solvedAt: Date.now() };
 
       console.log("[Sortii] Sort completed — results payload created, events in result:", full.events?.length);
-      await AsyncStorage.setItem(JUGGLE_RESULT_KEY, JSON.stringify(full));
+      await AsyncStorage.setItem(juggleKey(), JSON.stringify(full));
       setJuggleResult(full);
       setIsSorted(true);
       setFamilyStep("results");

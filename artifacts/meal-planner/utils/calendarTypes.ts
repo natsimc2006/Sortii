@@ -35,6 +35,7 @@ export interface CalendarSettings {
   googleCalendarIds: string[];
 }
 
+// Legacy constants — kept for callers not yet migrated
 export const APPLE_CONNECTED_KEY      = "sortii_apple_connected";
 export const APPLE_CALENDAR_IDS_KEY   = "sortii_apple_calendar_ids";
 export const GOOGLE_CONNECTED_KEY     = "sortii_google_connected";
@@ -44,6 +45,22 @@ export const GOOGLE_EMAIL_KEY         = "sortii_google_user_email";
 export const CACHED_EVENTS_KEY        = "sortii_cached_events";
 export const FAMILY_PUSHED_KEY        = "sortii_family_pushed_events";
 export const MANUAL_EVENTS_KEY        = "sortii_manual_events";
+
+// ── User-scoped key getters — use these for all new code ────────────────────
+import { SK } from "./storageKeys";
+import { getCurrentUserId } from "./currentUser";
+
+export const calKeys = {
+  appleConn:    () => SK.calAppleConn(getCurrentUserId()),
+  appleIds:     () => SK.calAppleIds(getCurrentUserId()),
+  googleConn:   () => SK.calGoogleConn(getCurrentUserId()),
+  googleToken:  () => SK.calGoogleToken(getCurrentUserId()),
+  googleIds:    () => SK.calGoogleIds(getCurrentUserId()),
+  googleEmail:  () => SK.calGoogleEmail(getCurrentUserId()),
+  googleRefresh:() => SK.calGoogleRefreshToken(getCurrentUserId()),
+  cachedEvents: () => SK.calEvents(getCurrentUserId()),
+  pushedEvents: () => SK.calPushed(getCurrentUserId()),
+};
 
 export const NOISY_CALENDAR_KEYWORDS = [
   "fixture", "nrl", "afl", "sport", "fixture", "cricket",

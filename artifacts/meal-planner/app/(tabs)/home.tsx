@@ -1,4 +1,5 @@
 import { Feather } from "@expo/vector-icons";
+import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
 import React, { useEffect, useMemo, useState } from "react";
 import OverwhelmModal, { PressureItem } from "@/components/OverwhelmModal";
@@ -24,7 +25,9 @@ import { computeFamilyWeek } from "@/utils/familyEngine";
 import { loadAppointments, Appointment } from "@/utils/appointmentStore";
 import { loadBills, computeBillStatus, Bill, daysUntilDue } from "@/utils/billStore";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { APPLE_CONNECTED_KEY, GOOGLE_CONNECTED_KEY, FAMILY_PUSHED_KEY } from "@/utils/calendarTypes";
+import { calKeys } from "@/utils/calendarTypes";
+import { SK } from "@/utils/storageKeys";
+import { getCurrentUserId } from "@/utils/currentUser";
 import {
   buildTimelineItems,
   deriveReminders,
@@ -33,7 +36,8 @@ import {
 } from "@/utils/weeklyAggregate";
 import { WeeklyGlanceCard, ReminderStrip } from "./upcoming";
 
-const JUGGLE_RESULT_KEY = "@sortii_juggle_result_v1";
+function juggleKey()     { return SK.juggle(getCurrentUserId()); }
+function welcomeTipKey() { return SK.welcomeTip(getCurrentUserId()); }
 
 interface JuggleResult {
   status: "sorted" | "tight" | "needs_attention";
@@ -153,6 +157,7 @@ export default function HomeTab() {
   const [calAppleConn,  setCalAppleConn]  = useState(false);
   const [calGoogleConn, setCalGoogleConn] = useState(false);
   const [calPushedCount, setCalPushedCount] = useState(0);
+  const [crossSellMsg, setCrossSellMsg]   = useState<{ title: string; sub: string; route: string; color: string } | null>(null);
 
   const todayName    = getTodayName();
   const todayIdx     = DAYS.indexOf(todayName);
@@ -186,17 +191,19 @@ export default function HomeTab() {
 
   useEffect(() => {
     (async () => {
-      const [familyState, nudgeResult, , savedJuggle, appts, bills, appleConnRaw, googleConnRaw, pushedRaw, tipDismissed] = await Promise.all([
+      const uid = getCurrentUserId();
+      const [familyState, nudgeResult, , savedJuggle, appts, bills, appleConnRaw, googleConnRaw, pushedRaw, tipDismissed, crossSellRaw] = await Promise.all([
         loadFamilyState(),
         computeNudge(currentPlan, allRecipes),
         recordAppOpen(),
-        AsyncStorage.getItem(JUGGLE_RESULT_KEY),
+        AsyncStorage.getItem(juggleKey()),
         loadAppointments(),
         loadBills(),
-        AsyncStorage.getItem(APPLE_CONNECTED_KEY),
-        AsyncStorage.getItem(GOOGLE_CONNECTED_KEY),
-        AsyncStorage.getItem(FAMILY_PUSHED_KEY),
-        AsyncStorage.getItem("sortii_welcome_tip_dismissed"),
+        AsyncStorage.getItem(calKeys.appleConn()),
+        AsyncStorage.getItem(calKeys.googleConn()),
+        AsyncStorage.getItem(calKeys.pushedEvents()),
+        AsyncStorage.getItem(welcomeTipKey()),
+        AsyncStorage.getItem(SK.crossSellNudge(uid)),
       ]);
       setWelcomeTipDismissed(tipDismissed === "true");
       setCalAppleConn(appleConnRaw === "true");
@@ -268,6 +275,33 @@ export default function HomeTab() {
         }
       }
       setConflictLines(detected);
+
+      // ── Cross-sell nudge (one-time per feature, shown until dismissed) ─────
+      if (!crossSellRaw) {
+        // Priority: money → family → bills, only if user has some meals set up
+        if (plannedCount > 0 && !hasMoneySetup) {
+          setCrossSellMsg({
+            title: "Your meals are sorted. How's the money looking?",
+            sub: "Add your income and outgoings to see your weekly breathing room.",
+            route: "/money-setup",
+            color: GOLD,
+          });
+        } else if (plannedCount > 0 && familyState.events.length === 0 && familyState.members.length === 0) {
+          setCrossSellMsg({
+            title: "Who else is in your household?",
+            sub: "Add your family to sort the weekly juggle — school runs, appointments, everything.",
+            route: "/(tabs)/family",
+            color: PLUM,
+          });
+        } else if (bills.length === 0 && hasMoneySetup) {
+          setCrossSellMsg({
+            title: "Track your bills in one place.",
+            sub: "Add recurring bills to complete your financial picture — they'll flow into your budget.",
+            route: "/(tabs)/bills",
+            color: TEAL,
+          });
+        }
+      }
 
       // Cross-module timeline
       const builtItems = buildTimelineItems({
@@ -352,7 +386,7 @@ export default function HomeTab() {
                 </TouchableOpacity>
                 <TouchableOpacity
                   onPress={async () => {
-                    await AsyncStorage.setItem("sortii_welcome_tip_dismissed", "true");
+                    await AsyncStorage.setItem(welcomeTipKey(), "true");
                     setWelcomeTipDismissed(true);
                   }}
                   hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
@@ -362,6 +396,50 @@ export default function HomeTab() {
               </View>
             </View>
           )}
+
+          {/* ── Week at a glance strip ── */}
+          <View style={styles.weekSection}>
+            <Text style={styles.sectionLabel}>WEEK AT A GLANCE</Text>
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.weekStrip}
+            >
+              {DAYS.map((day, i) => {
+                const isToday = day === todayName;
+                const hasMeal = currentPlan.some(
+                  (e) => e.day === day && e.slot === "dinner" && e.recipeId
+                );
+                return (
+                  <View
+                    key={day}
+                    style={[
+                      styles.dayPill,
+                      isToday ? styles.dayPillToday
+                        : hasMeal ? styles.dayPillMeal
+                        : styles.dayPillEmpty,
+                    ]}
+                  >
+                    <Text
+                      style={[
+                        styles.dayPillText,
+                        isToday ? { color: "#fff" }
+                          : hasMeal ? { color: TEXT }
+                          : { color: "#bbb" },
+                      ]}
+                    >
+                      {DAY_ABBR[i]}
+                    </Text>
+                    <View style={styles.dayDots}>
+                      {hasMeal && (
+                        <View style={[styles.dot, { backgroundColor: isToday ? "#fff" : TEAL }]} />
+                      )}
+                    </View>
+                  </View>
+                );
+              })}
+            </ScrollView>
+          </View>
 
           {/* B — Tonight's dinner */}
           <TouchableOpacity
@@ -637,50 +715,6 @@ export default function HomeTab() {
             );
           })()}
 
-          {/* E — Week at a glance */}
-          <View style={styles.weekSection}>
-            <Text style={styles.sectionLabel}>WEEK AT A GLANCE</Text>
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.weekStrip}
-            >
-              {DAYS.map((day, i) => {
-                const isToday = day === todayName;
-                const hasMeal = currentPlan.some(
-                  (e) => e.day === day && e.slot === "dinner" && e.recipeId
-                );
-                return (
-                  <View
-                    key={day}
-                    style={[
-                      styles.dayPill,
-                      isToday ? styles.dayPillToday
-                        : hasMeal ? styles.dayPillMeal
-                        : styles.dayPillEmpty,
-                    ]}
-                  >
-                    <Text
-                      style={[
-                        styles.dayPillText,
-                        isToday ? { color: "#fff" }
-                          : hasMeal ? { color: TEXT }
-                          : { color: "#bbb" },
-                      ]}
-                    >
-                      {DAY_ABBR[i]}
-                    </Text>
-                    <View style={styles.dayDots}>
-                      {hasMeal && (
-                        <View style={[styles.dot, { backgroundColor: isToday ? "#fff" : TEAL }]} />
-                      )}
-                    </View>
-                  </View>
-                );
-              })}
-            </ScrollView>
-          </View>
-
           {/* What's Coming Up — only when there's a cross-module insight */}
           {allItems.length > 0 && (
             <WeeklyGlanceCard
@@ -769,6 +803,41 @@ export default function HomeTab() {
               </TouchableOpacity>
             );
           })()}
+
+          {/* Cross-sell nudge — one-time, priority-ordered */}
+          {crossSellMsg && (
+            <View style={[styles.crossSellCard, { borderLeftColor: crossSellMsg.color }]}>
+              <View style={{ flex: 1 }}>
+                <Text style={[styles.crossSellTitle, { color: crossSellMsg.color }]}>
+                  {crossSellMsg.title}
+                </Text>
+                <Text style={styles.crossSellSub}>{crossSellMsg.sub}</Text>
+                <View style={styles.crossSellActions}>
+                  <TouchableOpacity
+                    onPress={() => {
+                      Haptics.selectionAsync();
+                      router.push(crossSellMsg.route as any);
+                    }}
+                    activeOpacity={0.8}
+                    style={[styles.crossSellCta, { backgroundColor: crossSellMsg.color }]}
+                  >
+                    <Text style={styles.crossSellCtaText}>Set it up →</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={async () => {
+                      const uid = getCurrentUserId();
+                      await AsyncStorage.setItem(SK.crossSellNudge(uid), JSON.stringify({ dismissedAt: Date.now() }));
+                      setCrossSellMsg(null);
+                    }}
+                    hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                    activeOpacity={0.7}
+                  >
+                    <Text style={styles.crossSellDismiss}>Not now ×</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+          )}
 
           <View style={{ paddingBottom: 90 }} />
         </ScrollView>
@@ -1200,5 +1269,60 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontFamily: "Inter_600SemiBold",
     color: "#fff",
+  },
+
+  // Cross-sell nudge
+  crossSellCard: {
+    borderRadius: 16,
+    borderLeftWidth: 3,
+    backgroundColor: CARD_BG,
+    borderWidth: 1,
+    borderColor: BORDER,
+    padding: 16,
+    marginTop: 4,
+    ...Platform.select({
+      web: { boxShadow: "0px 1px 6px rgba(0,0,0,0.06)" },
+      default: {
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.06,
+        shadowRadius: 6,
+        elevation: 1,
+      },
+    }),
+  },
+  crossSellTitle: {
+    fontSize: 15,
+    fontFamily: "Inter_600SemiBold",
+    lineHeight: 21,
+    marginBottom: 4,
+  },
+  crossSellSub: {
+    fontSize: 13,
+    fontFamily: "Inter_400Regular",
+    color: "#776B5A",
+    lineHeight: 18,
+    marginBottom: 12,
+  },
+  crossSellActions: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 14,
+  },
+  crossSellCta: {
+    paddingHorizontal: 16,
+    paddingVertical: 9,
+    borderRadius: 10,
+  },
+  crossSellCtaText: {
+    fontFamily: "Inter_600SemiBold",
+    fontSize: 13,
+    color: "#fff",
+  },
+  crossSellDismiss: {
+    fontSize: 13,
+    fontFamily: "Inter_400Regular",
+    color: "#AAA49A",
+    textDecorationLine: "underline",
   },
 });

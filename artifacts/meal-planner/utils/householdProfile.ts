@@ -1,4 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { SK } from "./storageKeys";
+import { getCurrentUserId } from "./currentUser";
 
 export type DietaryNeed = "vegan" | "vegetarian" | "gluten-free" | "dairy-free";
 export type KidSituation = "same" | "simpler" | "separate";
@@ -10,7 +12,9 @@ export interface HouseholdProfile {
   setup_date: string | null;
 }
 
-export const HOUSEHOLD_PROFILE_KEY = "sortii_household_profile";
+export const HOUSEHOLD_PROFILE_KEY = "sortii_household_profile"; // legacy
+
+function key(): string { return SK.household(getCurrentUserId()); }
 
 export const DEFAULT_HOUSEHOLD_PROFILE: HouseholdProfile = {
   dietary_needs: [],
@@ -21,7 +25,7 @@ export const DEFAULT_HOUSEHOLD_PROFILE: HouseholdProfile = {
 
 export async function getHouseholdProfile(): Promise<HouseholdProfile> {
   try {
-    const raw = await AsyncStorage.getItem(HOUSEHOLD_PROFILE_KEY);
+    const raw = await AsyncStorage.getItem(key());
     if (!raw) return { ...DEFAULT_HOUSEHOLD_PROFILE };
     return { ...DEFAULT_HOUSEHOLD_PROFILE, ...JSON.parse(raw) };
   } catch {
@@ -31,7 +35,7 @@ export async function getHouseholdProfile(): Promise<HouseholdProfile> {
 
 export async function saveHouseholdProfile(profile: HouseholdProfile): Promise<void> {
   try {
-    await AsyncStorage.setItem(HOUSEHOLD_PROFILE_KEY, JSON.stringify(profile));
+    await AsyncStorage.setItem(key(), JSON.stringify(profile));
   } catch {
   }
 }

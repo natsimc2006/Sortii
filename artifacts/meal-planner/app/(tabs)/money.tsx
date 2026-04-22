@@ -15,6 +15,8 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Colors from "@/constants/Colors";
+import { SK } from "@/utils/storageKeys";
+import { getCurrentUserId } from "@/utils/currentUser";
 import { usePlanner } from "@/context/PlannerContext";
 import { useLocale } from "@/context/LocaleContext";
 import { useUserWeek } from "@/context/UserWeekContext";
@@ -621,10 +623,11 @@ export default function MoneyScreen() {
 
   useFocusEffect(useCallback(() => {
     // First-visit snapshot expand tracking
-    AsyncStorage.getItem("sortii_snapshot_seen").then((raw) => {
+    const uid = getCurrentUserId();
+    AsyncStorage.getItem(SK.snapshotSeen(uid)).then((raw) => {
       if (!raw) {
         setSnapshotDefaultOpen(true);
-        AsyncStorage.setItem("sortii_snapshot_seen", "1").catch(() => {});
+        AsyncStorage.setItem(SK.snapshotSeen(uid), "1").catch(() => {});
       } else {
         setSnapshotDefaultOpen(false);
       }
@@ -645,7 +648,7 @@ export default function MoneyScreen() {
     loadAppointments().then(setAllAppts).catch(() => {});
 
     // Check nudge dismiss state
-    AsyncStorage.getItem("sortii_money_nudge_v1").then((raw) => {
+    AsyncStorage.getItem(SK.moneyNudge(uid)).then((raw) => {
       if (!raw) { setNudgeHidden(false); return; }
       try {
         const { dismissedAt, dismissCount } = JSON.parse(raw) as { dismissedAt: number; dismissCount: number };
@@ -695,9 +698,10 @@ export default function MoneyScreen() {
 
   const handleNudgeDismiss = async () => {
     try {
-      const raw = await AsyncStorage.getItem("sortii_money_nudge_v1");
+      const uid = getCurrentUserId();
+      const raw = await AsyncStorage.getItem(SK.moneyNudge(uid));
       const existing = raw ? JSON.parse(raw) : { dismissCount: 0 };
-      await AsyncStorage.setItem("sortii_money_nudge_v1", JSON.stringify({
+      await AsyncStorage.setItem(SK.moneyNudge(uid), JSON.stringify({
         dismissedAt: Date.now(),
         dismissCount: (existing.dismissCount ?? 0) + 1,
       }));

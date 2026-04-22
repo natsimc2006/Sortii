@@ -9,9 +9,11 @@
  */
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { SK } from "./storageKeys";
+import { getCurrentUserId } from "./currentUser";
 
-const LAST_OPENED_KEY = "@sortii_last_opened";
-const NUDGE_DATE_KEY  = "@sortii_nudge_date";
+function lastOpenedKey() { return SK.lastOpened(getCurrentUserId()); }
+function nudgeDateKey()  { return SK.nudgeDate(getCurrentUserId()); }
 
 const DAYS = [
   "Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday",
@@ -116,20 +118,20 @@ export async function computeNudge(
   const today = new Date().toDateString();
 
   // Enforce max 1 nudge per day
-  const lastNudgeDate = await AsyncStorage.getItem(NUDGE_DATE_KEY);
+  const lastNudgeDate = await AsyncStorage.getItem(nudgeDateKey());
   if (lastNudgeDate === today) return null;
 
   const todayIdx = getTodayIdx();
   const todayName = DAYS[todayIdx];
 
   // ── Re-entry: user hasn't opened in 3+ days ──────────────────
-  const lastOpenedStr = await AsyncStorage.getItem(LAST_OPENED_KEY);
+  const lastOpenedStr = await AsyncStorage.getItem(lastOpenedKey());
   if (lastOpenedStr) {
     const daysSince =
       (Date.now() - parseInt(lastOpenedStr, 10)) / (1000 * 60 * 60 * 24);
     if (daysSince >= 3) {
       const copy = pick(REENTRY_NUDGES);
-      await AsyncStorage.setItem(NUDGE_DATE_KEY, today);
+      await AsyncStorage.setItem(nudgeDateKey(), today);
       return { id: "reentry", ...copy, color: "#2A8F88", icon: "clock" };
     }
   }
@@ -141,14 +143,14 @@ export async function computeNudge(
 
   if (!anyMealsPlanned) {
     const copy = pick(EMPTY_WEEK_NUDGES);
-    await AsyncStorage.setItem(NUDGE_DATE_KEY, today);
+    await AsyncStorage.setItem(nudgeDateKey(), today);
     return { id: "empty_week", ...copy, color: "#D29A22", icon: "calendar" };
   }
 
   const tonightRecipe = getDinnerFor(todayName, currentPlan, allRecipes);
   if (!tonightRecipe) {
     const copy = pick(TONIGHT_EMPTY_NUDGES);
-    await AsyncStorage.setItem(NUDGE_DATE_KEY, today);
+    await AsyncStorage.setItem(nudgeDateKey(), today);
     return { id: "tonight_gap", ...copy, color: "#D29A22", icon: "moon" };
   }
 
@@ -158,7 +160,7 @@ export async function computeNudge(
     if (!getDinnerFor(day, currentPlan, allRecipes)) {
       const lastDayWithDinner = i > 0 ? DAYS[i - 1] : todayName;
       const copy = pick(GAP_NUDGES)(lastDayWithDinner);
-      await AsyncStorage.setItem(NUDGE_DATE_KEY, today);
+      await AsyncStorage.setItem(nudgeDateKey(), today);
       return { id: "gap", ...copy, color: "#D29A22", icon: "calendar" };
     }
   }
@@ -169,7 +171,7 @@ export async function computeNudge(
     for (let i = todayIdx + 4; i < 7; i++) {
       const day = DAYS[i];
       if (!getDinnerFor(day, currentPlan, allRecipes)) {
-        await AsyncStorage.setItem(NUDGE_DATE_KEY, today);
+        await AsyncStorage.setItem(nudgeDateKey(), today);
         return {
           id: "late_gap",
           message: `${day}'s looking unplanned.`,
@@ -186,5 +188,5 @@ export async function computeNudge(
 
 /** Call this on every home screen mount — after computing nudge */
 export async function recordAppOpen(): Promise<void> {
-  await AsyncStorage.setItem(LAST_OPENED_KEY, Date.now().toString());
+  await AsyncStorage.setItem(lastOpenedKey(), Date.now().toString());
 }

@@ -1,9 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Platform } from "react-native";
 import Constants from "expo-constants";
-import { SortiiCalEvent, GoogleCalendarMeta, GOOGLE_TOKEN_KEY } from "./calendarTypes";
-
-const GOOGLE_REFRESH_KEY = "sortii_google_refresh_token";
+import { SortiiCalEvent, GoogleCalendarMeta, calKeys } from "./calendarTypes";
 
 // EXPO_PUBLIC_GOOGLE_CLIENT_ID is forwarded from the GOOGLE_CLIENT_ID secret
 // via the dev script and inlined by Metro at bundle time.
@@ -59,7 +57,7 @@ async function refreshAccessToken(refreshToken: string): Promise<string | null> 
     if (!res.ok) return null;
     const data = (await res.json()) as { access_token?: string };
     if (data.access_token) {
-      await AsyncStorage.setItem(GOOGLE_TOKEN_KEY, data.access_token);
+      await AsyncStorage.setItem(calKeys.googleToken(), data.access_token);
       return data.access_token;
     }
     return null;
@@ -109,9 +107,9 @@ export async function signInWithGoogle(): Promise<string | null> {
       const tokens = await exchangeCodeForToken(code, codeVerifier, redirectUri);
       if (!tokens?.access_token) return null;
 
-      await AsyncStorage.setItem(GOOGLE_TOKEN_KEY, tokens.access_token);
+      await AsyncStorage.setItem(calKeys.googleToken(), tokens.access_token);
       if (tokens.refresh_token) {
-        await AsyncStorage.setItem(GOOGLE_REFRESH_KEY, tokens.refresh_token);
+        await AsyncStorage.setItem(calKeys.googleRefresh(), tokens.refresh_token);
       }
 
       // Fetch user email
@@ -122,7 +120,7 @@ export async function signInWithGoogle(): Promise<string | null> {
         if (infoRes.ok) {
           const info = (await infoRes.json()) as { email?: string };
           if (info.email) {
-            await AsyncStorage.setItem("sortii_google_user_email", info.email);
+            await AsyncStorage.setItem(calKeys.googleEmail(), info.email);
           }
         }
       } catch {}
@@ -137,7 +135,7 @@ export async function signInWithGoogle(): Promise<string | null> {
 
 // Returns a valid access token, refreshing if needed
 export async function getValidGoogleToken(): Promise<string | null> {
-  const token = await AsyncStorage.getItem(GOOGLE_TOKEN_KEY);
+  const token = await AsyncStorage.getItem(calKeys.googleToken());
   if (!token) return null;
 
   // Check if token is still valid
@@ -149,14 +147,14 @@ export async function getValidGoogleToken(): Promise<string | null> {
   } catch {}
 
   // Try to refresh
-  const refreshToken = await AsyncStorage.getItem(GOOGLE_REFRESH_KEY);
+  const refreshToken = await AsyncStorage.getItem(calKeys.googleRefresh());
   if (refreshToken) {
     const fresh = await refreshAccessToken(refreshToken);
     if (fresh) return fresh;
   }
 
   // Token dead and no refresh — clear both
-  await AsyncStorage.multiRemove([GOOGLE_TOKEN_KEY, GOOGLE_REFRESH_KEY]);
+  await AsyncStorage.multiRemove([calKeys.googleToken(), calKeys.googleRefresh()]);
   return null;
 }
 

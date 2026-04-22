@@ -1,6 +1,10 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { SK } from "./storageKeys";
+import { getCurrentUserId } from "./currentUser";
 
-export const BILLS_KEY = "@sortii_bills_v1";
+export const BILLS_KEY = "@sortii_bills_v1"; // legacy — kept for type export compatibility
+
+function key(): string { return SK.bills(getCurrentUserId()); }
 
 export type BillType       = "recurring" | "oneOff";
 export type RecurrenceType = "Weekly" | "Fortnightly" | "Monthly" | "Quarterly" | "Yearly";
@@ -25,7 +29,7 @@ export interface Bill {
 
 export async function loadBills(): Promise<Bill[]> {
   try {
-    const raw = await AsyncStorage.getItem(BILLS_KEY);
+    const raw = await AsyncStorage.getItem(key());
     if (!raw) return [];
     const parsed = JSON.parse(raw);
     return Array.isArray(parsed) ? parsed : [];
@@ -33,7 +37,7 @@ export async function loadBills(): Promise<Bill[]> {
 }
 
 export async function saveBills(bills: Bill[]): Promise<void> {
-  await AsyncStorage.setItem(BILLS_KEY, JSON.stringify(bills));
+  await AsyncStorage.setItem(key(), JSON.stringify(bills));
 }
 
 export function advanceDueDate(dateStr: string, recurrence: RecurrenceType): string {

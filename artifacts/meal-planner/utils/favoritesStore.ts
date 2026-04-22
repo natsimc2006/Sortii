@@ -1,10 +1,12 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { SK } from "./storageKeys";
+import { getCurrentUserId } from "./currentUser";
 
-const FAVORITES_KEY = "sortii_favorite_recipes";
+function key(): string { return SK.favorites(getCurrentUserId()); }
 
 export async function loadFavorites(): Promise<string[]> {
   try {
-    const raw = await AsyncStorage.getItem(FAVORITES_KEY);
+    const raw = await AsyncStorage.getItem(key());
     return raw ? (JSON.parse(raw) as string[]) : [];
   } catch {
     return [];
@@ -12,7 +14,7 @@ export async function loadFavorites(): Promise<string[]> {
 }
 
 export async function saveFavorites(ids: string[]): Promise<void> {
-  await AsyncStorage.setItem(FAVORITES_KEY, JSON.stringify(ids));
+  await AsyncStorage.setItem(key(), JSON.stringify(ids));
 }
 
 export async function toggleFavorite(recipeId: string, current: string[]): Promise<string[]> {
