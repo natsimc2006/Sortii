@@ -443,7 +443,11 @@ export default function HomeTab() {
 
           {/* B — Tonight's dinner */}
           <TouchableOpacity
-            onPress={() => router.push("/(tabs)/meals")}
+            onPress={() =>
+              plannedCount === 0
+                ? router.push("/(tabs)/preferences?flow=meals")
+                : router.push("/(tabs)/meals")
+            }
             activeOpacity={0.8}
             style={[styles.card, styles.cardNeutral, styles.cardRailTeal]}
           >

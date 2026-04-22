@@ -246,7 +246,8 @@ export default function PreferencesScreen() {
 
   const router = useRouter();
   const { flow } = useLocalSearchParams<{ flow?: string }>();
-  const isFreshFlow = flow === "fresh";
+  const isFreshFlow  = flow === "fresh";
+  const isMealsFlow  = flow === "meals";
 
   const PLAN_AFFECTING_KEYS: (keyof PlanPreferences)[] = [
     "planningMode", "healthStyle", "cookingEffort", "mealVariety",
@@ -261,7 +262,9 @@ export default function PreferencesScreen() {
     );
 
   const handleClose = () => {
-    if (isFreshFlow && router.canGoBack()) {
+    if (isMealsFlow) {
+      router.replace("/(tabs)/meals");
+    } else if (isFreshFlow && router.canGoBack()) {
       router.back();
     } else {
       router.navigate("/(tabs)/planner");
@@ -284,6 +287,8 @@ export default function PreferencesScreen() {
       setSavedToast(false);
       if (isFreshFlow) {
         router.push("/money-setup?flow=fresh");
+      } else if (isMealsFlow) {
+        router.replace("/(tabs)/meals");
       } else {
         router.replace("/(tabs)/planner");
       }
@@ -332,9 +337,13 @@ export default function PreferencesScreen() {
               <Feather name="arrow-left" size={18} color={C.primary} />
             </TouchableOpacity>
             <View style={{ flex: 1, marginHorizontal: 12 }}>
-              <Text style={[styles.prefHeroHeading, { color: C.text }]}>Make it yours.</Text>
+              <Text style={[styles.prefHeroHeading, { color: C.text }]}>
+                {isMealsFlow ? "Sort your dinners." : "Make it yours."}
+              </Text>
               <Text style={[styles.prefHeroSub, { color: C.textSecondary }]}>
-                Set your preferences — we'll handle the rest.
+                {isMealsFlow
+                  ? "Set your preferences once — we'll plan the week for you."
+                  : "Set your preferences — we'll handle the rest."}
               </Text>
             </View>
             <TouchableOpacity onPress={handleClose} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }} style={styles.closeBtn}>
@@ -731,7 +740,9 @@ export default function PreferencesScreen() {
           style={[styles.saveBtn, { backgroundColor: C.gold }]}
         >
           <Feather name="check" size={20} color="#fff" />
-          <Text style={styles.saveBtnText}>Save settings</Text>
+          <Text style={styles.saveBtnText}>
+            {isMealsFlow ? "Sort my dinners →" : "Save settings"}
+          </Text>
         </TouchableOpacity>
       </View>
     </View>
