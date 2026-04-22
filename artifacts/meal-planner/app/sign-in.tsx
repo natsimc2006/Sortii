@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import {
   View,
   Text,
+  Image,
   TouchableOpacity,
   StyleSheet,
   Platform,
@@ -9,10 +10,13 @@ import {
   Alert,
   ScrollView,
 } from "react-native";
+
 import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { getAuthUser, saveAuthUser, signInWithGoogleAuth } from "@/utils/authStore";
 import { setCurrentUserId } from "@/utils/currentUser";
+
+const sortiiLogo1 = require("@/assets/images/sortii-logo1-full.png");
 
 const TEAL  = "#2A8F88";
 const CREAM = "#F8F4EE";
@@ -91,11 +95,8 @@ export default function SignInScreen() {
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
-        {/* ── Wordmark ── */}
-        <View style={styles.wordmarkRow}>
-          <Text style={styles.wordmarkS}>S</Text>
-          <Text style={styles.wordmarkOrtii}>ortii</Text>
-        </View>
+        {/* ── Logo ── */}
+        <Image source={sortiiLogo1} style={styles.logoImage} resizeMode="contain" />
 
         {/* ── Tagline ── */}
         <Text style={styles.tagline}>
@@ -178,22 +179,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
 
-  wordmarkRow: {
-    flexDirection: "row",
-    alignItems: "baseline",
-    marginBottom: 4,
-  },
-  wordmarkS: {
-    fontFamily: "PlayfairDisplay_700Bold",
-    fontSize: 48,
-    color: TEAL,
-    letterSpacing: -1,
-  },
-  wordmarkOrtii: {
-    fontFamily: "PlayfairDisplay_400Regular",
-    fontSize: 42,
-    color: TEAL,
-    letterSpacing: -1,
+  logoImage: {
+    width: 220,
+    height: 90,
+    alignSelf: "center",
+    marginBottom: 8,
   },
 
   tagline: {

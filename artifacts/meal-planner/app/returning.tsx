@@ -18,7 +18,7 @@ import { usePlanner } from "@/context/PlannerContext";
 import { useUserWeek } from "@/context/UserWeekContext";
 
 const C = Colors.light;
-const sortiiLogo = require("@/assets/images/sortii-logo-yourweek.png");
+const sortiiLogo = require("@/assets/images/sortii-logo1-full.png");
 
 export default function ReturningScreen() {
   const router = useRouter();
@@ -73,14 +73,6 @@ export default function ReturningScreen() {
       >
         {/* Logo */}
         <Image source={sortiiLogo} style={styles.logo} resizeMode="contain" />
-
-        {/* Headline + sub */}
-        <View style={styles.headlineBlock}>
-          <Text style={[styles.headline, { color: C.text }]}>New week. Same you.</Text>
-          <Text style={[styles.sub, { color: C.textSecondary }]}>
-            Your preferences are saved — want a fresh plan or the same meals?
-          </Text>
-        </View>
 
         {/* Choices */}
         <View style={styles.choiceStack}>
@@ -152,9 +144,10 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   logo: {
-    width: 200,
-    height: 92,
-    alignSelf: "flex-start",
+    width: 240,
+    height: 100,
+    alignSelf: "center",
+    marginBottom: 8,
   },
   headlineBlock: { gap: 10 },
   headline: {

@@ -4,6 +4,7 @@ import { useRouter } from "expo-router";
 import React, { useEffect, useMemo, useState } from "react";
 import OverwhelmModal, { PressureItem } from "@/components/OverwhelmModal";
 import {
+  Image,
   Platform,
   Pressable,
   ScrollView,
@@ -327,9 +328,11 @@ export default function HomeTab() {
           {/* A — Header */}
           <View style={styles.headerRow}>
             <View style={styles.headerLeft}>
-              <Text style={styles.wordmark}>
-                sorti<Text style={styles.wordmarkGold}>ii</Text>.
-              </Text>
+              <Image
+                source={require("@/assets/images/sortii-logo2-wordmark.png")}
+                style={styles.wordmarkLogo}
+                resizeMode="contain"
+              />
               <Text style={styles.greeting}>{greeting}</Text>
             </View>
             <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
@@ -931,7 +934,7 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   headerLeft: { flex: 1, gap: 2 },
-  wordmark: { fontSize: 26, fontFamily: "PlayfairDisplay_700Bold", color: TEXT },
+  wordmarkLogo: { width: 100, height: 32 },
   wordmarkGold: { color: GOLD },
   greeting: { fontSize: 13, fontFamily: "Inter_400Regular", color: TEXT_MUTED },
   summary: {

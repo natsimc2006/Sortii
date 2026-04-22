@@ -3,6 +3,7 @@ import { useRouter } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
 import {
   Animated,
+  Image,
   Platform,
   ScrollView,
   StyleSheet,
@@ -11,14 +12,16 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { DEFAULT_PREFERENCES, DEFAULT_WEEKEND_OVERRIDES, PlanPreferences } from "@/constants/recipes";
 import { usePlanner } from "@/context/PlannerContext";
 import { useUserWeek } from "@/context/UserWeekContext";
 import { saveHouseholdProfile } from "@/utils/householdProfile";
 import { loadFamilyState, saveFamilyState } from "@/utils/familyStore";
 import { MEMBER_COLORS } from "@/utils/familyTypes";
+
+const sortiiLogo2 = require("@/assets/images/sortii-logo2-wordmark.png");
 
 const TEAL       = "#2A8F88";
 const TEAL_TINT  = "#E6F3F0";
@@ -272,11 +275,8 @@ export default function OnboardingScreen() {
   // ════════════════════════════════════════════════════════════════
   return (
     <View style={[styles.root, { paddingTop }]}>
-      {/* ── Wordmark ── */}
-      <View style={styles.welcomeWordmarkRow}>
-        <Text style={styles.welcomeS}>S</Text>
-        <Text style={styles.welcomeOrtii}>ortii</Text>
-      </View>
+      {/* ── Logo ── */}
+      <Image source={sortiiLogo2} style={styles.welcomeLogo} resizeMode="contain" />
 
       {/* ── Tagline ── */}
       <Animated.Text style={[styles.welcomeTagline, { opacity: line1 }]}>
@@ -326,23 +326,11 @@ const styles = StyleSheet.create({
   },
 
   // ── Welcome ─────────────────────────────────────────────────────
-  welcomeWordmarkRow: {
-    flexDirection: "row",
-    alignItems: "baseline",
+  welcomeLogo: {
+    width: 160,
+    height: 60,
     marginTop: 32,
     marginBottom: 8,
-  },
-  welcomeS: {
-    fontFamily: "PlayfairDisplay_700Bold",
-    fontSize: 44,
-    color: TEAL,
-    letterSpacing: -1,
-  },
-  welcomeOrtii: {
-    fontFamily: "PlayfairDisplay_400Regular",
-    fontSize: 38,
-    color: TEAL,
-    letterSpacing: -1,
   },
   welcomeTagline: {
     fontFamily: "Inter_400Regular",
