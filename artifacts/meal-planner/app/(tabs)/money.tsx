@@ -411,20 +411,65 @@ function GroceriesSection({
 
 // ─── 4. Quick Wins — WinRow ───────────────────────────────────
 
-function WinRow({ s, fmt }: { s: MoneySuggestion; fmt: (n: number) => string }) {
+function WinRow({
+  s,
+  fmt,
+  applied,
+  onApply,
+  onUndo,
+}: {
+  s: MoneySuggestion;
+  fmt: (n: number) => string;
+  applied: boolean;
+  onApply: () => void;
+  onUndo: () => void;
+}) {
   const showAmount = !s.isGoalProjection && !s.isMonthlyNudge && s.impactAmount > 0;
+  const cta = WIN_CTA[s.id] ?? "Try this";
+
   return (
-    <View style={styles.quickWinsRow}>
-      <Text style={styles.quickWinsArrow}>▸</Text>
-      <View style={styles.quickWinsContent}>
-        <Text style={styles.quickWinsLabel}>{s.label}</Text>
-        {s.reason ? <Text style={styles.quickWinsReason}>{s.reason}</Text> : null}
-      </View>
-      {showAmount && (
-        <View style={styles.winAmountPill}>
-          <Text style={styles.winAmountPillText}>~{fmt(s.impactAmount)}</Text>
+    <View style={[styles.quickWinsRow, applied && styles.quickWinsRowApplied]}>
+      {applied ? (
+        <View style={styles.quickWinsBadge}>
+          <Text style={styles.quickWinsBadgeText}>✓</Text>
         </View>
+      ) : (
+        <Text style={styles.quickWinsArrow}>▸</Text>
       )}
+      <View style={styles.quickWinsContent}>
+        <Text style={[styles.quickWinsLabel, applied && styles.quickWinsLabelApplied]}>
+          {s.label}
+        </Text>
+        {!applied && s.reason ? (
+          <Text style={styles.quickWinsReason}>{s.reason}</Text>
+        ) : null}
+        {applied ? (
+          <View style={styles.quickWinsCtaRow}>
+            <Text style={styles.quickWinsConfirm}>Done. Nicely handled.</Text>
+            <TouchableOpacity
+              onPress={onUndo}
+              hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
+            >
+              <Text style={styles.quickWinsUndo}>Undo</Text>
+            </TouchableOpacity>
+          </View>
+        ) : (
+          <View style={styles.quickWinsCtaRow}>
+            {showAmount && (
+              <View style={styles.winAmountPill}>
+                <Text style={styles.winAmountPillText}>~{fmt(s.impactAmount)}</Text>
+              </View>
+            )}
+            <TouchableOpacity
+              onPress={onApply}
+              activeOpacity={0.75}
+              style={styles.quickWinsCtaBtn}
+            >
+              <Text style={styles.quickWinsCtaBtnText}>{cta}</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+      </View>
     </View>
   );
 }
@@ -435,10 +480,16 @@ function QuickWinsSection({
   suggestions,
   fmt,
   defaultOpen,
+  appliedWins,
+  onApply,
+  onUndo,
 }: {
   suggestions: MoneySuggestion[];
   fmt: (n: number) => string;
   defaultOpen?: boolean;
+  appliedWins: Map<string, number>;
+  onApply: (id: string, amount: number) => void;
+  onUndo: (id: string) => void;
 }) {
   const [open, setOpen] = useState(defaultOpen ?? false);
   const tips = suggestions.slice(0, 3);
@@ -461,7 +512,17 @@ function QuickWinsSection({
       {open && (
         <View style={styles.quickWinsBody}>
           {tips.map((s) => (
-            <WinRow key={s.id} s={s} fmt={fmt} />
+            <WinRow
+              key={s.id}
+              s={s}
+              fmt={fmt}
+              applied={appliedWins.has(s.id)}
+              onApply={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                onApply(s.id, s.impactAmount);
+              }}
+              onUndo={() => onUndo(s.id)}
+            />
           ))}
         </View>
       )}
@@ -827,7 +888,7 @@ export default function MoneyScreen() {
       a.startTime.localeCompare(b.startTime),
   );
 
-  // Shared "full picture" section (State 1 expand + State 2 always-visible)
+  // Shared "full picture" section (State 2 always-visible)
   const fullPictureSection = (
     <>
       {money && (
@@ -842,7 +903,14 @@ export default function MoneyScreen() {
           defaultOpen={snapshotDefaultOpen}
         />
       )}
-      <QuickWinsSection suggestions={result.suggestions} fmt={formatMoneyRound} />
+      <QuickWinsSection
+        suggestions={result.suggestions}
+        fmt={formatMoneyRound}
+        appliedWins={appliedWins}
+        onApply={applyWin}
+        onUndo={undoWin}
+      />
+      <StackedWinsBar total={appliedSavingsTotal} count={appliedWins.size} fmt={formatMoneyRound} />
       {savingsGoal ? (
         <SavingsGoalCard
           goal={savingsGoal}
@@ -898,32 +966,26 @@ export default function MoneyScreen() {
       ) : !hasMoneySetup ? null : moneyTabState === "calm" ? (
         /* ── STATE 1 — Calm ──────────────────────────────────── */
         <>
-          {/* 1. Calm signal — left-aligned */}
-          <View style={styles.calmSignal}>
-            <View style={styles.calmCheckLeft}>
-              <Text style={styles.calmCheckText}>✓</Text>
+          {/* 1. Hero card — breathing room front and centre */}
+          <View style={styles.calmHeroCard}>
+            <View style={styles.calmHeroTopRow}>
+              <Text style={styles.calmHeroEyebrow}>THIS WEEK</Text>
+              <View style={styles.calmBadge}>
+                <Text style={styles.calmBadgeText}>All good ✓</Text>
+              </View>
             </View>
-            <View style={styles.calmSignalText}>
-              <Text style={styles.calmHeading}>This week looks fine.</Text>
-              <Text style={styles.calmSubtext}>Nothing unexpected coming.</Text>
-              {adjustedBreathingRoom > 0 && (
-                <Text style={styles.calmBreathing}>
-                  ~{formatMoneyRound(adjustedBreathingRoom)} breathing room this week.
+            {adjustedBreathingRoom > 0 ? (
+              <>
+                <Text style={styles.calmHeroBig}>
+                  ~{formatMoneyRound(adjustedBreathingRoom)}
                 </Text>
-              )}
-              {adjustedBreathingRoom > 0 && (() => {
-                const monthly = Math.round(adjustedBreathingRoom * 4.3 / 5) * 5;
-                return monthly > 0 ? (
-                  <Text style={styles.calmMonthly}>
-                    ~{formatMoneyRound(monthly)}/month
-                  </Text>
-                ) : null;
-              })()}
-            </View>
+                <Text style={styles.calmHeroLabel}>breathing room this week</Text>
+              </>
+            ) : (
+              <Text style={styles.calmHeading}>This week looks fine.</Text>
+            )}
+            <Text style={styles.calmSubtext}>Nothing unexpected landing.</Text>
           </View>
-
-          {/* Gap */}
-          <View style={{ height: 4 }} />
 
           {/* 2. Meal plan saving card */}
           <MealPlanSavingCard
@@ -932,7 +994,7 @@ export default function MoneyScreen() {
             fmt={formatMoneyRound}
           />
 
-          {/* 3. Quick version — collapsed to single line */}
+          {/* 3. Snapshot — collapsed with summary line */}
           {money && (() => {
             const remaining = result.remaining + appliedSavingsTotal;
             const summaryLine = `Income ${formatMoneyRound(money.weeklyIncome)} · Fixed ${formatMoneyRound(money.fixedWeeklyCosts)} · Left ~${formatMoneyRound(Math.max(0, remaining))}`;
@@ -952,18 +1014,26 @@ export default function MoneyScreen() {
           })()}
 
           {/* 4. Quick wins — expanded by default in State 1 */}
-          <QuickWinsSection suggestions={result.suggestions} fmt={formatMoneyRound} defaultOpen={true} />
+          <QuickWinsSection
+            suggestions={result.suggestions}
+            fmt={formatMoneyRound}
+            defaultOpen={true}
+            appliedWins={appliedWins}
+            onApply={applyWin}
+            onUndo={undoWin}
+          />
+
+          {/* 4b. Stacked wins bar — appears as wins accumulate */}
+          <StackedWinsBar total={appliedSavingsTotal} count={appliedWins.size} fmt={formatMoneyRound} />
 
           {/* 5. Savings goal card or quiet prompt */}
           {savingsGoal ? (
-            <View style={{ marginTop: 0, marginBottom: 0 }}>
-              <SavingsGoalCard
-                goal={savingsGoal}
-                weeklyDinnerSaving={weeklySortiiSaving}
-                fmt={formatMoneyRound}
-                onUpdate={goToGoalSetup}
-              />
-            </View>
+            <SavingsGoalCard
+              goal={savingsGoal}
+              weeklyDinnerSaving={weeklySortiiSaving}
+              fmt={formatMoneyRound}
+              onUpdate={goToGoalSetup}
+            />
           ) : (
             <View style={styles.quietGoalPrompt}>
               <Text style={styles.quietGoalPromptText}>
@@ -973,8 +1043,7 @@ export default function MoneyScreen() {
             </View>
           )}
 
-          {/* 6. Full breakdown → */}
-          <View style={{ height: 8 }} />
+          {/* 6. Update numbers link */}
           <TouchableOpacity
             onPress={() => setShowFullPicture((v) => !v)}
             activeOpacity={0.7}
@@ -1575,29 +1644,58 @@ const styles = StyleSheet.create({
   },
 
   // ── Phase 3 — STATE 1: Calm ──────────────────────────────────
-  calmSignal: {
-    flexDirection: "row", alignItems: "flex-start", gap: 14,
-    paddingVertical: 8,
+  calmHeroCard: {
+    borderRadius: 20,
+    backgroundColor: HERO_BG,
+    borderWidth: 1.5,
+    borderColor: "rgba(42,143,136,0.22)",
+    padding: 20,
+    gap: 6,
+    ...Platform.select({
+      web: { boxShadow: "0px 2px 12px rgba(42,143,136,0.10)" },
+      default: {
+        shadowColor: TEAL,
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.10,
+        shadowRadius: 10,
+        elevation: 2,
+      },
+    }),
   },
-  calmCheckLeft: {
-    width: 44, height: 44, borderRadius: 22,
-    backgroundColor: TEAL_TINT,
-    alignItems: "center", justifyContent: "center",
-    marginTop: 2, flexShrink: 0,
+  calmHeroTopRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 4,
   },
-  calmSignalText: {
-    flex: 1, gap: 4,
+  calmHeroEyebrow: {
+    fontSize: 11, fontFamily: "Inter_600SemiBold",
+    color: TEAL, textTransform: "uppercase", letterSpacing: 0.8,
   },
-  calmCheckText: {
-    fontSize: 20, color: TEAL, fontFamily: "Inter_700Bold",
+  calmBadge: {
+    backgroundColor: "rgba(42,143,136,0.12)",
+    borderRadius: 20,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+  },
+  calmBadgeText: {
+    fontSize: 12, fontFamily: "Inter_600SemiBold", color: TEAL,
+  },
+  calmHeroBig: {
+    fontSize: 38, fontFamily: "Manrope_700Bold",
+    color: TEAL, lineHeight: 46, letterSpacing: -0.5,
+  },
+  calmHeroLabel: {
+    fontSize: 14, fontFamily: "Inter_400Regular",
+    color: "#3A6E6A", lineHeight: 20,
   },
   calmHeading: {
     fontSize: 22, fontFamily: "Manrope_700Bold",
     color: "#2B2B2B",
   },
   calmSubtext: {
-    fontSize: 14, fontFamily: "Inter_400Regular",
-    color: "#888", lineHeight: 20,
+    fontSize: 13, fontFamily: "Inter_400Regular",
+    color: "#5A8E8A", lineHeight: 19, marginTop: 2,
   },
   calmBreathing: {
     fontSize: 15, fontFamily: "Inter_600SemiBold",
@@ -1696,7 +1794,11 @@ const styles = StyleSheet.create({
   // ── Phase 3 — STATE 3: Stretched ─────────────────────────────
   stretchedCard: {
     borderRadius: 16,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: "#FFF8F7",
+    borderWidth: 1.5,
+    borderColor: "rgba(184,101,87,0.25)",
+    borderLeftWidth: 3,
+    borderLeftColor: "#B86557",
     padding: 20,
     gap: 10,
   },
