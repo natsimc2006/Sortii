@@ -30,8 +30,9 @@ export const SK = {
   household:      (uid: string) => userKey(uid, "household"),
 
   // Money & goals
-  snapshotSeen:   (uid: string) => userKey(uid, "snapshotSeen"),
-  moneyNudge:     (uid: string) => userKey(uid, "moneyNudge"),
+  snapshotSeen:    (uid: string) => userKey(uid, "snapshotSeen"),
+  moneyNudge:      (uid: string) => userKey(uid, "moneyNudge"),
+  billsModePrompt: (uid: string) => userKey(uid, "billsModePrompt"),
 
   // Calendar
   calAppleConn:         (uid: string) => userKey(uid, "calAppleConn"),

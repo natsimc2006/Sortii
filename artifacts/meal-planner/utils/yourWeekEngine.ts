@@ -282,10 +282,16 @@ function buildDynamicSuggestions(
   if (ls.entertainment > 25) {
     const impact = Math.round(ls.entertainment * 0.4);
     if (impact > 0) {
+      const entLabel = isTightOrWorse
+        ? "Money's a bit tighter this week."
+        : "One or two things worth knowing.";
+      const entReason = isTightOrWorse
+        ? "One quieter night in could help."
+        : "Entertainment spend is nudging up a little.";
       personalised.push({
         id: 'skip_entertainment',
-        label: "A lot happening this week.",
-        reason: "One quieter night in could help balance things.",
+        label: entLabel,
+        reason: entReason,
         impactAmount: impact,
         category: 'money',
       });

@@ -5,6 +5,7 @@ import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
+  Modal,
   Platform,
   ScrollView,
   StyleSheet,
@@ -21,6 +22,9 @@ import { useUserWeek } from "@/context/UserWeekContext";
 import { WeekGoal } from "@/utils/yourWeekEngine";
 import { getOnboardingState } from "@/utils/onboardingState";
 import { loadBills, Bill } from "@/utils/billStore";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { SK } from "@/utils/storageKeys";
+import { getCurrentUserId } from "@/utils/currentUser";
 
 const C = Colors.light;
 
@@ -216,8 +220,9 @@ export default function MoneySetupScreen() {
   const [selectedGoal,       setSelectedGoal]       = useState<WeekGoal>("none");
   const [saving,             setSaving]             = useState(false);
   const [hasMealsSetup,      setHasMealsSetup]      = useState(false);
-  const [billsAutoMonthly,   setBillsAutoMonthly]   = useState<number | null>(null);
-  const [billsAutoOverride,  setBillsAutoOverride]  = useState(false);
+  const [billsAutoMonthly,     setBillsAutoMonthly]     = useState<number | null>(null);
+  const [billsAutoOverride,    setBillsAutoOverride]    = useState(false);
+  const [billsModePromptVisible, setBillsModePromptVisible] = useState(false);
 
   useEffect(() => {
     getOnboardingState().then((s) => setHasMealsSetup(s.hasMealsSetup));
@@ -240,6 +245,16 @@ export default function MoneySetupScreen() {
       }
     }).catch(() => {});
   }, []);
+
+  // One-time prompt when bills-auto total conflicts with a manually entered bills figure
+  useEffect(() => {
+    if (billsAutoMonthly === null || !isLoaded) return;
+    if (!savedMoney || (savedMoney.rawBillsLoans ?? 0) === 0) return;
+    const uid = getCurrentUserId();
+    AsyncStorage.getItem(SK.billsModePrompt(uid)).then((v) => {
+      if (!v) setBillsModePromptVisible(true);
+    }).catch(() => {});
+  }, [billsAutoMonthly, isLoaded]);
 
   // Restore saved values
   useEffect(() => {
@@ -361,7 +376,7 @@ export default function MoneySetupScreen() {
   return (
     <KeyboardAvoidingView
       style={{ flex: 1, backgroundColor: C.background }}
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
+      behavior="padding"
     >
       {/* Header */}
       <View style={[styles.header, { paddingTop, borderBottomColor: "rgba(37,133,127,0.18)" }]}>
@@ -442,14 +457,11 @@ export default function MoneySetupScreen() {
                   {currencySymbol}{billsAutoMonthly.toLocaleString()} /month
                 </Text>
                 <TouchableOpacity
-                  onPress={() => {
-                    setBillsAutoOverride(true);
-                    setBillsLoans(String(billsAutoMonthly));
-                  }}
+                  onPress={() => router.navigate("/(tabs)/bills")}
                   activeOpacity={0.7}
                   style={styles.autoCalcOverrideBtn}
                 >
-                  <Text style={styles.autoCalcOverrideBtnText}>Edit</Text>
+                  <Text style={styles.autoCalcOverrideBtnText}>Edit →</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -639,6 +651,45 @@ export default function MoneySetupScreen() {
           </Text>
         </TouchableOpacity>
       </View>
+
+      {/* Bills conflict prompt — shown once when bills store and manual entry both exist */}
+      <Modal visible={billsModePromptVisible} transparent animationType="fade">
+        <View style={styles.promptOverlay}>
+          <View style={styles.promptCard}>
+            <Text style={styles.promptTitle}>Your bills have changed</Text>
+            <Text style={styles.promptBody}>
+              Sortii found {currencySymbol}{billsAutoMonthly?.toLocaleString()} /month in recurring bills from your Bills list.
+              {"\n\n"}You also have a manually entered figure. Which would you like to use?
+            </Text>
+            <TouchableOpacity
+              onPress={() => {
+                setBillsAutoOverride(false);
+                setBillsModePromptVisible(false);
+                const uid = getCurrentUserId();
+                AsyncStorage.setItem(SK.billsModePrompt(uid), "auto").catch(() => {});
+              }}
+              activeOpacity={0.85}
+              style={styles.promptBtnPrimary}
+            >
+              <Text style={styles.promptBtnPrimaryText}>
+                Use my bills total ({currencySymbol}{billsAutoMonthly?.toLocaleString() ?? 0} /month)
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => {
+                setBillsAutoOverride(true);
+                setBillsModePromptVisible(false);
+                const uid = getCurrentUserId();
+                AsyncStorage.setItem(SK.billsModePrompt(uid), "manual").catch(() => {});
+              }}
+              activeOpacity={0.85}
+              style={styles.promptBtnSecondary}
+            >
+              <Text style={styles.promptBtnSecondaryText}>Keep my manual figure</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </KeyboardAvoidingView>
   );
 }
@@ -828,4 +879,37 @@ const styles = StyleSheet.create({
   primaryCtaText: { fontSize: 17, fontFamily: "Inter_700Bold", color: "#fff" },
   skipBtn:        { alignItems: "center", paddingVertical: 10 },
   skipText:       { fontSize: 13, fontFamily: "Inter_400Regular" },
+
+  // Bills conflict prompt modal
+  promptOverlay: {
+    flex: 1, backgroundColor: "rgba(0,0,0,0.45)",
+    justifyContent: "center", alignItems: "center", padding: 24,
+  },
+  promptCard: {
+    backgroundColor: "#fff", borderRadius: 20,
+    padding: 24, width: "100%", maxWidth: 400,
+    shadowColor: "#000", shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.12, shadowRadius: 24, elevation: 8,
+    gap: 12,
+  },
+  promptTitle: {
+    fontSize: 17, fontFamily: "Inter_700Bold", color: "#1A1410",
+  },
+  promptBody: {
+    fontSize: 14, fontFamily: "Inter_400Regular", color: "#6B5E52", lineHeight: 21,
+  },
+  promptBtnPrimary: {
+    backgroundColor: "#2A8F88", borderRadius: 14,
+    paddingVertical: 14, alignItems: "center",
+  },
+  promptBtnPrimaryText: {
+    fontSize: 14, fontFamily: "Inter_600SemiBold", color: "#fff",
+  },
+  promptBtnSecondary: {
+    borderWidth: 1.5, borderColor: "#D3CCC0", borderRadius: 14,
+    paddingVertical: 13, alignItems: "center",
+  },
+  promptBtnSecondaryText: {
+    fontSize: 14, fontFamily: "Inter_500Medium", color: "#8A7968",
+  },
 });

@@ -670,7 +670,6 @@ export default function MoneyScreen() {
   // Phase 3 — pressure data
   const [oneOffBillsThisWeek, setOneOffBillsThisWeek] = useState<Bill[]>([]);
   const [apptCostsThisWeek, setApptCostsThisWeek] = useState<ApptItem[]>([]);
-  const [showFullPicture, setShowFullPicture] = useState(false);
 
   // Phase 4 — Overwhelm mode
   const [showOverwhelm, setShowOverwhelm] = useState(false);
@@ -942,9 +941,18 @@ export default function MoneyScreen() {
       {/* Header */}
       <View style={styles.pageHeader}>
         <Text style={styles.pageTitle}>Money</Text>
-        <Text style={styles.pageSubtitle}>
-          Here's where your money sits this week.
-        </Text>
+        {hasMoneySetup ? (
+          <Text style={styles.pageSubtitle}>
+            {moneyTabState === "calm"      ? "This week's fine. Nothing to worry about."
+            : moneyTabState === "tight"    ? "A bit tight this week. Worth knowing."
+            : adjustedBreathingRoom < 0   ? "This one needs attention."
+            :                               "This week needs a look."}
+          </Text>
+        ) : (
+          <Text style={styles.pageSubtitle}>
+            Here's where your money sits this week.
+          </Text>
+        )}
       </View>
 
       {/* Quick-access chips */}
@@ -1043,25 +1051,14 @@ export default function MoneyScreen() {
             </View>
           )}
 
-          {/* 6. Update numbers link */}
+          {/* 6. Persistent "Update my numbers" button */}
           <TouchableOpacity
-            onPress={() => setShowFullPicture((v) => !v)}
-            activeOpacity={0.7}
-            style={styles.fullPictureToggle}
+            onPress={goToMoneySetup}
+            activeOpacity={0.85}
+            style={styles.updateMyNumbersBtn}
           >
-            <Text style={styles.fullPictureLink}>
-              {showFullPicture ? "Full breakdown ↑" : "Full breakdown →"}
-            </Text>
+            <Text style={styles.updateMyNumbersBtnText}>Update my numbers →</Text>
           </TouchableOpacity>
-
-          {showFullPicture && (
-            <View style={styles.updateCtaWrap}>
-              <Text style={styles.updateCtaLabel}>Your numbers, your call. Update anytime.</Text>
-              <TouchableOpacity onPress={goToMoneySetup} activeOpacity={0.85} style={styles.updateCtaBtn}>
-                <Text style={styles.updateCtaBtnText}>Update my numbers</Text>
-              </TouchableOpacity>
-            </View>
-          )}
         </>
 
       ) : moneyTabState === "tight" ? (
@@ -1705,12 +1702,12 @@ const styles = StyleSheet.create({
     fontSize: 12, fontFamily: "Inter_400Regular",
     color: "#AAA", fontStyle: "italic",
   },
-  fullPictureToggle: {
-    alignItems: "center", paddingVertical: 4,
+  updateMyNumbersBtn: {
+    borderWidth: 1.5, borderColor: TEAL, borderRadius: 12,
+    paddingVertical: 13, alignItems: "center", justifyContent: "center",
   },
-  fullPictureLink: {
-    fontSize: 14, fontFamily: "Inter_400Regular",
-    color: "#AAA",
+  updateMyNumbersBtnText: {
+    fontSize: 14, fontFamily: "Inter_600SemiBold", color: TEAL,
   },
 
   // Meal plan saving card

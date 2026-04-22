@@ -444,7 +444,7 @@ export default function BillsScreen() {
   if (view === "form") return (
     <SafeAreaView style={styles.safe}>
       <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : "height"}>
-        <ScrollView contentContainerStyle={{ paddingBottom: 40 }} showsVerticalScrollIndicator={false}>
+        <ScrollView contentContainerStyle={{ paddingBottom: insets.bottom + 120 }} showsVerticalScrollIndicator={false}>
           <View style={styles.formHeader}>
             <TouchableOpacity onPress={() => setView("overview")} style={styles.backBtn}>
               <Feather name="arrow-left" size={18} color={TEAL} />
