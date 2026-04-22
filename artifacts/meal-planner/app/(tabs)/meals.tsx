@@ -201,6 +201,11 @@ export default function MealsScreen() {
 
   // ── Helpers ──────────────────────────────────────────────────────────────
   const openSearch = (day: string, slot: MealSlot) => {
+    // When no meals are planned yet, direct user to set preferences first
+    if (isWeekEmpty) {
+      router.push("/(tabs)/preferences");
+      return;
+    }
     setSelectedDay(day);
     setSelectedSlot(slot);
     setModalVisible(true);
@@ -630,7 +635,7 @@ export default function MealsScreen() {
             hitSlop={{ top: 4, bottom: 4 }}
           >
             <Feather name="sliders" size={12} color="#fff" />
-            <Text style={[styles.toolBtnText, { color: "#fff" }]}>Adjust</Text>
+            <Text style={[styles.toolBtnText, { color: "#fff" }]}>Preferences</Text>
           </TouchableOpacity>
         </ScrollView>
       </View>

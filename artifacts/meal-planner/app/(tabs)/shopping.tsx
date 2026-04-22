@@ -310,22 +310,31 @@ export default function ShoppingScreen() {
   // ─── Compute shopping items ─────────────────────────────────────────────
   const allItems = useMemo<ShopItem[]>(() => {
     const map = new Map<string, ShopItem>();
-    for (const entry of currentPlan) {
-      if (!entry.recipeId) continue;
-      const recipe = getRecipeById(entry.recipeId);
-      if (!recipe) continue;
-      for (const ing of recipe.ingredients) {
-        const scaled = scaleQuantity(ing.quantity, recipe.baseServings, preferences.householdSize);
-        const key = `${ing.name.toLowerCase().trim()}_${ing.unit}`;
-        const cat: SpecCat = INGREDIENT_CAT_MAP[ing.category] ?? "other";
-        if (map.has(key)) {
-          const ex = map.get(key)!;
-          ex.baseQty += scaled;
-          if (!ex.recipes.includes(recipe.name)) ex.recipes.push(recipe.name);
-        } else {
-          map.set(key, { key, name: ing.name, baseQty: scaled, unit: ing.unit, cat, recipes: [recipe.name] });
+    try {
+      for (const entry of (currentPlan ?? [])) {
+        if (!entry?.recipeId) continue;
+        const recipe = getRecipeById(entry.recipeId);
+        if (!recipe?.ingredients) continue;
+        for (const ing of recipe.ingredients) {
+          if (!ing?.name) continue;
+          const scaled = scaleQuantity(
+            ing.quantity ?? 1,
+            recipe.baseServings ?? 4,
+            preferences.householdSize ?? 4,
+          );
+          const key = `${ing.name.toLowerCase().trim()}_${ing.unit ?? ""}`;
+          const cat: SpecCat = INGREDIENT_CAT_MAP[ing.category ?? ""] ?? "other";
+          if (map.has(key)) {
+            const ex = map.get(key)!;
+            ex.baseQty += scaled;
+            if (!ex.recipes.includes(recipe.name)) ex.recipes.push(recipe.name);
+          } else {
+            map.set(key, { key, name: ing.name, baseQty: scaled, unit: ing.unit ?? "", cat, recipes: [recipe.name] });
+          }
         }
       }
+    } catch (e) {
+      console.warn("[Sortii] Shopping list computation error:", e);
     }
     return Array.from(map.values());
   }, [currentPlan, getRecipeById, preferences.householdSize]);
@@ -561,6 +570,11 @@ export default function ShoppingScreen() {
           </View>
         )}
 
+        {/* Tick hint */}
+        <Text style={[styles.tickHint, { color: C.textMuted }]}>
+          Tap an item to tick it off if you already have it at home.
+        </Text>
+
         {/* Category sections */}
         {activeCats.map((cat) => (
           <View key={cat} style={styles.section}>
@@ -721,7 +735,7 @@ export default function ShoppingScreen() {
               returnKeyType="done"
               style={[styles.addInput, { color: C.text }]}
             />
-            {voiceSupported && (
+            {voiceSupported !== false && (
               <TouchableOpacity
                 onPress={startListening}
                 style={[styles.micBtn, { backgroundColor: "transparent", borderWidth: 1.5, borderColor: C.primary }]}
@@ -958,6 +972,7 @@ const styles = StyleSheet.create({
   catLabel: { flex: 1, fontSize: 14, fontFamily: "Inter_700Bold" },
   catCount: { fontSize: 12, fontFamily: "Inter_400Regular" },
   addHint: { fontSize: 11, fontFamily: "Inter_400Regular", marginTop: 1 },
+  tickHint: { fontSize: 11, fontFamily: "Inter_400Regular", marginBottom: 4, marginHorizontal: 4 },
   itemRow: {
     flexDirection: "row",
     alignItems: "center",
