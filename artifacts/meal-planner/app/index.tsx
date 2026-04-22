@@ -56,8 +56,9 @@ export default function OnboardingScreen() {
 
   const [step,          setStep]          = useState<Step>(0);
   const [householdSize, setHouseholdSize] = useState(4);
-  const [familyNames,   setFamilyNames]   = useState<string[]>([]);
+  const [familyMembers, setFamilyMembers] = useState<Array<{ name: string; role: "adult" | "child" }>>([]);
   const [nameInput,     setNameInput]     = useState("");
+  const [pendingRole,   setPendingRole]   = useState<"adult" | "child">("adult");
 
   // Welcome screen stagger anims
   const line1   = useRef(new Animated.Value(0)).current;
@@ -119,13 +120,13 @@ export default function OnboardingScreen() {
     await setPreferences(newPrefs);
 
     // Persist any entered family members to the family store
-    if (familyNames.length > 0) {
+    if (familyMembers.length > 0) {
       const existing = await loadFamilyState();
       const usedColors = existing.members.map((m) => m.color);
-      const newMembers = familyNames.map((name, i) => {
+      const newMembers = familyMembers.map((fm, i) => {
         const availableColor = MEMBER_COLORS.find((c) => !usedColors.includes(c)) ?? MEMBER_COLORS[i % MEMBER_COLORS.length]!;
         usedColors.push(availableColor);
-        return { id: `${Date.now()}_${i}`, name: name.trim(), role: "adult" as const, color: availableColor };
+        return { id: `${Date.now()}_${i}`, name: fm.name.trim(), role: fm.role, color: availableColor };
       });
       await saveFamilyState({
         ...existing,
@@ -199,25 +200,47 @@ export default function OnboardingScreen() {
             <Text style={styles.membersTitle}>Name your household members</Text>
             <Text style={styles.membersSub}>Optional — helps personalise your week. They'll appear on your Family board.</Text>
 
-            {/* Chips for added names */}
-            {familyNames.length > 0 && (
+            {/* Chips for added members */}
+            {familyMembers.length > 0 && (
               <View style={styles.chipsRow}>
-                {familyNames.map((name, i) => (
-                  <TouchableOpacity
-                    key={i}
-                    onPress={() => {
-                      Haptics.selectionAsync();
-                      setFamilyNames((prev) => prev.filter((_, idx) => idx !== i));
-                    }}
-                    activeOpacity={0.75}
-                    style={[styles.memberChip, { backgroundColor: MEMBER_COLORS[i % MEMBER_COLORS.length] + "22", borderColor: MEMBER_COLORS[i % MEMBER_COLORS.length] + "66" }]}
-                  >
-                    <Text style={[styles.memberChipText, { color: MEMBER_COLORS[i % MEMBER_COLORS.length] }]}>{name}</Text>
-                    <Text style={[styles.memberChipX, { color: MEMBER_COLORS[i % MEMBER_COLORS.length] }]}>×</Text>
-                  </TouchableOpacity>
-                ))}
+                {familyMembers.map((fm, i) => {
+                  const chipColor = MEMBER_COLORS[i % MEMBER_COLORS.length]!;
+                  return (
+                    <TouchableOpacity
+                      key={i}
+                      onPress={() => {
+                        Haptics.selectionAsync();
+                        setFamilyMembers((prev) => prev.filter((_, idx) => idx !== i));
+                      }}
+                      activeOpacity={0.75}
+                      style={[styles.memberChip, { backgroundColor: chipColor + "22", borderColor: chipColor + "66" }]}
+                    >
+                      <Text style={[styles.memberChipText, { color: chipColor }]}>{fm.name}</Text>
+                      <Text style={[styles.memberRoleTag, { color: chipColor + "CC" }]}>
+                        {fm.role === "adult" ? "Adult" : "Child"}
+                      </Text>
+                      <Text style={[styles.memberChipX, { color: chipColor }]}>×</Text>
+                    </TouchableOpacity>
+                  );
+                })}
               </View>
             )}
+
+            {/* Role toggle */}
+            <View style={styles.roleToggleRow}>
+              {(["adult", "child"] as const).map((r) => (
+                <TouchableOpacity
+                  key={r}
+                  onPress={() => setPendingRole(r)}
+                  activeOpacity={0.75}
+                  style={[styles.roleToggleBtn, pendingRole === r && styles.roleToggleBtnActive]}
+                >
+                  <Text style={[styles.roleToggleBtnText, pendingRole === r && styles.roleToggleBtnTextActive]}>
+                    {r === "adult" ? "Adult / driver" : "Child"}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
 
             {/* Name input row */}
             <View style={styles.nameInputRow}>
@@ -230,9 +253,9 @@ export default function OnboardingScreen() {
                 returnKeyType="done"
                 onSubmitEditing={() => {
                   const trimmed = nameInput.trim();
-                  if (trimmed && !familyNames.includes(trimmed)) {
+                  if (trimmed && !familyMembers.some((m) => m.name === trimmed)) {
                     Haptics.selectionAsync();
-                    setFamilyNames((prev) => [...prev, trimmed]);
+                    setFamilyMembers((prev) => [...prev, { name: trimmed, role: pendingRole }]);
                     setNameInput("");
                   }
                 }}
@@ -240,9 +263,9 @@ export default function OnboardingScreen() {
               <TouchableOpacity
                 onPress={() => {
                   const trimmed = nameInput.trim();
-                  if (trimmed && !familyNames.includes(trimmed)) {
+                  if (trimmed && !familyMembers.some((m) => m.name === trimmed)) {
                     Haptics.selectionAsync();
-                    setFamilyNames((prev) => [...prev, trimmed]);
+                    setFamilyMembers((prev) => [...prev, { name: trimmed, role: pendingRole }]);
                     setNameInput("");
                   }
                 }}
@@ -499,6 +522,39 @@ const styles = StyleSheet.create({
     fontSize: 15,
     lineHeight: 17,
     marginLeft: 2,
+  },
+  memberRoleTag: {
+    fontFamily: "Inter_400Regular",
+    fontSize: 11,
+    opacity: 0.8,
+  },
+  roleToggleRow: {
+    flexDirection: "row",
+    gap: 8,
+    marginTop: 10,
+    marginBottom: 4,
+  },
+  roleToggleBtn: {
+    flex: 1,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: BORDER,
+    paddingVertical: 7,
+    alignItems: "center",
+    backgroundColor: "#fff",
+  },
+  roleToggleBtnActive: {
+    borderColor: TEAL,
+    backgroundColor: TEAL + "12",
+  },
+  roleToggleBtnText: {
+    fontFamily: "Inter_500Medium",
+    fontSize: 13,
+    color: MUTED,
+  },
+  roleToggleBtnTextActive: {
+    color: TEAL,
+    fontFamily: "Inter_600SemiBold",
   },
   nameInputRow: {
     flexDirection: "row",

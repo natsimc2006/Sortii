@@ -27,6 +27,7 @@ export interface FamilyEvent {
   carpoolContact?: string;
   repeat: RepeatType;
   notes?: string;
+  isAppointment?: boolean;
 }
 
 export interface FamilyState {

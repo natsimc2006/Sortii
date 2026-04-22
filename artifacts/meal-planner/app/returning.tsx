@@ -125,10 +125,6 @@ export default function ReturningScreen() {
 
         </View>
 
-        {/* Footer */}
-        <Text style={[styles.footer, { color: C.textMuted }]}>
-          Either way — dinner's sorted.
-        </Text>
       </Animated.View>
     </View>
   );

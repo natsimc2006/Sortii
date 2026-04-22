@@ -17,7 +17,7 @@ import { PressableScale } from "@/components/PressableScale";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Colors from "@/constants/Colors";
 
-const sortiiLogo = require("@/assets/images/sortii-logo-v2-landing.png");
+const sortiiLogo = require("@/assets/images/sortii-logo1-full.png");
 
 const STEPS = [
   {

@@ -4,6 +4,7 @@ import React, { useCallback, useState } from "react";
 import {
   Alert,
   KeyboardAvoidingView,
+  Modal,
   Platform,
   ScrollView,
   StyleSheet,
@@ -12,6 +13,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { Calendar } from "react-native-calendars";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 import {
@@ -151,22 +153,25 @@ function EssentialChip({ level }: { level: EssentialLevel }) {
 }
 
 function DatePicker({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  const [calVisible, setCalVisible] = useState(false);
   const today    = todayStr();
   const nextWeek = shiftDateStr(today, 7);
   const nextMth  = shiftDateStr(today, 30);
+
   return (
     <View style={{ gap: 10 }}>
-      <View style={styles.datePickerRow}>
-        <TouchableOpacity onPress={() => onChange(shiftDateStr(value, -1))} style={styles.dateArrow}>
-          <Feather name="chevron-left" size={20} color={TEAL} />
-        </TouchableOpacity>
-        <View style={{ flex: 1, alignItems: "center" }}>
-          <Text style={styles.datePickerMain}>{formatDateFull(value)}</Text>
-        </View>
-        <TouchableOpacity onPress={() => onChange(shiftDateStr(value, 1))} style={styles.dateArrow}>
-          <Feather name="chevron-right" size={20} color={TEAL} />
-        </TouchableOpacity>
-      </View>
+      {/* Tap to open calendar */}
+      <TouchableOpacity
+        onPress={() => setCalVisible(true)}
+        activeOpacity={0.8}
+        style={styles.datePickerTrigger}
+      >
+        <Feather name="calendar" size={16} color={TEAL} />
+        <Text style={styles.datePickerMain}>{formatDateFull(value)}</Text>
+        <Feather name="chevron-down" size={14} color={MUTED} />
+      </TouchableOpacity>
+
+      {/* Quick shortcuts */}
       <View style={{ flexDirection: "row", gap: 8 }}>
         {[
           { label: "In a week",  val: nextWeek },
@@ -182,6 +187,40 @@ function DatePicker({ value, onChange }: { value: string; onChange: (v: string) 
           </TouchableOpacity>
         ))}
       </View>
+
+      {/* Calendar modal */}
+      <Modal visible={calVisible} transparent animationType="slide">
+        <View style={styles.calModalOverlay}>
+          <View style={styles.calModalCard}>
+            <View style={styles.calModalHeader}>
+              <Text style={styles.calModalTitle}>Pick a date</Text>
+              <TouchableOpacity onPress={() => setCalVisible(false)} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+                <Feather name="x" size={20} color={MUTED} />
+              </TouchableOpacity>
+            </View>
+            <Calendar
+              current={value}
+              onDayPress={(day: { dateString: string }) => {
+                onChange(day.dateString);
+                setCalVisible(false);
+              }}
+              markedDates={{ [value]: { selected: true, selectedColor: TEAL } }}
+              theme={{
+                selectedDayBackgroundColor: TEAL,
+                todayTextColor: TEAL,
+                arrowColor: TEAL,
+                textDayFontFamily: "Inter_400Regular",
+                textMonthFontFamily: "Inter_600SemiBold",
+                textDayHeaderFontFamily: "Inter_500Medium",
+                calendarBackground: "#fff",
+                textSectionTitleColor: MUTED,
+                dayTextColor: TEXT,
+                monthTextColor: TEXT,
+              }}
+            />
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -862,14 +901,18 @@ const styles = StyleSheet.create({
   catPillText: { fontSize: 13, fontFamily: "Inter_500Medium", color: MUTED },
   rowBetween:  { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
 
-  datePickerRow: {
+  datePickerTrigger: {
     flexDirection: "row", alignItems: "center", gap: 8,
-    backgroundColor: TEAL_TINT, borderRadius: 12, padding: 10,
+    backgroundColor: TEAL_TINT, borderRadius: 12, paddingHorizontal: 14, paddingVertical: 12,
   },
-  dateArrow:        { padding: 4 },
-  datePickerMain:   { fontSize: 15, fontFamily: "Inter_600SemiBold", color: TEXT, textAlign: "center" },
+  datePickerMain: { flex: 1, fontSize: 15, fontFamily: "Inter_600SemiBold", color: TEXT },
   dateShortcut:     { flex: 1, borderRadius: 20, paddingVertical: 6, alignItems: "center", borderWidth: 1, borderColor: BORDER, backgroundColor: CARD },
   dateShortcutText: { fontSize: 12, fontFamily: "Inter_500Medium", color: MUTED },
+
+  calModalOverlay: { flex: 1, backgroundColor: "rgba(0,0,0,0.45)", justifyContent: "flex-end" },
+  calModalCard: { backgroundColor: "#fff", borderTopLeftRadius: 20, borderTopRightRadius: 20, paddingBottom: 32 },
+  calModalHeader: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: 20, paddingTop: 18, paddingBottom: 8 },
+  calModalTitle: { fontSize: 17, fontFamily: "Inter_600SemiBold", color: TEXT },
 
   saveBtn:      { marginHorizontal: 16, marginTop: 20, backgroundColor: TEAL, borderRadius: 14, paddingVertical: 14, alignItems: "center" },
   saveBtnText:  { color: "#fff", fontSize: 16, fontFamily: "Inter_700Bold" },

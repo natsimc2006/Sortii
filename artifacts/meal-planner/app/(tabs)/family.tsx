@@ -253,8 +253,12 @@ function solveJuggleOnDevice(
             description: `${adult.name} has overlapping events on ${day}: "${a.title}" and "${b.title}".`,
             involved_events: [a.id, b.id], involved_adults: [adult.name],
             suggested_contacts: [],
-            recommendation: `Consider asking someone else to cover "${b.title}".`,
-            options: [`Ask another adult to take ${b.title}`, `Adjust time of ${b.title}`],
+            recommendation: b.isAppointment
+              ? `"${b.title}" is a fixed appointment for ${adult.name} — rearrange "${a.title}" if possible.`
+              : `Consider asking someone else to cover "${b.title}".`,
+            options: b.isAppointment
+              ? [`Move "${a.title}" to a different time`, `Check if "${a.title}" can be rescheduled`]
+              : [`Ask another adult to take ${b.title}`, `Adjust time of ${b.title}`],
           });
         }
       }
@@ -310,6 +314,7 @@ function blankDraft(): Omit<FamilyEvent, "id"> {
   return {
     title: "", day: "Monday", time: "", endTime: "", location: "",
     personIds: [], driverId: undefined, carpoolContact: "", repeat: "none", notes: "",
+    isAppointment: false,
   };
 }
 
@@ -527,6 +532,7 @@ function JuggleProcessingOverlay() {
 function JuggleResultsContent({
   juggleResult,
   members,
+  carpoolContacts,
   onClose,
   onSortAgain,
   onShare,
@@ -534,6 +540,7 @@ function JuggleResultsContent({
 }: {
   juggleResult: JuggleResult;
   members: FamilyMember[];
+  carpoolContacts: CarpoolContact[];
   onClose: () => void;
   onSortAgain: () => void;
   onShare: (text: string) => void;
@@ -789,18 +796,43 @@ function JuggleResultsContent({
       {/* ── 4. Tight spot / conflicts ── */}
       {conflicts.length > 0 && (
         <View style={styles.juggleConflictCard}>
-          <Text style={styles.juggleConflictLabel}>
-            {conflicts.length === 1 ? "HEADS UP" : "HEADS UP"}
-          </Text>
-          {conflicts.map((c, i) => (
-            <View key={i} style={i > 0 ? { marginTop: 12, paddingTop: 12, borderTopWidth: 1, borderTopColor: "#F3E0DC" } : undefined}>
-              <Text style={styles.juggleConflictDesc}>⚠ {c.description}</Text>
-              {c.recommendation ? <Text style={styles.juggleConflictRec}>{c.recommendation}</Text> : null}
-              {c.options.map((o, j) => (
-                <Text key={j} style={styles.juggleConflictOption}>· {o}</Text>
-              ))}
-            </View>
-          ))}
+          <Text style={styles.juggleConflictLabel}>HEADS UP</Text>
+          {conflicts.map((c, i) => {
+            const involvedJuggleEvs = (juggleResult.events ?? []).filter(
+              (e) => (c.involved_events ?? []).includes(e.id)
+            );
+            const conflictHasChild = involvedJuggleEvs.some(
+              (e) => e.child !== null && e.child !== undefined && e.child !== ""
+            );
+            return (
+              <View key={i} style={i > 0 ? { marginTop: 12, paddingTop: 12, borderTopWidth: 1, borderTopColor: "#F3E0DC" } : undefined}>
+                <Text style={styles.juggleConflictDesc}>⚠ {c.description}</Text>
+                {c.recommendation ? <Text style={styles.juggleConflictRec}>{c.recommendation}</Text> : null}
+                {c.options.map((o, j) => (
+                  <Text key={j} style={styles.juggleConflictOption}>· {o}</Text>
+                ))}
+                {conflictHasChild && (
+                  <View style={styles.carpoolClashBox}>
+                    <Feather name="users" size={13} color={TEAL} />
+                    {carpoolContacts.length > 0 ? (
+                      <View style={{ flex: 1 }}>
+                        <Text style={styles.carpoolClashLabel}>Carpool helpers:</Text>
+                        {carpoolContacts.map((cc) => (
+                          <Text key={cc.id} style={styles.carpoolClashContact}>
+                            · {cc.name}{cc.phone ? ` — ${cc.phone}` : ""}
+                          </Text>
+                        ))}
+                      </View>
+                    ) : (
+                      <TouchableOpacity onPress={onClose} activeOpacity={0.8} style={{ flex: 1 }}>
+                        <Text style={styles.carpoolClashLink}>Add carpool contacts →</Text>
+                      </TouchableOpacity>
+                    )}
+                  </View>
+                )}
+              </View>
+            );
+          })}
         </View>
       )}
 
@@ -1600,6 +1632,33 @@ function AddEventSheet({
                 {errors.map((e, i) => <Text key={i} style={styles.errorText}>{e}</Text>)}
               </View>
             )}
+
+            {/* Event type toggle */}
+            <View style={styles.formField}>
+              <Text style={styles.formLabel}>Type</Text>
+              <View style={{ flexDirection: "row", gap: 8 }}>
+                {([{ val: false, label: "Activity" }, { val: true, label: "Appointment" }] as const).map(({ val, label }) => {
+                  const active = !!draft.isAppointment === val;
+                  return (
+                    <TouchableOpacity
+                      key={label}
+                      style={[styles.repeatChip, active && styles.repeatChipSelected]}
+                      onPress={() => { Keyboard.dismiss(); setField("isAppointment", val); }}
+                      activeOpacity={0.75}
+                    >
+                      <Text style={[styles.repeatChipText, active && styles.repeatChipTextSelected]}>
+                        {label}
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
+              {draft.isAppointment && (
+                <Text style={[styles.formHint, { marginTop: 4 }]}>
+                  This person must attend — Sortii won't suggest cover for it.
+                </Text>
+              )}
+            </View>
 
             {/* Title */}
             <View style={styles.formField}>
@@ -2533,6 +2592,7 @@ export default function FamilyScreen() {
         <JuggleResultsContent
           juggleResult={juggleResult}
           members={state.members}
+          carpoolContacts={carpoolContacts}
           onClose={() => setFamilyStep("input")}
           onSortAgain={() => handleSortJuggle()}
           onShare={handleShareJuggle}
@@ -3296,6 +3356,14 @@ const styles = StyleSheet.create({
   juggleConflictDesc: { fontSize: 14, fontFamily: "Inter_600SemiBold", color: TEXT, lineHeight: 20 },
   juggleConflictRec: { fontSize: 13, fontFamily: "Inter_500Medium", color: TEAL, marginTop: 4, fontStyle: "italic" },
   juggleConflictOption: { fontSize: 13, fontFamily: "Inter_400Regular", color: TEXT_MUTED, marginTop: 2 },
+
+  carpoolClashBox: {
+    flexDirection: "row", alignItems: "flex-start", gap: 8,
+    marginTop: 10, paddingTop: 10, borderTopWidth: 1, borderTopColor: "#F3E0DC",
+  },
+  carpoolClashLabel: { fontSize: 12, fontFamily: "Inter_600SemiBold", color: TEAL, marginBottom: 3 },
+  carpoolClashContact: { fontSize: 12, fontFamily: "Inter_400Regular", color: TEXT_MUTED, lineHeight: 18 },
+  carpoolClashLink: { fontSize: 13, fontFamily: "Inter_600SemiBold", color: TEAL },
 
   // Juggle results — worth knowing
   juggleWorthKnowingCard: {

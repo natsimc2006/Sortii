@@ -363,7 +363,7 @@ export default function MoneySetupScreen() {
   const canSave = incomeRaw !== "" || groceries !== "";
 
   const paddingTop    = Platform.OS === "web" ? 60 : insets.top;
-  const paddingBottom = Platform.OS === "web" ? 40 : insets.bottom + 24;
+  const paddingBottom = Platform.OS === "web" ? 24 : insets.bottom + 8;
 
   if (!isLoaded) {
     return (
@@ -403,7 +403,7 @@ export default function MoneySetupScreen() {
       </View>
 
       <ScrollView
-        contentContainerStyle={[styles.container, { paddingBottom: paddingBottom + 80 }]}
+        contentContainerStyle={[styles.container, { paddingBottom: paddingBottom + 40 }]}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
@@ -445,16 +445,10 @@ export default function MoneySetupScreen() {
 
           {/* Bills field — auto-fills from bills store when available */}
           {billsAutoMonthly !== null && !billsAutoOverride ? (
-            <View>
-              <Text style={[styles.fieldLabel, { color: C.text }]}>
-                Bills, loans & regular payments
-              </Text>
-              <View style={styles.autoCalcRow}>
-                <View style={styles.autoCalcPill}>
-                  <Text style={styles.autoCalcPillText}>From your bills ✓</Text>
-                </View>
-                <Text style={styles.autoCalcValue}>
-                  {currencySymbol}{billsAutoMonthly.toLocaleString()} /month
+            <View style={styles.fieldBlock}>
+              <View style={styles.fieldLabelRow}>
+                <Text style={[styles.fieldLabel, { color: C.text }]}>
+                  Bills, loans & regular payments
                 </Text>
                 <TouchableOpacity
                   onPress={() => router.navigate("/(tabs)/bills")}
@@ -463,6 +457,12 @@ export default function MoneySetupScreen() {
                 >
                   <Text style={styles.autoCalcOverrideBtnText}>Edit →</Text>
                 </TouchableOpacity>
+              </View>
+              <Text style={styles.autoCalcValue}>
+                {currencySymbol}{billsAutoMonthly.toLocaleString()} /month
+              </Text>
+              <View style={[styles.autoCalcPill, { marginTop: 4 }]}>
+                <Text style={styles.autoCalcPillText}>from your bills ✓</Text>
               </View>
             </View>
           ) : (
