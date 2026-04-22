@@ -312,7 +312,7 @@ const styles = StyleSheet.create({
   },
   sheetTitle: {
     fontSize: 19,
-    fontFamily: "Manrope_700Bold",
+    fontFamily: "DMSans_700Bold",
     lineHeight: 26,
     marginBottom: 4,
   },

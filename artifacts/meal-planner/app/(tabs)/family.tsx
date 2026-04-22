@@ -161,6 +161,143 @@ const REPEAT_LABELS: Record<RepeatType, string> = {
   none: "One-off", weekly: "Weekly", fortnightly: "Fortnightly", monthly: "Monthly",
 };
 
+const DAY_ORDER: Partial<Record<DayOfWeek, number>> = {
+  Monday: 0, Tuesday: 1, Wednesday: 2, Thursday: 3,
+  Friday: 4, Saturday: 5, Sunday: 6,
+};
+
+function _toMins(hhmm: string | undefined): number {
+  if (!hhmm) return 0;
+  const [h, m] = hhmm.split(":").map(Number);
+  return (h ?? 0) * 60 + (m ?? 0);
+}
+
+// ── On-device juggle solver (no network required) ─────────────────────────────
+function solveJuggleOnDevice(
+  adults: FamilyMember[],
+  events: FamilyEvent[],
+  calEvents: SortiiCalEvent[],
+  memberLookup: Map<string, FamilyMember>,
+): JuggleResult {
+  if (adults.length === 0) {
+    return {
+      weekend_summary: { total_events: 0, conflicts_resolved: 0, tight_windows: 0, impossible_clashes: 0 },
+      events: [], conflicts: [], adult_plans: [], travel_estimates: [],
+      least_painful_version: { applicable: false }, smart_note: null, solvedAt: Date.now(),
+    };
+  }
+
+  // Assign each event to the adult with lowest load on that day
+  const adultLoadMap = new Map<string, Map<DayOfWeek, number>>();
+  for (const a of adults) adultLoadMap.set(a.id, new Map());
+  const assignments = new Map<string, string>(); // eventId → adultId
+
+  for (const ev of events) {
+    let best = adults[0]!;
+    let bestLoad = Infinity;
+    for (const a of adults) {
+      const load = adultLoadMap.get(a.id)?.get(ev.day) ?? 0;
+      if (load < bestLoad) { bestLoad = load; best = a; }
+    }
+    assignments.set(ev.id, best.id);
+    const dayMap = adultLoadMap.get(best.id)!;
+    dayMap.set(ev.day, (dayMap.get(ev.day) ?? 0) + 1);
+  }
+
+  // Build juggle event items
+  const juggleEvents: JuggleEventItem[] = events.map((ev, idx) => {
+    const adultId = assignments.get(ev.id) ?? adults[0]!.id;
+    const adultMember = adults.find((a) => a.id === adultId) ?? adults[0]!;
+    const child = ev.personIds
+      .map((id) => memberLookup.get(id))
+      .find((m) => m?.role === "child")?.name ?? null;
+    const dayType: "Saturday" | "Sunday" | "Weekday" =
+      ev.day === "Saturday" ? "Saturday"
+      : ev.day === "Sunday" ? "Sunday"
+      : "Weekday";
+    return {
+      id: ev.id, child, activity: ev.title,
+      location: ev.location || null, day: dayType,
+      start_time: ev.time || "09:00",
+      end_time: ev.endTime || "",
+      assigned_adult: adultMember.name,
+      adult_must_stay: false, child_colour_index: idx % 6,
+    };
+  });
+
+  // Detect overlaps per adult per day
+  const conflicts: JuggleConflict[] = [];
+  const adultEventsMap = new Map<string, FamilyEvent[]>();
+  for (const [evId, adultId] of assignments.entries()) {
+    const ev = events.find((e) => e.id === evId);
+    if (!ev) continue;
+    if (!adultEventsMap.has(adultId)) adultEventsMap.set(adultId, []);
+    adultEventsMap.get(adultId)!.push(ev);
+  }
+  for (const [adultId, evList] of adultEventsMap.entries()) {
+    const adult = adults.find((a) => a.id === adultId)!;
+    const byDay = new Map<DayOfWeek, FamilyEvent[]>();
+    for (const ev of evList) {
+      if (!byDay.has(ev.day)) byDay.set(ev.day, []);
+      byDay.get(ev.day)!.push(ev);
+    }
+    for (const [day, dayEvs] of byDay.entries()) {
+      const sorted = dayEvs.slice().sort((a, b) => _toMins(a.time) - _toMins(b.time));
+      for (let i = 0; i < sorted.length - 1; i++) {
+        const a = sorted[i]!; const b = sorted[i + 1]!;
+        const aEnd = _toMins(a.endTime) || _toMins(a.time) + 60;
+        const bStart = _toMins(b.time);
+        if (bStart < aEnd) {
+          conflicts.push({
+            id: `overlap-${a.id}-${b.id}`, type: "overlap", severity: "warning",
+            description: `${adult.name} has overlapping events on ${day}: "${a.title}" and "${b.title}".`,
+            involved_events: [a.id, b.id], involved_adults: [adult.name],
+            suggested_contacts: [],
+            recommendation: `Consider asking someone else to cover "${b.title}".`,
+            options: [`Ask another adult to take ${b.title}`, `Adjust time of ${b.title}`],
+          });
+        }
+      }
+    }
+  }
+
+  // Build adult_plans
+  const adultPlans: JuggleAdultPlan[] = adults.map((adult) => {
+    const evList = adultEventsMap.get(adult.id) ?? [];
+    const schedule: JuggleScheduleItem[] = evList
+      .sort((a, b) => {
+        const dd = (DAY_ORDER[a.day] ?? 0) - (DAY_ORDER[b.day] ?? 0);
+        return dd !== 0 ? dd : _toMins(a.time) - _toMins(b.time);
+      })
+      .map((ev) => {
+        const child = ev.personIds
+          .map((id) => memberLookup.get(id))
+          .find((m) => m?.role === "child")?.name ?? null;
+        return { time: ev.time || "09:00", child, activity: ev.title, location: ev.location || null, event_id: ev.id };
+      });
+    return { adult: adult.name, can_drive: true, schedule, free_windows: [] };
+  });
+
+  const totalEvents = juggleEvents.length + calEvents.length;
+  const smartNote = totalEvents === 0 ? null
+    : conflicts.length > 0
+    ? `${conflicts.length} overlap${conflicts.length > 1 ? "s" : ""} to sort — see below.`
+    : totalEvents === 1 ? "One event. One adult. Done."
+    : "All events assigned. Nothing clashing.";
+
+  return {
+    weekend_summary: {
+      total_events: totalEvents,
+      conflicts_resolved: 0,
+      tight_windows: 0,
+      impossible_clashes: conflicts.filter((c) => c.severity === "impossible").length,
+    },
+    events: juggleEvents, conflicts, adult_plans: adultPlans,
+    travel_estimates: [], least_painful_version: { applicable: false },
+    smart_note: smartNote, solvedAt: Date.now(),
+  };
+}
+
 const BUSYNESS_CONFIG: Record<BusynessLevel, { label: string; color: string }> = {
   clear:  { label: "Clear week",  color: TEXT_MUTED },
   quiet:  { label: "Quiet week",  color: TEAL },
@@ -1309,16 +1446,22 @@ function TimePickerSheet({
 }
 
 // ── AddEventSheet ──────────────────────────────────────────────────────────────
+export interface CarpoolContact { id: string; name: string; phone: string; }
+
 function AddEventSheet({
   visible,
   members,
   initialDraft,
+  carpoolContacts,
+  onAddCarpoolContact,
   onClose,
   onSave,
 }: {
   visible: boolean;
   members: FamilyMember[];
   initialDraft?: Partial<FamilyEvent> | null;
+  carpoolContacts: CarpoolContact[];
+  onAddCarpoolContact: (c: CarpoolContact) => void;
   onClose: () => void;
   onSave: (draft: Omit<FamilyEvent, "id">) => void;
 }) {
@@ -1331,6 +1474,9 @@ function AddEventSheet({
   const [showDiscard, setShowDiscard] = useState(false);
   const [timePickerVisible, setTimePickerVisible] = useState(false);
   const [timePickerFor, setTimePickerFor]         = useState<"start" | "end">("start");
+  const [addingContact, setAddingContact]         = useState(false);
+  const [newContactName, setNewContactName]       = useState("");
+  const [newContactPhone, setNewContactPhone]     = useState("");
 
   // Derived: is the form valid enough to save?
   const isFormValid = draft.title.trim().length > 0 && draft.time.trim().length > 0;
@@ -1372,6 +1518,7 @@ function AddEventSheet({
   }
 
   function togglePerson(id: string) {
+    Keyboard.dismiss();
     setDraft((d) => ({
       ...d,
       personIds: d.personIds.includes(id)
@@ -1476,7 +1623,7 @@ function AddEventSheet({
                     <TouchableOpacity
                       key={d}
                       style={[styles.dayChip, draft.day === d && styles.dayChipSelected]}
-                      onPress={() => setField("day", d)}
+                      onPress={() => { Keyboard.dismiss(); setField("day", d); }}
                       activeOpacity={0.75}
                     >
                       <Text style={[styles.dayChipText, draft.day === d && styles.dayChipTextSelected]}>
@@ -1544,19 +1691,99 @@ function AddEventSheet({
               </View>
             )}
 
-            {/* Backup contact — always shown; driver assigned by AI */}
+            {/* Who could help — persistent carpool contacts */}
             <View style={styles.formField}>
-              <Text style={styles.formLabel}>Backup contact (optional)</Text>
-              <TextInput
-                style={styles.formInput}
-                value={draft.carpoolContact ?? ""}
-                onChangeText={(v) => setField("carpoolContact", v)}
-                placeholder="e.g. Sarah — 0412 345 678"
-                placeholderTextColor="#bbb"
-              />
-              <Text style={styles.formHint}>
-                Someone who could help if needed. They'll appear in conflict suggestions.
-              </Text>
+              <Text style={styles.formLabel}>Who could help with this?</Text>
+              <Text style={styles.formHint}>Build your list as you go.</Text>
+
+              {/* Saved contact chips */}
+              {carpoolContacts.length > 0 && (
+                <View style={styles.carpoolChipRow}>
+                  {carpoolContacts.map((c) => {
+                    const selected = draft.carpoolContact === `${c.name} — ${c.phone}`;
+                    return (
+                      <TouchableOpacity
+                        key={c.id}
+                        onPress={() => {
+                          Keyboard.dismiss();
+                          setField("carpoolContact", selected ? "" : `${c.name} — ${c.phone}`);
+                        }}
+                        activeOpacity={0.75}
+                        style={[
+                          styles.carpoolChip,
+                          selected && styles.carpoolChipSelected,
+                        ]}
+                      >
+                        <Text style={[styles.carpoolChipText, selected && styles.carpoolChipTextSelected]}>
+                          {c.name}
+                        </Text>
+                        {selected && <Feather name="check" size={11} color={TEAL} />}
+                      </TouchableOpacity>
+                    );
+                  })}
+                  {!addingContact && (
+                    <TouchableOpacity
+                      onPress={() => { Keyboard.dismiss(); setAddingContact(true); }}
+                      style={styles.carpoolChipAdd}
+                      activeOpacity={0.75}
+                    >
+                      <Feather name="plus" size={12} color={TEAL} />
+                      <Text style={styles.carpoolChipAddText}>Add new</Text>
+                    </TouchableOpacity>
+                  )}
+                </View>
+              )}
+
+              {/* Add contact form — shown on first use or when "+ Add new" tapped */}
+              {(carpoolContacts.length === 0 || addingContact) && (
+                <View style={styles.carpoolAddForm}>
+                  <TextInput
+                    style={[styles.formInput, { marginBottom: 8 }]}
+                    value={newContactName}
+                    onChangeText={setNewContactName}
+                    placeholder="Name"
+                    placeholderTextColor="#bbb"
+                    returnKeyType="next"
+                  />
+                  <View style={styles.carpoolAddRow}>
+                    <TextInput
+                      style={[styles.formInput, { flex: 1 }]}
+                      value={newContactPhone}
+                      onChangeText={setNewContactPhone}
+                      placeholder="Phone number"
+                      placeholderTextColor="#bbb"
+                      keyboardType="phone-pad"
+                      returnKeyType="done"
+                    />
+                    <TouchableOpacity
+                      onPress={() => {
+                        if (!newContactName.trim()) return;
+                        const c: CarpoolContact = {
+                          id: Date.now().toString(),
+                          name: newContactName.trim(),
+                          phone: newContactPhone.trim(),
+                        };
+                        onAddCarpoolContact(c);
+                        setField("carpoolContact", `${c.name}${c.phone ? ` — ${c.phone}` : ""}`);
+                        setNewContactName("");
+                        setNewContactPhone("");
+                        setAddingContact(false);
+                        Keyboard.dismiss();
+                      }}
+                      style={[styles.carpoolAddBtn, !newContactName.trim() && { opacity: 0.4 }]}
+                      disabled={!newContactName.trim()}
+                      activeOpacity={0.8}
+                    >
+                      <Text style={styles.carpoolAddBtnText}>Add</Text>
+                    </TouchableOpacity>
+                  </View>
+                  {addingContact && (
+                    <TouchableOpacity onPress={() => { setAddingContact(false); }} style={{ marginTop: 6 }}>
+                      <Text style={[styles.formHint, { color: TEXT_MUTED }]}>Cancel</Text>
+                    </TouchableOpacity>
+                  )}
+                </View>
+              )}
             </View>
 
             {/* Repeat */}
@@ -1567,7 +1794,7 @@ function AddEventSheet({
                   <TouchableOpacity
                     key={r}
                     style={[styles.repeatChip, draft.repeat === r && styles.repeatChipSelected]}
-                    onPress={() => setField("repeat", r)}
+                    onPress={() => { Keyboard.dismiss(); setField("repeat", r); }}
                     activeOpacity={0.75}
                   >
                     <Text
@@ -2059,6 +2286,7 @@ export default function FamilyScreen() {
   const [showHelpers, setShowHelpers]         = useState(false);
   const [pushedCalEvents, setPushedCalEvents] = useState<SortiiCalEvent[]>([]);
   const [apptItems,       setApptItems]       = useState<Appointment[]>([]);
+  const [carpoolContacts, setCarpoolContacts] = useState<CarpoolContact[]>([]);
 
   // Compute a map from eventId → AI-assigned adult name (including swaps)
   const juggleDriverMap = React.useMemo(() => {
@@ -2074,12 +2302,16 @@ export default function FamilyScreen() {
     return map;
   }, [juggleResult]);
 
+  const carpoolKey = () => SK.carpoolContacts(getCurrentUserId());
+
   const load = useCallback(async () => {
-    const [s, savedJuggle, savedHelpers, appts] = await Promise.all([
+    const uid = getCurrentUserId();
+    const [s, savedJuggle, savedHelpers, appts, savedCarpool] = await Promise.all([
       loadFamilyState(),
       AsyncStorage.getItem(juggleKey()),
       AsyncStorage.getItem(HELPERS_KEY),
       loadAppointments(),
+      AsyncStorage.getItem(SK.carpoolContacts(uid)),
     ]);
     setState(s);
     setResult(computeFamilyWeek(s));
@@ -2089,6 +2321,9 @@ export default function FamilyScreen() {
     }
     if (savedHelpers) {
       try { setHelpers(JSON.parse(savedHelpers)); } catch {}
+    }
+    if (savedCarpool) {
+      try { setCarpoolContacts(JSON.parse(savedCarpool)); } catch {}
     }
     try {
       const pushed = await loadFamilyPushedEvents();
@@ -2204,76 +2439,33 @@ export default function FamilyScreen() {
     setFamilyStep("sorting");
     dismissBanner();
 
+    // Short artificial delay so the processing overlay is visible
+    await new Promise((r) => setTimeout(r, 1600));
+
     try {
-      // Build prompt using actual field names from FamilyEvent
-      const DAY_NAMES = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
-      const adultsStr = adults.map((a) => `${a.name}, can drive: yes`).join("\n");
-      const eventsStr = state.events.map((e) => {
-        const involved = e.personIds
-          .map((id) => state.members.find((m) => m.id === id)?.name)
-          .filter(Boolean)
-          .join(", ");
-        return [
-          `EventID: ${e.id}`,
-          `Activity: ${e.title}`,
-          `Day: ${e.day}`,
-          `Start: ${formatTime(e.time) || "not specified"}`,
-          `End: ${e.endTime ? formatTime(e.endTime) : "not specified"}`,
-          `Location: ${e.location || "not specified"}`,
-          `Who's going: ${involved || "unspecified"}`,
-          `Assigned adult: unassigned`,
-        ].join("\n");
-      }).join("\n---\n");
-
-      // Include pushed calendar events
-      const calStr = pushedCalEvents.map((e) => {
-        const day = DAY_NAMES[new Date(e.startTime).getDay()] ?? "Monday";
-        const startT = e.isAllDay ? "All day" : new Date(e.startTime).toLocaleTimeString("en-AU", { hour: "2-digit", minute: "2-digit" });
-        const endT = e.endTime && !e.isAllDay ? new Date(e.endTime).toLocaleTimeString("en-AU", { hour: "2-digit", minute: "2-digit" }) : "not specified";
-        return [
-          `EventID: ${e.id}`,
-          `Activity: ${e.title}`,
-          `Day: ${day}`,
-          `Start: ${startT}`,
-          `End: ${endT}`,
-          `Location: ${e.location || "not specified"}`,
-          `Who's going: unspecified`,
-          `Assigned adult: unassigned`,
-          `Source: ${e.calendarName || e.source} calendar`,
-        ].join("\n");
-      }).join("\n---\n");
-
-      const fullEventsStr = [eventsStr, calStr].filter(Boolean).join("\n---\n");
-      const prompt = `Available adults:\n${adultsStr}\n\nEvents this week:\n${fullEventsStr}\n\nPlease solve this schedule.`;
-
-      console.log("[Sortii] Loading state entered — calling API");
-      // Web: use root-relative URL (proxied at /api). Native: localhost directly.
-      const apiBase = Platform.OS === "web" ? "" : "http://localhost:8080";
-      const res = await fetch(`${apiBase}/api/juggle`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt }),
-      });
-      if (!res.ok) throw new Error(`API error ${res.status}`);
-      const data = await res.json() as { result: Omit<JuggleResult, "solvedAt"> };
-      const resultData = data.result ?? (data as unknown as Omit<JuggleResult, "solvedAt">);
-      const full: JuggleResult = { ...resultData, solvedAt: Date.now() };
-
-      console.log("[Sortii] Sort completed — results payload created, events in result:", full.events?.length);
+      const memberLookup = new Map<string, FamilyMember>(
+        state.members.map((m) => [m.id, m])
+      );
+      const full = solveJuggleOnDevice(adults, state.events, pushedCalEvents, memberLookup);
       await AsyncStorage.setItem(juggleKey(), JSON.stringify(full));
       setJuggleResult(full);
       setIsSorted(true);
       setFamilyStep("results");
-      console.log("[Sortii] Results screen activated");
     } catch (err) {
       console.error("[Sortii] Sort error:", err);
       setFamilyStep("input");
-      setSortError("Couldn't sort right now. Check your connection and try again.");
+      setSortError("Couldn't sort the week right now. Try again.");
     }
   }
 
   async function handleShareJuggle(text: string) {
     try { await Share.share({ message: text }); } catch {}
+  }
+
+  async function handleAddCarpoolContact(c: CarpoolContact) {
+    const next = [...carpoolContacts, c];
+    setCarpoolContacts(next);
+    await AsyncStorage.setItem(carpoolKey(), JSON.stringify(next));
   }
 
   async function handleAddHelper(name: string, contact?: string) {
@@ -2423,6 +2615,33 @@ export default function FamilyScreen() {
                   juggleDriverMap={juggleDriverMap}
                 />
               ))}
+              {/* This-week appointments — shown as distinct "Appointment" items */}
+              {thisWeekAppts.length > 0 && (
+                <View style={styles.apptSection}>
+                  <Text style={styles.apptSectionLabel}>APPOINTMENTS</Text>
+                  {thisWeekAppts.map((a) => {
+                    const timeLabel = a.startTime || "All day";
+                    const dateLabel = a.date
+                      ? new Date(a.date).toLocaleDateString("en-AU", { weekday: "short", day: "numeric", month: "short" })
+                      : "";
+                    return (
+                      <View key={a.id} style={styles.apptItemRow}>
+                        <View style={styles.apptTimePill}>
+                          <Text style={styles.apptTimeText}>{timeLabel}</Text>
+                        </View>
+                        <View style={{ flex: 1 }}>
+                          <Text style={styles.apptTitle} numberOfLines={1}>{a.title}</Text>
+                          {dateLabel ? <Text style={styles.apptDate}>{dateLabel}</Text> : null}
+                        </View>
+                        <View style={styles.apptBadge}>
+                          <Text style={styles.apptBadgeText}>Appt</Text>
+                        </View>
+                      </View>
+                    );
+                  })}
+                </View>
+              )}
+
               {/* Pushed calendar events */}
               {pushedCalEvents.length > 0 && (
                 <View style={{ gap: 8, marginTop: 4 }}>
@@ -2507,6 +2726,16 @@ export default function FamilyScreen() {
               lastSolvedAt={juggleResult?.solvedAt ?? null}
               onViewLastPlan={() => setFamilyStep("results")}
             />
+
+            {/* Persistent "Add another event" button — always visible when events exist */}
+            <TouchableOpacity
+              style={styles.addAnotherBtn}
+              onPress={openAddEvent}
+              activeOpacity={0.85}
+            >
+              <Feather name="plus" size={15} color={TEAL} />
+              <Text style={styles.addAnotherBtnText}>Add another event</Text>
+            </TouchableOpacity>
           </>
         ) : hasMembers ? (
           /* Members exist, no events yet */
@@ -2570,6 +2799,8 @@ export default function FamilyScreen() {
           visible={showForm}
           members={state.members}
           initialDraft={editingEvent}
+          carpoolContacts={carpoolContacts}
+          onAddCarpoolContact={handleAddCarpoolContact}
           onClose={() => { setShowForm(false); setEditingEvent(null); }}
           onSave={handleSaveEvent}
         />
@@ -2586,7 +2817,7 @@ const styles = StyleSheet.create({
 
   // Header
   header: { flexDirection: "row", alignItems: "flex-start", justifyContent: "space-between", gap: 12 },
-  pageTitle: { fontSize: 28, fontFamily: "Manrope_700Bold", color: TEXT, letterSpacing: -0.5 },
+  pageTitle: { fontSize: 28, fontFamily: "DMSans_700Bold", color: TEXT, letterSpacing: -0.5 },
   pageSub: {
     fontSize: 13, fontFamily: "Inter_400Regular", color: TEXT_MUTED, fontStyle: "italic",
     marginTop: 3, lineHeight: 18, maxWidth: 240,
@@ -2958,7 +3189,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#EAF6F4", borderRadius: 16, padding: 18, gap: 10,
   },
   resultSummaryOutcome: {
-    fontSize: 20, fontFamily: "Manrope_700Bold", color: TEXT,
+    fontSize: 20, fontFamily: "DMSans_700Bold", color: TEXT,
     letterSpacing: -0.3, lineHeight: 26,
   },
   resultSummaryStatsRow: {
@@ -3105,6 +3336,79 @@ const styles = StyleSheet.create({
   calPushedSource: { fontSize: 11, fontFamily: "Inter_400Regular", color: TEXT_MUTED },
   calPushedRemove: { fontSize: 12, fontFamily: "Inter_500Medium", color: TEXT_MUTED },
 
+  // Appointments weekly section
+  apptSection: {
+    marginTop: 12, backgroundColor: "#F5FBF9",
+    borderRadius: 10, padding: 12, gap: 8,
+  },
+  apptSectionLabel: {
+    fontSize: 10, fontFamily: "DMSans_700Bold", color: TEAL,
+    letterSpacing: 0.8, marginBottom: 2,
+  },
+  apptItemRow: {
+    flexDirection: "row", alignItems: "center", gap: 8,
+  },
+  apptTimePill: {
+    backgroundColor: TEAL + "18", borderRadius: 6,
+    paddingHorizontal: 6, paddingVertical: 3, minWidth: 52, alignItems: "center",
+  },
+  apptTimeText: {
+    fontSize: 11, fontFamily: "DMSans_600SemiBold", color: TEAL,
+  },
+  apptTitle: { fontSize: 13, fontFamily: "DMSans_600SemiBold", color: TEXT, flex: 1 },
+  apptDate: { fontSize: 11, fontFamily: "DMSans_400Regular", color: TEXT_MUTED },
+  apptBadge: {
+    backgroundColor: "#EEF2FF", borderRadius: 6,
+    paddingHorizontal: 6, paddingVertical: 2,
+  },
+  apptBadgeText: {
+    fontSize: 10, fontFamily: "DMSans_600SemiBold", color: "#6366F1",
+  },
+
+  // Carpool contact chips
+  carpoolChipRow: {
+    flexDirection: "row", flexWrap: "wrap", gap: 8, marginTop: 8,
+  },
+  carpoolChip: {
+    flexDirection: "row", alignItems: "center", gap: 5,
+    borderWidth: 1.5, borderColor: BORDER, borderRadius: 20,
+    paddingHorizontal: 12, paddingVertical: 6, backgroundColor: "#fff",
+  },
+  carpoolChipSelected: {
+    borderColor: TEAL, backgroundColor: TEAL + "12",
+  },
+  carpoolChipText: {
+    fontSize: 13, fontFamily: "DMSans_500Medium", color: TEXT,
+  },
+  carpoolChipTextSelected: { color: TEAL },
+  carpoolChipAdd: {
+    flexDirection: "row", alignItems: "center", gap: 4,
+    borderWidth: 1.5, borderColor: TEAL, borderRadius: 20, borderStyle: "dashed",
+    paddingHorizontal: 10, paddingVertical: 6,
+  },
+  carpoolChipAddText: {
+    fontSize: 12, fontFamily: "DMSans_500Medium", color: TEAL,
+  },
+  carpoolAddForm: { marginTop: 8 },
+  carpoolAddRow: { flexDirection: "row", alignItems: "center", gap: 8 },
+  carpoolAddBtn: {
+    backgroundColor: TEAL, borderRadius: 8,
+    paddingHorizontal: 16, paddingVertical: 11, justifyContent: "center",
+  },
+  carpoolAddBtnText: {
+    fontSize: 14, fontFamily: "DMSans_600SemiBold", color: "#fff",
+  },
+
+  // "Add another event" persistent button
+  addAnotherBtn: {
+    flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 6,
+    borderWidth: 1.5, borderColor: TEAL, borderRadius: 12,
+    paddingVertical: 13, marginTop: 12,
+  },
+  addAnotherBtnText: {
+    fontSize: 14, fontFamily: "DMSans_600SemiBold", color: TEAL,
+  },
+
   // FAB
   fab: {
     position: "absolute", right: 20,
@@ -3211,7 +3515,7 @@ const styles = StyleSheet.create({
     width: 10, height: 10, borderRadius: 5,
     backgroundColor: GOLD, marginTop: 1,
   },
-  staleSortTitle: { fontSize: 17, fontFamily: "Manrope_700Bold", color: TEXT, letterSpacing: -0.2 },
+  staleSortTitle: { fontSize: 17, fontFamily: "DMSans_700Bold", color: TEXT, letterSpacing: -0.2 },
   staleSortSub: { fontSize: 13, fontFamily: "Inter_400Regular", color: TEXT_MUTED, lineHeight: 19 },
   staleSortBtn: {
     flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8,
@@ -3311,7 +3615,7 @@ const styles = StyleSheet.create({
       default: { shadowColor: "#000", shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.10, shadowRadius: 16, elevation: 5 },
     }),
   },
-  sortCardTitle: { fontSize: 18, fontFamily: "Manrope_700Bold", color: TEXT, letterSpacing: -0.3 },
+  sortCardTitle: { fontSize: 18, fontFamily: "DMSans_700Bold", color: TEXT, letterSpacing: -0.3 },
   sortCardSub: { fontSize: 13, fontFamily: "Inter_400Regular", color: TEXT_MUTED, lineHeight: 20 },
   sortCardError: { flexDirection: "row", alignItems: "flex-start", gap: 7, marginTop: 2 },
   sortCardErrorText: { fontSize: 12, fontFamily: "Inter_400Regular", color: "#C04040", flex: 1 },
@@ -3489,7 +3793,7 @@ const styles = StyleSheet.create({
   },
   resultDashboardHeadline: {
     fontSize: 24,
-    fontFamily: "Manrope_700Bold",
+    fontFamily: "DMSans_700Bold",
     color: TEXT,
     letterSpacing: -0.5,
     lineHeight: 30,
@@ -3581,7 +3885,7 @@ const styles = StyleSheet.create({
   },
   resultsBack: { color: TEAL, fontSize: 14, fontFamily: "Inter_500Medium" },
   resultsTitle: {
-    color: TEXT, fontSize: 15, fontFamily: "Manrope_700Bold", letterSpacing: -0.2,
+    color: TEXT, fontSize: 15, fontFamily: "DMSans_700Bold", letterSpacing: -0.2,
     flex: 1, textAlign: "center",
   },
   resultsRetry: { color: TEXT_MUTED, fontSize: 13, fontFamily: "Inter_400Regular" },

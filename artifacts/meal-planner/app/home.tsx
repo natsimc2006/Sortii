@@ -285,7 +285,7 @@ const styles = StyleSheet.create({
   },
   mainHeadline: {
     fontSize: 35,
-    fontFamily: "Manrope_600SemiBold",
+    fontFamily: "DMSans_600SemiBold",
     fontWeight: "600",
     textAlign: "center",
     lineHeight: 52,

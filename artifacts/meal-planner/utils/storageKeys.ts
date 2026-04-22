@@ -44,6 +44,9 @@ export const SK = {
   calEvents:            (uid: string) => userKey(uid, "calEvents"),
   calPushed:            (uid: string) => userKey(uid, "calPushed"),
 
+  // Family
+  carpoolContacts: (uid: string) => userKey(uid, "carpoolContacts"),
+
   // UI state (dismissals / nudges)
   welcomeTip:     (uid: string) => userKey(uid, "welcomeTip"),
   crossSellNudge: (uid: string) => userKey(uid, "crossSellNudge"),

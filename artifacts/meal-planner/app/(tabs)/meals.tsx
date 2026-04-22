@@ -1278,7 +1278,7 @@ const styles = StyleSheet.create({
   },
   pageTitle: {
     fontSize: 24,
-    fontFamily: "Manrope_700Bold",
+    fontFamily: "DMSans_700Bold",
     letterSpacing: -0.4,
     lineHeight: 30,
   },

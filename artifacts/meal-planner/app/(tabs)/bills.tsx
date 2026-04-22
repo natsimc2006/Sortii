@@ -780,7 +780,7 @@ const styles = StyleSheet.create({
     flexDirection: "row", alignItems: "flex-start", gap: 8,
     paddingHorizontal: 16, paddingTop: 12, paddingBottom: 4,
   },
-  pageTitle: { fontSize: 24, fontFamily: "Manrope_700Bold", color: TEXT },
+  pageTitle: { fontSize: 24, fontFamily: "DMSans_700Bold", color: TEXT },
   pageSub:   { fontSize: 13, fontFamily: "Inter_400Regular", color: MUTED, fontStyle: "italic", marginTop: 1 },
 
   backBtn:  { flexDirection: "row", alignItems: "center", gap: 4, paddingVertical: 4 },
@@ -843,7 +843,7 @@ const styles = StyleSheet.create({
   },
 
   formHeader:       { paddingHorizontal: 16, paddingTop: 16, paddingBottom: 8, gap: 6 },
-  formTitle:        { fontSize: 22, fontFamily: "Manrope_700Bold", color: TEXT },
+  formTitle:        { fontSize: 22, fontFamily: "DMSans_700Bold", color: TEXT },
   formSection:      { paddingHorizontal: 16, paddingTop: 12, gap: 8 },
   formSectionLabel: { fontSize: 11, fontFamily: "Inter_600SemiBold", color: PLUM, textTransform: "uppercase", letterSpacing: 0.5 },
   formCard:         { backgroundColor: CARD, borderRadius: 14, borderWidth: 1, borderColor: BORDER, padding: 16 },
@@ -883,7 +883,7 @@ const styles = StyleSheet.create({
     backgroundColor: CARD, borderRadius: 14, borderWidth: 1, borderColor: BORDER,
     borderLeftWidth: 4, padding: 16, gap: 4,
   },
-  detailTitle:        { fontSize: 20, fontFamily: "Manrope_700Bold", color: TEXT },
+  detailTitle:        { fontSize: 20, fontFamily: "DMSans_700Bold", color: TEXT },
   detailAmount:       { fontSize: 28, fontFamily: "Inter_700Bold", color: TEXT, marginTop: 4 },
   detailMeta:         { fontSize: 14, fontFamily: "Inter_400Regular", color: MUTED },
   detailSection:      { backgroundColor: CARD, borderRadius: 12, borderWidth: 1, borderColor: BORDER, padding: 14, gap: 6 },

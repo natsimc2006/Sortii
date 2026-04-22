@@ -184,7 +184,7 @@ const wgStyles = StyleSheet.create({
   },
   topRow:   { flexDirection: "row", alignItems: "flex-start", gap: 8 },
   eyebrow:  { fontSize: 10, fontFamily: "Inter_600SemiBold", color: TEAL + "99", letterSpacing: 1 },
-  headline: { fontSize: 16, fontFamily: "Manrope_600SemiBold", color: TEXT, marginTop: 2, lineHeight: 22 },
+  headline: { fontSize: 16, fontFamily: "DMSans_600SemiBold", color: TEXT, marginTop: 2, lineHeight: 22 },
   chevronWrap: {
     width: 30, height: 30, borderRadius: 15,
     backgroundColor: TEAL + "18",
@@ -303,7 +303,7 @@ const tcStyles = StyleSheet.create({
   statusChip: { borderRadius: 6, borderWidth: 1, paddingHorizontal: 6, paddingVertical: 2 },
   statusText: { fontSize: 10, fontFamily: "Inter_600SemiBold" },
   dateLabel:  { fontSize: 11, fontFamily: "Inter_400Regular", color: TEXT_MUTED },
-  title:      { fontSize: 15, fontFamily: "Manrope_600SemiBold", color: TEXT, lineHeight: 20 },
+  title:      { fontSize: 15, fontFamily: "DMSans_600SemiBold", color: TEXT, lineHeight: 20 },
   bottomRow:  { flexDirection: "row", alignItems: "center", gap: 10 },
   assignedTo: { fontSize: 12, fontFamily: "Inter_400Regular", color: TEXT_MUTED },
   secondary:  { fontSize: 12, fontFamily: "Inter_400Regular", color: TEXT_MUTED, fontStyle: "italic" },
@@ -537,7 +537,7 @@ const styles = StyleSheet.create({
     borderBottomColor: BORDER,
   },
   backBtn:     { width: 36, height: 36, alignItems: "center", justifyContent: "center" },
-  headerTitle: { fontSize: 17, fontFamily: "Manrope_600SemiBold", color: TEXT },
+  headerTitle: { fontSize: 17, fontFamily: "DMSans_600SemiBold", color: TEXT },
 
   container: { paddingHorizontal: 20, paddingTop: 16, gap: 12 },
 
@@ -549,7 +549,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: TEAL + "30",
   },
-  summaryHeadline: { fontSize: 17, fontFamily: "Manrope_600SemiBold", color: TEXT },
+  summaryHeadline: { fontSize: 17, fontFamily: "DMSans_600SemiBold", color: TEXT },
   summaryChips:    { flexDirection: "row", flexWrap: "wrap", gap: 6 },
   summaryChipPill: {
     backgroundColor: "#fff",
@@ -573,6 +573,6 @@ const styles = StyleSheet.create({
     paddingVertical: 56,
     gap: 10,
   },
-  emptyTitle: { fontSize: 16, fontFamily: "Manrope_600SemiBold", color: TEXT },
+  emptyTitle: { fontSize: 16, fontFamily: "DMSans_600SemiBold", color: TEXT },
   emptySub:   { fontSize: 13, fontFamily: "Inter_400Regular", color: TEXT_MUTED, fontStyle: "italic" },
 });

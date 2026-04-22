@@ -160,7 +160,7 @@ const styles = StyleSheet.create({
   header: { gap: 4, marginBottom: 4 },
   pageTitle: {
     fontSize: 28,
-    fontFamily: "Manrope_700Bold",
+    fontFamily: "DMSans_700Bold",
     color: TEXT,
     letterSpacing: -0.5,
   },

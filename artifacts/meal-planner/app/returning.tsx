@@ -159,7 +159,7 @@ const styles = StyleSheet.create({
   headlineBlock: { gap: 10 },
   headline: {
     fontSize: 30,
-    fontFamily: "Manrope_700Bold",
+    fontFamily: "DMSans_700Bold",
     lineHeight: 38,
   },
   sub: {

@@ -9,7 +9,12 @@ import {
   PlayfairDisplay_700Bold,
   PlayfairDisplay_400Regular,
 } from "@expo-google-fonts/playfair-display";
-import { Manrope_600SemiBold, Manrope_700Bold } from "@expo-google-fonts/manrope";
+import {
+  DMSans_400Regular,
+  DMSans_500Medium,
+  DMSans_600SemiBold,
+  DMSans_700Bold,
+} from "@expo-google-fonts/dm-sans";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Stack, useRouter, useSegments } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
@@ -70,8 +75,10 @@ export default function RootLayout() {
     Inter_700Bold,
     PlayfairDisplay_700Bold,
     PlayfairDisplay_400Regular,
-    Manrope_600SemiBold,
-    Manrope_700Bold,
+    DMSans_400Regular,
+    DMSans_500Medium,
+    DMSans_600SemiBold,
+    DMSans_700Bold,
   });
 
   useEffect(() => {

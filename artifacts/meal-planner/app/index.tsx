@@ -286,7 +286,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   valuePropText: {
-    fontFamily: "Manrope_600SemiBold",
+    fontFamily: "DMSans_600SemiBold",
     fontSize: 17,
     color: INK,
     lineHeight: 24,
@@ -314,7 +314,7 @@ const styles = StyleSheet.create({
     color: TEAL,
   },
   stepHeading: {
-    fontFamily: "Manrope_700Bold",
+    fontFamily: "DMSans_700Bold",
     fontSize: 26,
     color: INK,
     marginBottom: 8,
@@ -390,7 +390,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   primaryBtnText: {
-    fontFamily: "Manrope_700Bold",
+    fontFamily: "DMSans_700Bold",
     fontSize: 17,
     color: "#FFFFFF",
     letterSpacing: 0.2,

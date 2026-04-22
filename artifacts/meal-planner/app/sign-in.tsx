@@ -214,7 +214,7 @@ const styles = StyleSheet.create({
   },
 
   promptHead: {
-    fontFamily: "Manrope_700Bold",
+    fontFamily: "DMSans_700Bold",
     fontSize: 20,
     color: INK,
     textAlign: "center",

@@ -1207,7 +1207,7 @@ const styles = StyleSheet.create({
   // Header
   pageHeader: { gap: 4, marginBottom: 4 },
   pageTitle: {
-    fontSize: 28, fontFamily: "Manrope_700Bold",
+    fontSize: 28, fontFamily: "DMSans_700Bold",
     color: C.text, letterSpacing: -0.5,
   },
   pageSubtitle: {
@@ -1249,7 +1249,7 @@ const styles = StyleSheet.create({
     color: TEAL, textTransform: "uppercase", letterSpacing: 0.8,
   },
   heroBigNumber: {
-    fontSize: 34, fontFamily: "Manrope_700Bold",
+    fontSize: 34, fontFamily: "DMSans_700Bold",
     color: TEAL, lineHeight: 42,
   },
   heroLabel: {
@@ -1338,7 +1338,7 @@ const styles = StyleSheet.create({
   },
   groceriesStatValueRow: { flexDirection: "row", alignItems: "center" },
   groceriesStatValue: {
-    fontSize: 22, fontFamily: "Manrope_700Bold", color: C.text, lineHeight: 28,
+    fontSize: 22, fontFamily: "DMSans_700Bold", color: C.text, lineHeight: 28,
   },
   groceriesTick: {
     fontSize: 16, color: TEAL, marginLeft: 4, fontFamily: "Inter_700Bold",
@@ -1520,7 +1520,7 @@ const styles = StyleSheet.create({
   },
   goalEmoji: { fontSize: 22 },
   goalName: {
-    flex: 1, fontSize: 16, fontFamily: "Manrope_700Bold", color: PLUM,
+    flex: 1, fontSize: 16, fontFamily: "DMSans_700Bold", color: PLUM,
   },
   goalPct: {
     fontSize: 16, fontFamily: "Inter_700Bold", color: PLUM,
@@ -1607,7 +1607,7 @@ const styles = StyleSheet.create({
   },
   emptyNudgeHeadline: {
     fontSize: 18,
-    fontFamily: "Manrope_700Bold",
+    fontFamily: "DMSans_700Bold",
     color: C.text,
     lineHeight: 26,
   },
@@ -1682,7 +1682,7 @@ const styles = StyleSheet.create({
     fontSize: 12, fontFamily: "Inter_600SemiBold", color: TEAL,
   },
   calmHeroBig: {
-    fontSize: 38, fontFamily: "Manrope_700Bold",
+    fontSize: 38, fontFamily: "DMSans_700Bold",
     color: TEAL, lineHeight: 46, letterSpacing: -0.5,
   },
   calmHeroLabel: {
@@ -1690,7 +1690,7 @@ const styles = StyleSheet.create({
     color: "#3A6E6A", lineHeight: 20,
   },
   calmHeading: {
-    fontSize: 22, fontFamily: "Manrope_700Bold",
+    fontSize: 22, fontFamily: "DMSans_700Bold",
     color: "#2B2B2B",
   },
   calmSubtext: {
@@ -1726,7 +1726,7 @@ const styles = StyleSheet.create({
     marginBottom: 2,
   },
   mealSavingBig: {
-    fontSize: 28, fontFamily: "Manrope_700Bold",
+    fontSize: 28, fontFamily: "DMSans_700Bold",
     color: TEAL, lineHeight: 34,
   },
   mealSavingDesc: {
@@ -1777,7 +1777,7 @@ const styles = StyleSheet.create({
     fontSize: 18, color: GOLD,
   },
   tightHeading: {
-    fontSize: 20, fontFamily: "Manrope_700Bold", color: "#2B2B2B", flex: 1,
+    fontSize: 20, fontFamily: "DMSans_700Bold", color: "#2B2B2B", flex: 1,
   },
   tightDivider: {
     height: 1, backgroundColor: "#E6E1D7", marginVertical: 4,
@@ -1803,7 +1803,7 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   stretchedHeading: {
-    fontSize: 22, fontFamily: "Manrope_700Bold", color: "#2B2B2B",
+    fontSize: 22, fontFamily: "DMSans_700Bold", color: "#2B2B2B",
   },
   stretchedSubtext: {
     fontSize: 14, fontFamily: "Inter_400Regular",

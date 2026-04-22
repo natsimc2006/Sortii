@@ -63,6 +63,7 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0",
+    "@expo-google-fonts/dm-sans": "^0.4.2",
     "@expo-google-fonts/manrope": "^0.4.2",
     "@expo-google-fonts/playfair-display": "^0.4.2",
     "@react-native-voice/voice": "^3.2.4",
