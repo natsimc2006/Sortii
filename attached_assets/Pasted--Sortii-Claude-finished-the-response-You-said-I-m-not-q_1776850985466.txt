@@ -1,0 +1,583 @@
+
+Sortii
+/
+Claude finished the response
+You said: I’m not quite sure what is happening on the money page - I have tested adding a couple of bills and when I do that it seems to adjust the income amount the use…
+IMG_4121.png
+IMG_4122.png
+IMG_4123.png
+IMG_4124.png
+IMG_4125.png
+IMG_4126.png
+IMG_4127.png
+IMG_4128.png
+IMG_4129.png
+I’m not quite sure what is happening on the money page - I have tested adding a couple of bills and when I do that it seems to adjust the income amount the user has entered but I’m not clear why?…
+
+Apr 21
+Claude responded: Looking at your screenshots, here's my best read on what's likely happening.
+
+Diagnosed likely state mutation bug affecting income calculation
+Diagnosed likely state mutation bug affecting income calculation
+Looking at your screenshots, here's my best read on what's likely happening.
+
+Your income display row shows: Income $1000 · Fixed $0 · Left ~$603
+
+The income is $1000 fortnightly, but the app needs to express everything as a weekly figure for the "breathing room" calculation. So somewhere in the code, it's converting: $1000 fortnightly ÷ 2 = $500/week. That's the number being used as the base.
+
+When you add a bill, the most likely bug is one of two things:
+
+Most likely — bill amount is being subtracted from the income variable directly, rather than added to a fixedCosts total and then the left figure being recalculated. So instead of left = income - fixedCosts - bills, it's doing something like income = income - billAmount.
+
+Second possibility — period conversion is double-dipping. The bill is entered as a one-off (e.g. $160 rego) but the code treats it as recurring and annualises or weekly-ises it, then applies it to the wrong field.
+
+To diagnose quickly: can you tell me exactly which number changes when you add a bill? Is it:
+
+The "Income $1000" part of that row, or
+The "Left ~$603" figure, or
+The big "~$603 breathing room" hero stat?
+That'll tell us exactly where the state mutation is going wrong and I can write you a precise Replit Agent fix prompt.
+
+You said: Ok, so having a bit of play, I don’t know if it is to do with the bills or not - it seems I add the income and then hit ‘see my week’ and then if I click tweak…
+Ok, so having a bit of play, I don’t know if it is to do with the bills or not - it seems I add the income and then hit ‘see my week’ and then if I click tweak my numbers the income then shows as halved, each time I hit see my week and then tweak my numbers it halves the income everytime on the input screen.
+
+I have the income entered as fortnightly, so it is seems to be changing it to weekly on the input view - but also actually reducing the income automatically by half everytime I hit tweak the numbers?
+
+Apr 21
+Claude responded: Classic bug — I know exactly what's happening.
+
+Identified recurring conversion bug halving stored income values
+Identified recurring conversion bug halving stored income values
+Classic bug — I know exactly what's happening.
+
+The code is converting fortnightly → weekly (÷2) for the calculation, but then saving the converted value back to state instead of the original. So the stored income becomes $500, then $250, then $125 each time.
+
+The fix is straightforward: the app needs to store the raw input value and the period separately, and only apply the conversion at display/calculation time — never write the converted figure back to state.
+
+Here's the Replit Agent prompt:
+
+REPLIT AGENT PROMPT — Fix income halving bug on Money tab
+
+The bug: Every time the user taps "See my week" and then returns to "Tweak numbers", the income input value is halved. This is because the fortnightly-to-weekly conversion (÷2) is being applied to the stored state value, not just used in calculations. Each visit to the screen applies the conversion again.
+
+The fix — three rules to enforce:
+
+Rule 1 — Never mutate the stored income value. The raw income figure entered by the user (e.g. 1000) and their selected period (e.g. "fortnightly") must be stored exactly as entered. Do not apply any conversion to these stored values.
+
+Rule 2 — Convert only at calculation time. A helper function should handle the conversion to weekly:
+
+Weekly input → use as-is
+Fortnightly input → divide by 2
+Monthly input → multiply by 12 then divide by 52
+This function is called when calculating "breathing room" and the breakdown row. It is never called when reading or writing the user's input fields.
+
+Rule 3 — Pre-populate the input screen with the raw stored value. When the user opens "Tweak numbers", the income field must show the original stored figure (e.g. 1000) and the period selector must reflect the stored period (e.g. "Fortnightly" highlighted). Do not pre-populate with a derived or converted figure.
+
+Check for the same bug on all other period-based fields (mortgage/rent is monthly — confirm it is also stored raw and only converted at calculation time).
+
+Do not change any UI, copy, colours, or layout. This is a state management fix only.
+
+That should be a clean, safe fix with no risk to the rest of the screen.
+
+You said: I think we’re on the final tidy uo if layout and logic now.
+IMG_4140.png
+IMG_4142.png
+IMG_4143.png
+IMG_4144.png
+IMG_4145.png
+IMG_4147.png
+IMG_4148.png
+IMG_4149.png
+IMG_4150.png
+IMG_4151.png
+IMG_4152.png
+IMG_4153.png
+IMG_4154.png
+IMG_4155.png
+I think we’re on the final tidy uo if layout and logic now.
+
+main page: I don’t think the bills card makes sense. It mentions the bill due this week but underneath mentioned. $460 outstanding? The family card says two things need sorting, it ik not sure what that is referring to either . The nav bar needs a slight tidy up and as the icons are not aligned right. Appointments don’t seem to be saving/storing after leaving the app. If I use the back button from the appts page, it opens the + page instead of going back to the home page. Focus mode page feels a little empty from the aesthetics there, and the ‘I’m back’ doesn’t make it clear that that take a you back to the home page.
+Meal page:
+Is there anyway to reduce the space used at the top, to allow more visuals for the actual meal cards section?
+
+Family page:
+This week section I think need a cleaner alignment - making the events all sit tidy (currently staggered due to length of the times column).
+See the plan/resort is still duplicated int be page (despite now having the sticky buttons.)
+
+Money page:
+The fonts don’t seem to be rendering in the correct Sortii font?
+
+Bills page:
+When going ‘back’ on this page it returns to the ‘more’  page, with no way to go to the home page. 
+There is an option to select ‘what’s coming up.
+When opening ‘coming up’ some of the fonts there are also not aligned to Sortii font. 
+
+On the appointment page:
+The add an appointment should be a proper CTA button as to subtle right now. 
+When adding an appointment the date selection is too limited as doesn’t open to allow to select a date much further in the future when needed. 
+The CTa button at  the bottom is stuck behind the nav bar.
+
+As a user, not being able to get back to the appt ir bill page from anywhere other than the Home Screen is a little annoying. Is there an option to change the + button maybe to ‘more’ or something and when that opens it is worded slightly different from ‘add’?
+
+The appt layer doesn’t seem to be feeding into the activities/juggle page smartly yet?
+
+Show more
+Apr 21
+Claude responded: That's a solid list — all very fixable.
+
+Systematized seventeen UI and navigation issues into organized categories
+Systematized seventeen UI and navigation issues into organized categories
+That's a solid list — all very fixable. Let me compile this into one clean prompt you can hand straight to Replit Agent.
+
+REPLIT AGENT PROMPT — UI tidy-up, navigation fixes, and persistence bugs
+
+This is a batch of layout, navigation, copy, and logic fixes across multiple screens. Work through each section completely before moving to the next. Do not change any colours, brand voice, or features not listed here.
+
+1. HOME SCREEN
+
+Bills card: The subtext "$460 outstanding this week" is incorrect — it is summing all bills regardless of due date. Fix: the subtext should only reference bills due within the current 7-day window. If one bill is due this week for $100, show "$100 due this week." Do not show a cumulative total of future bills.
+
+Family card: "2 things need sorting" is vague and confusing. Fix: the subtext should reflect what specifically needs attention — e.g. "2 activities need a driver" or "2 unassigned items this week." Pull the actual unresolved items from the family data to generate this label. If nothing genuinely needs action, do not show an alert state.
+
+Nav bar icons: Audit all five nav bar icons for vertical and horizontal alignment. All icons and labels must sit on the same baseline. Check icon size consistency — none should appear larger or higher than the others.
+
+Focus mode screen: This screen feels sparse. Add the Sortii logo mark at the top (small, centred). Replace "I'm back →" with a proper teal CTA button labelled "Back to home." "See everything →" can remain as a secondary text link below it. The overall layout should feel calm and intentional, not empty.
+
+2. NAVIGATION FIXES
+
+Back button from Appointments: Tapping back from the Appointments screen must return to the Home screen, not open the + sheet. Fix the navigation stack so Appointments correctly pops back to Home.
+
+Back button from Bills: Same issue — back from Bills must return to Home (or Money, if Bills was opened from Money tab). Never route to a "more" page. Audit all screens for correct back navigation destinations.
+
++ button → "More" bottom sheet: Rename the centre nav button from "Add" to "More." When tapped, the bottom sheet heading should change from "What needs adding?" to "What do you need?" and the subtext from "Pop it in. We'll sort the rest." to "Add something or get somewhere fast." Keep the four options (meal, family activity, appointment, bill) but add two navigation shortcuts at the bottom: "Go to Appointments →" and "Go to Bills →" as teal text links. This gives users a path to those screens from anywhere.
+
+3. APPOINTMENTS SCREEN
+
+Persistence bug: Appointments are not being saved between sessions. Audit the appointment storage logic — appointments must persist to AsyncStorage (or equivalent) and reload correctly on app restart and screen re-entry.
+
+"Add appointment" CTA: The current link/button is too subtle. Replace it with a full-width teal outlined button labelled "Add appointment" consistent with other secondary CTAs in the app.
+
+Date picker: The date selector currently only offers a limited scroll range. Fix it to allow selection of any date up to 12 months ahead. The arrow navigation (< >) must scroll freely through months without a hard stop.
+
+CTA button obscured by nav bar: The save/confirm button at the bottom of the Add Appointment form is sitting behind the nav bar. Add sufficient bottom padding (minimum 80px) to ensure it renders above the nav bar on all screen sizes.
+
+Appointments → Juggle/Activities feed: Appointments added manually must appear in the Family tab's weekly activity view and in the "What's Coming Up" timeline. Check that the appointment data is being read by both of these components and fix any missing connections.
+
+4. FAMILY SCREEN
+
+Event time column alignment: In the weekly events list, the time badge (e.g. "10am–11:30am") is causing staggered alignment because of variable width. Fix: set a fixed minimum width on the time badge column (e.g. 100px) so all event titles start at the same horizontal position regardless of time string length.
+
+Duplicated See the plan / Re-sort buttons: These buttons appear both inline on the page and in the sticky footer. Remove the inline version. Keep only the sticky footer buttons.
+
+5. MONEY SCREEN
+
+Font rendering: The Money screen is not rendering the correct Sortii typeface. Audit the font imports and stylesheet references on this screen specifically. Apply the correct font family (DM Sans for body, Playfair Display for headings) consistently across all text elements on the Money tab, including the breakdown row, the hero stat, quick wins section, and savings goal card.
+
+6. BILLS SCREEN
+
+Font rendering: Same font issue as Money screen. Apply correct Sortii fonts throughout — bill names, amounts, due dates, status pills, and section headers.
+
+"What's Coming Up" section fonts: This sub-screen also has incorrect font rendering. Apply the same fix.
+
+Do not change any colours, copy tone, layout structure, or features not explicitly listed above. This is a targeted fix pass only.
+
+You said: Still tightening up the logic layer a little and hoping you can help e brainstorm these peices please?
+Still tightening up the logic layer a little and hoping you can help e brainstorm these peices please?
+
+Given the personal info held and the 'possible sortii+' subscription layer, should there by a sign in layer for the app?
+The current new user flow leads the customer to enter their meal needs - but I think how the app has built out it speaks to different possible users, and introducing the initial entry screens as meal driven may not be the right message now...
+People who want to use the app for the meal planning (unboxed dinner planner)
+-People who want to use is primarily for the family juggle layer and the meals are secondary 
+-People who buy into the sort my messy mind out vibe, and will use some or all parts of the app, but may not be initally choosing it for the meal planning as a priority.
+As there are different customer 'initial' needs, which will hopefully then have them try the other sections and utilise it fully, the meal journey may not be their first thought, and that as the screen questions to enter the home page may be off putting. Am i better to have the user log in and take them straight to the home page with place holders in the cards for 'sort your meals/family juggle/money, to let them start the Sortii journey instead where they wish?
+
+Thinking about the bills page and how that should feed to the 'Money' page - at the momeny if a user enters a bill it doesnt feed into the Money numbers (Ithoght we had tried to feed it through?)
+If we can make it feed the money page, how do i ensure they dont complete the money page with estimate regular monthly bills, and then choose to add specified dated regular bills in the bill page for weekly sorting - then causing a double up of that bill in the money page? Trying to think of how to avoid that in the flow?...
+On the home page I feel like the days of the week maybe should be at the top - it feels strange having them instead in the middle of the screen
+The money screen I think has lost its persoanlity (the cheeky wit/cheeky friendy vibe)
+The money screen also need some work to sections make sense, as feels a little confusing at the momemt -It seems to have lost the 'meal plan is saving you x from your normal dinner spend' -The term 'a lot happening this week' doesnt seem aligned to the money page, where it should be something bout breathing rooms a little tight this week. -The drop down bar which has a snapshot noted is good, but think it needs a title along the lines of 'weekly snap shot' -The 'full breakdown ' just opens a CTA below which is update my numbers' - I think the note shold go and the CTA should just be there automatically instead
+Show more
+6:17 PM
+Claude responded: Good questions — these are all the right things to be stress-testing before launch.
+
+Synthesized six interconnected UX and product strategy considerations
+Synthesized six interconnected UX and product strategy considerations
+Good questions — these are all the right things to be stress-testing before launch. Let me work through each one.
+
+Sign-in layer
+
+Yes, you need one — but keep it as lightweight as possible. The moment you have savings goals, family member names, bill data, and potentially payment tiers, that data needs to belong to someone. Without auth, a user who clears their cache or switches phones loses everything, which will cause churn and kill trust fast.
+
+The right move for launch is magic link or Apple/Google SSO only — no username/password, no friction. One tap. The sign-in screen should feel like the rest of Sortii: "One tap and you're in. No passwords. No faff." Apple Sign In is actually mandatory on iOS if you offer any other social login, so lead with that. Google as second option.
+
+Hold the sign-in screen to a single purpose — don't put onboarding questions on it.
+
+Onboarding rethink — this is the most important one
+
+You're right, and this is worth getting right before launch. The meal-first flow is misaligned with at least two of your three user types. Here's how I'd think about it:
+
+The three user entry points are essentially:
+
+"Sort my dinners" — meal planning is the primary draw
+"Sort my family chaos" — the juggle layer is why they downloaded it
+"Sort my head out" — they're overwhelmed generally and want the whole thing
+The mistake would be building three separate onboarding paths, which creates complexity and delays the user getting to value. Instead, I'd recommend a single universal entry that skips the deep-dive questions entirely.
+
+The flow would be:
+
+Screen 1 — Welcome Logo. One line. "We take the thinking out of the week." Single gold CTA: "Let's go →"
+
+Screen 2 — The only question that matters universally "Who's in your house?" — number of people, quick name entry (optional). This feeds meals AND family AND money simultaneously, so it's genuinely universal and not meal-coded.
+
+Screen 3 — Home screen with placeholder cards Land them straight on the home screen. Each card has a soft placeholder state:
+
+Meals card: "Dinners not sorted yet. Takes 60 seconds. →"
+Family card: "Nothing juggled yet. Add what's on this week. →"
+Money card: "No numbers yet. Give us rough ones. →"
+This is the right call. Let them start where they want. The user who came for the family juggle will tap that card first. The meal planner will tap meals. The overwhelmed person will probably start with money. Each card then runs its own mini-onboarding in context — the meal card asks people count and hard no's, the money card asks income and rough costs, etc. You already have all those flows built.
+
+The only additional thing I'd add: after they've engaged with one card and it resolves, the home screen delivers a small nudge toward the next one — "Dinners sorted. Want to get the money picture too?" — as a one-time prompt, not a recurring nag.
+
+Bills → Money page feed
+
+This should be a direct connection and it sounds like it isn't wired. The logic should be:
+
+Bills marked as one-off expenses feed into the weekly "breathing room" calculation for the week they're due — reducing the "left" figure for that specific week only.
+
+Bills marked as regular bills should prompt the user: "We've added this to your regular committed spend. You can remove the estimate in your money settings if you've already counted it there." — which leads neatly to the double-counting problem.
+
+Avoiding double-counting
+
+This is a real UX trap. The cleanest solution is a single source of truth for regular bills, and the Money "Tweak numbers" screen should reference it rather than hold a separate value.
+
+Here's the flow:
+
+The "Bills, loans & regular payments" field in Tweak Numbers should have a note underneath: "Or manage individual bills below — we'll total them automatically."
+
+If the user has added any regular bills in the Bills screen, the monthly total field becomes read-only and auto-calculated, with a small label: "Based on your added bills — $X/month." The manual entry field greys out and a link appears: "Edit bills →"
+
+If they haven't added any individual bills yet, the manual field remains editable as an estimate.
+
+This way:
+
+Estimate-only users → type a number manually, it works fine
+Detailed-bills users → field becomes auto-populated, manual entry disabled
+Mixed users → prompted to choose one method
+The transition message when it flips to auto-mode: "We're using your saved bills now. Remove the estimate to avoid counting it twice."
+
+Days of the week — move to top
+
+Agreed. The week strip belongs at the top of the home screen, just below the greeting and status line. It acts as a navigation anchor for the whole page — it should orient the user before the cards, not interrupt them halfway down. Move it up.
+
+Money screen — personality and structure
+
+You're right that it's lost its voice. Here's a revised structure with copy that brings it back:
+
+Hero section (top) Status line in cheeky Sortii voice — context-aware:
+
+Healthy: "This week looks fine. Breathe."
+Tight: "Breathing room's a bit tight this week."
+Very tight: "This week needs a little care."
+Zero/negative: "Worth taking a look at this week."
+Big teal figure: ~$603 breathing room Grey subtext: ~$2,595/month equivalent
+
+Meal plan saving (restore this — it's the moat) Teal tint card: THIS WEEK'S DINNER SAVING ~$63 Cooking this plan vs. eating out. 7 dinners sorted.
+
+Weekly Snapshot (rename the dropdown — give it this title as a section header above it, not inside the dropdown) Row: Income $1,000 · Fixed $233 · Left ~$371 Dropdown expands to show the breakdown of committed spend line by line.
+
+Remove the "Full breakdown" note entirely. Replace with a persistent teal outlined button directly below the snapshot row: "Update my numbers →"
+
+Quick wins (plum card — keep this, fix the copy) The trigger copy "A lot happening this week" is wrong for the Money page. Replace with context-sensitive lines:
+
+"Breathing room's tighter than usual — a couple of easy wins below."
+"One or two things worth knowing this week." The individual tips are good as-is.
+Savings goal (keep — it's working)
+
+Want me to compile the structural and copy changes into a Replit Agent prompt once you've confirmed the direction on the onboarding flow? That's the biggest decision — once you lock that, I can write the prompt cleanly.
+
+You said: Yes I like that new onboarding flow.
+Yes I like that new onboarding flow.
+2 questions before we build the prompt - 
+
+will the one off bills also geed into money summary page (so the breathing room or just that week where rego might land will be wired to be aware of the once off bill that week as noted in the bill page?
+IS the 'breath' concept running through too many lines, making it a bit to 'lifestyle' and not enough dry wit/cheeky friend - helpful but not judgy and not too soft?
+6:29 PM
+Claude responded: On one-off bills feeding the money page — yes, absolutely.
+
+Identified two clarification questions requiring attention
+Identified two clarification questions requiring attention
+On one-off bills feeding the money page — yes, absolutely.
+
+That's exactly how it should work. The breathing room figure for any given week should already have one-off bills deducted if they fall in that window. So if rego is due Thursday, that week's home screen card and money page both reflect the hit — the number is already smaller, no explanation needed. The intelligence is invisible. User doesn't need to see "rego deducted" — they just see a tighter number that week, and if they tap through, the snapshot row shows it.
+
+The only moment it surfaces is in the weekly snapshot breakdown: "Rego — $160" sits in the list alongside fixed costs for that week. Clean, factual, no drama.
+
+On "breathe/breathing room" — yes, you're right to flag it.
+
+"Breathing room" as the label for the leftover figure is fine — it's functional, it means something, keep it. But using "breathe" or "breathing" in the status copy tips it into wellness-app territory, which is exactly the wrong register for Sortii.
+
+Here's the fix — swap the hero status lines to something drier:
+
+Healthy: "This week's fine. Nothing to worry about."
+Tight: "A bit tight this week. Worth knowing."
+Very tight: "This week needs a look."
+Zero/negative: "This one needs attention."
+No breathing. No exhaling. No lifestyle. Just a cheeky, slightly deadpan friend who checked your numbers and is giving you the real read — helpful, not hand-holdy.
+
+The word "breathe" can stay exactly once in the whole app: the subtext on a healthy week — "~$603 left this week. Relax." — which earns its lightness because the news is genuinely good.
+
+Ready to write the prompt?
+
+You said: yes please
+yes please
+
+6:30 PM
+Claude responded: REPLIT AGENT PROMPT — Onboarding redesign, bills/money wiring, and Money screen rebuild
+
+Orchestrated comprehensive Replit Agent prompt consolidating multiple feature updates
+Orchestrated comprehensive Replit Agent prompt consolidating multiple feature updates
+REPLIT AGENT PROMPT — Onboarding redesign, bills/money wiring, and Money screen rebuild
+
+Work through each section completely before moving to the next. Do not change any colours, navigation structure, or features not listed here. All copy must follow Sortii brand voice: confident, short, cheeky but not try-hard, never corporate, never wellness-coded.
+
+SECTION 1 — AUTHENTICATION
+
+Add a sign-in layer before the app loads. Support two methods only: Apple Sign In and Google Sign In. No username/password option.
+
+Screen layout:
+
+Sortii logo mark centred, top third of screen
+Tagline below: "We take the thinking out of the week."
+Apple Sign In button (full width, standard Apple styling)
+Google Sign In button (full width, standard Google styling)
+No other copy, no links, no explanations
+On successful sign-in, first-time users proceed to the new onboarding flow (Section 2). Returning users go directly to the home screen with their data restored.
+
+All user data (meals, family members, bills, money settings, appointments) must be scoped to the authenticated user and persisted server-side so it survives app restarts, cache clears, and device changes.
+
+SECTION 2 — NEW ONBOARDING FLOW
+
+Replace the current meal-first onboarding entirely. The new flow is two screens only.
+
+Onboarding Screen 1 — Welcome
+
+Full screen. Centred layout.
+
+Sortii logo lockup (full wordmark + tagline)
+Heading: "One less thing to think about."
+Subtext: "Actually, quite a few things."
+Single gold full-width CTA button: "Let's go →"
+No questions on this screen.
+
+Onboarding Screen 2 — The one universal question
+
+Heading: "Who's in your house?" Subtext: "Just the basics. You can add more later."
+
+Input: number of people (stepper, default 2)
+Below stepper: optional name fields appear for each person (placeholder: "e.g. Mum, Tom, Izzy"). Names are optional — user can skip.
+
+Single gold full-width CTA: "Done →" Below CTA, small grey text link: "Skip for now →"
+
+On completion, go directly to the home screen. Do not ask about meals, budget, or hard no's at this stage.
+
+Home screen placeholder card states (first-time user only)
+
+Each card on the home screen shows a soft prompt state if that section has no data yet:
+
+Meals card: "Dinners not sorted yet." / subtext: "Takes 60 seconds. →" — tapping opens the meal preferences flow in context
+Family card: "Nothing juggled yet." / subtext: "Add what's on this week. →" — tapping opens the family setup
+Money card: "No numbers yet." / subtext: "Give us rough ones. →" — tapping opens Tweak Numbers
+Once a section has data, it reverts to its normal populated state. Placeholder states never reappear once dismissed.
+
+One-time cross-sell nudge
+
+After a user completes their first section (whichever they choose first), show a single one-time dismissible prompt on the home screen relevant to the next logical section. Examples:
+
+Completed meals first: "Dinners sorted. Want to see what that saves you? →" (links to Money)
+Completed family first: "Week's mapped out. Sort dinners to match? →" (links to Meals)
+Completed money first: "Numbers looking clearer. Meals next? →" (links to Meals)
+Show this prompt once only. If dismissed, never show again. Do not show prompts for sections the user has already populated.
+
+SECTION 3 — BILLS → MONEY PAGE WIRING
+
+Core rule: the breathing room figure must always reflect bills.
+
+Regular bills added in the Bills screen must feed directly into the committed spend total used to calculate the weekly breathing room figure. The "Bills, loans & regular payments" field in Tweak Numbers must behave as follows:
+
+If no individual bills have been added in the Bills screen: the field is manually editable as an estimated monthly total
+If one or more regular bills have been added in the Bills screen: the field becomes read-only and auto-calculates from those bills. Display the auto-calculated figure with a label beneath: "Based on your saved bills — updated automatically." The manual entry field greys out. A teal text link appears: "Edit bills →"
+If the user switches from manual to bill-based: show a one-time prompt: "We'll use your saved bills from now on. Remove your estimate to avoid counting things twice." with a teal button "Remove estimate" and a grey text link "Keep both for now."
+One-off bills (weekly impact)
+
+One-off expenses added in the Bills screen must reduce the breathing room figure for the specific week they fall in — not every week, only that week.
+
+The breathing room figure on both the home screen money card and the Money tab must already have the one-off deducted if the bill falls within the current 7-day window. The user does not need to see an explanation — the number is simply lower that week.
+
+The only place the one-off bill surfaces explicitly is inside the weekly snapshot breakdown, where it appears as a line item (e.g. "Rego — $160") alongside fixed costs for that week. No additional callouts or alerts needed.
+
+SECTION 4 — HOME SCREEN — WEEK STRIP POSITION
+
+Move the days-of-week strip to the top of the home screen, directly below the greeting line and status message. It must appear before any cards. Do not change the strip design — only its position on the page.
+
+SECTION 5 — MONEY SCREEN FULL REBUILD
+
+Rebuild the Money screen layout and copy in the following order, top to bottom:
+
+5a — Hero status section
+
+Context-aware single status line (bold, large) based on breathing room amount:
+
+Healthy (>30% of weekly income remaining): "This week's fine. Nothing to worry about."
+Tight (10–30% remaining): "A bit tight this week. Worth knowing."
+Very tight (<10% remaining): "This week needs a look."
+Zero or negative: "This one needs attention."
+Below status line, large teal figure: ~$603 breathing room Below figure, small grey text: ~$2,595/month equivalent
+
+No use of the word "breathe" or "breathing" in status copy. "Breathing room" is kept only as the label for the leftover figure itself.
+
+Exception: on a healthy week only, the subtext below the figure may read: "Relax." — used once, earns its lightness because the news is good.
+
+5b — Meal plan saving card (restore)
+
+Teal tint card, positioned below the hero stat. This section was removed and must be restored.
+
+Label (small caps): THIS WEEK'S DINNER SAVING Large teal figure: ~$63 Subtext: "Cooking this plan vs. your usual spend." Below: "7 dinners sorted this week." (dynamic — pulls from meal plan count)
+
+If no meal plan exists yet: suppress this card entirely, do not show a zero state.
+
+5c — Weekly Snapshot
+
+Section header above the row (not inside it): "Weekly snapshot" in small caps.
+
+Row: Income $1,000 · Fixed $233 · Left ~$371
+
+Dropdown expands to show each committed spend line item individually, including any bills added in the Bills screen for this week.
+
+Remove the "Full breakdown" note entirely.
+
+Below the snapshot row, a persistent teal outlined button: "Update my numbers →"
+
+5d — Quick wins (plum card)
+
+Keep this section. Fix the trigger copy — remove "A lot happening this week" entirely.
+
+Replace with context-sensitive lines:
+
+Tight week: "A bit tight this week — a couple of easy wins if you want them."
+Normal week: "One or two things worth knowing."
+Bills-heavy week: "Big week for bills. These might help."
+Individual tips inside the card remain unchanged.
+
+5e — Savings goal card
+
+No changes. Keep as-is.
+
+5f — Font fix
+
+Apply correct Sortii fonts across the entire Money screen: DM Sans for all body text, figures, labels, and subtext. Playfair Display for any heading-level text. Audit every text element on this screen and correct any that are falling back to system fonts.
+
+Do not change any colours, navigation structure, icon design, or copy on screens not listed above. This is a targeted rebuild of specific screens and logic only.
+
+You said: what option do i want for long term her?
+what option do i want for long term her?
+Two options:
+
+A — Full now: Auth UI + Apple/Google sign-in + Replit database + API endpoints + migrate every store to user-scoped server sync. Sections 2–5 in the same run.
+B — Auth-light now: Auth UI + sign-in screen + user ID stored locally (data isolated per user on-device) + Sections 2–5. Server-side cloud sync as a separate dedicated task.
+6:39 PM
+Claude responded: Option B, without question.
+
+Weighed architectural ambition against pragmatic delivery constraints
+Weighed architectural ambition against pragmatic delivery constraints
+Option B, without question.
+
+Here's why:
+
+Option A is the right architecture long-term, but it's a enormous single Replit Agent run — auth UI, database setup, API endpoints, and migrating every data store simultaneously. That's the kind of scope where agents start making cascading decisions that break things quietly. You're pre-launch. The risk isn't worth it.
+
+Option B gets you everything that matters to a user right now:
+
+Sign-in screen exists and looks real
+Each user's data is isolated and won't bleed between devices sharing the app
+Sections 2–5 all build correctly on top of it
+Nothing breaks that's already working
+The on-device isolation also means if someone clears the app or switches phones they lose data — but at launch volume, that's an acceptable trade-off. The moment you have real returning users and are approaching the Sortii Plus tier, you do the cloud sync as a clean, dedicated, properly scoped task. At that point you also have real data to inform how the sync should work.
+
+One thing to add to the Option B prompt: explicitly instruct the agent to store the user ID and all data keys in a way that is cloud-sync ready — meaning the data structure shouldn't need to be redesigned when you do the server migration, just lifted. Name the keys consistently, keep user ID as the top-level scope on everything. That way Option A becomes a migration task, not a rebuild.
+
+Want me to add that future-proofing note into the prompt before you run it?
+
+You said: -At the moment the starting flow is still generating the meals, but need to leave them blank until user selects that card.
+Screenshot 2026-04-22 190954.png
+Screenshot 2026-04-22 191026.png
+Screenshot 2026-04-22 191145.png
+Screenshot 2026-04-22 191210.png
+Screenshot 2026-04-22 191338.png
+Screenshot 2026-04-22 191409.png
+Screenshot 2026-04-22 192121.png
+Screenshot 2026-04-22 192157.png
+Screenshot 2026-04-22 192353.png
+Screenshot 2026-04-22 192825.png
+Screenshot 2026-04-22 193039.png
+Screenshot 2026-04-22 193130.png
+Screenshot 2026-04-22 193530.png
+-At the moment the starting flow is still generating the meals, but need to leave them blank until user selects that card.
+-The set up still has dietry question, instead of tell us whos in the family
+- The new user start up occurs even for a returning visitor at the moment
+-The app is using Manrope for all numbers in the app, but think that was mean to be DM Sans/Inter?
+-On the family set up an activity, the keyboard seems to remain even when selecing the chips, which then cover the 'add event' button and makes the adding a bit annoying
+-There doesnt seem to be a way to add a second activity?
+-The is a box to add someone for carpool forthat particular event, but the concept is to allow the user to build/add car pool options/contact list as they go, so they can also select from a growing list (eg. Sam Soccer Tel: / Mel Netball Tel: 
+-The 'sort the family plan button creates an error and doesnt trigger
+-The appointments I think should allow an 'add family member' rather than just a general text box, to allow the app to understand and link who in the  family when the juggle is done has an appoitinment that needs to be pulled in for that week/day in the juggle
+-The date selection in the appt page should open a calandar rather than having to move day by day to the correct rate (current format).
+-The appointments are not yet flowing into the the family summary page.
+-On the money set numbers page the keypad and the CTA take up too much room (there is a lot of white space under the CTA when in that status?
+-the 'full breakdown' at the bottom of the money summary pager only works to then display the 'Update my numbers' CTA, so that should be removed and the CTA should just be there.
+-Bills the 'Add Bill' CTA is falling being the Nav bar when scrolled down to add.
+-When i add a regular bill, the app is overwriting what was in the money 'bills' input in a very messy confusing way?
+
+Show more
+7:37 PM
+Claude responded: Good progress — the bones are clearly working.
+
+Consolidated comprehensive bug report into structured prompt
+Consolidated comprehensive bug report into structured prompt
+Good progress — the bones are clearly working. This is a solid bug-and-polish pass. Let me compile it all into one clean prompt.
+
+REPLIT AGENT PROMPT — Bug fix and polish pass
+
+Work through each section completely before moving to the next. Do not change any colours, brand voice, or features not listed here.
+
+SECTION 1 — ONBOARDING FLOW FIXES
+
+Meal generation on startup: The app is currently generating a meal plan during onboarding. Stop this. No meals should be generated or pre-populated at startup. The meals card on the home screen must show the placeholder state ("Dinners not sorted yet. Takes 60 seconds. →") until the user explicitly taps it and completes the meal setup flow.
+
+Dietary question must be removed: The onboarding screen 2 currently shows a dietary needs question. Remove it entirely. The only content on screen 2 is: the "Who's in your house?" heading, the people count stepper, optional name fields, and the "Done →" CTA. No dietary options, no other questions.
+
+Returning user bypass: The new user onboarding flow is triggering for returning users on every app open. Fix this. On app launch, check AsyncStorage for an existing user ID and completed onboarding flag. If both exist, skip the onboarding flow entirely and go directly to the home screen with the user's saved data loaded. The onboarding screens must only appear on genuine first launch.
+
+SECTION 2 — FONTS
+
+The app is using Manrope for numbers throughout. This is incorrect. The correct fonts are:
+
+Body text, labels, numbers, subtext: DM Sans (fallback: Inter)
+Heading-level display text: Playfair Display
+Audit every screen and replace all Manrope instances with DM Sans. Check that font imports are correctly loaded. This applies globally — Money screen, Home screen, Family screen, Bills screen, all form screens.
+
+SECTION 3 — FAMILY SCREEN
+
+Keyboard behaviour when selecting chips: When a user is in the Add Event sheet and taps a chip (day selector, family member, recurrence), the keyboard must dismiss. Currently it stays open and covers the Add Event button. Fix: on chip tap, call Keyboard.dismiss() before updating the selected state.
+
+No way to add a second activity: After saving a first event, there is no visible way to add another. Fix: after an event is saved and the sheet closes, the Family screen must show a clearly visible teal outlined button: "+ Add another event" directly below the last saved event. This is in addition to the existing flow for first-time entry.
+
+Carpool / contact list: The current "backup contact" field is a single free-text input. Replace this with a contact list system that builds over time:
+
+On first use: show a text field with two inputs — name and phone number — and an "Add" button. On save, this contact is stored persistently in the user's carpool contacts list.
+On subsequent events: show a dropdown/chip selector of saved contacts, with an "+ Add new" option at the end to add a new one.
+Stored contacts must persist to AsyncStorage under the user's ID, scoped as carpoolContacts.
+Display saved contacts as tappable chips on the event form — tapping one assigns them to that event.
+Label this section: "Who could help with this?" with subtext: "Build your list as you go."
+Family sort plan error: The "See the plan / Re-sort" action is throwing a network error (TypeError: Network request failed). This feature must not make any external network calls. Fix: the family sort logic must run entirely on-device using the locally stored event data. Remove any API or fetch call from this function. The sort output should be generated from the existing event list without a network dependency.
+
+Appointments not feeding into Family summary: Appointments added via the Appointments flow are not appearing in the Family tab weekly view or the juggle summary. Fix: when the Family tab renders, it must read from both the familyEvents store and the appointments store and merge them into the weekly timeline. Appointments must appear as distinct items (labelled "Appointment") alongside family activities.

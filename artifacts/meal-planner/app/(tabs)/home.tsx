@@ -370,11 +370,11 @@ export default function HomeTab() {
               <View style={styles.welcomeTipTop}>
                 <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
                   <Feather name="check-circle" size={14} color={TEAL} />
-                  <Text style={styles.welcomeTipTitle}>Your first week is sorted.</Text>
+                  <Text style={styles.welcomeTipTitle}>Welcome to Sortii.</Text>
                 </View>
               </View>
               <Text style={styles.welcomeTipBody}>
-                Tap Meals to see your dinners — your shopping list is already built and ready.
+                Tap the Meals card below to get your dinners sorted — takes about 60 seconds.
               </Text>
               <View style={styles.welcomeTipActions}>
                 <TouchableOpacity
@@ -382,7 +382,7 @@ export default function HomeTab() {
                   style={styles.welcomeTipCta}
                   activeOpacity={0.8}
                 >
-                  <Text style={styles.welcomeTipCtaText}>See my meals →</Text>
+                  <Text style={styles.welcomeTipCtaText}>Sort my meals →</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                   onPress={async () => {
@@ -453,10 +453,10 @@ export default function HomeTab() {
                   TONIGHT'S DINNER
                 </Text>
                 <Text style={styles.cardTitle}>
-                  {tonightRecipe ? tonightRecipe.name : "Nothing planned yet."}
+                  {tonightRecipe ? tonightRecipe.name : "Dinners not sorted yet."}
                 </Text>
                 <Text style={[styles.cardSub, { color: tonightRecipe ? TEAL : TEXT_MUTED }]}>
-                  {tonightRecipe ? "Sorted. ✓" : "Tap to sort tonight →"}
+                  {tonightRecipe ? "Sorted. ✓" : "Takes 60 seconds. →"}
                 </Text>
               </View>
               <View style={[styles.cardChevron, { backgroundColor: (tonightRecipe ? TEAL : GOLD) + "12" }]}>

@@ -15,25 +15,14 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { DEFAULT_PREFERENCES, DEFAULT_WEEKEND_OVERRIDES, PlanPreferences } from "@/constants/recipes";
 import { usePlanner } from "@/context/PlannerContext";
 import { useUserWeek } from "@/context/UserWeekContext";
-import { updateOnboardingState } from "@/utils/onboardingState";
-import { DietaryNeed, saveHouseholdProfile } from "@/utils/householdProfile";
+import { saveHouseholdProfile } from "@/utils/householdProfile";
 
 const TEAL       = "#2A8F88";
 const TEAL_TINT  = "#E6F3F0";
 const CREAM      = "#F8F4EE";
 const INK        = "#1A1410";
 const MUTED      = "#8A7968";
-const GOLD       = "#D29A22";
-const PLUM       = "#5E3A4C";
-const PLUM_TINT  = "#F3E8EE";
 const BORDER     = "#EDE9E3";
-
-const ROTATING_MESSAGES = [
-  "Sorting your first week…",
-  "Finding meals that work for you.",
-  "Building your shopping list.",
-  "Almost there.",
-];
 
 const HOUSEHOLD_HINTS: Record<number, string> = {
   1: "Just you. Easy week.",
@@ -46,63 +35,36 @@ const HOUSEHOLD_HINTS: Record<number, string> = {
   8: "Big household. We've got you.",
 };
 
-const DIETARY_OPTIONS: { id: DietaryNeed; label: string; bg: string; color: string }[] = [
-  { id: "vegan",       label: "🌱  Vegan",       bg: PLUM_TINT,  color: PLUM },
-  { id: "vegetarian",  label: "🥚  Vegetarian",  bg: PLUM_TINT,  color: PLUM },
-  { id: "gluten-free", label: "🌾  Gluten-free", bg: TEAL_TINT,  color: TEAL },
-  { id: "dairy-free",  label: "🥛  Dairy-free",  bg: TEAL_TINT,  color: TEAL },
-];
-
-type Step = 0 | 1 | 2; // 0 = welcome, 1 = household, 2 = generating
+type Step = 0 | 1;
 
 export default function OnboardingScreen() {
   const router = useRouter();
   const {
     setPreferences, setIsOnboarded, isOnboarded, isContextLoaded,
-    autoGeneratePlan, reloadHouseholdProfile,
+    reloadHouseholdProfile,
   } = usePlanner();
   const {
-    setWeeklyMode: setContextWeeklyMode,
-    setHasMealsSetup: setContextHasMealsSetup,
-    updateWeekKey,
     isLoaded: isWeekLoaded,
-    lastUpdatedAt,
   } = useUserWeek();
   const insets = useSafeAreaInsets();
 
   const [step,          setStep]          = useState<Step>(0);
   const [householdSize, setHouseholdSize] = useState(4);
-  const [dietaryNeeds,  setDietaryNeeds]  = useState<DietaryNeed[]>([]);
-  const [generatingMsg, setGeneratingMsg] = useState(ROTATING_MESSAGES[0]);
-  const [generatingDone, setGeneratingDone] = useState(false);
 
-  const fadeAnim  = useRef(new Animated.Value(1)).current;
-  const pulseAnim = useRef(new Animated.Value(1)).current;
-  const msgIndex  = useRef(0);
-  const isInGeneratingFlow = useRef(false);
-
-  // Welcome screen stagger
-  const line1 = useRef(new Animated.Value(0)).current;
-  const line2 = useRef(new Animated.Value(0)).current;
-  const line3 = useRef(new Animated.Value(0)).current;
+  // Welcome screen stagger anims
+  const line1   = useRef(new Animated.Value(0)).current;
+  const line2   = useRef(new Animated.Value(0)).current;
+  const line3   = useRef(new Animated.Value(0)).current;
   const ctaAnim = useRef(new Animated.Value(0)).current;
 
   const paddingBottom = Platform.OS === "web" ? 40 : insets.bottom + 16;
   const paddingTop    = Platform.OS === "web" ? 60 : insets.top + 8;
 
-  // ── Returning user gate ──────────────────────────────────────────
+  // ── Returning user gate — always skip to home if onboarded ──────
   useEffect(() => {
     if (!isContextLoaded || !isWeekLoaded) return;
-    if (isInGeneratingFlow.current) return;
     if (isOnboarded) {
-      if (lastUpdatedAt) {
-        const daysSince = (Date.now() - new Date(lastUpdatedAt).getTime()) / (1000 * 60 * 60 * 24);
-        if (daysSince < 7) {
-          router.replace("/(tabs)/home");
-          return;
-        }
-      }
-      router.replace("/returning");
+      router.replace("/(tabs)/home");
     }
   }, [isContextLoaded, isWeekLoaded, isOnboarded]);
 
@@ -125,39 +87,8 @@ export default function OnboardingScreen() {
     return () => timers.forEach(clearTimeout);
   }, [step]);
 
-  // ── Generating animation ─────────────────────────────────────────
-  useEffect(() => {
-    if (step !== 2) return;
-    const pulse = Animated.loop(
-      Animated.sequence([
-        Animated.timing(pulseAnim, { toValue: 1.18, duration: 800, useNativeDriver: true }),
-        Animated.timing(pulseAnim, { toValue: 1,    duration: 800, useNativeDriver: true }),
-      ])
-    );
-    pulse.start();
-    const tick = () => {
-      Animated.timing(fadeAnim, { toValue: 0, duration: 300, useNativeDriver: true }).start(() => {
-        msgIndex.current = (msgIndex.current + 1) % ROTATING_MESSAGES.length;
-        setGeneratingMsg(ROTATING_MESSAGES[msgIndex.current]);
-        Animated.timing(fadeAnim, { toValue: 1, duration: 300, useNativeDriver: true }).start();
-      });
-    };
-    const interval = setInterval(tick, 2000);
-    const doneTimer = setTimeout(() => {
-      clearInterval(interval);
-      pulse.stop();
-      setGeneratingDone(true);
-      setTimeout(() => router.replace("/(tabs)/home"), 900);
-    }, 5500);
-    return () => {
-      clearInterval(interval);
-      clearTimeout(doneTimer);
-      pulse.stop();
-    };
-  }, [step]);
-
-  // ── Start generating ─────────────────────────────────────────────
-  const startGenerating = async () => {
+  // ── Complete onboarding — no meal generation ─────────────────────
+  const finishOnboarding = async () => {
     const newPrefs: PlanPreferences = {
       ...DEFAULT_PREFERENCES,
       planningMode:     "auto",
@@ -170,55 +101,23 @@ export default function OnboardingScreen() {
       weekendOverrides: { ...DEFAULT_WEEKEND_OVERRIDES },
     };
 
-    isInGeneratingFlow.current = true;
-
-    if (dietaryNeeds.length > 0) {
-      await saveHouseholdProfile({
-        dietary_needs: dietaryNeeds,
-        kids_situation: "same",
-        setup_complete: true,
-        setup_date: new Date().toISOString(),
-      });
-      await reloadHouseholdProfile();
-    }
-
+    await saveHouseholdProfile({
+      dietary_needs:  [],
+      kids_situation: "same",
+      setup_complete: true,
+      setup_date:     new Date().toISOString(),
+    });
+    await reloadHouseholdProfile();
     await setPreferences(newPrefs);
     await setIsOnboarded(true);
-    await updateOnboardingState({ hasMealsSetup: true, scope: "meals", weeklyMode: "balanced" });
-    setContextWeeklyMode("balanced");
-    setContextHasMealsSetup(true);
-    updateWeekKey();
-    autoGeneratePlan(newPrefs);
-    setStep(2);
-  };
 
-  const toggleDietary = (id: DietaryNeed) => {
-    Haptics.selectionAsync();
-    setDietaryNeeds((prev) =>
-      prev.includes(id) ? prev.filter((n) => n !== id) : [...prev, id]
-    );
+    router.replace("/(tabs)/home");
   };
 
   const adjustSize = (delta: number) => {
     Haptics.selectionAsync();
     setHouseholdSize((v) => Math.max(1, Math.min(8, v + delta)));
   };
-
-  // ════════════════════════════════════════════════════════════════
-  // SCREEN 2 — GENERATING
-  // ════════════════════════════════════════════════════════════════
-  if (step === 2) {
-    return (
-      <View style={[styles.genRoot, { paddingTop }]}>
-        <Animated.View style={[styles.genRing, { transform: [{ scale: pulseAnim }] }]} />
-        <Text style={styles.genEmoji}>🥘</Text>
-        <Animated.Text style={[styles.genMsg, { opacity: fadeAnim }]}>
-          {generatingMsg}
-        </Animated.Text>
-        {generatingDone && <Text style={styles.genDone}>All done ✓</Text>}
-      </View>
-    );
-  }
 
   // ════════════════════════════════════════════════════════════════
   // SCREEN 1 — HOUSEHOLD SETUP
@@ -272,40 +171,15 @@ export default function OnboardingScreen() {
             <Text style={styles.sizeHint}>{HOUSEHOLD_HINTS[householdSize]}</Text>
           </View>
 
-          {/* Dietary needs */}
-          <Text style={styles.sectionLabel}>Dietary needs</Text>
-          <Text style={styles.sectionSub}>Select anything that applies.</Text>
-
-          <View style={styles.pillGrid}>
-            {DIETARY_OPTIONS.map(({ id, label, bg, color }) => {
-              const on = dietaryNeeds.includes(id);
-              return (
-                <TouchableOpacity
-                  key={id}
-                  onPress={() => toggleDietary(id)}
-                  activeOpacity={0.75}
-                  style={[
-                    styles.pill,
-                    on ? { backgroundColor: bg, borderColor: color } : styles.pillOff,
-                  ]}
-                >
-                  <Text style={[styles.pillText, on ? { color } : styles.pillTextOff]}>
-                    {label}
-                  </Text>
-                </TouchableOpacity>
-              );
-            })}
-          </View>
-
           <TouchableOpacity
             onPress={() => {
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-              startGenerating();
+              finishOnboarding();
             }}
             activeOpacity={0.85}
             style={styles.primaryBtn}
           >
-            <Text style={styles.primaryBtnText}>Get my plan →</Text>
+            <Text style={styles.primaryBtnText}>Done →</Text>
           </TouchableOpacity>
         </ScrollView>
       </View>
@@ -457,7 +331,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFFFFF",
     borderRadius: 16,
     padding: 20,
-    marginBottom: 28,
+    marginBottom: 32,
     shadowColor: "#000",
     shadowOpacity: 0.04,
     shadowRadius: 8,
@@ -506,75 +380,6 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: MUTED,
     textAlign: "center",
-  },
-
-  sectionLabel: {
-    fontFamily: "Manrope_700Bold",
-    fontSize: 16,
-    color: INK,
-    marginBottom: 4,
-  },
-  sectionSub: {
-    fontFamily: "Inter_400Regular",
-    fontSize: 13,
-    color: MUTED,
-    marginBottom: 14,
-  },
-  pillGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 10,
-    marginBottom: 32,
-  },
-  pill: {
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderRadius: 20,
-    borderWidth: 1.5,
-  },
-  pillOff: {
-    backgroundColor: "#FFFFFF",
-    borderColor: BORDER,
-  },
-  pillText: {
-    fontFamily: "Inter_500Medium",
-    fontSize: 14,
-  },
-  pillTextOff: {
-    color: MUTED,
-  },
-
-  // ── Generating ───────────────────────────────────────────────────
-  genRoot: {
-    flex: 1,
-    backgroundColor: CREAM,
-    alignItems: "center",
-    justifyContent: "center",
-    paddingHorizontal: 24,
-  },
-  genRing: {
-    width: 88,
-    height: 88,
-    borderRadius: 44,
-    backgroundColor: TEAL_TINT,
-    position: "absolute",
-  },
-  genEmoji: {
-    fontSize: 40,
-    marginBottom: 28,
-  },
-  genMsg: {
-    fontFamily: "Inter_400Regular",
-    fontSize: 16,
-    color: MUTED,
-    textAlign: "center",
-    lineHeight: 24,
-  },
-  genDone: {
-    fontFamily: "Inter_600SemiBold",
-    fontSize: 15,
-    color: TEAL,
-    marginTop: 16,
   },
 
   // ── Shared ───────────────────────────────────────────────────────
