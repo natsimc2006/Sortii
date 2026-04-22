@@ -7,6 +7,7 @@ import {
   ScrollView,
   StyleSheet,
   Text,
+  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
@@ -16,6 +17,8 @@ import { DEFAULT_PREFERENCES, DEFAULT_WEEKEND_OVERRIDES, PlanPreferences } from 
 import { usePlanner } from "@/context/PlannerContext";
 import { useUserWeek } from "@/context/UserWeekContext";
 import { saveHouseholdProfile } from "@/utils/householdProfile";
+import { loadFamilyState, saveFamilyState } from "@/utils/familyStore";
+import { MEMBER_COLORS } from "@/utils/familyTypes";
 
 const TEAL       = "#2A8F88";
 const TEAL_TINT  = "#E6F3F0";
@@ -50,6 +53,8 @@ export default function OnboardingScreen() {
 
   const [step,          setStep]          = useState<Step>(0);
   const [householdSize, setHouseholdSize] = useState(4);
+  const [familyNames,   setFamilyNames]   = useState<string[]>([]);
+  const [nameInput,     setNameInput]     = useState("");
 
   // Welcome screen stagger anims
   const line1   = useRef(new Animated.Value(0)).current;
@@ -109,8 +114,23 @@ export default function OnboardingScreen() {
     });
     await reloadHouseholdProfile();
     await setPreferences(newPrefs);
-    await setIsOnboarded(true);
 
+    // Persist any entered family members to the family store
+    if (familyNames.length > 0) {
+      const existing = await loadFamilyState();
+      const usedColors = existing.members.map((m) => m.color);
+      const newMembers = familyNames.map((name, i) => {
+        const availableColor = MEMBER_COLORS.find((c) => !usedColors.includes(c)) ?? MEMBER_COLORS[i % MEMBER_COLORS.length]!;
+        usedColors.push(availableColor);
+        return { id: `${Date.now()}_${i}`, name: name.trim(), role: "adult" as const, color: availableColor };
+      });
+      await saveFamilyState({
+        ...existing,
+        members: [...existing.members, ...newMembers],
+      });
+    }
+
+    await setIsOnboarded(true);
     router.replace("/(tabs)/home");
   };
 
@@ -169,6 +189,67 @@ export default function OnboardingScreen() {
               </TouchableOpacity>
             </View>
             <Text style={styles.sizeHint}>{HOUSEHOLD_HINTS[householdSize]}</Text>
+          </View>
+
+          {/* Family members card */}
+          <View style={styles.membersCard}>
+            <Text style={styles.membersTitle}>Name your household members</Text>
+            <Text style={styles.membersSub}>Optional — helps personalise your week. They'll appear on your Family board.</Text>
+
+            {/* Chips for added names */}
+            {familyNames.length > 0 && (
+              <View style={styles.chipsRow}>
+                {familyNames.map((name, i) => (
+                  <TouchableOpacity
+                    key={i}
+                    onPress={() => {
+                      Haptics.selectionAsync();
+                      setFamilyNames((prev) => prev.filter((_, idx) => idx !== i));
+                    }}
+                    activeOpacity={0.75}
+                    style={[styles.memberChip, { backgroundColor: MEMBER_COLORS[i % MEMBER_COLORS.length] + "22", borderColor: MEMBER_COLORS[i % MEMBER_COLORS.length] + "66" }]}
+                  >
+                    <Text style={[styles.memberChipText, { color: MEMBER_COLORS[i % MEMBER_COLORS.length] }]}>{name}</Text>
+                    <Text style={[styles.memberChipX, { color: MEMBER_COLORS[i % MEMBER_COLORS.length] }]}>×</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            )}
+
+            {/* Name input row */}
+            <View style={styles.nameInputRow}>
+              <TextInput
+                style={styles.nameInput}
+                placeholder="Add a name…"
+                placeholderTextColor={MUTED}
+                value={nameInput}
+                onChangeText={setNameInput}
+                returnKeyType="done"
+                onSubmitEditing={() => {
+                  const trimmed = nameInput.trim();
+                  if (trimmed && !familyNames.includes(trimmed)) {
+                    Haptics.selectionAsync();
+                    setFamilyNames((prev) => [...prev, trimmed]);
+                    setNameInput("");
+                  }
+                }}
+              />
+              <TouchableOpacity
+                onPress={() => {
+                  const trimmed = nameInput.trim();
+                  if (trimmed && !familyNames.includes(trimmed)) {
+                    Haptics.selectionAsync();
+                    setFamilyNames((prev) => [...prev, trimmed]);
+                    setNameInput("");
+                  }
+                }}
+                activeOpacity={0.8}
+                style={[styles.nameAddBtn, !nameInput.trim() && styles.nameAddBtnDisabled]}
+                disabled={!nameInput.trim()}
+              >
+                <Text style={styles.nameAddBtnText}>Add</Text>
+              </TouchableOpacity>
+            </View>
           </View>
 
           <TouchableOpacity
@@ -365,7 +446,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   sizeNumber: {
-    fontFamily: "PlayfairDisplay_700Bold",
+    fontFamily: "DMSans_700Bold",
     fontSize: 52,
     color: INK,
     lineHeight: 58,
@@ -380,6 +461,87 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: MUTED,
     textAlign: "center",
+  },
+
+  // ── Family members card ─────────────────────────────────────────
+  membersCard: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 32,
+    shadowColor: "#000",
+    shadowOpacity: 0.04,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 2,
+    gap: 12,
+  },
+  membersTitle: {
+    fontFamily: "DMSans_600SemiBold",
+    fontSize: 15,
+    color: INK,
+  },
+  membersSub: {
+    fontFamily: "Inter_400Regular",
+    fontSize: 13,
+    color: MUTED,
+    lineHeight: 19,
+    marginTop: -4,
+  },
+  chipsRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
+  },
+  memberChip: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    borderRadius: 20,
+    borderWidth: 1,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+  },
+  memberChipText: {
+    fontFamily: "DMSans_500Medium",
+    fontSize: 13,
+  },
+  memberChipX: {
+    fontFamily: "Inter_400Regular",
+    fontSize: 15,
+    lineHeight: 17,
+    marginLeft: 2,
+  },
+  nameInputRow: {
+    flexDirection: "row",
+    gap: 8,
+    alignItems: "center",
+  },
+  nameInput: {
+    flex: 1,
+    fontFamily: "DMSans_400Regular",
+    fontSize: 14,
+    color: INK,
+    backgroundColor: CREAM,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: BORDER,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+  },
+  nameAddBtn: {
+    backgroundColor: TEAL,
+    borderRadius: 10,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+  },
+  nameAddBtnDisabled: {
+    opacity: 0.38,
+  },
+  nameAddBtnText: {
+    fontFamily: "DMSans_600SemiBold",
+    fontSize: 14,
+    color: "#fff",
   },
 
   // ── Shared ───────────────────────────────────────────────────────
