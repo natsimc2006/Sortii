@@ -68,6 +68,7 @@
     "@expo-google-fonts/playfair-display": "^0.4.2",
     "@react-native-voice/voice": "^3.2.4",
     "expo-auth-session": "^55.0.14",
-    "expo-calendar": "^55.0.14"
+    "expo-calendar": "^55.0.14",
+    "react-native-calendars": "^1.1314.0"
   }
 }

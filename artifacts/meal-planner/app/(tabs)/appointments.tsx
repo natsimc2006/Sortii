@@ -20,6 +20,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { Calendar } from "react-native-calendars";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 import {
@@ -270,28 +271,42 @@ function TimePicker({ value, onChange }: { value: string; onChange: (v: string) 
   );
 }
 
-function DatePicker({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+function CalendarDatePicker({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  const [open, setOpen] = useState(false);
   const today    = todayStr();
   const tomorrow = shiftDateStr(today, 1);
   const nextWeek = shiftDateStr(today, 7);
+
+  // max date: 24 months ahead
+  const maxDate = (() => {
+    const d = new Date();
+    d.setMonth(d.getMonth() + 24);
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  })();
+
+  const markedDates: Record<string, { selected: boolean; selectedColor: string }> = {
+    [value]: { selected: true, selectedColor: TEAL },
+  };
+
   return (
     <View style={{ gap: 10 }}>
-      <View style={styles.datePickerRow}>
-        <TouchableOpacity onPress={() => onChange(shiftDateStr(value, -1))} style={styles.dateArrow}>
-          <Feather name="chevron-left" size={20} color={TEAL} />
-        </TouchableOpacity>
-        <View style={{ flex: 1, alignItems: "center" }}>
-          <Text style={styles.datePickerMain}>{formatDateFull(value)}</Text>
-        </View>
-        <TouchableOpacity onPress={() => onChange(shiftDateStr(value, 1))} style={styles.dateArrow}>
-          <Feather name="chevron-right" size={20} color={TEAL} />
-        </TouchableOpacity>
-      </View>
+      {/* Tap to open calendar */}
+      <TouchableOpacity
+        onPress={() => setOpen(true)}
+        activeOpacity={0.8}
+        style={styles.dateDisplayRow}
+      >
+        <Feather name="calendar" size={16} color={TEAL} />
+        <Text style={styles.datePickerMain}>{formatDateFull(value)}</Text>
+        <Feather name="chevron-down" size={16} color={MUTED} />
+      </TouchableOpacity>
+
+      {/* Quick shortcuts */}
       <View style={{ flexDirection: "row", gap: 8 }}>
         {[
-          { label: "Today",    val: today    },
-          { label: "Tomorrow", val: tomorrow },
-          { label: "Next week",val: nextWeek },
+          { label: "Today",     val: today    },
+          { label: "Tomorrow",  val: tomorrow },
+          { label: "Next week", val: nextWeek },
         ].map(({ label, val }) => (
           <TouchableOpacity
             key={label}
@@ -303,6 +318,55 @@ function DatePicker({ value, onChange }: { value: string; onChange: (v: string) 
           </TouchableOpacity>
         ))}
       </View>
+
+      {/* Full calendar modal */}
+      <Modal visible={open} animationType="slide" transparent>
+        <View style={styles.calModalOverlay}>
+          <View style={styles.calModalSheet}>
+            <View style={styles.calModalHandle} />
+            <View style={styles.calModalHeader}>
+              <Text style={styles.calModalTitle}>Pick a date</Text>
+              <TouchableOpacity onPress={() => setOpen(false)} style={styles.calModalClose}>
+                <Feather name="x" size={20} color={MUTED} />
+              </TouchableOpacity>
+            </View>
+            <Calendar
+              current={value}
+              minDate={today}
+              maxDate={maxDate}
+              markedDates={markedDates}
+              onDayPress={(day: { dateString: string }) => {
+                onChange(day.dateString);
+                setOpen(false);
+              }}
+              enableSwipeMonths
+              theme={{
+                todayTextColor: TEAL,
+                selectedDayBackgroundColor: TEAL,
+                selectedDayTextColor: "#ffffff",
+                arrowColor: TEAL,
+                monthTextColor: TEXT,
+                textDayFontFamily: "DMSans_400Regular",
+                textMonthFontFamily: "DMSans_700Bold",
+                textDayHeaderFontFamily: "DMSans_600SemiBold",
+                textDayFontSize: 14,
+                textMonthFontSize: 16,
+                textDayHeaderFontSize: 12,
+                calendarBackground: "#ffffff",
+                dayTextColor: TEXT,
+                textDisabledColor: "#D3D3D3",
+              }}
+            />
+            <TouchableOpacity
+              style={[styles.calModalDoneBtn, { marginHorizontal: 20, marginBottom: 20 }]}
+              onPress={() => setOpen(false)}
+              activeOpacity={0.85}
+            >
+              <Text style={styles.calModalDoneBtnText}>Done</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -1028,7 +1092,7 @@ export default function AppointmentsScreen() {
   if (view === "form") return (
     <SafeAreaView style={styles.safe}>
       <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : "height"}>
-        <ScrollView contentContainerStyle={{ paddingBottom: 100 }} showsVerticalScrollIndicator={false}>
+        <ScrollView contentContainerStyle={{ paddingBottom: 160 }} showsVerticalScrollIndicator={false}>
           {/* Header */}
           <View style={styles.formHeader}>
             <TouchableOpacity onPress={() => setView("overview")} style={styles.backBtn}>
@@ -1070,13 +1134,43 @@ export default function AppointmentsScreen() {
               </ScrollView>
 
               <Text style={[styles.fieldLabel, { marginTop: 14 }]}>Who's this for?</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="e.g. Emma, Mum, whole family"
-                placeholderTextColor={MUTED}
-                value={form.person}
-                onChangeText={(t) => setForm((p) => ({ ...p, person: t }))}
-              />
+              {familyMembers.length === 0 ? (
+                <TextInput
+                  style={styles.input}
+                  placeholder="e.g. Emma, Mum, whole family"
+                  placeholderTextColor={MUTED}
+                  value={form.person}
+                  onChangeText={(t) => setForm((p) => ({ ...p, person: t }))}
+                />
+              ) : (
+                <View style={styles.memberChipRow}>
+                  {familyMembers.map((m) => {
+                    const selected = form.person.split(", ").filter(Boolean).includes(m.name);
+                    return (
+                      <TouchableOpacity
+                        key={m.id}
+                        onPress={() => {
+                          const current = form.person.split(", ").filter(Boolean);
+                          const next = selected
+                            ? current.filter((n) => n !== m.name)
+                            : [...current, m.name];
+                          setForm((p) => ({ ...p, person: next.join(", ") }));
+                        }}
+                        activeOpacity={0.75}
+                        style={[
+                          styles.memberChip,
+                          selected && { backgroundColor: m.color ?? TEAL, borderColor: m.color ?? TEAL },
+                        ]}
+                      >
+                        <Text style={[styles.memberChipText, selected && { color: "#fff" }]}>
+                          {m.name}
+                        </Text>
+                        {selected && <Feather name="check" size={11} color="#fff" />}
+                      </TouchableOpacity>
+                    );
+                  })}
+                </View>
+              )}
             </View>
           </View>
 
@@ -1085,7 +1179,7 @@ export default function AppointmentsScreen() {
             <Text style={styles.formSectionLabel}>WHEN</Text>
             <View style={styles.formCard}>
               <Text style={styles.fieldLabel}>Date</Text>
-              <DatePicker value={form.date} onChange={(d) => setForm((p) => ({ ...p, date: d }))} />
+              <CalendarDatePicker value={form.date} onChange={(d) => setForm((p) => ({ ...p, date: d }))} />
 
               <Text style={[styles.fieldLabel, { marginTop: 16 }]}>Start time</Text>
               <TimePicker value={form.startTime} onChange={(t) => setForm((p) => ({ ...p, startTime: t }))} />
@@ -1929,17 +2023,64 @@ const styles = StyleSheet.create({
 
   rowBetween: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
 
-  datePickerRow: {
-    flexDirection: "row", alignItems: "center", gap: 8,
-    backgroundColor: TEAL_TINT, borderRadius: 12, padding: 10,
+  dateDisplayRow: {
+    flexDirection: "row", alignItems: "center", gap: 10,
+    backgroundColor: TEAL_TINT, borderRadius: 12, padding: 12,
   },
-  dateArrow: { padding: 4 },
-  datePickerMain: { fontSize: 15, fontFamily: "Inter_600SemiBold", color: TEXT, textAlign: "center" },
+  datePickerMain: { flex: 1, fontSize: 15, fontFamily: "DMSans_600SemiBold", color: TEXT },
   dateShortcut: {
     flex: 1, borderRadius: 20, paddingVertical: 6, alignItems: "center",
     borderWidth: 1, borderColor: BORDER, backgroundColor: CARD,
   },
-  dateShortcutText: { fontSize: 12, fontFamily: "Inter_500Medium", color: MUTED },
+  dateShortcutText: { fontSize: 12, fontFamily: "DMSans_500Medium", color: MUTED },
+
+  // Calendar modal
+  calModalOverlay: {
+    flex: 1, backgroundColor: "rgba(0,0,0,0.45)",
+    justifyContent: "flex-end",
+  },
+  calModalSheet: {
+    backgroundColor: "#fff", borderTopLeftRadius: 20, borderTopRightRadius: 20,
+    paddingBottom: 8,
+    ...Platform.select({
+      web: {},
+      default: {
+        shadowColor: "#000", shadowOffset: { width: 0, height: -4 },
+        shadowOpacity: 0.12, shadowRadius: 16, elevation: 16,
+      },
+    }),
+  },
+  calModalHandle: {
+    width: 36, height: 4, backgroundColor: "#D1D5DB",
+    borderRadius: 2, alignSelf: "center", marginTop: 10, marginBottom: 4,
+  },
+  calModalHeader: {
+    flexDirection: "row", alignItems: "center", justifyContent: "space-between",
+    paddingHorizontal: 20, paddingVertical: 10,
+  },
+  calModalTitle: {
+    fontSize: 17, fontFamily: "DMSans_700Bold", color: TEXT,
+  },
+  calModalClose: { padding: 4 },
+  calModalDoneBtn: {
+    backgroundColor: TEAL, borderRadius: 12,
+    paddingVertical: 13, alignItems: "center",
+    marginTop: 4,
+  },
+  calModalDoneBtnText: {
+    fontSize: 15, fontFamily: "DMSans_600SemiBold", color: "#fff",
+  },
+
+  // Family member chips (attendee selector)
+  memberChipRow: {
+    flexDirection: "row", flexWrap: "wrap", gap: 8, marginTop: 8,
+  },
+  memberChip: {
+    flexDirection: "row", alignItems: "center", gap: 5,
+    borderWidth: 1.5, borderColor: BORDER, borderRadius: 20,
+    paddingHorizontal: 12, paddingVertical: 7, backgroundColor: CARD,
+  },
+  memberChipText: { fontSize: 13, fontFamily: "DMSans_500Medium", color: TEXT },
 
   timeSlot: {
     borderRadius: 20, paddingHorizontal: 12, paddingVertical: 6,
