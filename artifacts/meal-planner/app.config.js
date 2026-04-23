@@ -18,11 +18,6 @@ console.error(
 module.exports = {
   ...base.expo,
 
-  // EAS project linkage — must live here since app.config.js overrides app.json
-  name: "Sortii - Your Week, Sorted.",
-  slug: "sortii-your-week-sorted",
-  owner: "replit-private-6a7ace6b-4dcb-4dbe-924f-d6962fc1ac17",
-
   ios: {
     ...base.expo.ios,
     appleTeamId: "539W2H9SZV",
