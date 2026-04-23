@@ -187,7 +187,7 @@ const styles = StyleSheet.create({
   },
   logoText: {
     fontSize: 22,
-    fontFamily: "Manrope_700Bold",
+    fontFamily: "DMSans_700Bold",
     color: TEAL,
     textAlign: "center",
     letterSpacing: -0.5,
@@ -203,7 +203,7 @@ const styles = StyleSheet.create({
   },
   heading: {
     fontSize: 24,
-    fontFamily: "Manrope_700Bold",
+    fontFamily: "DMSans_700Bold",
     color: "#2B2B2B",
     textAlign: "center",
     lineHeight: 34,

@@ -1,0 +1,657 @@
+Build this as a **production-ready feature** inside the existing Sortii meal planner app.
+
+# Feature name
+
+**Cook With What’s Already Here**
+
+## Purpose
+
+Create a low-energy dinner rescue feature for nights when the user has not shopped, money is tight, energy is low, and they need the app to suggest realistic meals from random ingredients already in the house.
+
+This should feel like a **Sortii rescue tool**, not a pantry manager and not a formal recipe search engine.
+
+The user should feel:
+
+* relieved
+* guided
+* not judged
+* able to get to a useful dinner answer quickly
+
+---
+
+# Product behaviour summary
+
+## Pantry assumptions
+
+Always assume these are available and do not require user entry:
+
+* salt
+* pepper
+* cooking oil
+* water
+
+Treat these as default pantry staples in all matching and fallback logic.
+
+---
+
+# UX flow
+
+## Entry point
+
+Add a new feature entry inside the Meals module:
+**Cook With What’s Already Here**
+
+Optional subheading:
+**Tell me the bits you’ve got and I’ll work out what dinner could be.**
+
+---
+
+## Screen structure
+
+Build this as a simple single-flow screen with two clear input paths:
+
+### 1. Guided prompts
+
+This is the primary path.
+
+### 2. Free text input
+
+This is a secondary optional path for messy natural language input.
+
+The user should be able to:
+
+* use guided prompts only
+* use free text only
+* use both together
+
+If both are used, merge them intelligently before running matching.
+
+---
+
+# UI requirements
+
+## Top intro block
+
+Small supportive intro card:
+
+* title: **Cook With What’s Already Here**
+* body: **I’ll assume basics like salt, pepper, oil and water. You tell me the rest.**
+
+Use Sortii styling:
+
+* soft white / warm neutral surface
+* gentle border
+* clean spacing
+* readable hierarchy
+* calm, non-busy layout
+
+---
+
+## Guided prompt blocks
+
+Create these as grouped sections with chip-select or token-style options plus optional manual add.
+
+### Section 1: Protein
+
+Prompt:
+**What protein do you have?**
+
+Suggested chips:
+
+* chicken
+* beef mince
+* eggs
+* tuna
+* beans
+* tofu
+* bacon
+* sausage
+* none
+
+Allow custom add.
+
+### Section 2: Base items
+
+Prompt:
+**What base items do you have?**
+
+Suggested chips:
+
+* pasta
+* rice
+* noodles
+* wraps
+* bread
+* potatoes
+* couscous
+* tortillas
+* none
+
+Allow custom add.
+
+### Section 3: Vegetables / freezer bits
+
+Prompt:
+**Any vegetables or freezer bits?**
+
+Suggested chips:
+
+* onion
+* carrots
+* broccoli
+* spinach
+* peas
+* corn
+* mixed veg
+* capsicum
+* mushrooms
+* none
+
+Allow custom add.
+
+### Section 4: Extras / flavour helpers
+
+Prompt:
+**Anything else that helps pull a meal together?**
+
+Suggested chips:
+
+* cheese
+* tinned tomatoes
+* cream
+* stock
+* soy sauce
+* pesto
+* curry paste
+* mayo
+* garlic
+* lemon
+
+Allow custom add.
+
+### Section 5: What kind of night is this?
+
+Prompt:
+**What kind of night is this?**
+
+Suggested chips:
+
+* fastest
+* cheapest
+* kid-friendly
+* low effort
+* one pan only
+* use fridge stuff first
+* 15 min max
+
+This section should influence ranking logic.
+
+---
+
+## Free text section
+
+Below the guided prompts, include a text area with clear optional label:
+
+**Or just type what you’ve got**
+
+Placeholder:
+**Example: I’ve got eggs, wraps, cheese, frozen peas and maybe some rice. Need something easy and quick.**
+
+Support messy input, incomplete lists, and casual wording.
+
+---
+
+## Primary CTA
+
+Use one strong button:
+**See what I can make**
+
+This CTA must remain clearly visible and never hide behind sticky nav or bottom bars.
+
+---
+
+# Technical architecture
+
+Build this feature in a modular way.
+
+## Suggested structure
+
+### Components
+
+Create or adapt components similar to:
+
+* `CookWithWhatYouHaveScreen`
+* `IngredientPromptSection`
+* `IngredientChipSelector`
+* `FreeTextIngredientInput`
+* `MealMatchResults`
+* `MealSuggestionCard`
+* `FallbackIdeaCard`
+
+### Logic / utility files
+
+Create reusable utility modules such as:
+
+* `parseIngredientText.ts`
+* `normalizeIngredients.ts`
+* `scoreRecipeMatch.ts`
+* `generateFallbackMeal.ts`
+* `cookWithWhatYouHaveTypes.ts`
+
+Keep business logic separate from presentation components.
+
+---
+
+# Data handling
+
+## Existing recipe dataset
+
+Use the current Sortii recipe dataset as the primary source of meal suggestions.
+
+Do not replace the current recipe engine.
+Reuse the dataset and matching structures where possible.
+
+Each recipe should be scored against:
+
+* ingredients explicitly entered by the user
+* pantry assumptions: salt, pepper, oil, water
+* selected night-style preferences
+* recipe cook time
+* recipe effort / difficulty if available
+* recipe tags like family-friendly, budget, quick, one-pan if available
+
+---
+
+# Ingredient parsing requirements
+
+## 1. Merge all input sources
+
+When user taps CTA:
+
+* collect guided prompt selections
+* collect manually added chip items
+* collect free text input
+* merge into one ingredient input set
+
+## 2. Parse free text
+
+Extract likely ingredients and intent from free text.
+
+Examples:
+
+* “I’ve got eggs, cheese, wraps and frozen peas” → eggs, cheese, wraps, peas
+* “Need something quick and cheap” → preferences: fastest, cheapest, low effort
+* “Have random freezer veg and rice” → mixed veg, rice
+
+## 3. Normalise ingredient names
+
+Create a light normalisation / synonym map.
+
+Examples:
+
+* mince → beef mince
+* ground beef → beef mince
+* shredded cheese → cheese
+* grated cheese → cheese
+* frozen veg → mixed veg
+* canned tomatoes → tinned tomatoes
+* capsicum ↔ bell pepper
+* tortilla wraps → wraps
+* ramen noodles → noodles
+
+Do not overbuild this. Keep it practical and extendable.
+
+---
+
+# Matching engine
+
+## Matching priority
+
+Always search internal recipe dataset first.
+
+### Matching logic goals
+
+Return the most realistic “yes, you can make this” options first.
+
+### Suggested scoring model
+
+Create a weighted score for each recipe.
+
+Example score dimensions:
+
+* ingredient overlap score
+* required ingredient coverage
+* missing ingredient penalty
+* time preference bonus
+* low effort bonus
+* kid-friendly bonus
+* one-pan bonus
+* cheapest bonus
+* fridge-use bonus
+
+### Recipe categories
+
+Classify results into these groups:
+
+#### 1. You can make this now
+
+Use when:
+
+* all major recipe ingredients are present
+* only assumed pantry basics are needed
+* or only tiny optional items are missing
+
+#### 2. Very close
+
+Use when:
+
+* recipe is missing only 1 to 2 non-essential or swappable ingredients
+
+#### 3. Backup idea
+
+Use when:
+
+* internal recipe confidence is low
+* or no internal recipe passes minimum threshold
+
+---
+
+# Scoring rule suggestions
+
+## Ingredient weighting
+
+Not all ingredients should be equal.
+
+If your dataset supports it, distinguish between:
+
+* core ingredients
+* supporting ingredients
+* pantry ingredients
+* optional ingredients
+
+If not, approximate this by:
+
+* first few listed ingredients count more
+* protein and base item matches count more
+* flavour helper mismatches count less
+
+### Example approach
+
+* protein match: high value
+* base carb/starch match: high value
+* key vegetables: medium value
+* sauces/extras: lower value
+* assumed pantry basics: auto included, no penalty
+
+## Missing ingredient tolerance
+
+Allow:
+
+* 0 missing major items for “You can make this now”
+* 1 to 2 missing minor items for “Very close”
+
+Do not show unrealistic matches.
+
+If a recipe technically matches but clearly depends on a missing core ingredient, do not rank it highly.
+
+---
+
+# Fallback AI behaviour
+
+## Trigger
+
+Only use AI fallback if internal recipe matching is weak or empty.
+
+Do not use AI fallback first.
+Do not use external web search as the primary approach.
+
+## Fallback purpose
+
+Generate a simple improvised meal concept using the user’s ingredients and Sortii’s tone.
+
+### Fallback constraints
+
+The AI fallback should:
+
+* use entered ingredients plus assumed basics
+* keep it simple
+* keep method short
+* avoid fancy chef language
+* avoid introducing lots of new ingredients
+* favour low-cost, low-effort combinations
+* sound like a useful rescue option
+
+### Fallback output structure
+
+Return:
+
+* meal name
+* why it works
+* quick 2 to 4 step method
+* rough cook time
+* effort label
+
+Example feel:
+
+* **Cheesy Egg Wraps**
+  Uses your eggs, wraps and cheese for a fast no-shop dinner.
+  10 to 15 mins • very easy
+
+## Future-ready note
+
+Architect this so a future optional external recipe search layer can be added later if desired, but do not build that into the main flow right now unless it is already part of the app infrastructure.
+
+---
+
+# Result screen requirements
+
+## Layout
+
+Return results in a clean stacked layout with clear section headers.
+
+### Section 1
+
+**You can make this now**
+
+### Section 2
+
+**Very close**
+
+### Section 3
+
+**Backup idea based on what you’ve got**
+
+Only show sections that have results.
+
+---
+
+## Result card content
+
+Each result card should show:
+
+* recipe name
+* short explanation of why it was selected
+* cook time
+* effort level
+* match label
+
+### Example labels
+
+* Uses what you already have
+* Missing 1 item
+* Missing 2 small extras
+* Backup idea
+
+### Example card copy
+
+**Egg Fried Rice**
+Great use of your rice, eggs and freezer veg.
+15 mins • easy
+Uses what you already have
+
+**Cheesy Tuna Pasta**
+Uses your pasta, tuna and cheese.
+20 mins • easy
+Missing 1 small extra
+
+---
+
+# Tone rules
+
+Keep all UI copy and outputs aligned to Sortii voice:
+
+* warm
+* lightly dry
+* practical
+* calm
+* never too cute
+* never bossy
+* never shaming
+
+Good examples:
+
+* “Not glamorous, but still dinner.”
+* “A decent no-shop-night option.”
+* “This should get the job done.”
+* “Uses the bits you’ve already got without making life harder.”
+
+Avoid:
+
+* recipe blog enthusiasm
+* excessive emojis
+* smug humour
+* language that implies the user failed to shop properly
+
+---
+
+# Empty / low-input states
+
+## If user enters very little
+
+Do not dead-end.
+
+Example response approach:
+
+* prompt them gently that broader results work better with a few more ingredients
+* still try to generate at least one fallback idea
+
+Example:
+**You’ve not given me much to work with, but here’s a rescue option.**
+
+## If no internal match exists
+
+Still return:
+
+* one AI fallback idea
+* optionally one small suggestion encouraging adding 1 to 2 more ingredients for better results
+
+---
+
+# State management expectations
+
+Make sure:
+
+* selections can be changed easily
+* results regenerate cleanly
+* guided prompt choices persist during the session
+* free text remains editable after result generation
+* user can quickly go back and tweak one thing without redoing the whole flow
+
+---
+
+# Performance expectations
+
+Keep this lightweight and responsive.
+Do not make the feature feel heavy or over-processed.
+
+Prefer:
+
+* local scoring against existing dataset
+* minimal AI calls
+* AI fallback only when needed
+
+---
+
+# Implementation detail suggestions
+
+## Types
+
+Use clear types for:
+
+* normalized ingredient
+* parsed preferences
+* recipe match score
+* result section
+* fallback idea structure
+
+## Suggested interfaces
+
+Example shape only, adapt to current codebase:
+
+```ts
+type UserIngredientInput = {
+  selectedIngredients: string[];
+  freeText: string;
+  preferences: string[];
+};
+
+type ParsedCookWhatYouHaveInput = {
+  ingredients: string[];
+  preferences: string[];
+  assumedPantry: string[];
+};
+
+type RecipeMatchResult = {
+  recipeId: string;
+  recipeName: string;
+  score: number;
+  missingIngredients: string[];
+  matchedIngredients: string[];
+  category: 'make_now' | 'very_close';
+  reason: string;
+};
+
+type FallbackMealIdea = {
+  title: string;
+  reason: string;
+  steps: string[];
+  cookTime: string;
+  effort: string;
+};
+```
+
+---
+
+# Dev requirements
+
+Please:
+
+* integrate cleanly with the current Sortii meal planner codebase
+* reuse recipe data and any existing meal card components where sensible
+* keep code readable and modular
+* avoid hacks or one-off duplicated logic
+* comment any scoring thresholds clearly
+* make it easy to extend later with smarter pantry logic or optional external search
+
+---
+
+# Final success criteria
+
+A user should be able to:
+
+1. open the Meals module
+2. choose **Cook With What’s Already Here**
+3. quickly tap a few ingredients or type a messy sentence
+4. hit **See what I can make**
+5. get useful, realistic dinner suggestions within seconds
+
+The feature should feel:
+
+* helpful
+* calm
+* clever
+* very real-world
+* distinctly Sortii
+
+It should feel like:
+**“the week went sideways, but the app still helped me get dinner sorted.”**

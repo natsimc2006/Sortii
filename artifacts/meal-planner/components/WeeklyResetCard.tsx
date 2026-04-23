@@ -150,7 +150,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 18,
-    fontFamily: "Manrope_700Bold",
+    fontFamily: "DMSans_700Bold",
     lineHeight: 24,
   },
   subtitle: {

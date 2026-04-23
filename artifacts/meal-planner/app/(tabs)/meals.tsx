@@ -780,6 +780,34 @@ export default function MealsScreen() {
         )}
 
 
+        {/* Cook With What's Already Here — rescue entry */}
+        <TouchableOpacity
+          style={[
+            styles.rescueEntry,
+            { backgroundColor: TEAL + "0D", borderColor: TEAL + "28" },
+          ]}
+          onPress={() => router.push("/(tabs)/cook-with" as any)}
+          activeOpacity={0.78}
+        >
+          <View
+            style={[
+              styles.rescueEntryIcon,
+              { backgroundColor: TEAL + "18" },
+            ]}
+          >
+            <Feather name="search" size={14} color={TEAL} />
+          </View>
+          <View style={{ flex: 1, gap: 2 }}>
+            <Text style={[styles.rescueEntryTitle, { color: C.text }]}>
+              Cook With What's Already Here
+            </Text>
+            <Text style={[styles.rescueEntrySub, { color: C.textMuted }]}>
+              Tell me what you've got and I'll sort dinner.
+            </Text>
+          </View>
+          <Feather name="chevron-right" size={15} color={C.textMuted} />
+        </TouchableOpacity>
+
         {/* Day-by-day meal cards */}
         {DAYS.map((day) => {
           const dinnerEntry = getEntry(day, "dinner");
@@ -1490,6 +1518,32 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontFamily: "Inter_400Regular",
     marginBottom: 20,
+  },
+  rescueEntry: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    marginHorizontal: 0,
+    marginBottom: 16,
+    padding: 13,
+    borderRadius: 13,
+    borderWidth: 1,
+  },
+  rescueEntryIcon: {
+    width: 30,
+    height: 30,
+    borderRadius: 9,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  rescueEntryTitle: {
+    fontSize: 13,
+    fontFamily: "Inter_600SemiBold",
+    lineHeight: 18,
+  },
+  rescueEntrySub: {
+    fontSize: 12,
+    fontFamily: "Inter_400Regular",
   },
   dayBlock: { gap: 8, marginBottom: 20 },
   dayLabelRow: {
