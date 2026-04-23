@@ -30797,5 +30797,1037 @@
       "Combine quinoa, roasted veg, chickpeas and rocket in a bowl.",
       "Drizzle dressing over. Crumble feta on top."
     ]
+  },
+  {
+    "id": "r393",
+    "name": "BBQ Pulled Pork",
+    "description": "Slow cooker pulled pork with smoky BBQ sauce — fork-tender after 8 hours. Pile into buns with coleslaw.",
+    "baseServings": 8,
+    "cookTimeMinutes": 480,
+    "difficulty": "easy",
+    "cookingStyle": "mixed",
+    "healthTags": [
+      "standard"
+    ],
+    "budgetTags": [
+      "standard"
+    ],
+    "leftoversFriendly": true,
+    "batchCook": true,
+    "mealType": "dinner",
+    "estimatedCostBand": "medium",
+    "ingredients": [
+      {
+        "name": "Pork shoulder",
+        "quantity": 2000,
+        "unit": "g",
+        "category": "proteins"
+      },
+      {
+        "name": "BBQ sauce",
+        "quantity": 500,
+        "unit": "ml",
+        "category": "condiments"
+      },
+      {
+        "name": "Brown sugar",
+        "quantity": 2,
+        "unit": "tbsp",
+        "category": "pantry"
+      },
+      {
+        "name": "Smoked paprika",
+        "quantity": 2,
+        "unit": "tsp",
+        "category": "herbs"
+      },
+      {
+        "name": "Ground cumin",
+        "quantity": 1,
+        "unit": "tsp",
+        "category": "herbs"
+      },
+      {
+        "name": "Garlic powder",
+        "quantity": 1,
+        "unit": "tsp",
+        "category": "herbs"
+      },
+      {
+        "name": "Onion powder",
+        "quantity": 1,
+        "unit": "tsp",
+        "category": "herbs"
+      },
+      {
+        "name": "Cayenne pepper",
+        "quantity": 0.5,
+        "unit": "tsp",
+        "category": "herbs"
+      },
+      {
+        "name": "Mustard powder",
+        "quantity": 1,
+        "unit": "tsp",
+        "category": "herbs"
+      },
+      {
+        "name": "Salt",
+        "quantity": 2,
+        "unit": "tsp",
+        "category": "pantry"
+      },
+      {
+        "name": "Apple cider vinegar",
+        "quantity": 2,
+        "unit": "tbsp",
+        "category": "condiments"
+      },
+      {
+        "name": "Brioche buns",
+        "quantity": 8,
+        "unit": "whole",
+        "category": "grains",
+        "optional": true
+      },
+      {
+        "name": "Coleslaw",
+        "quantity": 200,
+        "unit": "g",
+        "category": "vegetables",
+        "optional": true
+      }
+    ],
+    "instructions": [
+      "Mix brown sugar, smoked paprika, cumin, garlic powder, onion powder, cayenne, mustard powder and salt into a dry rub.",
+      "Pat pork shoulder dry and rub all over with the spice mix.",
+      "Place pork in slow cooker. Pour apple cider vinegar and half the BBQ sauce around the pork.",
+      "Cook on LOW for 8 hours or HIGH for 5 hours until the meat pulls apart easily.",
+      "Remove pork and shred with two forks, discarding any large fat pieces.",
+      "Stir remaining BBQ sauce through the shredded pork. Add a splash of cooking juices to taste.",
+      "Serve in buns with coleslaw. Leftovers freeze well."
+    ],
+    "proteinType": "pork",
+    "cuisineType": "american",
+    "seasonTags": [
+      "all"
+    ],
+    "familyStyle": true,
+    "kidFriendly": true,
+    "kidFriendlyScore": 2,
+    "costPerServeAUD": 6.5,
+    "costPerServeGBP": 4.2,
+    "source": "https://www.recipetineats.com/pulled-pork-with-bbq-sauce/"
+  },
+  {
+    "id": "r394",
+    "name": "Slow Cooker Leg of Lamb",
+    "description": "Fall-off-the-bone lamb leg slow cooked with garlic, rosemary and root vegetables. A proper Sunday roast with minimal effort.",
+    "baseServings": 6,
+    "cookTimeMinutes": 480,
+    "difficulty": "easy",
+    "cookingStyle": "mixed",
+    "healthTags": [
+      "standard",
+      "high-protein"
+    ],
+    "budgetTags": [
+      "premium"
+    ],
+    "leftoversFriendly": true,
+    "batchCook": false,
+    "mealType": "dinner",
+    "estimatedCostBand": "high",
+    "ingredients": [
+      {
+        "name": "Leg of lamb",
+        "quantity": 2000,
+        "unit": "g",
+        "category": "proteins"
+      },
+      {
+        "name": "Garlic",
+        "quantity": 6,
+        "unit": "cloves",
+        "category": "herbs"
+      },
+      {
+        "name": "Fresh rosemary",
+        "quantity": 4,
+        "unit": "sprigs",
+        "category": "herbs"
+      },
+      {
+        "name": "Chicken or lamb stock",
+        "quantity": 250,
+        "unit": "ml",
+        "category": "pantry"
+      },
+      {
+        "name": "Onion",
+        "quantity": 2,
+        "unit": "whole",
+        "category": "vegetables"
+      },
+      {
+        "name": "Carrots",
+        "quantity": 3,
+        "unit": "whole",
+        "category": "vegetables"
+      },
+      {
+        "name": "Celery",
+        "quantity": 2,
+        "unit": "stalks",
+        "category": "vegetables"
+      },
+      {
+        "name": "Olive oil",
+        "quantity": 2,
+        "unit": "tbsp",
+        "category": "condiments"
+      },
+      {
+        "name": "Tomato paste",
+        "quantity": 2,
+        "unit": "tbsp",
+        "category": "pantry"
+      },
+      {
+        "name": "Worcestershire sauce",
+        "quantity": 2,
+        "unit": "tbsp",
+        "category": "condiments"
+      },
+      {
+        "name": "Salt and pepper",
+        "quantity": 1,
+        "unit": "to taste",
+        "category": "pantry"
+      }
+    ],
+    "instructions": [
+      "Cut slits all over the lamb leg and push in garlic cloves and rosemary sprigs.",
+      "Season lamb generously with salt and pepper.",
+      "Heat oil in a large pan over high heat. Sear lamb on all sides until browned (about 5 mins).",
+      "Place roughly chopped onion, carrots and celery into slow cooker.",
+      "Mix stock, tomato paste and Worcestershire sauce and pour over vegetables.",
+      "Sit the seared lamb on top. Cook on LOW for 8-10 hours until completely tender.",
+      "Rest lamb 15 minutes before carving. Strain cooking juices to make a simple gravy."
+    ],
+    "proteinType": "lamb",
+    "cuisineType": "australian",
+    "seasonTags": [
+      "autumn",
+      "winter"
+    ],
+    "familyStyle": true,
+    "kidFriendly": false,
+    "kidFriendlyScore": 1,
+    "costPerServeAUD": 12,
+    "costPerServeGBP": 7.8,
+    "source": "https://www.bbcgoodfood.com/recipes/slow-cooker-leg-lamb"
+  },
+  {
+    "id": "r395",
+    "name": "Slow Cooker Beef Stew",
+    "description": "Rich and hearty beef stew with tender chunks of chuck, potatoes and carrots. Throw it all in and come home to dinner.",
+    "baseServings": 6,
+    "cookTimeMinutes": 480,
+    "difficulty": "easy",
+    "cookingStyle": "mixed",
+    "healthTags": [
+      "standard"
+    ],
+    "budgetTags": [
+      "budget",
+      "standard"
+    ],
+    "leftoversFriendly": true,
+    "batchCook": true,
+    "mealType": "dinner",
+    "estimatedCostBand": "low",
+    "ingredients": [
+      {
+        "name": "Chuck steak or gravy beef",
+        "quantity": 1000,
+        "unit": "g",
+        "category": "proteins"
+      },
+      {
+        "name": "Potatoes",
+        "quantity": 600,
+        "unit": "g",
+        "category": "vegetables"
+      },
+      {
+        "name": "Carrots",
+        "quantity": 3,
+        "unit": "whole",
+        "category": "vegetables"
+      },
+      {
+        "name": "Onion",
+        "quantity": 2,
+        "unit": "whole",
+        "category": "vegetables"
+      },
+      {
+        "name": "Celery",
+        "quantity": 2,
+        "unit": "stalks",
+        "category": "vegetables"
+      },
+      {
+        "name": "Beef stock",
+        "quantity": 500,
+        "unit": "ml",
+        "category": "pantry"
+      },
+      {
+        "name": "Tomato paste",
+        "quantity": 3,
+        "unit": "tbsp",
+        "category": "pantry"
+      },
+      {
+        "name": "Worcestershire sauce",
+        "quantity": 2,
+        "unit": "tbsp",
+        "category": "condiments"
+      },
+      {
+        "name": "Garlic",
+        "quantity": 3,
+        "unit": "cloves",
+        "category": "herbs"
+      },
+      {
+        "name": "Plain flour",
+        "quantity": 3,
+        "unit": "tbsp",
+        "category": "pantry"
+      },
+      {
+        "name": "Dried thyme",
+        "quantity": 1,
+        "unit": "tsp",
+        "category": "herbs"
+      },
+      {
+        "name": "Bay leaves",
+        "quantity": 2,
+        "unit": "whole",
+        "category": "herbs"
+      },
+      {
+        "name": "Olive oil",
+        "quantity": 2,
+        "unit": "tbsp",
+        "category": "condiments"
+      }
+    ],
+    "instructions": [
+      "Cut beef into 4cm chunks. Toss in flour seasoned with salt and pepper.",
+      "Heat oil in a pan over high heat. Brown beef in batches and transfer to slow cooker.",
+      "Roughly chop onion, carrots, celery and potatoes. Add to slow cooker with garlic.",
+      "Mix stock, tomato paste and Worcestershire sauce and pour over.",
+      "Add thyme and bay leaves. Stir to combine.",
+      "Cook on LOW for 8 hours or HIGH for 5 hours until beef is fall-apart tender.",
+      "Remove bay leaves. Taste and season. Serve with crusty bread or mashed potato."
+    ],
+    "proteinType": "beef",
+    "cuisineType": "australian",
+    "seasonTags": [
+      "autumn",
+      "winter"
+    ],
+    "familyStyle": true,
+    "kidFriendly": true,
+    "kidFriendlyScore": 2,
+    "costPerServeAUD": 5,
+    "costPerServeGBP": 3.2,
+    "source": "https://www.bbcgoodfood.com/recipes/slow-cooker-beef-stew"
+  },
+  {
+    "id": "r396",
+    "name": "Shredded Slow Cooker Chicken",
+    "description": "Foolproof shredded chicken from the slow cooker — juicy, versatile and done in 3 hours. Use in tacos, sandwiches, salads or pasta.",
+    "baseServings": 6,
+    "cookTimeMinutes": 180,
+    "difficulty": "easy",
+    "cookingStyle": "mixed",
+    "healthTags": [
+      "healthy",
+      "high-protein"
+    ],
+    "budgetTags": [
+      "budget"
+    ],
+    "leftoversFriendly": true,
+    "batchCook": true,
+    "mealType": "both",
+    "estimatedCostBand": "low",
+    "ingredients": [
+      {
+        "name": "Chicken breasts",
+        "quantity": 1000,
+        "unit": "g",
+        "category": "proteins"
+      },
+      {
+        "name": "Chicken stock",
+        "quantity": 250,
+        "unit": "ml",
+        "category": "pantry"
+      },
+      {
+        "name": "Garlic powder",
+        "quantity": 1,
+        "unit": "tsp",
+        "category": "herbs"
+      },
+      {
+        "name": "Onion powder",
+        "quantity": 1,
+        "unit": "tsp",
+        "category": "herbs"
+      },
+      {
+        "name": "Smoked paprika",
+        "quantity": 1,
+        "unit": "tsp",
+        "category": "herbs"
+      },
+      {
+        "name": "Ground cumin",
+        "quantity": 0.5,
+        "unit": "tsp",
+        "category": "herbs"
+      },
+      {
+        "name": "Salt",
+        "quantity": 1,
+        "unit": "tsp",
+        "category": "pantry"
+      },
+      {
+        "name": "Olive oil",
+        "quantity": 1,
+        "unit": "tbsp",
+        "category": "condiments"
+      }
+    ],
+    "instructions": [
+      "Place chicken breasts in the bottom of the slow cooker in a single layer.",
+      "Mix all spices together and sprinkle over the chicken.",
+      "Pour chicken stock around (not over) the chicken.",
+      "Cook on LOW for 3-4 hours or HIGH for 1.5-2 hours. Do not overcook.",
+      "Remove chicken and shred with two forks.",
+      "Return shredded chicken to cooker and toss through the cooking juices.",
+      "Use immediately or refrigerate for up to 4 days. Freezes well."
+    ],
+    "proteinType": "chicken",
+    "cuisineType": "american",
+    "seasonTags": [
+      "all"
+    ],
+    "familyStyle": true,
+    "kidFriendly": true,
+    "kidFriendlyScore": 2,
+    "costPerServeAUD": 3.8,
+    "costPerServeGBP": 2.5,
+    "source": "https://www.goodlifeeats.com/shredded-crock-pot-slow-cooker-chicken/"
+  },
+  {
+    "id": "r397",
+    "name": "Chinese Shredded Chicken",
+    "description": "Slow cooker Chinese-style shredded chicken with soy, hoisin and five spice. Serve over rice with spring onion and sesame.",
+    "baseServings": 4,
+    "cookTimeMinutes": 240,
+    "difficulty": "easy",
+    "cookingStyle": "mixed",
+    "healthTags": [
+      "standard",
+      "high-protein"
+    ],
+    "budgetTags": [
+      "budget",
+      "standard"
+    ],
+    "leftoversFriendly": true,
+    "batchCook": true,
+    "mealType": "dinner",
+    "estimatedCostBand": "low",
+    "ingredients": [
+      {
+        "name": "Chicken thighs (boneless)",
+        "quantity": 800,
+        "unit": "g",
+        "category": "proteins"
+      },
+      {
+        "name": "Soy sauce",
+        "quantity": 4,
+        "unit": "tbsp",
+        "category": "condiments"
+      },
+      {
+        "name": "Hoisin sauce",
+        "quantity": 3,
+        "unit": "tbsp",
+        "category": "condiments"
+      },
+      {
+        "name": "Oyster sauce",
+        "quantity": 2,
+        "unit": "tbsp",
+        "category": "condiments"
+      },
+      {
+        "name": "Chinese five spice",
+        "quantity": 1,
+        "unit": "tsp",
+        "category": "herbs"
+      },
+      {
+        "name": "Fresh ginger",
+        "quantity": 2,
+        "unit": "tsp",
+        "category": "herbs"
+      },
+      {
+        "name": "Garlic",
+        "quantity": 3,
+        "unit": "cloves",
+        "category": "herbs"
+      },
+      {
+        "name": "Sesame oil",
+        "quantity": 1,
+        "unit": "tbsp",
+        "category": "condiments"
+      },
+      {
+        "name": "Brown sugar",
+        "quantity": 1,
+        "unit": "tbsp",
+        "category": "pantry"
+      },
+      {
+        "name": "Spring onions",
+        "quantity": 4,
+        "unit": "whole",
+        "category": "vegetables"
+      },
+      {
+        "name": "Steamed rice",
+        "quantity": 320,
+        "unit": "g",
+        "category": "grains"
+      }
+    ],
+    "instructions": [
+      "Mix soy sauce, hoisin, oyster sauce, five spice, ginger, garlic, sesame oil and brown sugar in the slow cooker.",
+      "Add chicken thighs and turn to coat in the sauce.",
+      "Cook on LOW for 4-5 hours or HIGH for 2.5-3 hours until very tender.",
+      "Remove chicken and shred finely with two forks.",
+      "Return chicken to the sauce. If sauce is thin, cook on HIGH with lid off for 15 mins.",
+      "Serve over steamed rice, topped with sliced spring onions and extra sesame oil."
+    ],
+    "proteinType": "chicken",
+    "cuisineType": "asian",
+    "seasonTags": [
+      "all"
+    ],
+    "familyStyle": true,
+    "kidFriendly": true,
+    "kidFriendlyScore": 1,
+    "costPerServeAUD": 4.5,
+    "costPerServeGBP": 2.9,
+    "source": "https://www.recipetineats.com/slow-cooker-crispy-chinese-shredded-chicken/"
+  },
+  {
+    "id": "r398",
+    "name": "Slow Cooker Pulled Beef",
+    "description": "Meltingly tender pulled beef — deeply savoury with a hint of smokiness. Great in buns, tacos or on mash.",
+    "baseServings": 8,
+    "cookTimeMinutes": 480,
+    "difficulty": "easy",
+    "cookingStyle": "mixed",
+    "healthTags": [
+      "high-protein"
+    ],
+    "budgetTags": [
+      "standard"
+    ],
+    "leftoversFriendly": true,
+    "batchCook": true,
+    "mealType": "dinner",
+    "estimatedCostBand": "medium",
+    "ingredients": [
+      {
+        "name": "Chuck roast or gravy beef",
+        "quantity": 1500,
+        "unit": "g",
+        "category": "proteins"
+      },
+      {
+        "name": "Beef stock",
+        "quantity": 250,
+        "unit": "ml",
+        "category": "pantry"
+      },
+      {
+        "name": "Worcestershire sauce",
+        "quantity": 3,
+        "unit": "tbsp",
+        "category": "condiments"
+      },
+      {
+        "name": "Garlic",
+        "quantity": 4,
+        "unit": "cloves",
+        "category": "herbs"
+      },
+      {
+        "name": "Onion",
+        "quantity": 1,
+        "unit": "whole",
+        "category": "vegetables"
+      },
+      {
+        "name": "Brown sugar",
+        "quantity": 2,
+        "unit": "tbsp",
+        "category": "pantry"
+      },
+      {
+        "name": "Tomato paste",
+        "quantity": 3,
+        "unit": "tbsp",
+        "category": "pantry"
+      },
+      {
+        "name": "Smoked paprika",
+        "quantity": 2,
+        "unit": "tsp",
+        "category": "herbs"
+      },
+      {
+        "name": "Garlic powder",
+        "quantity": 1,
+        "unit": "tsp",
+        "category": "herbs"
+      },
+      {
+        "name": "Onion powder",
+        "quantity": 1,
+        "unit": "tsp",
+        "category": "herbs"
+      },
+      {
+        "name": "Salt and pepper",
+        "quantity": 1,
+        "unit": "to taste",
+        "category": "pantry"
+      },
+      {
+        "name": "Olive oil",
+        "quantity": 2,
+        "unit": "tbsp",
+        "category": "condiments"
+      }
+    ],
+    "instructions": [
+      "Pat beef dry and season with salt, pepper, smoked paprika, garlic powder and onion powder.",
+      "Heat oil in a large pan over very high heat. Sear beef on all sides until deeply browned.",
+      "Place sliced onion and garlic in slow cooker base.",
+      "Sit seared beef on top. Mix stock, Worcestershire, brown sugar and tomato paste and pour over.",
+      "Cook on LOW for 8-10 hours until beef pulls apart with a fork.",
+      "Remove beef and shred. Skim fat from cooking liquid, then stir through shredded beef.",
+      "Serve in toasted buns, on mashed potato, or in tacos with pickled onion and slaw."
+    ],
+    "proteinType": "beef",
+    "cuisineType": "american",
+    "seasonTags": [
+      "all"
+    ],
+    "familyStyle": true,
+    "kidFriendly": true,
+    "kidFriendlyScore": 2,
+    "costPerServeAUD": 7,
+    "costPerServeGBP": 4.5,
+    "source": "https://www.dinnerin321.com/slow-cooker-pulled-beef/"
+  },
+  {
+    "id": "r399",
+    "name": "Shredded Beef Ragu Pasta",
+    "description": "Slow cooker shredded beef ragu with crushed tomatoes and red wine — rich, deeply flavoured, better the next day.",
+    "baseServings": 6,
+    "cookTimeMinutes": 480,
+    "difficulty": "easy",
+    "cookingStyle": "mixed",
+    "healthTags": [
+      "standard"
+    ],
+    "budgetTags": [
+      "standard"
+    ],
+    "leftoversFriendly": true,
+    "batchCook": true,
+    "mealType": "dinner",
+    "estimatedCostBand": "medium",
+    "ingredients": [
+      {
+        "name": "Chuck steak or beef brisket",
+        "quantity": 1500,
+        "unit": "g",
+        "category": "proteins"
+      },
+      {
+        "name": "Crushed tomatoes",
+        "quantity": 800,
+        "unit": "g",
+        "category": "pantry"
+      },
+      {
+        "name": "Red wine",
+        "quantity": 250,
+        "unit": "ml",
+        "category": "pantry"
+      },
+      {
+        "name": "Beef stock",
+        "quantity": 250,
+        "unit": "ml",
+        "category": "pantry"
+      },
+      {
+        "name": "Onion",
+        "quantity": 1,
+        "unit": "whole",
+        "category": "vegetables"
+      },
+      {
+        "name": "Garlic",
+        "quantity": 4,
+        "unit": "cloves",
+        "category": "herbs"
+      },
+      {
+        "name": "Carrot",
+        "quantity": 1,
+        "unit": "whole",
+        "category": "vegetables"
+      },
+      {
+        "name": "Celery",
+        "quantity": 2,
+        "unit": "stalks",
+        "category": "vegetables"
+      },
+      {
+        "name": "Tomato paste",
+        "quantity": 2,
+        "unit": "tbsp",
+        "category": "pantry"
+      },
+      {
+        "name": "Bay leaves",
+        "quantity": 2,
+        "unit": "whole",
+        "category": "herbs"
+      },
+      {
+        "name": "Dried oregano",
+        "quantity": 1,
+        "unit": "tsp",
+        "category": "herbs"
+      },
+      {
+        "name": "Pappardelle or rigatoni",
+        "quantity": 500,
+        "unit": "g",
+        "category": "grains"
+      },
+      {
+        "name": "Parmesan cheese",
+        "quantity": 60,
+        "unit": "g",
+        "category": "dairy"
+      },
+      {
+        "name": "Olive oil",
+        "quantity": 2,
+        "unit": "tbsp",
+        "category": "condiments"
+      }
+    ],
+    "instructions": [
+      "Heat oil in a large pan. Sear beef in batches over high heat until browned all over.",
+      "Finely dice onion, carrot and celery. Add to slow cooker.",
+      "Place seared beef on top. Add garlic, tomato paste, crushed tomatoes, wine, stock, bay leaves and oregano.",
+      "Cook on LOW for 8-10 hours until beef is very tender and falls apart.",
+      "Remove beef and shred coarsely with two forks. Discard bay leaves.",
+      "Return beef to the sauce and stir well. Season generously.",
+      "Cook pasta in salted boiling water. Toss with ragu and serve with parmesan."
+    ],
+    "proteinType": "beef",
+    "cuisineType": "italian",
+    "seasonTags": [
+      "autumn",
+      "winter"
+    ],
+    "familyStyle": true,
+    "kidFriendly": true,
+    "kidFriendlyScore": 2,
+    "costPerServeAUD": 7.5,
+    "costPerServeGBP": 4.8,
+    "source": "https://www.recipetineats.com/slow-cooked-shredded-beef-ragu-pasta/"
+  },
+  {
+    "id": "r400",
+    "name": "Slow Cooker Pork Loin Roast",
+    "description": "Juicy pork loin slow cooked with apple cider, garlic and fresh herbs. Slices beautifully and makes its own simple pan jus.",
+    "baseServings": 6,
+    "cookTimeMinutes": 360,
+    "difficulty": "easy",
+    "cookingStyle": "mixed",
+    "healthTags": [
+      "standard",
+      "high-protein"
+    ],
+    "budgetTags": [
+      "standard"
+    ],
+    "leftoversFriendly": true,
+    "batchCook": false,
+    "mealType": "dinner",
+    "estimatedCostBand": "medium",
+    "ingredients": [
+      {
+        "name": "Pork loin roast",
+        "quantity": 1500,
+        "unit": "g",
+        "category": "proteins"
+      },
+      {
+        "name": "Apple cider",
+        "quantity": 250,
+        "unit": "ml",
+        "category": "pantry"
+      },
+      {
+        "name": "Chicken stock",
+        "quantity": 125,
+        "unit": "ml",
+        "category": "pantry"
+      },
+      {
+        "name": "Garlic",
+        "quantity": 4,
+        "unit": "cloves",
+        "category": "herbs"
+      },
+      {
+        "name": "Fresh thyme",
+        "quantity": 4,
+        "unit": "sprigs",
+        "category": "herbs"
+      },
+      {
+        "name": "Fresh rosemary",
+        "quantity": 2,
+        "unit": "sprigs",
+        "category": "herbs"
+      },
+      {
+        "name": "Dijon mustard",
+        "quantity": 2,
+        "unit": "tbsp",
+        "category": "condiments"
+      },
+      {
+        "name": "Brown sugar",
+        "quantity": 1,
+        "unit": "tbsp",
+        "category": "pantry"
+      },
+      {
+        "name": "Onion",
+        "quantity": 1,
+        "unit": "whole",
+        "category": "vegetables"
+      },
+      {
+        "name": "Carrots",
+        "quantity": 2,
+        "unit": "whole",
+        "category": "vegetables",
+        "optional": true
+      },
+      {
+        "name": "Salt and pepper",
+        "quantity": 1,
+        "unit": "to taste",
+        "category": "pantry"
+      },
+      {
+        "name": "Olive oil",
+        "quantity": 2,
+        "unit": "tbsp",
+        "category": "condiments"
+      }
+    ],
+    "instructions": [
+      "Season pork loin all over with salt and pepper.",
+      "Heat oil in a pan over high heat. Sear pork on all sides until golden brown.",
+      "Spread Dijon mustard and brown sugar over the top of the pork.",
+      "Place sliced onion and carrots in slow cooker. Lay thyme and rosemary on top.",
+      "Sit pork on the vegetables. Mix apple cider and stock and pour around (not over) the pork.",
+      "Cook on LOW for 5-6 hours until internal temperature reaches 63°C (145°F).",
+      "Rest 10 minutes before slicing. Use cooking juices strained as a simple jus."
+    ],
+    "proteinType": "pork",
+    "cuisineType": "australian",
+    "seasonTags": [
+      "all"
+    ],
+    "familyStyle": true,
+    "kidFriendly": true,
+    "kidFriendlyScore": 2,
+    "costPerServeAUD": 8,
+    "costPerServeGBP": 5.2,
+    "source": "https://www.recipetineats.com/slow-cooker-pork-loin-roast/"
+  },
+  {
+    "id": "r401",
+    "name": "Pork Carnitas",
+    "description": "Mexican slow cooker pulled pork — spiced, slow cooked then crisped under the grill. The best tacos you will make at home.",
+    "baseServings": 8,
+    "cookTimeMinutes": 480,
+    "difficulty": "easy",
+    "cookingStyle": "mixed",
+    "healthTags": [
+      "standard",
+      "high-protein"
+    ],
+    "budgetTags": [
+      "standard"
+    ],
+    "leftoversFriendly": true,
+    "batchCook": true,
+    "mealType": "dinner",
+    "estimatedCostBand": "medium",
+    "ingredients": [
+      {
+        "name": "Pork shoulder",
+        "quantity": 2000,
+        "unit": "g",
+        "category": "proteins"
+      },
+      {
+        "name": "Orange juice",
+        "quantity": 125,
+        "unit": "ml",
+        "category": "fruit"
+      },
+      {
+        "name": "Lime juice",
+        "quantity": 2,
+        "unit": "tbsp",
+        "category": "fruit"
+      },
+      {
+        "name": "Ground cumin",
+        "quantity": 2,
+        "unit": "tsp",
+        "category": "herbs"
+      },
+      {
+        "name": "Dried oregano",
+        "quantity": 1,
+        "unit": "tsp",
+        "category": "herbs"
+      },
+      {
+        "name": "Smoked paprika",
+        "quantity": 1,
+        "unit": "tsp",
+        "category": "herbs"
+      },
+      {
+        "name": "Garlic",
+        "quantity": 4,
+        "unit": "cloves",
+        "category": "herbs"
+      },
+      {
+        "name": "Onion",
+        "quantity": 1,
+        "unit": "whole",
+        "category": "vegetables"
+      },
+      {
+        "name": "Chipotle in adobo sauce",
+        "quantity": 2,
+        "unit": "tbsp",
+        "category": "condiments",
+        "optional": true
+      },
+      {
+        "name": "Chicken stock",
+        "quantity": 125,
+        "unit": "ml",
+        "category": "pantry"
+      },
+      {
+        "name": "Salt",
+        "quantity": 2,
+        "unit": "tsp",
+        "category": "pantry"
+      },
+      {
+        "name": "Corn or flour tortillas",
+        "quantity": 16,
+        "unit": "whole",
+        "category": "grains"
+      },
+      {
+        "name": "Coriander leaves",
+        "quantity": 1,
+        "unit": "handful",
+        "category": "herbs",
+        "optional": true
+      },
+      {
+        "name": "Lime wedges",
+        "quantity": 2,
+        "unit": "whole",
+        "category": "fruit",
+        "optional": true
+      }
+    ],
+    "instructions": [
+      "Mix cumin, oregano, paprika and salt into a dry rub. Coat pork shoulder all over.",
+      "Place sliced onion and garlic in slow cooker base.",
+      "Set pork on top. Mix orange juice, lime juice, chipotle and stock and pour around pork.",
+      "Cook on LOW for 8-10 hours or HIGH for 5 hours until pork shreds easily.",
+      "Remove pork and shred coarsely with two forks.",
+      "Spread shredded pork on a foil-lined tray. Spoon over a few tablespoons of cooking juices.",
+      "Grill/broil on HIGH for 5-7 minutes until edges crisp. Serve in warm tortillas."
+    ],
+    "proteinType": "pork",
+    "cuisineType": "mexican",
+    "seasonTags": [
+      "all"
+    ],
+    "familyStyle": true,
+    "kidFriendly": true,
+    "kidFriendlyScore": 1,
+    "costPerServeAUD": 6.5,
+    "costPerServeGBP": 4.2,
+    "source": "https://www.recipetineats.com/pork-carnitas-mexican-slow-cooker-pulled-pork/"
   }
 ]
