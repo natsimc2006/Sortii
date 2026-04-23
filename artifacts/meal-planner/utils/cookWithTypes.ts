@@ -13,12 +13,23 @@ export interface RecipeMatchResult {
   score: number;
   missingIngredients: string[];
   matchedIngredients: string[];
-  category: "make_now" | "very_close";
+  category: "ready_now" | "almost_there";
   cookTimeMinutes: number;
   difficulty: "easy" | "moderate";
   reason: string;
+  missingNote: string;
   isOnePan: boolean;
   isKidFriendly: boolean;
+}
+
+export interface RescueMealIdea {
+  id: string;
+  title: string;
+  reason: string;
+  steps: string[];
+  cookTime: string;
+  effort: string;
+  matchedIngredients: string[];
 }
 
 export interface FallbackMealIdea {
@@ -30,7 +41,8 @@ export interface FallbackMealIdea {
 }
 
 export interface CookWithResults {
-  makeNow: RecipeMatchResult[];
-  veryClose: RecipeMatchResult[];
+  readyNow: RecipeMatchResult[];
+  almostThere: RecipeMatchResult[];
+  rescue: RescueMealIdea[];
   fallback: FallbackMealIdea | null;
 }

@@ -1,0 +1,401 @@
+Please update the new **Cook With What’s Already Here / Fridge Rescue** feature inside Sortii to improve both the UX flow and the recipe matching logic.
+
+The current version is close, but right now the results are too loose and sometimes suggest meals that still require the user to go out and buy a key ingredient. That breaks the promise of the feature.
+
+The updated version should feel stricter, smarter, and more genuinely useful on a real no-shop, low-energy night.
+
+---
+
+## Main goals
+
+1. Make **free text input the primary option**
+2. Add a **homepage shortcut** into the Home screen
+3. Tighten the recipe matching logic so **“You can make this now” really means now**
+4. Make **“Very close” much stricter**
+5. Add a new section for **simple rescue meals** built from what the user has
+6. Improve result labels and copy so they feel more honest and useful
+7. Add any layout fixes needed so the results screen feels polished and not cramped by the bottom nav
+
+---
+
+# 1. Home screen shortcut
+
+Add a subtle but visible shortcut to this feature on the Home screen.
+
+Best placement:
+Inside the existing **Tonight’s Dinner** card.
+
+If dinners are not sorted yet, include a contextual quick action such as:
+
+* **Use what’s in the fridge →**
+  or
+* **Cook with what’s here →**
+
+This should feel like a useful rescue shortcut, not like a new major module tile.
+
+Do not clutter the home screen with a large new card if it can be avoided. This should feel like a natural action within the dinner context.
+
+---
+
+# 2. Reorder the input flow
+
+The current screen makes guided prompts feel like the main input and free text feel secondary.
+
+Please reverse that.
+
+## New input order
+
+### First: free text input at the top
+
+This should be the primary input path.
+
+At the top of the screen, directly under the intro card, place:
+
+**Label:**
+Just tell me what you’ve got
+
+**Placeholder example:**
+e.g. eggs, wraps, cheese, frozen peas, half an onion… need something easy
+
+This should feel like the easiest path for a tired user.
+
+### Second: guided prompt sections below
+
+Keep the chip-based sections, but place them underneath the free text input.
+
+Add a light divider or supporting line such as:
+
+**Or tap a few things instead**
+
+The guided prompts are still useful, but they should feel like the structured backup route rather than the main one.
+
+---
+
+# 3. Tighten recipe matching logic
+
+This is the most important part.
+
+The app currently shows recipes in “You can make this now” or similar states even when a key ingredient is missing. That needs to stop.
+
+The feature promise is:
+**Help me cook with what I already have.**
+
+So the result logic must be much stricter.
+
+---
+
+## Introduce 3 match types
+
+### A. Ready now
+
+This should only show recipes that the user can genuinely make right now.
+
+### B. Almost there
+
+This should only show recipes missing one small non-core item at most.
+
+### C. Sortii rescue options
+
+These are simple make-do meal ideas generated from ingredient patterns or fallback logic, not necessarily direct recipe dataset matches.
+
+---
+
+# 4. Add stricter scoring and filtering rules
+
+Please update the internal scoring system with the following logic.
+
+## Pantry assumptions still apply
+
+Always assume these exist:
+
+* salt
+* pepper
+* oil
+* water
+
+These should never count as missing.
+
+---
+
+## Core ingredient logic
+
+For each recipe, classify ingredients into practical groups if possible:
+
+* **core protein**
+* **core base / carb**
+* **key sauce or main flavour base**
+* **supporting ingredients**
+* **optional ingredients**
+* **pantry staples**
+
+If the dataset does not already support this, approximate it with practical rules:
+
+* protein and carb/base matter most
+* first-listed ingredients matter more
+* sauces like tinned tomatoes, curry paste, cream, stock, pesto etc can be key ingredients depending on recipe type
+* herbs, garnish, or flavour extras matter less
+
+---
+
+## Hard exclusion rule
+
+Before a recipe can be shown, check whether it is missing a core ingredient.
+
+If a recipe is missing any of the following, it must NOT appear in **Ready now**:
+
+* the main protein if the recipe depends on one
+* the main base carb or starch
+* the key sauce or main binding ingredient
+* any obvious central component without which the recipe is no longer meaningfully that recipe
+
+Examples:
+
+* no chicken → do not show chicken-based recipe as Ready now
+* no rice → do not show fried rice as Ready now
+* no tinned tomatoes → do not show tomato pasta as Ready now unless the recipe genuinely works without it
+* no arborio rice → do not show risotto as Ready now
+
+---
+
+## Ready now rules
+
+A recipe can only appear in **Ready now** if:
+
+* all core ingredients are present
+* only assumed pantry basics are missing
+* or only clearly optional minor extras are missing
+
+This section should feel trustworthy.
+
+If the user taps into this section, they should not discover the meal quietly depends on a shop trip.
+
+---
+
+## Almost there rules
+
+This section must be tightened significantly.
+
+A recipe can only appear in **Almost there** if:
+
+* it is missing **1 small non-core ingredient maximum**
+* and that ingredient is realistically skippable, swappable, or non-essential
+
+Do not allow:
+
+* missing protein
+* missing base carb/starch
+* missing central sauce base
+* multiple missing ingredients unless they are extremely minor
+
+Examples:
+Allowed:
+
+* fried rice missing soy sauce
+* cheesy pasta missing lemon
+* wraps missing mayo
+
+Not allowed:
+
+* congee missing chicken
+* pasta bake missing pasta sauce
+* risotto missing mushrooms and stock and rice type
+
+If a recipe is missing more than one meaningful ingredient, it should not be shown in Almost there.
+
+---
+
+# 5. Add a “Sortii rescue options” section
+
+Add a new section after Ready now and before or after Almost there, whichever works best visually.
+
+Suggested title:
+**Sortii rescue options**
+
+This section should contain practical make-do meal ideas based on ingredient patterns, not just formal recipe matches.
+
+This is important because real users on low-energy nights often need:
+
+* something fast
+* something not too fussy
+* something a normal tired person would actually throw together
+
+Examples of rescue-style logic:
+
+* eggs + rice + frozen veg → quick egg fried rice
+* wraps + cheese + beans → toasted wraps / quesadillas
+* pasta + cheese + butter/oil → simple cheesy pasta
+* bread + cheese + tuna → tuna melts
+* potatoes + cheese + beans → loaded potatoes
+* noodles + mixed veg + egg → pantry noodle bowl
+
+These should feel practical and slightly improvised, but still helpful and realistic.
+
+These rescue ideas can come from:
+
+* fallback AI logic
+* a simple pattern-based rescue meal library
+* hybrid fallback logic
+
+But they should not feel like formal gourmet recipes.
+
+---
+
+# 6. Improve result card labels
+
+The current labels are a bit too generous.
+
+Please replace the current status labels with clearer ones:
+
+### Use:
+
+* **Ready now**
+* **Almost there**
+* **Rescue option**
+
+Avoid labels that imply full readiness when a recipe still needs something important.
+
+---
+
+# 7. Improve result card copy
+
+Make the reason text more honest and less “just pop to the shops.”
+
+## Better phrasing examples
+
+Instead of:
+
+* missing just crushed tomatoes
+
+Use:
+
+* **Needs: crushed tomatoes**
+* **Better if you have: crushed tomatoes**
+* **Works best with: soy sauce**
+* **Optional extra: lemon**
+
+If something is actually required, be direct.
+If it is skippable, say that clearly.
+
+Do not make missing ingredients sound smaller than they are.
+
+---
+
+# 8. Add stronger section ordering logic
+
+Please change result ordering to this priority:
+
+1. **Ready now**
+2. **Sortii rescue options**
+3. **Almost there**
+
+Why:
+If the user is tired and needs dinner now, the app should first show:
+
+* genuine exact or strict matches
+* then realistic improvised rescue meals
+* only then meals that are close but still need something extra
+
+This will make the feature feel more useful and less frustrating.
+
+---
+
+# 9. Improve free text parsing slightly
+
+The current input already supports free text, but because it is becoming the primary path, make the parser a bit stronger.
+
+Please improve parsing so it can extract:
+
+* ingredients
+* likely synonyms
+* intent words
+
+Examples:
+
+* “tinned corned beef, rice, pasta, cheese” → corned beef, rice, pasta, cheese
+* “need something quick and easy” → fastest, low effort
+* “random freezer veg” → mixed veg
+* “half an onion” → onion
+* “some shredded cheese” → cheese
+
+Do not over-engineer this, just make it more practical and forgiving.
+
+---
+
+# 10. UI polish updates
+
+Please make these visual improvements too:
+
+## On the input screen
+
+* move free text input to the top
+* keep intro card
+* guided sections below
+* preserve calm spacing and hierarchy
+
+## On the results screen
+
+* add more bottom padding so cards do not feel cut by the sticky nav
+* ensure result sections have strong visual separation
+* keep cards clean and readable
+* make the whole page feel slightly tighter and more confident
+
+---
+
+# 11. Empty and low-confidence behaviour
+
+If the user has entered very little, do not return a long list of weak matches.
+
+Instead:
+
+* show 1 to 2 rescue options
+* optionally prompt the user to add 1 or 2 more ingredients for better results
+
+If internal recipe match confidence is low:
+
+* suppress weak “Almost there” clutter
+* prioritise rescue options instead
+
+The feature should prefer **fewer, more believable suggestions** over a long list of technically related but unrealistic options.
+
+---
+
+# 12. Technical implementation guidance
+
+Please update the matching engine with practical thresholds and hard filters.
+
+Suggested structure:
+
+* parse and normalise all entered ingredients
+* extract preference modifiers from text and chips
+* score internal recipes
+* apply hard exclusion for missing core ingredients
+* build strict Ready now matches
+* build tight Almost there matches
+* generate rescue options from pattern logic / fallback AI only when appropriate
+* render sections in priority order
+
+Please comment the thresholds clearly in code so they can be tuned later.
+
+---
+
+# 13. Final success criteria
+
+After this update, the experience should feel like this:
+
+A user can type:
+**“tinned corned beef, rice, pasta, cheese”**
+
+And the app should:
+
+* first show anything they can genuinely make now
+* then show practical rescue meals built from those ingredients
+* avoid surfacing formal recipes that quietly depend on shopping
+* feel more trustworthy, more useful, and more Sortii
+
+The updated feature should feel like:
+**“Here’s what you can actually do with the bits you’ve got.”**
+
+Not:
+**“Here are some recipes that sort of relate to your ingredients.”**
+
+Please implement the UX reorder, homepage shortcut, stricter scoring logic, new rescue section, and cleaner result states in one pass.

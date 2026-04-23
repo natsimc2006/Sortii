@@ -445,32 +445,44 @@ export default function HomeTab() {
           </View>
 
           {/* B — Tonight's dinner */}
-          <TouchableOpacity
-            onPress={() =>
-              plannedCount === 0
-                ? router.push("/(tabs)/preferences?flow=meals")
-                : router.push("/(tabs)/meals")
-            }
-            activeOpacity={0.8}
-            style={[styles.card, styles.cardNeutral, styles.cardRailTeal]}
-          >
-            <View style={styles.cardRow}>
-              <View style={{ flex: 1 }}>
-                <Text style={[styles.cardLabel, { color: tonightRecipe ? TEAL : GOLD }]}>
-                  TONIGHT'S DINNER
-                </Text>
-                <Text style={styles.cardTitle}>
-                  {tonightRecipe ? tonightRecipe.name : "Dinners not sorted yet."}
-                </Text>
-                <Text style={[styles.cardSub, { color: tonightRecipe ? TEAL : TEXT_MUTED }]}>
-                  {tonightRecipe ? "Sorted. ✓" : "Takes 60 seconds. →"}
-                </Text>
+          <View style={[styles.card, styles.cardNeutral, styles.cardRailTeal, { padding: 0, overflow: "hidden" }]}>
+            <TouchableOpacity
+              onPress={() =>
+                plannedCount === 0
+                  ? router.push("/(tabs)/preferences?flow=meals")
+                  : router.push("/(tabs)/meals")
+              }
+              activeOpacity={0.8}
+              style={{ padding: 15 }}
+            >
+              <View style={styles.cardRow}>
+                <View style={{ flex: 1 }}>
+                  <Text style={[styles.cardLabel, { color: tonightRecipe ? TEAL : GOLD }]}>
+                    TONIGHT'S DINNER
+                  </Text>
+                  <Text style={styles.cardTitle}>
+                    {tonightRecipe ? tonightRecipe.name : "Dinners not sorted yet."}
+                  </Text>
+                  <Text style={[styles.cardSub, { color: tonightRecipe ? TEAL : TEXT_MUTED }]}>
+                    {tonightRecipe ? "Sorted. ✓" : "Takes 60 seconds. →"}
+                  </Text>
+                </View>
+                <View style={[styles.cardChevron, { backgroundColor: (tonightRecipe ? TEAL : GOLD) + "12" }]}>
+                  <Feather name="chevron-right" size={16} color={tonightRecipe ? TEAL : GOLD} />
+                </View>
               </View>
-              <View style={[styles.cardChevron, { backgroundColor: (tonightRecipe ? TEAL : GOLD) + "12" }]}>
-                <Feather name="chevron-right" size={16} color={tonightRecipe ? TEAL : GOLD} />
-              </View>
-            </View>
-          </TouchableOpacity>
+            </TouchableOpacity>
+            {!tonightRecipe && (
+              <TouchableOpacity
+                onPress={() => router.push("/(tabs)/cook-with" as any)}
+                style={styles.fridgeShortcut}
+                activeOpacity={0.7}
+              >
+                <Feather name="search" size={11} color={TEAL} />
+                <Text style={styles.fridgeShortcutText}>Cook with what's in the fridge →</Text>
+              </TouchableOpacity>
+            )}
+          </View>
 
           {/* C — Family */}
           {(() => {
@@ -1105,6 +1117,21 @@ const styles = StyleSheet.create({
   cardRailTeal: { borderLeftWidth: 3.5, borderLeftColor: TEAL },
   cardRailPlum: { borderLeftWidth: 3.5, borderLeftColor: PLUM },
   cardRailGold: { borderLeftWidth: 3.5, borderLeftColor: GOLD },
+  fridgeShortcut: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: TEAL + "28",
+    backgroundColor: TEAL + "07",
+  },
+  fridgeShortcutText: {
+    fontSize: 12,
+    fontFamily: "Inter_500Medium",
+    color: TEAL,
+  },
   cardRow: { flexDirection: "row", alignItems: "center", gap: 10 },
   cardLabel: {
     fontSize: 10,
