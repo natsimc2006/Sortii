@@ -799,7 +799,7 @@ export default function MealsScreen() {
           </View>
           <View style={{ flex: 1, gap: 2 }}>
             <Text style={[styles.rescueEntryTitle, { color: C.text }]}>
-              Cook With What's Already Here
+              Fridge Rescue
             </Text>
             <Text style={[styles.rescueEntrySub, { color: C.textMuted }]}>
               Tell me what you've got and I'll sort dinner.

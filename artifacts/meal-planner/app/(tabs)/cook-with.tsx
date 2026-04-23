@@ -442,7 +442,7 @@ export default function CookWithScreen() {
           <Text style={[st.backText, { color: C.textSecondary }]}>Meals</Text>
         </TouchableOpacity>
         <Text style={[st.headerTitle, { color: C.text }]}>
-          Cook With What's Already Here
+          Fridge Rescue
         </Text>
       </View>
 
@@ -452,9 +452,10 @@ export default function CookWithScreen() {
       >
         <ScrollView
           ref={scrollRef}
+          style={{ flex: 1 }}
           contentContainerStyle={[
             st.scrollContent,
-            { paddingBottom: insets.bottom + 100 },
+            { paddingBottom: 24 },
           ]}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}

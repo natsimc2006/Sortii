@@ -66,9 +66,21 @@ const TEXT_MUTED= "#888888";
 const DAYS     = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
 const DAY_ABBR = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
 
-function getTodayName() {
-  const d = new Date().getDay();
-  return DAYS[d === 0 ? 6 : d - 1];
+function getTodayName(): string {
+  // Use Intl to get the correct local weekday.
+  // On real devices the OS timezone is used automatically.
+  // In web/preview environments that run in UTC (e.g. Replit canvas),
+  // we fall back to Australia/Sydney since this is an AU-first app.
+  try {
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const effective = tz === "UTC" || tz === "Etc/UTC" ? "Australia/Sydney" : tz;
+    const raw = new Date().toLocaleDateString("en-AU", { weekday: "long", timeZone: effective });
+    const cap = raw.charAt(0).toUpperCase() + raw.slice(1);
+    return DAYS.find((d) => d === cap) ?? DAYS[new Date().getDay() === 0 ? 6 : new Date().getDay() - 1]!;
+  } catch {
+    const d = new Date().getDay();
+    return DAYS[d === 0 ? 6 : d - 1]!;
+  }
 }
 
 function getGreeting() {
@@ -479,7 +491,7 @@ export default function HomeTab() {
                 activeOpacity={0.7}
               >
                 <Feather name="search" size={11} color={TEAL} />
-                <Text style={styles.fridgeShortcutText}>Cook with what's in the fridge →</Text>
+                <Text style={styles.fridgeShortcutText}>Fridge Rescue →</Text>
               </TouchableOpacity>
             )}
           </View>
@@ -946,7 +958,7 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   headerLeft: { flex: 1, gap: 2 },
-  wordmarkLogo: { width: 100, height: 32 },
+  wordmarkLogo: { width: "100%", height: 44 },
   wordmarkGold: { color: GOLD },
   greeting: { fontSize: 13, fontFamily: "Inter_400Regular", color: TEXT_MUTED },
   summary: {

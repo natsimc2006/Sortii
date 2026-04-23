@@ -350,10 +350,11 @@ const styles = StyleSheet.create({
 
   // ── Welcome ─────────────────────────────────────────────────────
   welcomeLogo: {
-    width: 160,
-    height: 60,
+    width: "100%",
+    height: 110,
     marginTop: 32,
     marginBottom: 8,
+    alignSelf: "center",
   },
   welcomeTagline: {
     fontFamily: "Inter_400Regular",
