@@ -1,6 +1,7 @@
 import { Feather } from "@expo/vector-icons";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
+  ActionSheetIOS,
   Alert,
   Animated,
   Keyboard,
@@ -187,20 +188,31 @@ function solveJuggleOnDevice(
     };
   }
 
-  // Assign each event to the adult with lowest load on that day
+  // Assign each event — prefer the adult in personIds, fall back to load-balance
   const adultLoadMap = new Map<string, Map<DayOfWeek, number>>();
   for (const a of adults) adultLoadMap.set(a.id, new Map());
   const assignments = new Map<string, string>(); // eventId → adultId
 
   for (const ev of events) {
-    let best = adults[0]!;
-    let bestLoad = Infinity;
-    for (const a of adults) {
-      const load = adultLoadMap.get(a.id)?.get(ev.day) ?? 0;
-      if (load < bestLoad) { bestLoad = load; best = a; }
+    // Check if an adult is explicitly named in personIds
+    const explicitAdult = ev.personIds
+      .map((id) => memberLookup.get(id))
+      .find((m) => m?.role === "adult");
+
+    let chosen: FamilyMember;
+    if (explicitAdult) {
+      chosen = explicitAdult;
+    } else {
+      let best = adults[0]!;
+      let bestLoad = Infinity;
+      for (const a of adults) {
+        const load = adultLoadMap.get(a.id)?.get(ev.day) ?? 0;
+        if (load < bestLoad) { bestLoad = load; best = a; }
+      }
+      chosen = best;
     }
-    assignments.set(ev.id, best.id);
-    const dayMap = adultLoadMap.get(best.id)!;
+    assignments.set(ev.id, chosen.id);
+    const dayMap = adultLoadMap.get(chosen.id)!;
     dayMap.set(ev.day, (dayMap.get(ev.day) ?? 0) + 1);
   }
 
@@ -248,17 +260,49 @@ function solveJuggleOnDevice(
         const aEnd = _toMins(a.endTime) || _toMins(a.time) + 60;
         const bStart = _toMins(b.time);
         if (bStart < aEnd) {
+          const aIsRecurring = a.repeat !== "none";
+          const bIsRecurring = b.repeat !== "none";
+
+          // Find other adults free during this conflict window
+          const freeAdults = adults.filter((oa) => {
+            if (oa.id === adultId) return false;
+            const oaDayEvs = (adultEventsMap.get(oa.id) ?? []).filter((e) => e.day === day);
+            return !oaDayEvs.some((e) => {
+              const eStart = _toMins(e.time);
+              const eEnd = _toMins(e.endTime) || _toMins(e.time) + 60;
+              return eStart < aEnd && eEnd > bStart;
+            });
+          });
+
+          const aEndLabel = a.endTime ? a.endTime : (() => {
+            const endM = (_toMins(a.time) + 60);
+            return `${String(Math.floor(endM / 60)).padStart(2, "0")}:${String(endM % 60).padStart(2, "0")}`;
+          })();
+
+          let description = `${adult.name} has overlapping commitments on ${day}.\n${a.title} runs until ${aEndLabel}. ${b.title} is at ${b.time}.`;
+          let recommendation = "";
+
+          if (aIsRecurring && !bIsRecurring) {
+            recommendation = `${b.title} is a one-off — reschedule it to after ${aEndLabel} to keep the regular ${a.title} in place.`;
+          } else if (!aIsRecurring && bIsRecurring) {
+            recommendation = `${a.title} is a one-off — reschedule it to avoid clashing with the regular ${b.title}.`;
+          } else {
+            recommendation = `Both "${a.title}" and "${b.title}" are on at the same time. Which is higher priority?`;
+          }
+
+          if (freeAdults.length > 0) {
+            recommendation += `\n\n${freeAdults[0]!.name}'s free from ${b.time} — could they cover one of these?`;
+          } else {
+            recommendation += `\nOr reschedule ${aIsRecurring && !bIsRecurring ? b.title : a.title} to after ${aEndLabel}.`;
+          }
+
           conflicts.push({
             id: `overlap-${a.id}-${b.id}`, type: "overlap", severity: "warning",
-            description: `${adult.name} has overlapping events on ${day}: "${a.title}" and "${b.title}".`,
+            description,
             involved_events: [a.id, b.id], involved_adults: [adult.name],
-            suggested_contacts: [],
-            recommendation: b.isAppointment
-              ? `"${b.title}" is a fixed appointment for ${adult.name} — rearrange "${a.title}" if possible.`
-              : `Consider asking someone else to cover "${b.title}".`,
-            options: b.isAppointment
-              ? [`Move "${a.title}" to a different time`, `Check if "${a.title}" can be rescheduled`]
-              : [`Ask another adult to take ${b.title}`, `Adjust time of ${b.title}`],
+            suggested_contacts: freeAdults.map((fa) => fa.name),
+            recommendation,
+            options: [],
           });
         }
       }
@@ -549,21 +593,13 @@ function JuggleResultsContent({
   const ws            = juggleResult.weekend_summary ?? { total_events: 0, conflicts_resolved: 0, tight_windows: 0, impossible_clashes: 0 };
   const adultPlans    = juggleResult.adult_plans ?? [];
   const conflicts     = juggleResult.conflicts ?? [];
-  const allAdultNames = adultPlans.map((p) => p.adult);
-
-  const [swapAssignments, setSwapAssignments] = useState<Record<string, string>>(
-    juggleResult.swapOverrides ?? {}
-  );
-  const [swappingEventId, setSwappingEventId] = useState<string | null>(null);
-  const [swappedFlash, setSwappedFlash]       = useState<string | null>(null);
-
   const planRows = adultPlans.flatMap((p) =>
     p.schedule.map((s) => {
       const evtItem = (juggleResult.events ?? []).find((e) => e.id === s.event_id);
       return {
         time:     s.time,
         endTime:  evtItem?.end_time ?? null as string | null,
-        adult:    swapAssignments[s.event_id] ?? p.adult,
+        adult:    p.adult,
         child:    s.child,
         activity: s.activity,
         location: s.location,
@@ -571,27 +607,6 @@ function JuggleResultsContent({
       };
     })
   ).sort((a, b) => a.time.localeCompare(b.time));
-
-  function handleSwap(event_id: string) {
-    if (allAdultNames.length === 2) {
-      const cur   = planRows.find((r) => r.event_id === event_id)?.adult ?? allAdultNames[0];
-      const other = allAdultNames.find((a) => a !== cur) ?? allAdultNames[0]!;
-      setSwapAssignments((prev) => ({ ...prev, [event_id]: other }));
-      onSwapApplied?.(event_id, other);
-      setSwappedFlash(event_id);
-      setTimeout(() => setSwappedFlash(null), 2000);
-    } else {
-      setSwappingEventId(swappingEventId === event_id ? null : event_id);
-    }
-  }
-
-  function pickAdult(event_id: string, adult: string) {
-    setSwapAssignments((prev) => ({ ...prev, [event_id]: adult }));
-    onSwapApplied?.(event_id, adult);
-    setSwappingEventId(null);
-    setSwappedFlash(event_id);
-    setTimeout(() => setSwappedFlash(null), 2000);
-  }
 
   const impossible = ws.impossible_clashes ?? 0;
   const tight      = ws.tight_windows ?? 0;
@@ -705,19 +720,10 @@ function JuggleResultsContent({
                     <Text style={styles.juggleTimePillText}>{row.time}{row.endTime ? `–${row.endTime}` : ""}</Text>
                   </View>
                 </View>
-                <View style={[styles.jugglePlanCellWho, { gap: 4 }]}>
+                <View style={styles.jugglePlanCellWho}>
                   <Text style={styles.jugglePlanWhoText}>
                     {row.adult}{row.child ? ` · ${row.child}` : ""}
                   </Text>
-                  {swappedFlash === row.event_id ? (
-                    <View style={styles.juggleSwappedPill}>
-                      <Text style={styles.juggleSwappedPillText}>Swapped ✓</Text>
-                    </View>
-                  ) : (
-                    <TouchableOpacity style={styles.juggleSwapPill} onPress={() => handleSwap(row.event_id)} activeOpacity={0.75}>
-                      <Text style={styles.juggleSwapPillText}>⇄ Swap</Text>
-                    </TouchableOpacity>
-                  )}
                 </View>
                 <View style={styles.jugglePlanCellWhere}>
                   <Text style={styles.jugglePlanWhereText} numberOfLines={2}>
@@ -725,16 +731,6 @@ function JuggleResultsContent({
                   </Text>
                 </View>
               </View>
-              {swappingEventId === row.event_id && allAdultNames.length >= 3 && (
-                <View style={styles.jugglePickerRow}>
-                  <Text style={styles.jugglePickerLabel}>Swap to:</Text>
-                  {allAdultNames.filter((a) => a !== row.adult).map((a) => (
-                    <TouchableOpacity key={a} style={styles.jugglePickerPill} onPress={() => pickAdult(row.event_id, a)} activeOpacity={0.8}>
-                      <Text style={styles.jugglePickerPillText}>{a}</Text>
-                    </TouchableOpacity>
-                  ))}
-                </View>
-              )}
             </View>
           ))}
         </View>
@@ -747,7 +743,7 @@ function JuggleResultsContent({
           {adultPlans.map((plan) => {
             const member = members.find((m) => m.name === plan.adult);
             return (
-              <View key={plan.adult} style={styles.juggleAdultCard}>
+              <View key={plan.adult} style={[styles.juggleAdultCard, { borderLeftColor: member?.color ?? TEAL }]}>
                 <View style={styles.juggleAdultCardHeader}>
                   <View style={[styles.juggleAdultDot, { backgroundColor: member?.color ?? TEAL }]} />
                   <Text style={styles.juggleAdultName}>{plan.adult}</Text>
@@ -773,20 +769,6 @@ function JuggleResultsContent({
                     <Text style={styles.juggleFreeWindow}>{insight}</Text>
                   ) : null;
                 })()}
-                <TouchableOpacity
-                  style={styles.juggleAdultSendBtn}
-                  onPress={() => {
-                    const lines = [`Hi ${plan.adult} — here's your bit:`, ""];
-                    plan.schedule.forEach((s) =>
-                      lines.push(`${s.time}  ${s.activity}${s.child ? ` with ${s.child}` : ""}${s.location ? ` · ${s.location}` : ""}`)
-                    );
-                    lines.push("", "— Sent from Sortii.");
-                    onShare(lines.join("\n"));
-                  }}
-                  activeOpacity={0.8}
-                >
-                  <Text style={styles.juggleAdultSendBtnText}>{plan.adult}'s list →</Text>
-                </TouchableOpacity>
               </View>
             );
           })}
@@ -797,52 +779,15 @@ function JuggleResultsContent({
       {conflicts.length > 0 && (
         <View style={styles.juggleConflictCard}>
           <Text style={styles.juggleConflictLabel}>HEADS UP</Text>
-          {conflicts.map((c, i) => {
-            const involvedJuggleEvs = (juggleResult.events ?? []).filter(
-              (e) => (c.involved_events ?? []).includes(e.id)
-            );
-            const conflictHasChild = involvedJuggleEvs.some(
-              (e) => e.child !== null && e.child !== undefined && e.child !== ""
-            );
-            return (
-              <View key={i} style={i > 0 ? { marginTop: 12, paddingTop: 12, borderTopWidth: 1, borderTopColor: "#F3E0DC" } : undefined}>
-                <Text style={styles.juggleConflictDesc}>⚠ {c.description}</Text>
-                {c.recommendation ? <Text style={styles.juggleConflictRec}>{c.recommendation}</Text> : null}
-                {c.options.map((o, j) => (
-                  <Text key={j} style={styles.juggleConflictOption}>· {o}</Text>
-                ))}
-                {conflictHasChild && (
-                  <View style={styles.carpoolClashBox}>
-                    <Feather name="users" size={13} color={TEAL} />
-                    {carpoolContacts.length > 0 ? (
-                      <View style={{ flex: 1 }}>
-                        <Text style={styles.carpoolClashLabel}>Carpool helpers:</Text>
-                        {carpoolContacts.map((cc) => (
-                          <Text key={cc.id} style={styles.carpoolClashContact}>
-                            · {cc.name}{cc.phone ? ` — ${cc.phone}` : ""}
-                          </Text>
-                        ))}
-                      </View>
-                    ) : (
-                      <TouchableOpacity onPress={onClose} activeOpacity={0.8} style={{ flex: 1 }}>
-                        <Text style={styles.carpoolClashLink}>Add carpool contacts →</Text>
-                      </TouchableOpacity>
-                    )}
-                  </View>
-                )}
-              </View>
-            );
-          })}
+          {conflicts.map((c, i) => (
+            <View key={i} style={i > 0 ? { marginTop: 12, paddingTop: 12, borderTopWidth: 1, borderTopColor: "#F3E0DC" } : undefined}>
+              <Text style={styles.juggleConflictDesc}>⚠ {c.description}</Text>
+              {c.recommendation ? <Text style={styles.juggleConflictRec}>{c.recommendation}</Text> : null}
+            </View>
+          ))}
         </View>
       )}
 
-      {/* ── 5. Worth knowing ── */}
-      {juggleResult.smart_note ? (
-        <View style={styles.juggleWorthKnowingCard}>
-          <Text style={styles.juggleWorthKnowingLabel}>✦ WORTH KNOWING</Text>
-          <Text style={styles.juggleWorthKnowingText}>{juggleResult.smart_note}</Text>
-        </View>
-      ) : null}
 
       {/* ── 6. Actions ── */}
       <View style={styles.resultActionsRow}>
@@ -879,70 +824,33 @@ function JuggleResultsContent({
   );
 }
 
-// ── SavedBanner ────────────────────────────────────────────────────────────────
+// ── SavedToast ─────────────────────────────────────────────────────────────────
 type BannerType = "first" | "subsequent" | "edited";
 
-function SavedBanner({
-  type,
-  eventTitle,
-  onReview,
-  onAddAnother,
-  onDismiss,
-}: {
-  type: BannerType;
-  eventTitle: string;
-  onReview: () => void;
-  onAddAnother: () => void;
-  onDismiss: () => void;
-}) {
-  const opacity = useRef(new Animated.Value(0)).current;
-  const translateY = useRef(new Animated.Value(-8)).current;
+function SavedToast({ visible }: { visible: boolean }) {
+  const translateY = useRef(new Animated.Value(80)).current;
+  const opacity    = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    Animated.parallel([
-      Animated.timing(opacity,     { toValue: 1, duration: 250, useNativeDriver: true }),
-      Animated.spring(translateY,  { toValue: 0, tension: 90, friction: 14, useNativeDriver: true }),
-    ]).start();
-  }, []);
-
-  const headline =
-    type === "first"      ? "Saved. One thing down."
-    : type === "edited"   ? "Updated."
-    : "Saved. Plan updated.";
-
-  const reviewLabel =
-    type === "first" ? "Review week" : "Review full plan";
-
-  const subline =
-    type === "first"
-      ? "Want us to map the week?"
-      : type === "edited"
-      ? "The plan reflects your change."
-      : "We've sorted the week around it.";
+    if (visible) {
+      Animated.parallel([
+        Animated.spring(translateY, { toValue: 0, tension: 80, friction: 10, useNativeDriver: true }),
+        Animated.timing(opacity,    { toValue: 1, duration: 200, useNativeDriver: true }),
+      ]).start();
+    } else {
+      Animated.parallel([
+        Animated.timing(translateY, { toValue: 80, duration: 200, useNativeDriver: true }),
+        Animated.timing(opacity,    { toValue: 0,  duration: 180, useNativeDriver: true }),
+      ]).start();
+    }
+  }, [visible]);
 
   return (
-    <Animated.View style={[styles.savedBanner, { opacity, transform: [{ translateY }] }]}>
-      <View style={styles.savedBannerLeft}>
-        <View style={styles.savedBannerDot} />
-        <View style={{ flex: 1 }}>
-          <Text style={styles.savedBannerHeadline}>{headline}</Text>
-          <Text style={styles.savedBannerSub}>{subline}</Text>
-        </View>
-      </View>
-      <View style={styles.savedBannerActions}>
-        {type !== "edited" && (
-          <TouchableOpacity style={styles.bannerReviewBtn} onPress={onReview} activeOpacity={0.85}>
-            <Text style={styles.bannerReviewBtnText}>{reviewLabel}</Text>
-          </TouchableOpacity>
-        )}
-        <TouchableOpacity style={styles.bannerAddBtn} onPress={onAddAnother} activeOpacity={0.85}>
-          <Feather name="plus" size={13} color={TEAL} />
-          <Text style={styles.bannerAddBtnText}>Add another</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={onDismiss} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
-          <Feather name="x" size={14} color={TEXT_MUTED} />
-        </TouchableOpacity>
-      </View>
+    <Animated.View
+      style={[styles.savedToast, { opacity, transform: [{ translateY }] }]}
+      pointerEvents="none"
+    >
+      <Text style={styles.savedToastText}>Saved. We've sorted the week around it.</Text>
     </Animated.View>
   );
 }
@@ -1219,7 +1127,6 @@ function EventCard({
   onDelete: () => void;
   aiDriver?: string;
 }) {
-  const [expanded, setExpanded] = useState(false);
   const driverDisplay = aiDriver ?? (event.driverId ? members.find((m) => m.id === event.driverId)?.name : null);
   const involved = event.personIds
     .map((id) => members.find((m) => m.id === id))
@@ -1227,12 +1134,23 @@ function EventCard({
   const timeLabel = formatTime(event.time);
   const endLabel  = event.endTime ? `–${formatTime(event.endTime)}` : "";
 
+  function showActions() {
+    if (Platform.OS === "ios") {
+      ActionSheetIOS.showActionSheetWithOptions(
+        { options: ["Cancel", "Edit event", "Remove event"], cancelButtonIndex: 0, destructiveButtonIndex: 2 },
+        (idx) => { if (idx === 1) onEdit(); if (idx === 2) onDelete(); }
+      );
+    } else {
+      Alert.alert(event.title, undefined, [
+        { text: "Edit event", onPress: onEdit },
+        { text: "Remove event", onPress: onDelete, style: "destructive" },
+        { text: "Cancel", style: "cancel" },
+      ]);
+    }
+  }
+
   return (
-    <TouchableOpacity
-      style={styles.eventCard}
-      onPress={() => setExpanded((v) => !v)}
-      activeOpacity={0.85}
-    >
+    <View style={styles.eventCard}>
       <View style={styles.eventCardMain}>
         <View style={styles.eventTimePill}>
           <Text style={styles.eventTimeText}>{timeLabel}</Text>
@@ -1267,29 +1185,16 @@ function EventCard({
             </View>
           )}
         </View>
+        <TouchableOpacity
+          style={styles.eventMenuBtn}
+          onPress={showActions}
+          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+          activeOpacity={0.7}
+        >
+          <Feather name="more-horizontal" size={16} color={TEXT_MUTED} />
+        </TouchableOpacity>
       </View>
-
-      {expanded && (
-        <View style={styles.eventActions}>
-          {event.carpoolContact ? (
-            <Text style={styles.carpoolText}>Carpool: {event.carpoolContact}</Text>
-          ) : null}
-          {event.notes ? (
-            <Text style={styles.eventNotes}>{event.notes}</Text>
-          ) : null}
-          <View style={styles.eventActionBtns}>
-            <TouchableOpacity style={styles.editBtn} onPress={onEdit} activeOpacity={0.8}>
-              <Feather name="edit-2" size={13} color={TEAL} />
-              <Text style={styles.editBtnText}>Edit</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.deleteBtn} onPress={onDelete} activeOpacity={0.8}>
-              <Feather name="trash-2" size={13} color="#C0392B" />
-              <Text style={styles.deleteBtnText}>Remove</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      )}
-    </TouchableOpacity>
+    </View>
   );
 }
 
@@ -1700,7 +1605,7 @@ function AddEventSheet({
               <View style={styles.formRow}>
                 <TouchableOpacity
                   style={[styles.formTimeField, { flex: 1 }]}
-                  onPress={() => { setTimePickerFor("start"); setTimePickerVisible(true); }}
+                  onPress={() => { Keyboard.dismiss(); setTimePickerFor("start"); setTimePickerVisible(true); }}
                   activeOpacity={0.75}
                 >
                   <Text style={draft.time ? styles.formTimeFieldText : styles.formTimeFieldPlaceholder}>
@@ -1710,7 +1615,7 @@ function AddEventSheet({
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={[styles.formTimeField, { flex: 1 }]}
-                  onPress={() => { setTimePickerFor("end"); setTimePickerVisible(true); }}
+                  onPress={() => { Keyboard.dismiss(); setTimePickerFor("end"); setTimePickerVisible(true); }}
                   activeOpacity={0.75}
                 >
                   <Text style={draft.endTime ? styles.formTimeFieldText : styles.formTimeFieldPlaceholder}>
@@ -2413,7 +2318,7 @@ export default function FamilyScreen() {
   function showBanner(type: BannerType, title: string) {
     setSavedBanner({ type, title });
     if (bannerTimer.current) clearTimeout(bannerTimer.current);
-    bannerTimer.current = setTimeout(() => setSavedBanner(null), 6000);
+    bannerTimer.current = setTimeout(() => setSavedBanner(null), 3000);
     setTimeout(() => scrollRef.current?.scrollTo({ y: 0, animated: true }), 80);
   }
 
@@ -2640,17 +2545,6 @@ export default function FamilyScreen() {
           </View>
         </View>
 
-        {/* ── Post-save confirmation banner ── */}
-        {savedBanner && (
-          <SavedBanner
-            type={savedBanner.type}
-            eventTitle={savedBanner.title}
-            onReview={openPlanSummary}
-            onAddAnother={() => { dismissBanner(); openAddEvent(); }}
-            onDismiss={dismissBanner}
-          />
-        )}
-
         {/* ── Family members — always at top ── */}
         <ManagePeopleSection
           members={state.members}
@@ -2793,7 +2687,7 @@ export default function FamilyScreen() {
               onPress={openAddEvent}
               activeOpacity={0.85}
             >
-              <Feather name="plus" size={15} color={TEAL} />
+              <Feather name="plus" size={15} color="#fff" />
               <Text style={styles.addAnotherBtnText}>Add another event</Text>
             </TouchableOpacity>
           </>
@@ -2830,6 +2724,9 @@ export default function FamilyScreen() {
           </View>
         )}
       </ScrollView>
+
+      {/* ── Saved toast — appears above sticky bar ── */}
+      <SavedToast visible={!!savedBanner} />
 
       {/* ── Sticky bar — See the plan + Re-sort when events exist ── */}
       {hasEvents && (
@@ -2960,11 +2857,12 @@ const styles = StyleSheet.create({
   dayLabel: { fontSize: 13, fontFamily: "Inter_700Bold", color: TEXT, flex: 1 },
   eventCountBadge: { backgroundColor: TEAL + "18", borderRadius: 10, paddingHorizontal: 7, paddingVertical: 1 },
   eventCountText: { fontSize: 11, fontFamily: "Inter_600SemiBold", color: TEAL },
-  daySectionEvents: { gap: 6, marginBottom: 12 },
+  daySectionEvents: { gap: 12, marginBottom: 12 },
 
   // Event card
   eventCard: { backgroundColor: CARD_BG, borderRadius: 12, borderWidth: 1, borderColor: BORDER, overflow: "hidden" },
-  eventCardMain: { flexDirection: "row", gap: 10, padding: 11 },
+  eventCardMain: { flexDirection: "row", gap: 10, padding: 11, alignItems: "flex-start" },
+  eventMenuBtn: { alignSelf: "flex-start", paddingLeft: 4, paddingTop: 1 },
   eventTimePill: {
     backgroundColor: TEAL_TINT, borderRadius: 8, paddingHorizontal: 8, paddingVertical: 5,
     alignSelf: "flex-start", flexShrink: 0, flexDirection: "row", alignItems: "center",
@@ -3064,6 +2962,27 @@ const styles = StyleSheet.create({
   addPersonCtaText: { fontSize: 13, fontFamily: "Inter_600SemiBold", color: TEAL },
 
   // Saved banner
+  // Saved toast — replaces old banner
+  savedToast: {
+    position: "absolute",
+    bottom: 90,
+    left: 16,
+    right: 16,
+    backgroundColor: TEAL,
+    borderRadius: 12,
+    paddingVertical: 14,
+    paddingHorizontal: 18,
+    alignItems: "center" as const,
+    zIndex: 1000,
+    ...Platform.select({
+      web: { boxShadow: `0px 4px 20px ${TEAL}55` },
+      default: { shadowColor: TEAL, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 12, elevation: 8 },
+    }),
+  },
+  savedToastText: {
+    fontSize: 14, fontFamily: "Inter_600SemiBold", color: "#fff", textAlign: "center" as const,
+  },
+
   savedBanner: {
     backgroundColor: CARD_BG, borderRadius: 14, borderWidth: 1,
     borderColor: TEAL + "40", borderLeftWidth: 3, borderLeftColor: TEAL,
@@ -3273,12 +3192,16 @@ const styles = StyleSheet.create({
     fontSize: 12, fontFamily: "Inter_400Regular", color: TEXT_MUTED, fontStyle: "italic",
   },
 
-  // Juggle results — adult card (WHO'S DOING THE RUNNING)
+  // Juggle results — adult card (WHO'S GOT WHAT)
   juggleAdultCard: {
-    backgroundColor: "#F2FAF8", borderRadius: 14,
-    borderWidth: 1, borderColor: TEAL + "28",
-    borderLeftWidth: 3, borderLeftColor: TEAL + "66",
-    padding: 14, gap: 10,
+    backgroundColor: "#fff", borderRadius: 14,
+    borderWidth: 1, borderColor: BORDER,
+    borderLeftWidth: 4,
+    padding: 14, gap: 8,
+    ...Platform.select({
+      web: { boxShadow: "0px 2px 8px rgba(0,0,0,0.06)" },
+      default: { shadowColor: "#000", shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.06, shadowRadius: 6, elevation: 1 },
+    }),
   },
   juggleAdultCardHeader: { flexDirection: "row", alignItems: "center", gap: 8, marginBottom: 2 },
   juggleAdultDot: { width: 10, height: 10, borderRadius: 5 },
@@ -3470,11 +3393,15 @@ const styles = StyleSheet.create({
   // "Add another event" persistent button
   addAnotherBtn: {
     flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 6,
-    borderWidth: 1.5, borderColor: TEAL, borderRadius: 12,
+    backgroundColor: TEAL, borderRadius: 12,
     paddingVertical: 13, marginTop: 12,
+    ...Platform.select({
+      web: { boxShadow: `0px 2px 10px ${TEAL}44` },
+      default: { shadowColor: TEAL, shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.22, shadowRadius: 8, elevation: 4 },
+    }),
   },
   addAnotherBtnText: {
-    fontSize: 14, fontFamily: "DMSans_600SemiBold", color: TEAL,
+    fontSize: 14, fontFamily: "DMSans_600SemiBold", color: "#fff",
   },
 
   // FAB
@@ -3497,7 +3424,7 @@ const styles = StyleSheet.create({
     position: "absolute", left: 0, right: 0, bottom: 0,
     backgroundColor: "#fff",
     borderTopWidth: 1, borderTopColor: BORDER,
-    paddingHorizontal: 20, paddingTop: 14,
+    paddingHorizontal: 20, paddingTop: 16,
     gap: 8,
     ...Platform.select({
       web: { boxShadow: "0px -2px 12px rgba(0,0,0,0.07)" },
