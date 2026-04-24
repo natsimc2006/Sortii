@@ -173,6 +173,35 @@ function _toMins(hhmm: string | undefined): number {
   return (h ?? 0) * 60 + (m ?? 0);
 }
 
+function _fromMins(mins: number): string {
+  const h = Math.floor(mins / 60);
+  const m = mins % 60;
+  return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
+}
+
+// Travel time matrix (minutes) — key is "locationA|locationB" sorted alphabetically lowercase
+const TRAVEL_MATRIX: Record<string, number> = {
+  "morisset|rathmines": 12,
+  "rathmines|warners bay": 10,
+  "morisset|warners bay": 15,
+};
+
+function getTravelTime(locA: string | null | undefined, locB: string | null | undefined): number {
+  if (!locA || !locB) return 15;
+  const a = locA.trim().toLowerCase();
+  const b = locB.trim().toLowerCase();
+  if (a === b) return 0;
+  const key = [a, b].sort().join("|");
+  return TRAVEL_MATRIX[key] ?? 15;
+}
+
+const MEDICAL_KEYWORDS = ["doctor", "doctors", "gp", "dentist", "hospital", "physio", "appointment"];
+
+function isMedicalAppointment(title: string): boolean {
+  const t = title.toLowerCase();
+  return MEDICAL_KEYWORDS.some((k) => t.includes(k));
+}
+
 // ── On-device juggle solver (no network required) ─────────────────────────────
 function solveJuggleOnDevice(
   adults: FamilyMember[],
@@ -261,47 +290,80 @@ function solveJuggleOnDevice(
         const aEnd = _toMins(a.endTime) || _toMins(a.time) + 60;
         const bStart = _toMins(b.time);
         if (bStart < aEnd) {
+          const bEnd = _toMins(b.endTime) || _toMins(b.time) + 60;
           const aIsRecurring = a.repeat !== "none";
           const bIsRecurring = b.repeat !== "none";
+          const aIsMedical = isMedicalAppointment(a.title);
+          const bIsMedical = isMedicalAppointment(b.title);
+          const aChild = a.personIds.map((id) => memberLookup.get(id)).find((m) => m?.role === "child")?.name ?? null;
+          const aEndLabel = a.endTime ? a.endTime : _fromMins(_toMins(a.time) + 60);
 
-          // Find other adults free during this conflict window
-          const freeAdults = adults.filter((oa) => {
-            if (oa.id === adultId) return false;
+          // ── Priority 1: Find adults who can cover via handoff ──────────────
+          const handoffCandidates: Array<{ adult: FamilyMember; lastEvent: FamilyEvent | null; availableAt: number }> = [];
+          for (const oa of adults) {
+            if (oa.id === adultId) continue;
             const oaDayEvs = (adultEventsMap.get(oa.id) ?? []).filter((e) => e.day === day);
-            return !oaDayEvs.some((e) => {
+            // Skip if this adult is busy during the conflict window
+            const hasConflict = oaDayEvs.some((e) => {
               const eStart = _toMins(e.time);
               const eEnd = _toMins(e.endTime) || _toMins(e.time) + 60;
-              return eStart < aEnd && eEnd > bStart;
+              return eStart < bEnd && eEnd > bStart;
             });
-          });
-
-          const aEndLabel = a.endTime ? a.endTime : (() => {
-            const endM = (_toMins(a.time) + 60);
-            return `${String(Math.floor(endM / 60)).padStart(2, "0")}:${String(endM % 60).padStart(2, "0")}`;
-          })();
-
-          let description = `${adult.name} has overlapping commitments on ${day}.\n${a.title} runs until ${aEndLabel}. ${b.title} is at ${b.time}.`;
-          let recommendation = "";
-
-          if (aIsRecurring && !bIsRecurring) {
-            recommendation = `${b.title} is a one-off — reschedule it to after ${aEndLabel} to keep the regular ${a.title} in place.`;
-          } else if (!aIsRecurring && bIsRecurring) {
-            recommendation = `${a.title} is a one-off — reschedule it to avoid clashing with the regular ${b.title}.`;
-          } else {
-            recommendation = `Both "${a.title}" and "${b.title}" are on at the same time. Which is higher priority?`;
+            if (hasConflict) continue;
+            // Find their last event ending before bStart
+            const eventsBefore = oaDayEvs
+              .filter((e) => { const eEnd = _toMins(e.endTime) || _toMins(e.time) + 60; return eEnd <= bStart; })
+              .sort((e1, e2) => {
+                const e1End = _toMins(e1.endTime) || _toMins(e1.time) + 60;
+                const e2End = _toMins(e2.endTime) || _toMins(e2.time) + 60;
+                return e2End - e1End;
+              });
+            if (eventsBefore.length === 0) {
+              handoffCandidates.push({ adult: oa, lastEvent: null, availableAt: 0 });
+            } else {
+              const lastEv = eventsBefore[0]!;
+              const lastEvEnd = _toMins(lastEv.endTime) || _toMins(lastEv.time) + 60;
+              const travel = getTravelTime(lastEv.location, a.location);
+              if (lastEvEnd + travel <= aEnd) {
+                handoffCandidates.push({ adult: oa, lastEvent: lastEv, availableAt: lastEvEnd });
+              }
+            }
           }
 
-          if (freeAdults.length > 0) {
-            recommendation += `\n\n${freeAdults[0]!.name}'s free from ${b.time} — could they cover one of these?`;
+          const description = `${adult.name} has overlapping commitments on ${day}.\n${a.title} runs until ${aEndLabel}. ${b.title} is at ${b.time}.`;
+          let recommendation = "";
+
+          if (handoffCandidates.length > 0) {
+            // Priority 1 — handoff is possible
+            const best = handoffCandidates[0]!;
+            const coverVerb = aChild
+              ? `collect ${aChild} from ${a.title} at ${aEndLabel}`
+              : `cover ${a.title} at ${aEndLabel}`;
+            if (best.lastEvent) {
+              const lastEvEndLabel = _fromMins(best.availableAt);
+              recommendation = `${best.adult.name} finishes ${best.lastEvent.title} at ${lastEvEndLabel} — they could ${coverVerb} while ${adult.name} heads to ${b.title}.`;
+            } else {
+              recommendation = `${best.adult.name} is free — they could ${coverVerb} while ${adult.name} heads to ${b.title}.`;
+            }
+          } else if (aIsRecurring && !bIsRecurring && !bIsMedical) {
+            // Priority 2a — reschedule the one-off (b), never reschedule recurring
+            recommendation = `${b.title} is a one-off — moving it to after ${aEndLabel} keeps everything else in place.`;
+          } else if (!aIsRecurring && bIsRecurring && !aIsMedical) {
+            // Priority 2b — reschedule the one-off (a), never reschedule recurring
+            recommendation = `${a.title} is a one-off — moving it to avoid clashing with the regular ${b.title} keeps everything in place.`;
+          } else if (aIsMedical || bIsMedical) {
+            // Priority 3 — medical appointment is fixed, no handoff available
+            recommendation = "This one needs sorting manually.";
           } else {
-            recommendation += `\nOr reschedule ${aIsRecurring && !bIsRecurring ? b.title : a.title} to after ${aEndLabel}.`;
+            // Priority 2c — both non-recurring, no handoff
+            recommendation = `Both "${a.title}" and "${b.title}" are on at the same time — which takes priority?`;
           }
 
           conflicts.push({
             id: `overlap-${a.id}-${b.id}`, type: "overlap", severity: "warning",
             description,
             involved_events: [a.id, b.id], involved_adults: [adult.name],
-            suggested_contacts: freeAdults.map((fa) => fa.name),
+            suggested_contacts: handoffCandidates.map((h) => h.adult.name),
             recommendation,
             options: [],
           });
@@ -683,14 +745,21 @@ function JuggleResultsContent({
                 </Text>
               </View>
             )}
-            {ws.conflicts_resolved > 0 && impossible === 0 && (
+            {ws.conflicts_resolved > 0 && impossible === 0 && conflicts.length === 0 && (
               <View style={[styles.resultChip, { backgroundColor: TEAL + "18", borderColor: TEAL + "33" }]}>
                 <Text style={[styles.resultChipText, { color: TEAL }]}>
                   {ws.conflicts_resolved} sorted ✓
                 </Text>
               </View>
             )}
-            {impossible === 0 && tight === 0 && (
+            {impossible === 0 && conflicts.length > 0 && (
+              <View style={[styles.resultChip, { backgroundColor: GOLD, borderColor: GOLD }]}>
+                <Text style={[styles.resultChipText, { color: "#fff" }]}>
+                  {conflicts.length} {conflicts.length === 1 ? "clash" : "clashes"} to sort
+                </Text>
+              </View>
+            )}
+            {impossible === 0 && tight === 0 && conflicts.length === 0 && (
               <View style={[styles.resultChip, { backgroundColor: TEAL + "18", borderColor: TEAL + "33" }]}>
                 <Text style={[styles.resultChipText, { color: TEAL }]}>all clear ✓</Text>
               </View>
