@@ -30,9 +30,6 @@ module.exports = {
 
   extra: {
     ...(base.expo.extra ?? {}),
-    eas: {
-      projectId: "0665bcc7-d4cb-4b6c-93a7-3e284255f03e",
-    },
     googleClientId,
     googleIosClientId,
   },
