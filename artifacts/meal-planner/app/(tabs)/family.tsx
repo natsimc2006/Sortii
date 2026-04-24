@@ -1582,6 +1582,23 @@ function AddEventSheet({
               />
             </View>
 
+            {/* Who's involved */}
+            {members.length > 0 && (
+              <View style={styles.formField}>
+                <Text style={styles.formLabel}>Who needs to be there?</Text>
+                <View style={styles.chipGroup}>
+                  {members.map((m) => (
+                    <MemberChip
+                      key={m.id}
+                      member={m}
+                      selected={draft.personIds.includes(m.id)}
+                      onPress={() => togglePerson(m.id)}
+                    />
+                  ))}
+                </View>
+              </View>
+            )}
+
             {/* Day */}
             <View style={styles.formField}>
               <Text style={styles.formLabel}>Which day?</Text>
@@ -1641,23 +1658,6 @@ function AddEventSheet({
                 placeholderTextColor="#bbb"
               />
             </View>
-
-            {/* Who's involved */}
-            {members.length > 0 && (
-              <View style={styles.formField}>
-                <Text style={styles.formLabel}>Who needs to be there?</Text>
-                <View style={styles.chipGroup}>
-                  {members.map((m) => (
-                    <MemberChip
-                      key={m.id}
-                      member={m}
-                      selected={draft.personIds.includes(m.id)}
-                      onPress={() => togglePerson(m.id)}
-                    />
-                  ))}
-                </View>
-              </View>
-            )}
 
             {/* Who could help — persistent carpool contacts */}
             <View style={styles.formField}>
@@ -2405,7 +2405,6 @@ export default function FamilyScreen() {
     console.log("[Sortii] Sort triggered — adults:", adults.length, "events:", state.events.length, "cal:", pushedCalEvents.length);
     setSortError(null);
     setFamilyStep("sorting");
-    dismissBanner();
 
     // Short artificial delay so the processing overlay is visible
     await new Promise((r) => setTimeout(r, 1600));
