@@ -247,7 +247,8 @@ function solveJuggleOnDevice(
     adultEventsMap.get(adultId)!.push(ev);
   }
   for (const [adultId, evList] of adultEventsMap.entries()) {
-    const adult = adults.find((a) => a.id === adultId)!;
+    const adult = adults.find((a) => a.id === adultId);
+    if (!adult) continue;
     const byDay = new Map<DayOfWeek, FamilyEvent[]>();
     for (const ev of evList) {
       if (!byDay.has(ev.day)) byDay.set(ev.day, []);
@@ -1230,6 +1231,9 @@ function DaySection({
               onDelete={() => onDeleteEvent(ev.id)}
               aiDriver={juggleDriverMap?.get(ev.id)}
             />
+            {idx < events.length - 1 && (
+              <View style={styles.dayEventConnector} />
+            )}
             {juggleDriverMap && idx < events.length - 1 && (() => {
               const hint = getTravelHint(ev, events[idx + 1]!, juggleDriverMap);
               if (!hint) return null;
@@ -2418,7 +2422,7 @@ export default function FamilyScreen() {
     } catch (err) {
       console.error("[Sortii] Sort error:", err);
       setFamilyStep("input");
-      setSortError("Couldn't sort the week right now. Try again.");
+      setSortError("Something went sideways. Try re-sorting.");
     }
   }
 
@@ -2857,15 +2861,17 @@ const styles = StyleSheet.create({
   dayLabel: { fontSize: 13, fontFamily: "Inter_700Bold", color: TEXT, flex: 1 },
   eventCountBadge: { backgroundColor: TEAL + "18", borderRadius: 10, paddingHorizontal: 7, paddingVertical: 1 },
   eventCountText: { fontSize: 11, fontFamily: "Inter_600SemiBold", color: TEAL },
-  daySectionEvents: { gap: 12, marginBottom: 12 },
+  daySectionEvents: { gap: 8, marginBottom: 12 },
+  dayEventConnector: { height: 1, backgroundColor: BORDER, marginHorizontal: 4, opacity: 0.6 },
 
   // Event card
-  eventCard: { backgroundColor: CARD_BG, borderRadius: 12, borderWidth: 1, borderColor: BORDER, overflow: "hidden" },
+  eventCard: { backgroundColor: CARD_BG, borderRadius: 12, borderWidth: 1, borderColor: BORDER, borderLeftWidth: 3, overflow: "hidden" },
   eventCardMain: { flexDirection: "row", gap: 10, padding: 11, alignItems: "flex-start" },
   eventMenuBtn: { alignSelf: "flex-start", paddingLeft: 4, paddingTop: 1 },
   eventTimePill: {
     backgroundColor: TEAL_TINT, borderRadius: 8, paddingHorizontal: 8, paddingVertical: 5,
     alignSelf: "flex-start", flexShrink: 0, flexDirection: "row", alignItems: "center",
+    minWidth: 110,
   },
   eventTimeText: { fontSize: 11, fontFamily: "Inter_700Bold", color: TEAL },
   eventTimeEnd: { fontSize: 11, fontFamily: "Inter_400Regular", color: TEAL },

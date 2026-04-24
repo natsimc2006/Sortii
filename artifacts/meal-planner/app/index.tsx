@@ -21,7 +21,7 @@ import { saveHouseholdProfile } from "@/utils/householdProfile";
 import { loadFamilyState, saveFamilyState } from "@/utils/familyStore";
 import { MEMBER_COLORS } from "@/utils/familyTypes";
 
-const sortiiLogo2 = require("@/assets/images/sortii-logo2-wordmark.png");
+const sortiiLogo1 = require("@/assets/images/sortii-logo1-full.png");
 
 const TEAL       = "#2A8F88";
 const TEAL_TINT  = "#E6F3F0";
@@ -29,6 +29,8 @@ const CREAM      = "#F8F4EE";
 const INK        = "#1A1410";
 const MUTED      = "#8A7968";
 const BORDER     = "#EDE9E3";
+const PLUM       = "#5E3A4C";
+const GOLD       = "#D29A22";
 
 const HOUSEHOLD_HINTS: Record<number, string> = {
   1: "Just you. Easy week.",
@@ -299,22 +301,17 @@ export default function OnboardingScreen() {
   return (
     <View style={[styles.root, { paddingTop }]}>
       {/* ── Logo ── */}
-      <Image source={sortiiLogo2} style={styles.welcomeLogo} resizeMode="contain" />
-
-      {/* ── Tagline ── */}
-      <Animated.Text style={[styles.welcomeTagline, { opacity: line1 }]}>
-        We take the thinking out of the week.
-      </Animated.Text>
+      <Image source={sortiiLogo1} style={styles.welcomeLogo} resizeMode="contain" />
 
       {/* ── Value props ── */}
       <View style={styles.valueProps}>
         {[
-          { anim: line1, icon: "🥘", text: "Dinners planned — no thinking required" },
-          { anim: line2, icon: "📅", text: "Your week in one clear view" },
-          { anim: line3, icon: "💰", text: "Know where your money actually goes" },
-        ].map(({ anim, icon, text }) => (
+          { anim: line1, color: TEAL,  text: "Dinner sorted — no decisions required" },
+          { anim: line2, color: PLUM,  text: "Your week in one clear view" },
+          { anim: line3, color: GOLD,  text: "Know exactly where the money goes" },
+        ].map(({ anim, color, text }) => (
           <Animated.View key={text} style={[styles.valueProp, { opacity: anim }]}>
-            <Text style={styles.valuePropIcon}>{icon}</Text>
+            <View style={[styles.valuePropDot, { backgroundColor: color }]} />
             <Text style={styles.valuePropText}>{text}</Text>
           </Animated.View>
         ))}
@@ -341,7 +338,7 @@ export default function OnboardingScreen() {
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    backgroundColor: CREAM,
+    backgroundColor: "#FFFFFF",
     paddingHorizontal: 24,
   },
   scroll: {
@@ -356,13 +353,6 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     alignSelf: "center",
   },
-  welcomeTagline: {
-    fontFamily: "Inter_400Regular",
-    fontSize: 16,
-    color: MUTED,
-    marginBottom: 36,
-    lineHeight: 24,
-  },
   valueProps: {
     flex: 1,
     gap: 20,
@@ -373,16 +363,18 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 16,
   },
-  valuePropIcon: {
-    fontSize: 28,
-    width: 40,
-    textAlign: "center",
+  valuePropDot: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    flexShrink: 0,
+    marginTop: 2,
   },
   valuePropText: {
-    fontFamily: "DMSans_600SemiBold",
-    fontSize: 17,
-    color: INK,
-    lineHeight: 24,
+    fontFamily: "DMSans_500Medium",
+    fontSize: 16,
+    color: "#2B2B2B",
+    lineHeight: 22,
     flex: 1,
   },
   ctaWrap: {
@@ -391,7 +383,7 @@ const styles = StyleSheet.create({
   welcomeNote: {
     fontFamily: "Inter_400Regular",
     fontSize: 13,
-    color: MUTED,
+    color: "#888",
     textAlign: "center",
   },
 

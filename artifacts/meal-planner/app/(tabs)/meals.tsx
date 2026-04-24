@@ -603,11 +603,6 @@ export default function MealsScreen() {
         <Text style={[styles.statusLine, { color: C.textMuted }]}>
           {getMealStatusLine()}
         </Text>
-        {weeklySwapSaving >= 4 && (
-          <Text style={[styles.moneyFeedbackLine, { color: TEAL }]}>
-            ~{currencySymbol}{weeklySwapSaving} in smarter swaps this week.
-          </Text>
-        )}
 
         {/* Tools row — prominent, horizontally scrollable */}
         <ScrollView
@@ -713,7 +708,7 @@ export default function MealsScreen() {
         {weeklySwapSaving >= 2 && !swapBannerDismissed && (
           <View style={styles.swapBanner}>
             <Text style={[styles.swapBannerText, { flex: 1 }]}>
-              💡 Review swaps → save up to {currencySymbol}{weeklySwapSaving}
+              💡 ~{currencySymbol}{weeklySwapSaving} in smarter swaps available
             </Text>
             <TouchableOpacity
               onPress={() => setSwapBannerDismissed(true)}
@@ -726,35 +721,6 @@ export default function MealsScreen() {
         )}
         <PantryTips key={planKey} tips={weeklyPantryTips} />
 
-        <View style={[styles.progressBar, { backgroundColor: C.chipBg }]}>
-          <View
-            style={[
-              styles.progressFill,
-              {
-                backgroundColor: C.primaryDark,
-                width: `${(filledCount / Math.max(totalSlots, 1)) * 100}%` as any,
-              },
-            ]}
-          />
-        </View>
-        {isWeekFull ? (
-          <Animated.Text
-            style={[styles.progressLabel, { color: C.primary, opacity: weekSortedOpacity }]}
-          >
-            ✓ {weekSortedMessage}
-          </Animated.Text>
-        ) : (
-          <Text
-            style={[
-              styles.progressLabel,
-              { color: isWeekEmpty ? C.textMuted : C.textSecondary },
-            ]}
-          >
-            {isWeekEmpty
-              ? pickRandom(EMPTY_PLAN_MESSAGES)
-              : `${filledCount} of ${totalSlots} meals planned`}
-          </Text>
-        )}
 
         {/* Mid-week check-in */}
         {isMidWeek && filledMeals.length >= 3 && !midWeekDismissed && (
@@ -780,36 +746,8 @@ export default function MealsScreen() {
         )}
 
 
-        {/* Cook With What's Already Here — rescue entry */}
-        <TouchableOpacity
-          style={[
-            styles.rescueEntry,
-            { backgroundColor: TEAL + "0D", borderColor: TEAL + "28" },
-          ]}
-          onPress={() => router.push("/(tabs)/cook-with" as any)}
-          activeOpacity={0.78}
-        >
-          <View
-            style={[
-              styles.rescueEntryIcon,
-              { backgroundColor: TEAL + "18" },
-            ]}
-          >
-            <Feather name="search" size={14} color={TEAL} />
-          </View>
-          <View style={{ flex: 1, gap: 2 }}>
-            <Text style={[styles.rescueEntryTitle, { color: C.text }]}>
-              Fridge Rescue
-            </Text>
-            <Text style={[styles.rescueEntrySub, { color: C.textMuted }]}>
-              Tell me what you've got and I'll sort dinner.
-            </Text>
-          </View>
-          <Feather name="chevron-right" size={15} color={C.textMuted} />
-        </TouchableOpacity>
-
         {/* Day-by-day meal cards */}
-        {DAYS.map((day) => {
+        {DAYS.map((day, dayIdx) => {
           const dinnerEntry = getEntry(day, "dinner");
           const lunchEntry =
             preferences.mealCoverage === "lunch-dinner"
@@ -829,7 +767,13 @@ export default function MealsScreen() {
             isWeekend && preferences.weekendOverrides?.enabled;
 
           return (
-            <View key={day} style={styles.dayBlock}>
+            <React.Fragment key={day}>
+              {dayIdx === 0 && (
+                <Text style={styles.weekProgressLabel}>
+                  {plannedCount} of 7 planned
+                </Text>
+              )}
+              <View style={styles.dayBlock}>
               <View style={styles.dayLabelRow}>
                 <Text style={[styles.dayLabel, { color: C.textSecondary }]}>{day}</Text>
                 {hasWeekendOverride && (
@@ -915,9 +859,38 @@ export default function MealsScreen() {
                   )}
                 </>
               )}
-            </View>
+              </View>
+            </React.Fragment>
           );
         })}
+
+        {/* Cook With What's Already Here — rescue entry */}
+        <TouchableOpacity
+          style={[
+            styles.rescueEntry,
+            { backgroundColor: TEAL + "0D", borderColor: TEAL + "28" },
+          ]}
+          onPress={() => router.push("/(tabs)/cook-with" as any)}
+          activeOpacity={0.78}
+        >
+          <View
+            style={[
+              styles.rescueEntryIcon,
+              { backgroundColor: TEAL + "18" },
+            ]}
+          >
+            <Feather name="search" size={14} color={TEAL} />
+          </View>
+          <View style={{ flex: 1, gap: 2 }}>
+            <Text style={[styles.rescueEntryTitle, { color: C.text }]}>
+              Fridge Rescue
+            </Text>
+            <Text style={[styles.rescueEntrySub, { color: C.textMuted }]}>
+              Tell me what you've got and I'll sort dinner.
+            </Text>
+          </View>
+          <Feather name="chevron-right" size={15} color={C.textMuted} />
+        </TouchableOpacity>
 
         {/* Easy night quiet confirmation line */}
         {planHasEasyNight && (
@@ -1329,6 +1302,13 @@ const styles = StyleSheet.create({
     fontStyle: "italic",
     lineHeight: 18,
     marginBottom: 2,
+  },
+  weekProgressLabel: {
+    fontSize: 12,
+    fontFamily: "Inter_400Regular",
+    color: "#999",
+    marginBottom: 6,
+    marginTop: 2,
   },
   moneyFeedbackLine: {
     fontSize: 12,

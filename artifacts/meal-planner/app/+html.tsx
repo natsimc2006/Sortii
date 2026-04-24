@@ -20,7 +20,7 @@ export default function Root({ children }: PropsWithChildren) {
           name="viewport"
           content="width=device-width, initial-scale=1, viewport-fit=cover"
         />
-        <title>Sortii – Dinner. Sorted.</title>
+        <title>Sortii</title>
         <ScrollViewStyleReset />
 
         {/*

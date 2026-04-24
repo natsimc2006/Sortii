@@ -1,0 +1,200 @@
+Sortii
+/
+You said: Can you help me tidy up the family juggle views/pages - they don’t present visually well at the moment (screen shots attached).
+IMG_4215.png
+IMG_4216.png
+IMG_4217.png
+IMG_4218.png
+Can you help me tidy up the family juggle views/pages - they don’t present visually well at the moment (screen shots attached).
+
+Also the keyboard doesn’t hide immediately when hitting a time chip.
+The add an event button gets a bit lost so maybe needs to be full green colour?
+The layout of the events logged and then planned looks messy.
+The logic also isn’t great (doesn’t seem smart) when you look at the mum cross over (suggesting rearrange football)
+
+6:38 PM
+Claude responded: Looking at the screenshots, here's what I'm seeing across all four issues:
+
+Diagnosed five UI/logic issues and formulated comprehensive fixes
+Diagnosed five UI/logic issues and formulated comprehensive fixes
+Looking at the screenshots, here's what I'm seeing across all four issues:
+
+"Add another event" — outlined ghost button, disappears against the background. Needs to be filled teal.
+
+Keyboard on time chip — needs Keyboard.dismiss() wired to chip press.
+
+Event layout — the inline Edit/Remove expansion within the card breaks the visual hierarchy. And the "Saved. Plan updated." banner is fighting for attention with everything else.
+
+The conflict logic — this is the real problem. The system has assigned Mum to both take Tom to Football (10:30–12:00 at Morisset) AND attend her Doctors at 11:30, which overlap. Then it suggests "rearrange Football." Football is Tom's weekly recurring sport — that's the wrong thing to surface. The smarter read is: recurring sport is fixed, Doctors is the moveable thing, and Dad is free during that window. That's what the suggestion should say.
+
+There's also a data inconsistency — Doctors shows under "Dad" in the event list (gold dot) but is assigned to Mum in the plan.
+
+Here's the compiled Replit prompt:
+
+REPLIT PROMPT — Family Juggle UI + Logic Fixes
+
+Fix the following issues across the Family Juggle screens. Do not change any unrelated functionality.
+
+FIX 1 — "Add another event" button
+
+Find the + Add another event button in the Family tab screen.
+
+Change from: outlined border with teal text on transparent background Change to: solid filled teal background (
+#2A8F88), white text (
+#FFFFFF), full width, same border radius as currently used, font weight 600.
+
+FIX 2 — Keyboard dismiss on time chip tap
+
+In the event entry flow, wherever time chips (time slot selectors / time picker chips) are rendered and pressable:
+
+Add Keyboard.dismiss() at the top of the onPress handler for each time chip. Import Keyboard from react-native if not already imported.
+
+FIX 3 — Event card layout in Family tab
+
+The inline Edit / Remove expansion inside the event card is visually messy. Fix as follows:
+
+Remove the inline Edit / Remove row that appears inside the expanded card
+Instead, add a small ··· icon (three dots) to the top-right corner of each event card
+On press, show a bottom sheet or action sheet with two options: "Edit event" and "Remove event"
+The action sheet destructive option ("Remove event") should use colour 
+#B86557
+Event cards should have consistent height when not expanded — no inline expansion states
+Also fix the "Saved. Plan updated." confirmation banner:
+
+It currently appears at the top of the screen as a persistent card
+Change it to a toast notification that auto-dismisses after 3 seconds
+Toast should appear at the bottom of the screen above the tab bar
+Background: 
+#2A8F88, white text, border radius 12, message: "Saved. We've sorted the week around it."
+FIX 4 — Plan view layout ("Sorted. Here's the plan")
+
+In the plan results screen:
+
+Table section:
+
+Remove the ⇌ Swap pill from every row in the TIME/WHO/WHERE table. These belong on the Meals plan, not on a family logistics plan.
+"WHO'S GOT WHAT" section:
+
+Reduce visual weight. Change section background from the current teal-tinted card to plain white cards with a left border only (4px, colour = person's assigned dot colour)
+Remove the "Mum's list →" and "Dad's list →" buttons — they add noise without clear utility at this stage
+Keep the per-person event breakdown but tighten vertical spacing
+"WORTH KNOWING" card:
+
+Remove this section entirely. It is redundant with the HEADS UP card below it.
+FIX 5 — Conflict detection logic
+
+This is the most important fix. The conflict suggestion logic needs to be smarter.
+
+Bug: Doctors is currently stored/assigned under "Dad" in the event list but is being shown as Mum's event in the plan. Find where person assignment is resolved and ensure the plan view uses the same person assignment as the event list. Do not reassign people silently.
+
+Logic fix — conflict suggestion priority:
+
+When two events for the same person overlap in time, apply the following priority logic to determine the suggestion:
+
+Rule 1: If one event is recurring (isRecurring: true) and the other is not — 
+  → The NON-recurring event is the one to suggest adjusting. Never suggest rearranging a recurring activity.
+
+Rule 2: If both events are non-recurring — 
+  → Flag the overlap and ask which is higher priority, do not make an assumption.
+
+Rule 3: If another adult family member has a clear gap during the conflict window — 
+  → Proactively name them in the suggestion as someone who could cover.
+Fix the HEADS UP card copy:
+
+Replace the current generic conflict message with dynamic copy that follows the rules above.
+
+Example for the Mum / Football / Doctors scenario (Football is recurring, Doctors is not, Dad has no events):
+
+HEADS UP
+Mum has overlapping commitments on Saturday.
+Football runs until 12:00. Doctors is at 11:30.
+
+Dad's free from 11am — could he cover the Doctors run?
+Or reschedule Doctors to after 12pm.
+Remove the bullet points ("Move Football to a different time" / "Check if Football can be rescheduled") — these are wrong and feel robotic
+Remove the "Add carpool contacts →" link — out of scope and adds noise
+Keep the red left border on the HEADS UP card
+FIX 6 — General spacing
+
+In the Family tab (event list view):
+
+Increase spacing between event cards to 12px gap
+Ensure the bottom CTA row ("See the plan →" / "Re-sort ↺") has at least 16px padding above it and sits visually separated from the last card
+Test after each fix before moving to the next. Do not modify the Meals tab, Money tab, or recipe logic.
+
+The logic fix (Fix 5) is the one that matters most for the product feeling smart. The rest are polish. Run them in order.
+
+You said: I’m just working through the app again - a few things I’m hoping you can help en with a prompt for -
+IMG_4219.png
+IMG_4220.png
+IMG_4221.png
+IMG_4222.png
+IMG_4223.png
+IMG_4224.png
+IMG_4225.png
+IMG_4226.png
+IMG_4227.png
+I’m just working through the app again - a few things I’m hoping you can help en with a prompt for - 
+- when the ai is loading in expo I am getting the old logo and tag line (I have tried to prompt Replit to correct but it remains as the old logo and tagline).
+- the landing oage for first use doesn’t feel very ‘Sortii’ yet in the way it is themed - the background and colours don’t quite seem to align. 
+- the message if days no meals for the week although I added 1 meal (I assume it is looking at the next ‘full week’ maybe and not the current?
+- the meal page on landing looks quite busy. It is all valid info, and it scrolls away when I swipe up to view the meals, but I’m not sure if it is a bit overwhelming?
+- I have images the family juggle oage to get feedback in the layout (the events are staggered and feel they could maybe look tidier?)
+I am getting an error when I try to then sort the week?
+
+9:54 PM
+Claude responded: Good progress on the family card layout — the ··· dots are working and the cards are much cleaner.
+
+Catalogued six UI bugs spanning logo, onboarding, messaging, layout, and JavaScript errors
+Catalogued six UI bugs spanning logo, onboarding, messaging, layout, and JavaScript errors
+Good progress on the family card layout — the ··· dots are working and the cards are much cleaner. Now let me work through each issue from the screenshots:
+
+What I'm seeing:
+
+Splash screen — correct logo lockup renders, but there's a second plain-text label below it: "Sortii - Dinner. Sorted." in bold black. That's a stale <Text> element sitting below the logo component.
+Landing/onboarding logo — the 'o' in "sortii" has been replaced with a tick/checkmark icon. That's a wrong logo variant. Should be the standard wordmark with no icon modification.
+"Dinners not sorted yet" — 1 meal (Monday) is planned but the home card still says unsorted. The logic is checking if today (Friday) has a meal, not whether this week has any meals. Wrong scope.
+Meals header too busy — subtitle line, savings nudge, 3 action buttons, 2 filter pills, swap banner, progress counter, Fridge Rescue card — all before a single meal renders. Too much competing for the same scroll position.
+Family event layout — cards are cleaner, but the overlapping time windows (10am, 10:30am, 11am) could be visually grouped better.
+ReferenceError on sort — JavaScript error thrown during plan generation. Likely an undefined variable in the conflict logic we added.
+REPLIT PROMPT — Bug Fixes + UI Polish Pass
+
+Fix the following issues. Work through them in order. Do not touch the Meals recipe logic, shopping list, or Money tab.
+
+FIX 1 — Splash screen duplicate text label
+
+On the splash/loading screen component, find any <Text> element that renders the string "Sortii - Dinner. Sorted." or similar plain-text app title.
+
+Remove that <Text> element entirely. The logo lockup component already renders the brand name and tagline — the extra label is a duplicate and should not exist.
+
+FIX 2 — Onboarding screen logo + background
+
+In the first-use landing/onboarding screen:
+
+Logo fix:
+
+Remove any logo variant that places a tick, checkmark, or icon inside or replacing a letter in "sortii"
+Use the standard wordmark only: "sort" in charcoal 
+#2B2B2B, "ii." in gold 
+#D29A22, set in Playfair Display
+No icon modifications to the letterforms
+Background fix:
+
+Change the screen background from white 
+#FFFFFF to warm neutral 
+#F7F3EB
+Feature list fix:
+
+Replace the three emoji icons (🍳 📅 💰) with simple filled circles in the brand colours: teal 
+#2A8F88, plum 
+#5E3A4C, gold 
+#D29A22 — 10px diameter, vertically centred with the text
+Feature copy update (replace existing lines with):
+Line 1: "Dinner sorted — no decisions required"
+Line 2: "Your week in one clear view"
+Line 3: "Know exactly where the money goes"
+Font: DM Sans, 16px, weight 500, colour 
+#2B2B2B
+Subtext below button:
+
+Keep "Takes about 30 seconds. No account required." — colour #888, font size 13px
