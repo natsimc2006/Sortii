@@ -32,17 +32,17 @@ export interface RescueMealIdea {
   matchedIngredients: string[];
 }
 
-export interface FallbackMealIdea {
-  title: string;
-  reason: string;
+export interface AiMealIdea {
+  name: string;
+  hook: string;
   steps: string[];
-  cookTime: string;
-  effort: string;
+  timeMinutes: number;
+  difficulty: "very easy" | "easy" | "medium";
 }
 
 export interface CookWithResults {
   readyNow: RecipeMatchResult[];
   almostThere: RecipeMatchResult[];
   rescue: RescueMealIdea[];
-  fallback: FallbackMealIdea | null;
+  fallback: AiMealIdea[] | null;
 }

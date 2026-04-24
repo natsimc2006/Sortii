@@ -21,9 +21,9 @@ import { normalizeIngredients } from "@/utils/normalizeIngredients";
 import { parseIngredientText } from "@/utils/parseIngredientText";
 import { scoreAndRankRecipes } from "@/utils/scoreRecipeMatch";
 import {
+  AiMealIdea,
   CookWithPreference,
   CookWithResults,
-  FallbackMealIdea,
   RecipeMatchResult,
   RescueMealIdea,
 } from "@/utils/cookWithTypes";
@@ -116,7 +116,7 @@ function RecipeCard({ result }: { result: RecipeMatchResult }) {
   );
 }
 
-// ── Rescue card ───────────────────────────────────────────────────────────────
+// ── Rescue card (local pattern-based) ────────────────────────────────────────
 function RescueCard({ idea }: { idea: RescueMealIdea }) {
   const C = Colors.light;
   return (
@@ -146,16 +146,16 @@ function RescueCard({ idea }: { idea: RescueMealIdea }) {
   );
 }
 
-// ── AI fallback card ──────────────────────────────────────────────────────────
-function FallbackCard({ idea }: { idea: FallbackMealIdea }) {
+// ── AI rescue card (new multi-result format) ──────────────────────────────────
+function AiRescueCard({ idea }: { idea: AiMealIdea }) {
   const C = Colors.light;
   return (
     <View style={[st.card, { backgroundColor: C.card, borderColor: PLUM + "22" }]}>
       <View style={[st.badge, { backgroundColor: PLUM + "10" }]}>
         <Text style={[st.badgeText, { color: PLUM }]}>Sortii idea</Text>
       </View>
-      <Text style={[st.cardName, { color: C.text }]}>{idea.title}</Text>
-      <Text style={[st.cardReason, { color: C.textSecondary }]}>{idea.reason}</Text>
+      <Text style={[st.cardName, { color: C.text }]}>{idea.name}</Text>
+      <Text style={[st.cardReason, { color: C.textSecondary }]}>{idea.hook}</Text>
       {idea.steps.map((step, i) => (
         <View key={i} style={st.stepRow}>
           <Text style={[st.stepNum, { color: PLUM }]}>{i + 1}.</Text>
@@ -165,11 +165,11 @@ function FallbackCard({ idea }: { idea: FallbackMealIdea }) {
       <View style={st.metaRow}>
         <View style={st.metaItem}>
           <Feather name="clock" size={11} color={C.textMuted} />
-          <Text style={[st.metaText, { color: C.textMuted }]}>{idea.cookTime}</Text>
+          <Text style={[st.metaText, { color: C.textMuted }]}>{idea.timeMinutes} mins</Text>
         </View>
         <View style={st.metaItem}>
           <Feather name="zap" size={11} color={C.textMuted} />
-          <Text style={[st.metaText, { color: C.textMuted }]}>{idea.effort}</Text>
+          <Text style={[st.metaText, { color: C.textMuted }]}>{idea.difficulty}</Text>
         </View>
       </View>
     </View>
@@ -181,15 +181,19 @@ function ResultSection({
   label,
   dotColor,
   spaceTop,
+  noDot,
 }: {
   label: string;
-  dotColor: string;
+  dotColor?: string;
   spaceTop?: boolean;
+  noDot?: boolean;
 }) {
   const C = Colors.light;
   return (
     <View style={[st.sectionHeader, spaceTop && { marginTop: 32 }]}>
-      <View style={[st.sectionDot, { backgroundColor: dotColor }]} />
+      {!noDot && dotColor && (
+        <View style={[st.sectionDot, { backgroundColor: dotColor }]} />
+      )}
       <Text style={[st.sectionLabel, { color: C.text }]}>{label}</Text>
     </View>
   );
@@ -219,6 +223,7 @@ export default function CookWithScreen() {
   const [view, setView]                       = useState<"input" | "loading" | "results">("input");
   const [results, setResults]                 = useState<CookWithResults | null>(null);
   const [fallbackLoading, setFallbackLoading] = useState(false);
+  const [fallbackAttempted, setFallbackAttempted] = useState(false);
 
   function toggleChip(sid: SectionId, chip: string) {
     Keyboard.dismiss();
@@ -251,22 +256,20 @@ export default function CookWithScreen() {
     Keyboard.dismiss();
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     setView("loading");
+    setFallbackAttempted(false);
 
-    // Collect ingredients from chips + custom items
     const allSelected: string[] = [];
     for (const sid of Object.keys(chipSel) as SectionId[]) {
       chipSel[sid].forEach((c) => allSelected.push(c));
       customItems[sid].forEach((c) => allSelected.push(c));
     }
 
-    // Parse free text for additional ingredients and preferences
     const { ingredients: parsedIng, preferences: parsedPrefs } =
       parseIngredientText(freeText);
 
     const allIngredients = normalizeIngredients([...allSelected, ...parsedIng]);
     const allPrefs = [...new Set([...preferences, ...parsedPrefs])] as CookWithPreference[];
 
-    // Brief pause so the transition feels intentional, not instant
     await new Promise((r) => setTimeout(r, 500));
 
     const local = scoreAndRankRecipes(allIngredients, allPrefs);
@@ -274,13 +277,15 @@ export default function CookWithScreen() {
     setView("results");
     scrollRef.current?.scrollTo({ y: 0, animated: false });
 
-    // Trigger AI fallback when readyNow + rescue is thin
     const needsFallback = local.readyNow.length + local.rescue.length < 2;
     if (needsFallback && allIngredients.length >= 1) {
       setFallbackLoading(true);
-      generateFallbackMeal(allIngredients, allPrefs).then((fallback) => {
+      setFallbackAttempted(true);
+      generateFallbackMeal(allIngredients, allPrefs).then((ideas) => {
         setFallbackLoading(false);
-        if (fallback) setResults((prev) => (prev ? { ...prev, fallback } : prev));
+        setResults((prev) =>
+          prev ? { ...prev, fallback: ideas ?? [] } : prev,
+        );
       });
     }
   }
@@ -289,9 +294,9 @@ export default function CookWithScreen() {
     setView("input");
     setResults(null);
     setFallbackLoading(false);
+    setFallbackAttempted(false);
   }
 
-  // CTA is active when user has given us something to work with
   const hasInput =
     freeText.trim().length > 0 ||
     Object.values(chipSel).flat().length > 0 ||
@@ -313,11 +318,19 @@ export default function CookWithScreen() {
 
   // ── Results ──────────────────────────────────────────────────────────────
   if (view === "results" && results) {
+    const aiIdeas = results.fallback ?? [];
+    const showRescueSection =
+      results.rescue.length > 0 ||
+      fallbackLoading ||
+      (fallbackAttempted && !fallbackLoading);
+
     const allEmpty =
       results.readyNow.length === 0 &&
       results.rescue.length === 0 &&
       results.almostThere.length === 0 &&
-      !results.fallback;
+      !fallbackLoading &&
+      aiIdeas.length === 0 &&
+      !fallbackAttempted;
 
     return (
       <View style={[st.container, { backgroundColor: C.background }]}>
@@ -371,48 +384,52 @@ export default function CookWithScreen() {
                 </>
               )}
 
-              {/* 2. Sortii rescue options — pattern-based improvised meals */}
-              {results.rescue.length > 0 && (
+              {/* 2. Rescue ideas — local patterns + AI ideas, no dot */}
+              {showRescueSection && (
                 <>
                   <ResultSection
-                    label="Sortii rescue options"
-                    dotColor={PLUM}
+                    label="Rescue ideas"
+                    noDot
                     spaceTop={results.readyNow.length > 0}
                   />
                   {results.rescue.map((r) => <RescueCard key={r.id} idea={r} />)}
+
+                  {fallbackLoading && (
+                    <View style={st.fallbackLoadRow}>
+                      <ActivityIndicator size="small" color={PLUM} />
+                      <Text style={[st.fallbackLoadText, { color: C.textMuted }]}>
+                        Getting rescue ideas…
+                      </Text>
+                    </View>
+                  )}
+
+                  {!fallbackLoading && aiIdeas.length > 0 &&
+                    aiIdeas.map((idea, i) => (
+                      <AiRescueCard key={idea.name + i} idea={idea} />
+                    ))
+                  }
+
+                  {/* Fallback message when AI returned nothing useful */}
+                  {!fallbackLoading &&
+                    fallbackAttempted &&
+                    aiIdeas.length === 0 &&
+                    results.rescue.length === 0 && (
+                    <View style={[st.rescueEmptyCard, { backgroundColor: C.card, borderColor: C.cardBorder }]}>
+                      <Text style={[st.rescueEmptyText, { color: C.textMuted }]}>
+                        Try adding a protein — chicken, eggs, or tuna usually opens things up.
+                      </Text>
+                    </View>
+                  )}
                 </>
               )}
 
-              {/* AI fallback spinner / card */}
-              {fallbackLoading && (
-                <View style={st.fallbackLoadRow}>
-                  <ActivityIndicator size="small" color={PLUM} />
-                  <Text style={[st.fallbackLoadText, { color: C.textMuted }]}>
-                    Getting a backup idea…
-                  </Text>
-                </View>
-              )}
-              {results.fallback && results.rescue.length === 0 && (
-                <>
-                  <ResultSection
-                    label="Sortii rescue options"
-                    dotColor={PLUM}
-                    spaceTop={results.readyNow.length > 0}
-                  />
-                  <FallbackCard idea={results.fallback} />
-                </>
-              )}
-              {results.fallback && results.rescue.length > 0 && (
-                <FallbackCard idea={results.fallback} />
-              )}
-
-              {/* 3. Almost there — strict, 1 supporting ingredient missing */}
+              {/* 3. Almost there — 1 supporting ingredient missing */}
               {results.almostThere.length > 0 && (
                 <>
                   <ResultSection
                     label="Almost there"
                     dotColor={GOLD}
-                    spaceTop={results.readyNow.length > 0 || results.rescue.length > 0}
+                    spaceTop={results.readyNow.length > 0 || showRescueSection}
                   />
                   {results.almostThere.map((r) => <RecipeCard key={r.recipeId} result={r} />)}
                 </>
@@ -448,14 +465,15 @@ export default function CookWithScreen() {
 
       <KeyboardAvoidingView
         style={{ flex: 1 }}
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        keyboardVerticalOffset={0}
       >
         <ScrollView
           ref={scrollRef}
           style={{ flex: 1 }}
           contentContainerStyle={[
             st.scrollContent,
-            { paddingBottom: 24 },
+            { paddingBottom: 100 + insets.bottom },
           ]}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
@@ -469,7 +487,7 @@ export default function CookWithScreen() {
 
           {/* ── PRIMARY: Free text input ── */}
           <View style={st.sectionBlock}>
-            <Text style={[st.sectionLabel, { color: C.text }]}>
+            <Text style={[st.sectionLabelInput, { color: C.text }]}>
               Just tell me what you've got
             </Text>
             <TextInput
@@ -503,7 +521,7 @@ export default function CookWithScreen() {
           {/* ── SECONDARY: Guided chip sections ── */}
           {SECTION_DEFS.map((section) => (
             <View key={section.id} style={st.sectionBlock}>
-              <Text style={[st.sectionLabel, { color: C.text }]}>{section.label}</Text>
+              <Text style={[st.sectionLabelInput, { color: C.text }]}>{section.label}</Text>
 
               <View style={st.chipWrap}>
                 {section.chips.map((chip) => {
@@ -529,7 +547,6 @@ export default function CookWithScreen() {
                 })}
               </View>
 
-              {/* Custom additions */}
               {customItems[section.id].length > 0 && (
                 <View style={st.chipWrap}>
                   {customItems[section.id].map((item) => (
@@ -576,7 +593,7 @@ export default function CookWithScreen() {
 
           {/* Night style / preferences */}
           <View style={st.sectionBlock}>
-            <Text style={[st.sectionLabel, { color: C.text }]}>What kind of night is this?</Text>
+            <Text style={[st.sectionLabelInput, { color: C.text }]}>What kind of night is this?</Text>
             <View style={st.chipWrap}>
               {PREF_DEFS.map(({ id, label }) => {
                 const active = preferences.includes(id);
@@ -602,29 +619,29 @@ export default function CookWithScreen() {
             </View>
           </View>
         </ScrollView>
-
-        {/* Sticky CTA */}
-        <View
-          style={[
-            st.ctaWrap,
-            {
-              paddingBottom: insets.bottom + 12,
-              borderTopColor: C.cardBorder,
-              backgroundColor: C.background,
-            },
-          ]}
-        >
-          <TouchableOpacity
-            style={[st.ctaBtn, { backgroundColor: hasInput ? TEAL : C.chipBg }]}
-            onPress={handleRun}
-            activeOpacity={0.82}
-          >
-            <Text style={[st.ctaBtnText, { color: hasInput ? "#fff" : C.textMuted }]}>
-              {hasInput ? "See what I can make →" : "Add some ingredients first"}
-            </Text>
-          </TouchableOpacity>
-        </View>
       </KeyboardAvoidingView>
+
+      {/* Sticky CTA — outside KeyboardAvoidingView so it anchors to screen bottom */}
+      <View
+        style={[
+          st.ctaWrap,
+          {
+            paddingBottom: insets.bottom + 12,
+            borderTopColor: C.cardBorder,
+            backgroundColor: C.background,
+          },
+        ]}
+      >
+        <TouchableOpacity
+          style={[st.ctaBtn, { backgroundColor: hasInput ? TEAL : C.chipBg }]}
+          onPress={handleRun}
+          activeOpacity={0.82}
+        >
+          <Text style={[st.ctaBtnText, { color: hasInput ? "#fff" : C.textMuted }]}>
+            {hasInput ? "See what I can make →" : "Add some ingredients first"}
+          </Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
@@ -660,7 +677,7 @@ const st = StyleSheet.create({
 
   // ── Input sections ──
   sectionBlock: { marginBottom: 22, gap: 10 },
-  sectionLabel: { fontSize: 14, fontFamily: "Inter_600SemiBold", lineHeight: 19 },
+  sectionLabelInput: { fontSize: 14, fontFamily: "Inter_600SemiBold", lineHeight: 19 },
 
   freeText: {
     borderWidth: 1,
@@ -740,7 +757,7 @@ const st = StyleSheet.create({
 
   missingNote: { fontSize: 12, fontFamily: "Inter_500Medium", marginTop: 2 },
 
-  // ── Steps (rescue / fallback cards) ──
+  // ── Steps (rescue / AI cards) ──
   stepRow: { flexDirection: "row", gap: 6, marginTop: 4 },
   stepNum: { fontSize: 13, fontFamily: "Inter_600SemiBold", minWidth: 16 },
   stepText: { flex: 1, fontSize: 13, fontFamily: "Inter_400Regular", lineHeight: 19 },
@@ -754,6 +771,19 @@ const st = StyleSheet.create({
     justifyContent: "center",
   },
   fallbackLoadText: { fontSize: 13, fontFamily: "Inter_400Regular" },
+
+  // ── Rescue empty nudge ──
+  rescueEmptyCard: {
+    borderRadius: 12,
+    borderWidth: 1,
+    padding: 16,
+    marginBottom: 12,
+  },
+  rescueEmptyText: {
+    fontSize: 13,
+    fontFamily: "Inter_400Regular",
+    lineHeight: 20,
+  },
 
   // ── Empty state ──
   emptyCard: {

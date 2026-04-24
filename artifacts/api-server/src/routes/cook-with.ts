@@ -12,26 +12,32 @@ const apiKey =
 
 const client = new Anthropic({ apiKey, ...(baseURL ? { baseURL } : {}) });
 
-const SYSTEM_PROMPT = `You are Sortii, a calm and practical household meal planner.
-Your job: suggest ONE realistic improvised dinner from the ingredients listed.
+const SYSTEM_PROMPT = `You are Sortii's Fridge Rescue engine. The user has told you what's in their fridge and cupboard. Your job is to suggest dinner ideas they can make RIGHT NOW with what they have.
 
-RULES:
-- Use only the provided ingredients plus assumed basics (salt, pepper, oil, water, garlic if present).
-- Do NOT introduce many new ingredients. Keep it real and achievable.
-- Keep it simple, low-effort, and edible. No fancy chef language.
-- Aim for the cheapest, least-fuss approach with what they have.
-- Sound like a helpful friend, not a recipe blog.
+Oil, salt, and pepper are always available. Do not count these as missing ingredients.
 
-Tone: warm, practical, lightly dry. Never shaming ("not glamorous, but still dinner").
+Rules:
+- Always return EXACTLY 2 to 3 dinner ideas. Never fewer. Never more.
+- Each idea must be genuinely makeable from the listed ingredients — no missing proteins or bases.
+- Steps: maximum 3 steps, each under 15 words.
+- Hook: one punchy line. Practical tone. Never poetic or aspirational.
+- Time: realistic cook time in minutes.
+- Difficulty: one of "very easy", "easy", or "medium".
+- Use as many of the listed ingredients as possible across the suggestions.
+- Prioritise meals under 30 minutes.
 
-Return ONLY valid JSON. No markdown fences. Exact shape:
-{
-  "title": "Meal name (short, plain English)",
-  "reason": "1 sentence why this works — mention 1-2 key ingredients they have",
-  "steps": ["step 1 (short)", "step 2 (short)", "step 3 (short)"],
-  "cookTime": "e.g. 15 mins or 20-25 mins",
-  "effort": "very easy | easy | moderate"
-}`;
+Return ONLY a valid JSON array. No preamble, no explanation, no markdown.
+
+Format:
+[
+  {
+    "name": "Egg fried rice",
+    "hook": "Your eggs and rice — classic no-shop dinner.",
+    "steps": ["Cook rice or use leftover. Beat eggs.", "Fry eggs in hot oil, breaking up as they cook. Add rice.", "Stir-fry 3–4 mins. Season with soy sauce or salt."],
+    "timeMinutes": 15,
+    "difficulty": "very easy"
+  }
+]`;
 
 router.post("/cook-with", async (req, res) => {
   try {
@@ -56,7 +62,7 @@ router.post("/cook-with", async (req, res) => {
 
     const message = await client.messages.create({
       model: "claude-haiku-4-5",
-      max_tokens: 512,
+      max_tokens: 1024,
       system: SYSTEM_PROMPT,
       messages: [{ role: "user", content: prompt }],
     });
@@ -72,16 +78,26 @@ router.post("/cook-with", async (req, res) => {
       .replace(/```\s*/g, "")
       .trim();
 
-    const start = cleaned.indexOf("{");
-    const end = cleaned.lastIndexOf("}");
-    if (start !== -1 && end !== -1) cleaned = cleaned.slice(start, end + 1);
+    const start = cleaned.indexOf("[");
+    const end = cleaned.lastIndexOf("]");
+    if (start === -1 || end === -1) {
+      logger.warn("cook-with: AI did not return a JSON array");
+      res.json({ result: [] });
+      return;
+    }
+    cleaned = cleaned.slice(start, end + 1);
 
     const parsed = JSON.parse(cleaned);
-    logger.info("cook-with: AI fallback success");
+    if (!Array.isArray(parsed)) {
+      res.json({ result: [] });
+      return;
+    }
+
+    logger.info({ count: parsed.length }, "cook-with: AI rescue success");
     res.json({ result: parsed });
   } catch (err) {
-    logger.error({ err }, "cook-with: AI fallback error");
-    res.status(500).json({ error: "Failed to generate fallback meal" });
+    logger.error({ err }, "cook-with: AI rescue error");
+    res.status(500).json({ error: "Failed to generate rescue ideas" });
   }
 });
 
