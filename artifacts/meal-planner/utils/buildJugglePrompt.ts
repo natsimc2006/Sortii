@@ -1,5 +1,7 @@
 import type { FamilyEvent, FamilyMember, CarpoolContactEntry } from "./familyTypes";
 
+const PERSONAL_APPT_RE = /doctor|gp|dentist|hospital|physio|appointment|clinic/i;
+
 /**
  * Builds the user message sent to Claude's juggle-solve endpoint.
  * Maps from FamilyMember[] + FamilyEvent[] to the structured text format
@@ -11,6 +13,10 @@ export function buildJugglePrompt(
   globalContacts: CarpoolContactEntry[] = [],
   freeText: string = "",
 ): string {
+  const adultNames = members
+    .filter((m) => m.role === "adult" && m.name.trim())
+    .map((m) => m.name.toLowerCase());
+
   const adultsStr = members
     .filter((m) => m.role === "adult" && m.name.trim())
     .map((m) => `- ${m.name} (can drive)`)
@@ -25,18 +31,25 @@ export function buildJugglePrompt(
       const child =
         childMembers.map((m) => m!.name).join(", ") || e.title;
 
-      const assignedAdult =
-        e.assignedAdult ||
-        (e.driverId
-          ? (members.find((m) => m.id === e.driverId)?.name ?? "unassigned")
-          : "unassigned");
+      // Detect personal appointment (an adult attending their own appointment)
+      const isPersonalAppointment =
+        adultNames.some((n) => child.toLowerCase() === n) &&
+        PERSONAL_APPT_RE.test(e.title);
+
+      // For personal appointments the adult IS the attendee — self-assign
+      const assignedAdult = isPersonalAppointment
+        ? child
+        : e.assignedAdult ||
+          (e.driverId
+            ? (members.find((m) => m.id === e.driverId)?.name ?? "unassigned")
+            : "unassigned");
 
       const priority = e.priority ?? (e.isAppointment ? "must" : "must");
       const isRecurring = e.isRecurring ?? e.repeat !== "none";
 
       return [
         `Event ${i + 1} (ID: ${e.id}):`,
-        `  Child/person: ${child}`,
+        `  Child/person: ${child}${isPersonalAppointment ? " (this is their own appointment — they must attend in person)" : ""}`,
         `  Activity: ${e.title}`,
         `  Location: ${e.location || "unspecified"}`,
         `  Day: ${e.day}`,

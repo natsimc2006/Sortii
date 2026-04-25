@@ -1736,12 +1736,19 @@ function AddEventSheet({
 
   function togglePerson(id: string) {
     Keyboard.dismiss();
-    setDraft((d) => ({
-      ...d,
-      personIds: d.personIds.includes(id)
+    setDraft((d) => {
+      const wasSelected = d.personIds.includes(id);
+      const newPersonIds = wasSelected
         ? d.personIds.filter((x) => x !== id)
-        : [...d.personIds, id],
-    }));
+        : [...d.personIds, id];
+      const member = members.find((m) => m.id === id);
+      // FIX 1: for appointment + adult member, lock assignedAdult to themselves
+      let assignedAdult = d.assignedAdult;
+      if (d.isAppointment && member?.role === "adult") {
+        assignedAdult = wasSelected ? "" : member.name;
+      }
+      return { ...d, personIds: newPersonIds, assignedAdult };
+    });
   }
 
   function handleSave() {
@@ -1753,6 +1760,16 @@ function AddEventSheet({
 
     const parsedTime = parseTime(draft.time) || draft.time;
     const parsedEnd  = draft.endTime?.trim() ? (parseTime(draft.endTime) || draft.endTime) : undefined;
+
+    // FIX 2: if an adult is the attending person for an appointment, self-assign them silently
+    const adultAttendee = draft.personIds
+      .map((id) => members.find((m) => m.id === id))
+      .find((m) => m?.role === "adult");
+    const correctedAssignedAdult =
+      draft.isAppointment && adultAttendee
+        ? adultAttendee.name
+        : draft.assignedAdult?.trim() || undefined;
+
     onSave({
       ...draft,
       title: draft.title.trim(),
@@ -1763,6 +1780,7 @@ function AddEventSheet({
       carpoolContacts: draft.carpoolContacts?.length ? draft.carpoolContacts : undefined,
       notes: draft.notes?.trim() || undefined,
       driverId: undefined,
+      assignedAdult: correctedAssignedAdult,
     });
   }
 
@@ -1877,32 +1895,43 @@ function AddEventSheet({
               </View>
             )}
 
-            {/* WHO'S RESPONSIBLE FOR THIS? — adult selector */}
-            {members.some((m) => m.role === "adult") && (
-              <View style={styles.formField}>
-                <Text style={styles.formLabel}>WHO'S RESPONSIBLE FOR THIS?</Text>
-                <View style={styles.chipGroup}>
-                  {members.filter((m) => m.role === "adult").map((m) => {
-                    const active = draft.assignedAdult === m.name;
-                    return (
-                      <TouchableOpacity
-                        key={m.id}
-                        style={[styles.repeatChip, active && styles.repeatChipSelected]}
-                        onPress={() => {
-                          Keyboard.dismiss();
-                          setField("assignedAdult", active ? "" : m.name);
-                        }}
-                        activeOpacity={0.75}
-                      >
-                        <Text style={[styles.repeatChipText, active && styles.repeatChipTextSelected]}>
-                          {m.name}
-                        </Text>
-                      </TouchableOpacity>
-                    );
-                  })}
+            {/* WHO'S RESPONSIBLE FOR THIS? — adult selector or locked for personal appts */}
+            {members.some((m) => m.role === "adult") && (() => {
+              const lockedAdult = draft.isAppointment
+                ? members.find((m) => draft.personIds.includes(m.id) && m.role === "adult")
+                : null;
+              return (
+                <View style={styles.formField}>
+                  <Text style={styles.formLabel}>WHO'S RESPONSIBLE FOR THIS?</Text>
+                  {lockedAdult ? (
+                    <Text style={{ fontSize: 14, fontFamily: "Inter_400Regular", color: TEXT_MUTED, fontStyle: "italic" }}>
+                      {lockedAdult.name} — it's their appointment
+                    </Text>
+                  ) : (
+                    <View style={styles.chipGroup}>
+                      {members.filter((m) => m.role === "adult").map((m) => {
+                        const active = draft.assignedAdult === m.name;
+                        return (
+                          <TouchableOpacity
+                            key={m.id}
+                            style={[styles.repeatChip, active && styles.repeatChipSelected]}
+                            onPress={() => {
+                              Keyboard.dismiss();
+                              setField("assignedAdult", active ? "" : m.name);
+                            }}
+                            activeOpacity={0.75}
+                          >
+                            <Text style={[styles.repeatChipText, active && styles.repeatChipTextSelected]}>
+                              {m.name}
+                            </Text>
+                          </TouchableOpacity>
+                        );
+                      })}
+                    </View>
+                  )}
                 </View>
-              </View>
-            )}
+              );
+            })()}
 
             {/* Day */}
             <View style={styles.formField}>
