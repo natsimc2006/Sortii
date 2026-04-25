@@ -306,9 +306,9 @@ export default function OnboardingScreen() {
       {/* ── Value props ── */}
       <View style={styles.valueProps}>
         {[
-          { anim: line1, color: TEAL,  text: "Dinner sorted — no decisions required" },
-          { anim: line2, color: PLUM,  text: "Your week in one clear view" },
-          { anim: line3, color: GOLD,  text: "Know exactly where the money goes" },
+          { anim: line1, color: TEAL,  text: "Dinners done. No thinking needed." },
+          { anim: line2, color: PLUM,  text: "Your whole week, at a glance." },
+          { anim: line3, color: GOLD,  text: "Money tracked. No spreadsheet." },
         ].map(({ anim, color, text }) => (
           <Animated.View key={text} style={[styles.valueProp, { opacity: anim }]}>
             <View style={[styles.valuePropDot, { backgroundColor: color }]} />
@@ -355,6 +355,7 @@ const styles = StyleSheet.create({
   },
   valueProps: {
     flex: 1,
+    justifyContent: "center",
     gap: 20,
     marginBottom: 24,
   },
@@ -371,10 +372,11 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   valuePropText: {
-    fontFamily: "DMSans_500Medium",
-    fontSize: 16,
+    fontFamily: "DMSans_600SemiBold",
+    fontWeight: "600",
+    fontSize: 17,
     color: "#2B2B2B",
-    lineHeight: 22,
+    lineHeight: 23,
     flex: 1,
   },
   ctaWrap: {
