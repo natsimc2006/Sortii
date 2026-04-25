@@ -25,6 +25,7 @@ export interface FamilyEvent {
   personIds: string[];
   driverId?: string;
   carpoolContact?: string;
+  carpoolContacts?: { name: string; mobile?: string }[];
   repeat: RepeatType;
   notes?: string;
   isAppointment?: boolean;

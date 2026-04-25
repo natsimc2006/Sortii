@@ -422,7 +422,8 @@ const BUSYNESS_CONFIG: Record<BusynessLevel, { label: string; color: string }> =
 function blankDraft(): Omit<FamilyEvent, "id"> {
   return {
     title: "", day: "Monday", time: "", endTime: "", location: "",
-    personIds: [], driverId: undefined, carpoolContact: "", repeat: "none", notes: "",
+    personIds: [], driverId: undefined, carpoolContact: "", carpoolContacts: [],
+    repeat: "none", notes: "",
     isAppointment: false,
   };
 }
@@ -747,6 +748,7 @@ function JuggleResultsContent({
   const dashAccent = impossible > 0 ? "#C0695A" : tight > 0 ? GOLD : TEAL;
 
   return (
+    <View style={{ flex: 1 }}>
     <ScrollView style={{ flex: 1 }} contentContainerStyle={{ gap: 0, paddingBottom: 120 }}>
       {/* ── 1. Hero dashboard ── */}
       <View style={[styles.resultDashboard, { backgroundColor: dashBg, borderBottomColor: dashAccent + "22" }]}>
@@ -962,9 +964,10 @@ function JuggleResultsContent({
       </TouchableOpacity>
 
       </View>{/* end paddingHorizontal wrapper */}
+    </ScrollView>
 
-      {/* ── Swap bottom sheet ── */}
-      <Modal
+    {/* ── Swap bottom sheet ── */}
+    <Modal
         visible={!!swapRow}
         transparent
         animationType="slide"
@@ -1060,8 +1063,8 @@ function JuggleResultsContent({
             </TouchableOpacity>
           </View>
         </View>
-      </Modal>
-    </ScrollView>
+    </Modal>
+    </View>
   );
 }
 
@@ -1684,6 +1687,8 @@ function AddEventSheet({
   const [addingContact, setAddingContact]         = useState(false);
   const [newContactName, setNewContactName]       = useState("");
   const [newContactPhone, setNewContactPhone]     = useState("");
+  const [carpoolEntryName, setCarpoolEntryName]   = useState("");
+  const [carpoolEntryMobile, setCarpoolEntryMobile] = useState("");
 
   // Derived: is the form valid enough to save?
   const isFormValid = draft.title.trim().length > 0 && draft.time.trim().length > 0;
@@ -1708,6 +1713,8 @@ function AddEventSheet({
     if (visible) {
       setDraft(initialDraft ? { ...blankDraft(), ...initialDraft } : blankDraft());
       setErrors([]);
+      setCarpoolEntryName("");
+      setCarpoolEntryMobile("");
       Animated.parallel([
         Animated.spring(slideY, { toValue: 0, useNativeDriver: true, tension: 80, friction: 12 }),
         Animated.timing(overlayOp, { toValue: 1, duration: 200, useNativeDriver: true }),
@@ -1749,6 +1756,7 @@ function AddEventSheet({
       endTime: parsedEnd || undefined,
       location: draft.location?.trim() || undefined,
       carpoolContact: draft.carpoolContact?.trim() || undefined,
+      carpoolContacts: draft.carpoolContacts?.length ? draft.carpoolContacts : undefined,
       notes: draft.notes?.trim() || undefined,
       driverId: undefined,
     });
@@ -1925,98 +1933,86 @@ function AddEventSheet({
               />
             </View>
 
-            {/* Who could help — persistent carpool contacts */}
+            {/* WHO COULD HELP WITH THIS? — per-event carpool contacts */}
             <View style={styles.formField}>
-              <Text style={styles.formLabel}>Who could help with this?</Text>
-              <Text style={styles.formHint}>Build your list as you go.</Text>
+              <Text style={{ fontSize: 11, fontFamily: "Inter_600SemiBold", color: "#999", textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 4 }}>
+                Who could help with this?
+              </Text>
+              <Text style={{ fontSize: 13, fontFamily: "Inter_400Regular", color: "#777", marginBottom: 10 }}>
+                Add a name and number for someone who could do a pickup run.
+              </Text>
 
-              {/* Saved contact chips */}
-              {carpoolContacts.length > 0 && (
-                <View style={styles.carpoolChipRow}>
-                  {carpoolContacts.map((c) => {
-                    const selected = draft.carpoolContact === `${c.name} — ${c.phone}`;
-                    return (
-                      <TouchableOpacity
-                        key={c.id}
-                        onPress={() => {
-                          Keyboard.dismiss();
-                          setField("carpoolContact", selected ? "" : `${c.name} — ${c.phone}`);
-                        }}
-                        activeOpacity={0.75}
-                        style={[
-                          styles.carpoolChip,
-                          selected && styles.carpoolChipSelected,
-                        ]}
-                      >
-                        <Text style={[styles.carpoolChipText, selected && styles.carpoolChipTextSelected]}>
-                          {c.name}
-                        </Text>
-                        {selected && <Feather name="check" size={11} color={TEAL} />}
-                      </TouchableOpacity>
-                    );
-                  })}
-                  {!addingContact && (
-                    <TouchableOpacity
-                      onPress={() => { Keyboard.dismiss(); setAddingContact(true); }}
-                      style={styles.carpoolChipAdd}
-                      activeOpacity={0.75}
-                    >
-                      <Feather name="plus" size={12} color={TEAL} />
-                      <Text style={styles.carpoolChipAddText}>Add new</Text>
-                    </TouchableOpacity>
-                  )}
-                </View>
-              )}
-
-              {/* Add contact form — shown on first use or when "+ Add new" tapped */}
-              {(carpoolContacts.length === 0 || addingContact) && (
-                <View style={styles.carpoolAddForm}>
-                  <TextInput
-                    style={[styles.formInput, { marginBottom: 8 }]}
-                    value={newContactName}
-                    onChangeText={setNewContactName}
-                    placeholder="Name"
-                    placeholderTextColor="#bbb"
-                    returnKeyType="next"
-                  />
-                  <View style={styles.carpoolAddRow}>
-                    <TextInput
-                      style={[styles.formInput, { flex: 1 }]}
-                      value={newContactPhone}
-                      onChangeText={setNewContactPhone}
-                      placeholder="Phone number"
-                      placeholderTextColor="#bbb"
-                      keyboardType="phone-pad"
-                      returnKeyType="done"
-                    />
-                    <TouchableOpacity
-                      onPress={() => {
-                        if (!newContactName.trim()) return;
-                        const c: CarpoolContact = {
-                          id: Date.now().toString(),
-                          name: newContactName.trim(),
-                          phone: newContactPhone.trim(),
-                        };
-                        onAddCarpoolContact(c);
-                        setField("carpoolContact", `${c.name}${c.phone ? ` — ${c.phone}` : ""}`);
-                        setNewContactName("");
-                        setNewContactPhone("");
-                        setAddingContact(false);
-                        Keyboard.dismiss();
-                      }}
-                      style={[styles.carpoolAddBtn, !newContactName.trim() && { opacity: 0.4 }]}
-                      disabled={!newContactName.trim()}
-                      activeOpacity={0.8}
-                    >
-                      <Text style={styles.carpoolAddBtnText}>Add</Text>
-                    </TouchableOpacity>
+              {/* Already-added contacts */}
+              {(draft.carpoolContacts ?? []).map((c, idx) => (
+                <View key={idx} style={{ flexDirection: "row", alignItems: "center", marginBottom: 8, gap: 8 }}>
+                  <View style={{ flex: 1, flexDirection: "row", alignItems: "center", gap: 6 }}>
+                    <Feather name="user" size={13} color={TEAL} />
+                    <Text style={{ fontFamily: "Inter_500Medium", fontSize: 14, color: TEXT }}>
+                      {c.name}{c.mobile ? ` · ${c.mobile}` : ""}
+                    </Text>
                   </View>
-                  {addingContact && (
-                    <TouchableOpacity onPress={() => { setAddingContact(false); }} style={{ marginTop: 6 }}>
-                      <Text style={[styles.formHint, { color: TEXT_MUTED }]}>Cancel</Text>
-                    </TouchableOpacity>
-                  )}
+                  <TouchableOpacity
+                    onPress={() => {
+                      const next = (draft.carpoolContacts ?? []).filter((_, i) => i !== idx);
+                      setField("carpoolContacts", next);
+                    }}
+                    hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                  >
+                    <Feather name="x" size={14} color={TEXT_MUTED} />
+                  </TouchableOpacity>
                 </View>
+              ))}
+
+              {/* Input row for a new contact */}
+              <TextInput
+                style={[styles.formInput, { marginBottom: 8 }]}
+                value={carpoolEntryName}
+                onChangeText={setCarpoolEntryName}
+                placeholder="Name"
+                placeholderTextColor="#bbb"
+                returnKeyType="next"
+              />
+              <View style={{ flexDirection: "row", gap: 8, alignItems: "center" }}>
+                <TextInput
+                  style={[styles.formInput, { flex: 1 }]}
+                  value={carpoolEntryMobile}
+                  onChangeText={setCarpoolEntryMobile}
+                  placeholder="Mobile (optional)"
+                  placeholderTextColor="#bbb"
+                  keyboardType="phone-pad"
+                  returnKeyType="done"
+                />
+                <TouchableOpacity
+                  onPress={() => {
+                    if (!carpoolEntryName.trim()) return;
+                    const next = [
+                      ...(draft.carpoolContacts ?? []),
+                      { name: carpoolEntryName.trim(), mobile: carpoolEntryMobile.trim() || undefined },
+                    ];
+                    setField("carpoolContacts", next);
+                    setCarpoolEntryName("");
+                    setCarpoolEntryMobile("");
+                    Keyboard.dismiss();
+                  }}
+                  style={[styles.carpoolAddBtn, !carpoolEntryName.trim() && { opacity: 0.4 }]}
+                  disabled={!carpoolEntryName.trim()}
+                  activeOpacity={0.8}
+                >
+                  <Text style={styles.carpoolAddBtnText}>Add</Text>
+                </TouchableOpacity>
+              </View>
+
+              {/* "+ Add another" shown when at least one contact exists and inputs are empty */}
+              {(draft.carpoolContacts ?? []).length > 0 && !carpoolEntryName.trim() && (
+                <TouchableOpacity
+                  onPress={() => {}}
+                  style={{ marginTop: 8 }}
+                  activeOpacity={1}
+                >
+                  <Text style={{ color: TEAL, fontFamily: "Inter_500Medium", fontSize: 13 }}>
+                    + Add another
+                  </Text>
+                </TouchableOpacity>
               )}
             </View>
 

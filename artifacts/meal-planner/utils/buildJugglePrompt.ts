@@ -9,79 +9,66 @@ export function buildJugglePrompt(
   members: FamilyMember[],
   events: FamilyEvent[]
 ): string {
-  const adults   = members.filter((m) => m.role === "adult");
-  const children = members.filter((m) => m.role === "child");
+  const adults   = members.filter((m) => m.role === "adult").map((m) => m.name);
+  const children = members.filter((m) => m.role === "child").map((m) => m.name);
 
-  const lines: string[] = [];
+  const eventLines = events.map((ev) => {
+    const personNames = ev.personIds
+      .map((id) => members.find((m) => m.id === id)?.name)
+      .filter(Boolean)
+      .join(", ");
 
-  // ── Adults section ──────────────────────────────────────────────────────────
-  lines.push("Available adults:");
-  if (adults.length === 0) {
-    lines.push("(none)");
-  } else {
-    for (const a of adults) {
-      lines.push(`${a.name}, can drive: yes`);
+    const driverName = ev.driverId
+      ? (members.find((m) => m.id === ev.driverId)?.name ?? "unassigned")
+      : "unassigned";
+
+    const isAppointment = ev.isAppointment ?? false;
+
+    const coverage = isAppointment
+      ? `${driverName}'s own appointment — they must attend`
+      : `${driverName} is primary driver — needs to be there for drop-off/pick-up`;
+
+    const startDisplay = formatTime(ev.time) || ev.time;
+    const endDisplay   = ev.endTime ? `–${formatTime(ev.endTime) || ev.endTime}` : "";
+
+    // Prefer per-event carpoolContacts array, fall back to legacy string field
+    let carpoolLine: string;
+    if (ev.carpoolContacts && ev.carpoolContacts.length > 0) {
+      carpoolLine = `Carpool contacts: ${ev.carpoolContacts.map((c) => c.mobile ? `${c.name} (${c.mobile})` : c.name).join(", ")}`;
+    } else if (ev.carpoolContact) {
+      carpoolLine = `Carpool contacts: ${ev.carpoolContact}`;
+    } else {
+      carpoolLine = "No carpool contacts listed";
     }
-  }
 
-  lines.push("");
+    return [
+      `Event: ${ev.title}`,
+      `Child/person: ${personNames || driverName}`,
+      `Day: ${ev.day}`,
+      `Time: ${startDisplay}${endDisplay}`,
+      `Location: ${ev.location || "not specified"}`,
+      `Type: ${ev.repeat !== "none" ? "Recurring weekly" : "One-off"}`,
+      `Priority: ${isAppointment ? "must — medical appointment, do not reschedule" : "must"}`,
+      `Coverage needed: ${coverage}`,
+      carpoolLine,
+    ].join("\n");
+  }).join("\n\n");
 
-  // ── Children section ─────────────────────────────────────────────────────
-  if (children.length > 0) {
-    lines.push("Children in household:");
-    for (const c of children) {
-      lines.push(`${c.name}`);
-    }
-    lines.push("");
-  }
+  return `
+Family: ${adults.join(", ")} (adults), ${children.join(", ")} (children)
+Location context: Lake Macquarie / Hunter region, NSW Australia
 
-  // ── Events section ───────────────────────────────────────────────────────
-  lines.push("Events this week:");
-  if (events.length === 0) {
-    lines.push("(none)");
-  } else {
-    for (const ev of events) {
-      const childNames = ev.personIds
-        .map((id) => members.find((m) => m.id === id)?.name)
-        .filter(Boolean)
-        .join(", ");
-      const driverName = ev.driverId
-        ? (members.find((m) => m.id === ev.driverId)?.name ?? "unassigned")
-        : "unassigned";
-      const endDisplay = ev.endTime ? formatTime(ev.endTime) : "not specified";
-      const repeat = ev.repeat !== "none" ? ev.repeat : "one-off";
+Events requiring coverage this week:
 
-      lines.push(`Activity: ${ev.title}`);
-      lines.push(`Day: ${ev.day}`);
-      lines.push(`Start: ${formatTime(ev.time) || "not specified"}`);
-      lines.push(`End: ${endDisplay}`);
-      lines.push(`Who's going: ${childNames || "not specified"}`);
-      lines.push(`Assigned adult/driver: ${driverName}`);
-      if (ev.location) lines.push(`Location: ${ev.location}`);
-      if (ev.carpoolContact) lines.push(`Carpool contact: ${ev.carpoolContact}`);
-      if (ev.notes) lines.push(`Notes: ${ev.notes}`);
-      lines.push(`Frequency: ${repeat}`);
-      lines.push("---");
-    }
-  }
+${eventLines}
 
-  // ── Carpool contacts section (deduplicated from event fields) ─────────────
-  const carpoolContacts = events
-    .filter((e) => e.carpoolContact && e.carpoolContact.trim().length > 0)
-    .map((e) => e.carpoolContact!.trim());
-  const uniqueContacts = [...new Set(carpoolContacts)];
-  if (uniqueContacts.length > 0) {
-    lines.push("");
-    lines.push("Carpool contacts available:");
-    for (const c of uniqueContacts) {
-      lines.push(c);
-    }
-  }
-
-  lines.push("");
-  lines.push(
-    "Please work out the most practical plan for this week. Flag any timing issues, conflicts, or things worth knowing."
-  );
-
-  return lines.join("\n");
+Instructions:
+- Assign one adult per child event (drop-off and pick-up)
+- Medical appointments are fixed — never suggest rescheduling them
+- Where one adult has two overlapping commitments, check if another adult can cover via handoff
+- Factor in drive time between locations. Morisset to Wangi Wangi is ~12 min. Wangi Wangi to Rathmines is ~10 min. Morisset to Rathmines is ~15 min.
+- If a handoff is possible (adult finishes nearby in time to cover), name it explicitly: who, what time, where
+- Prefer handoff solutions over rescheduling suggestions
+- If carpool contacts are listed for a child, surface them by name in conflict suggestions for that child only
+`.trim();
 }
