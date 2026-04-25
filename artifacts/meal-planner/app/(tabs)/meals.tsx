@@ -691,6 +691,15 @@ export default function MealsScreen() {
               range={filledCount > 0 ? estimatedCostBand : undefined}
               onPress={() => setActiveChip("budget")}
             />
+            <TouchableOpacity
+              style={styles.fridgeRescueChip}
+              onPress={() => router.push("/(tabs)/cook-with" as any)}
+              activeOpacity={0.72}
+              hitSlop={{ top: 6, bottom: 6, left: 4, right: 4 }}
+            >
+              <Feather name="search" size={10} color={TEAL} />
+              <Text style={styles.fridgeRescueChipText}>Fridge Rescue</Text>
+            </TouchableOpacity>
           </View>
           {preferences.kidFriendly && (
             <Text style={[styles.kidFriendlyNote, { color: C.textSecondary }]}>
@@ -864,23 +873,6 @@ export default function MealsScreen() {
           );
         })}
 
-        {/* Fridge Rescue — always shown below meal list */}
-        <TouchableOpacity
-          style={styles.rescueEntry}
-          onPress={() => router.push("/(tabs)/cook-with" as any)}
-          activeOpacity={0.78}
-        >
-          <View style={styles.rescueEntryIcon}>
-            <Feather name="search" size={20} color={TEAL} />
-          </View>
-          <View style={{ flex: 1, gap: 3 }}>
-            <Text style={styles.rescueEntryTitle}>Fridge Rescue</Text>
-            <Text style={styles.rescueEntrySub}>
-              Tell me what you've got and I'll sort dinner.
-            </Text>
-          </View>
-          <Feather name="chevron-right" size={16} color={TEAL} />
-        </TouchableOpacity>
 
         {/* Easy night quiet confirmation line */}
         {planHasEasyNight && (
@@ -1489,35 +1481,21 @@ const styles = StyleSheet.create({
     fontFamily: "Inter_400Regular",
     marginBottom: 20,
   },
-  rescueEntry: {
+  fridgeRescueChip: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 12,
-    marginHorizontal: 0,
-    marginBottom: 16,
-    padding: 16,
-    borderRadius: 12,
+    gap: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 16,
+    borderWidth: 1,
     backgroundColor: "#E6F3F0",
-    borderWidth: 0,
+    borderColor: "#2A8F8840",
   },
-  rescueEntryIcon: {
-    width: 36,
-    height: 36,
-    borderRadius: 10,
-    backgroundColor: "#2A8F8820",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  rescueEntryTitle: {
-    fontSize: 15,
-    fontFamily: "Inter_600SemiBold",
-    color: "#2B2B2B",
-    lineHeight: 20,
-  },
-  rescueEntrySub: {
-    fontSize: 13,
-    fontFamily: "Inter_400Regular",
-    color: "#777777",
+  fridgeRescueChipText: {
+    fontSize: 11,
+    fontFamily: "Inter_500Medium",
+    color: "#2A8F88",
   },
   dayBlock: { gap: 8, marginBottom: 20 },
   dayLabelRow: {
