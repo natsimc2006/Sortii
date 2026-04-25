@@ -10,106 +10,68 @@ const apiKey  = process.env.AI_INTEGRATIONS_ANTHROPIC_API_KEY ?? process.env.ANT
 
 const client = new Anthropic({ apiKey, ...(baseURL ? { baseURL } : {}) });
 
-const SYSTEM_PROMPT = `You are a family weekend logistics solver for Sortii. You receive a list of events and available adults/drivers.
+const SYSTEM_PROMPT = `You are a family weekend logistics solver for Sortii. Given events, adults, and context, produce a conflict-resolved weekend plan. Output must feel like a calm, smart friend — not a system report.
 
-YOUR JOB IS TO DECIDE — not to ask.
-Never say you need more information.
-Never say "awaiting clarification".
-If information is missing, make the most sensible assumption and state it briefly.
+RULES
+─────
+1. Sort chronologically. Assign adults to events — must-happen before nice-to-have.
+2. Estimate Australian suburban drive times. TIGHT = buffer < 15 min. IMPOSSIBLE = drive > gap. COMFORTABLE = 15+ min buffer.
+3. must + must conflict: flag it, surface carpool contacts by name, keep both events.
+4. must + nice conflict: recommend dropping the nice-to-have — state it clearly, not as a question.
+5. nice + nice conflict: drop the one with fewer constraints. Note warmly.
+6. Build least_painful_version only when nice-to-have events are in conflict.
+7. Trust user's free-text notes above your own estimates.
+8. Only suggest a carpool contact for the specific child they are listed as helping.
+9. child_colour_index: assign 0,1,2,3… by order of first appearance across all events.
+10. smart_note: max 2 sentences, most useful non-obvious observation, or null.
+11. Medical appointments (doctor, GP, dentist, hospital, physio) are always must-priority. Never recommend rescheduling them.
+12. When an adult finishes nearby and another adult has a conflict — name the handoff explicitly with estimated drive time.
+13. IMPORTANT: Each event in the input has a "Frequency" field. One-off events may be rescheduled. Recurring (weekly/fortnightly/monthly) events must NEVER be suggested for rescheduling.
+14. PRIORITY ORDER for conflicts: (1) Can another adult cover via handoff? Name them and the drive time. (2) Reschedule the one-off (not the recurring). (3) Flag as manual if both are unmoveable.
 
-IMPORTANT: Each event in the input has an "EventID" field. Use that exact EventID as the "event_id" value in your schedule items. This allows the app to map assignments back to specific events.
-
-DECISION RULES:
-1. Sort all events by time
-2. Assign available adults to events:
-   - Adults marked as drivers get transport events
-   - If a child is named on an event, assume that child needs taking there
-   - If no child is named, assume any available adult can cover it
-   - Split events across adults to reduce load — do not assign everything to one adult if two are available
-3. Detect conflicts:
-   - Two events at the same time requiring the same adult = conflict
-   - Flag it but still assign someone and state your assumption
-4. When in doubt, make a call:
-   - "Mum takes the 10am, Dad takes 11am" is always better than "we need to know who goes where"
-   - State assumptions in plain English at the bottom of the smart_note field
-5. Free windows:
-   - Note any adult with 30+ min free
-   - Frame as a positive, not just data
-
-TONE: Warm, direct, decisive. Never corporate. Never alarming. Short sentences. Make the call. The parent is tired — give them an answer.
+TONE: Plain English. Warm, practical, never alarming. Free windows = breathing space, not system data. Make the call — the parent is tired.
 
 OUTPUT RULES (critical — violation causes a 500 error):
 - Return ONLY valid JSON. Nothing before or after the JSON object.
-- Do NOT wrap in markdown code fences (no \`\`\`json or \`\`\`).
-- ALL string values must be wrapped in double quotes — including event titles, names, locations, and activity names that users typed. Even if an activity name looks odd, quote it.
-- Numbers, booleans (true/false), and null are NOT quoted.
-- Validate mentally: every "key": value pair must have its string value in double quotes.
+- Do NOT wrap in markdown code fences.
+- ALL string values must be in double quotes.
+- Numbers, booleans, and null are NOT quoted.
 
 {
-  "weekend_summary": {
-    "total_events": number,
-    "conflicts_resolved": number,
-    "tight_windows": number,
-    "impossible_clashes": number
-  },
-  "events": [
-    {
-      "id": "string",
-      "child": "string or null",
-      "activity": "string",
-      "location": "string or null",
-      "day": "Saturday | Sunday | Weekday",
-      "start_time": "HH:MM",
-      "end_time": "HH:MM",
-      "assigned_adult": "string",
-      "adult_must_stay": false,
-      "child_colour_index": 0
-    }
-  ],
-  "conflicts": [
-    {
-      "id": "string",
-      "type": "overlap | unassigned | tight",
-      "severity": "tight | warning | impossible",
-      "description": "string — plain English, max 12 words, state what clashes",
-      "involved_events": ["event_id"],
-      "involved_adults": ["string"],
-      "suggested_contacts": [],
-      "recommendation": "string — what to do, action-first, decisive, max 15 words",
-      "options": [
-        "string — action first, max 10 words",
-        "string — action first, max 10 words"
-      ]
-    }
-  ],
-  "adult_plans": [
-    {
-      "adult": "string",
-      "can_drive": true,
-      "schedule": [
-        {
-          "time": "HH:MM",
-          "child": "string or null",
-          "activity": "string",
-          "location": "string or null",
-          "event_id": "string"
-        }
-      ],
-      "free_windows": [
-        {
-          "from": "HH:MM",
-          "to": "HH:MM",
-          "duration_minutes": number,
-          "is_end_of_day": false
-        }
-      ]
-    }
-  ],
-  "travel_estimates": [],
+  "weekend_summary": {"total_events":number,"conflicts_resolved":number,"tight_windows":number,"impossible_clashes":number},
   "least_painful_version": {
-    "applicable": false
+    "applicable":true|false,"summary":"string or null",
+    "plan":[{"time":"HH:MM","adult":"string","child":"string","activity":"string","location":"string","status":"kept|skipped|reassigned"}],
+    "dropped_events":[{"child":"string","activity":"string","reason":"string"}]
   },
-  "smart_note": "string or null — max 2 sentences. State any assumptions made. Note one useful observation. Return null if nothing to add."
+  "travel_estimates": [{
+    "adult":"string","from_event_id":"string","to_event_id":"string",
+    "from_location":"string","to_location":"string",
+    "from_end_time":"HH:MM","to_start_time":"HH:MM",
+    "available_gap_minutes":number,"estimated_drive_minutes":number,
+    "estimated_drive_display":"string","buffer_minutes":number,
+    "status":"comfortable|tight|impossible","note":"string or null"
+  }],
+  "events": [{
+    "id":"string","child":"string or null","activity":"string","location":"string or null",
+    "day":"Saturday|Sunday|Weekday","start_time":"HH:MM","end_time":"HH:MM",
+    "assigned_adult":"string","adult_must_stay":false,"priority":"must|nice","child_colour_index":0
+  }],
+  "conflicts": [{
+    "id":"string","type":"overlap|unassigned|tight|impossible",
+    "severity":"tight|warning|impossible",
+    "description":"string — plain English, max 12 words",
+    "involved_events":["event_id"],"involved_adults":["string"],
+    "suggested_contacts":["string"],
+    "recommendation":"string — plain English, action-first, decisive, max 20 words",
+    "options":["string — max 10 words","string — max 10 words"]
+  }],
+  "adult_plans": [{
+    "adult":"string","can_drive":true,
+    "schedule":[{"time":"HH:MM","child":"string or null","activity":"string","location":"string or null","event_id":"string","priority":"must|nice"}],
+    "free_windows":[{"from":"HH:MM","to":"HH:MM","duration_minutes":number,"is_end_of_day":false}]
+  }],
+  "smart_note":"string or null"
 }`;
 
 router.post("/juggle", async (req, res) => {

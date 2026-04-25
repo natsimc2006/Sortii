@@ -1,0 +1,94 @@
+import Anthropic from "@anthropic-ai/sdk";
+
+const anthropic = new Anthropic();
+
+const SYSTEM_PROMPT = `You are a family weekend logistics solver for Sortii. Given events, adults, and context, produce a conflict-resolved weekend plan. Output must feel like a calm, smart friend — not a system report.
+
+RULES
+─────
+1. Sort chronologically. Assign adults to events — must-happen before nice-to-have.
+2. Estimate Australian suburban drive times. TIGHT = buffer < 15 min. IMPOSSIBLE = drive > gap. COMFORTABLE = 15+ min buffer.
+3. must + must conflict: flag it, surface carpool contacts by name, keep both events.
+4. must + nice conflict: recommend dropping the nice-to-have — state it clearly, not as a question.
+5. nice + nice conflict: drop the one with fewer constraints. Note warmly.
+6. Build least_painful_version only when nice-to-have events are in conflict.
+7. Trust user's free-text notes above your own estimates.
+8. Only suggest a carpool contact for the specific child they are listed as helping.
+9. child_colour_index: assign 0,1,2,3… by order of first appearance across all events.
+10. smart_note: max 2 sentences, most useful non-obvious observation, or null.
+11. Medical appointments (doctor, GP, dentist, hospital, physio) are always must-priority. Never recommend rescheduling them.
+12. When an adult finishes nearby and another adult has a conflict — name the handoff explicitly with travel time.
+
+TONE: Plain English. Warm, practical, never alarming. Free windows = breathing space, not system data.
+
+Return ONLY valid JSON. No text before or after. No markdown fences.
+
+{
+  "weekend_summary": {"total_events":number,"conflicts_resolved":number,"tight_windows":number,"impossible_clashes":number},
+  "least_painful_version": {
+    "applicable":true|false,"summary":"string or null",
+    "plan":[{"time":"HH:MM","adult":"string","child":"string","activity":"string","location":"string","status":"kept|skipped|reassigned"}],
+    "dropped_events":[{"child":"string","activity":"string","reason":"string — max 10 words"}]
+  },
+  "travel_estimates": [{
+    "adult":"string","from_event_id":"string","to_event_id":"string",
+    "from_location":"string","to_location":"string",
+    "from_end_time":"HH:MM","to_start_time":"HH:MM",
+    "available_gap_minutes":number,"estimated_drive_minutes":number,
+    "estimated_drive_display":"string","buffer_minutes":number,
+    "status":"comfortable|tight|impossible","note":"string or null"
+  }],
+  "events": [{
+    "id":"string","child":"string","activity":"string","location":"string",
+    "day":"string","start_time":"HH:MM","end_time":"HH:MM",
+    "assigned_adult":"string","adult_must_stay":true|false,
+    "priority":"must|nice","child_colour_index":number
+  }],
+  "conflicts": [{
+    "id":"string","type":"overlap|unassigned|tight|impossible",
+    "severity":"tight|warning|impossible","description":"string — plain English, max 12 words",
+    "involved_events":["event_id"],"involved_adults":["string"],
+    "suggested_contacts":["string"],"recommendation":"string — max 15 words",
+    "options":["string — max 10 words","string — max 10 words"]
+  }],
+  "adult_plans": [{
+    "adult":"string","can_drive":true|false,
+    "schedule":[{"time":"HH:MM","child":"string","activity":"string","location":"string","event_id":"string","priority":"must|nice"}],
+    "free_windows":[{"from":"HH:MM","to":"HH:MM","duration_minutes":number,"is_end_of_day":true|false}]
+  }],
+  "smart_note":"string|null"
+}`;
+
+function safeParseResponse(text: string): Record<string, unknown> | null {
+  let cleaned = text.trim();
+  if (cleaned.startsWith("```")) {
+    cleaned = cleaned.replace(/^```[a-z]*\n?/, "").replace(/```$/, "").trim();
+  }
+  const jsonStart = cleaned.indexOf("{");
+  const jsonEnd = cleaned.lastIndexOf("}");
+  if (jsonStart === -1) return null;
+  const jsonStr = jsonEnd !== -1 ? cleaned.slice(jsonStart, jsonEnd + 1) : cleaned.slice(jsonStart);
+  try {
+    return JSON.parse(jsonStr);
+  } catch {
+    return null;
+  }
+}
+
+export async function solveJuggle(userMessage: string): Promise<Record<string, unknown>> {
+  const message = await anthropic.messages.create({
+    model: "claude-sonnet-4-20250514",
+    max_tokens: 4000,
+    system: SYSTEM_PROMPT,
+    messages: [{ role: "user", content: userMessage }],
+  });
+
+  const textBlock = message.content.find((b) => b.type === "text");
+  if (!textBlock || textBlock.type !== "text") {
+    throw new Error("No text response from AI");
+  }
+
+  const parsed = safeParseResponse(textBlock.text);
+  if (!parsed) throw new Error("Could not parse AI response");
+  return parsed;
+}

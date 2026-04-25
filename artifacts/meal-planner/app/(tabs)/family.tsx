@@ -38,6 +38,7 @@ import {
 } from "@/utils/familyTypes";
 import { loadFamilyState, saveFamilyState } from "@/utils/familyStore";
 import { buildJugglePrompt } from "@/utils/buildJugglePrompt";
+import { solveJuggle } from "@/services/juggleSolver";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { SortiiCalEvent, FAMILY_PUSHED_KEY } from "@/utils/calendarTypes";
 import { loadFamilyPushedEvents, removeEventFromFamily } from "@/utils/appointmentService";
@@ -653,9 +654,15 @@ function JuggleResultsContent({
   onShare: (text: string) => void;
   onSwapApplied?: (event_id: string, adult: string) => void;
 }) {
+  type TravelEstimate = {
+    from_event_id: string; to_event_id: string;
+    status: "comfortable" | "tight" | "impossible";
+    estimated_drive_display: string; note: string | null;
+  };
   const ws            = juggleResult.weekend_summary ?? { total_events: 0, conflicts_resolved: 0, tight_windows: 0, impossible_clashes: 0 };
   const adultPlans    = juggleResult.adult_plans ?? [];
   const conflicts     = juggleResult.conflicts ?? [];
+  const travelEstimates = (juggleResult.travel_estimates ?? []) as TravelEstimate[];
   const planRows = adultPlans.flatMap((p) =>
     p.schedule.map((s) => {
       const evtItem = (juggleResult.events ?? []).find((e) => e.id === s.event_id);
@@ -782,7 +789,12 @@ function JuggleResultsContent({
             <Text style={[styles.jugglePlanCellWho, styles.jugglePlanHeaderText]}>WHO</Text>
             <Text style={[styles.jugglePlanCellWhere, styles.jugglePlanHeaderText]}>WHERE</Text>
           </View>
-          {planRows.map((row, i) => (
+          {planRows.map((row, i) => {
+            const travelWarning = travelEstimates.find(
+              (t) => (t.from_event_id === row.event_id || t.to_event_id === row.event_id) &&
+                     (t.status === "tight" || t.status === "impossible")
+            );
+            return (
             <View key={i}>
               <View style={[styles.jugglePlanDataRow, { backgroundColor: i % 2 === 0 ? "#fff" : "#FAFAF8" }]}>
                 <View style={styles.jugglePlanCellTime}>
@@ -801,8 +813,17 @@ function JuggleResultsContent({
                   </Text>
                 </View>
               </View>
+              {travelWarning && (
+                <View style={{ paddingHorizontal: 12, paddingBottom: 6, backgroundColor: i % 2 === 0 ? "#fff" : "#FAFAF8" }}>
+                  <Text style={{ fontSize: 11, fontFamily: "Inter_500Medium", color: travelWarning.status === "impossible" ? "#C0695A" : "#A07010" }}>
+                    {travelWarning.status === "impossible" ? "⚠ " : "⏱ "}
+                    {travelWarning.note ?? `${travelWarning.estimated_drive_display} drive — ${travelWarning.status}`}
+                  </Text>
+                </View>
+              )}
             </View>
-          ))}
+            );
+          })}
         </View>
       )}
 
@@ -858,6 +879,20 @@ function JuggleResultsContent({
         </View>
       )}
 
+      {/* ── 5. Worth knowing (smart_note) ── */}
+      {juggleResult.smart_note ? (
+        <View style={{
+          backgroundColor: PLUM + "12", borderRadius: 12,
+          padding: 14, borderLeftWidth: 3, borderLeftColor: PLUM,
+        }}>
+          <Text style={{ fontSize: 11, fontFamily: "Inter_700Bold", color: PLUM, letterSpacing: 0.8, marginBottom: 4 }}>
+            WORTH KNOWING
+          </Text>
+          <Text style={{ fontSize: 13, fontFamily: "Inter_400Regular", color: PLUM, lineHeight: 19 }}>
+            {juggleResult.smart_note}
+          </Text>
+        </View>
+      ) : null}
 
       {/* ── 6. Actions ── */}
       <View style={styles.resultActionsRow}>
@@ -2475,14 +2510,10 @@ export default function FamilyScreen() {
     setSortError(null);
     setFamilyStep("sorting");
 
-    // Short artificial delay so the processing overlay is visible
-    await new Promise((r) => setTimeout(r, 1600));
-
     try {
-      const memberLookup = new Map<string, FamilyMember>(
-        state.members.map((m) => [m.id, m])
-      );
-      const full = solveJuggleOnDevice(adults, state.events, pushedCalEvents, memberLookup);
+      const userMessage = buildJugglePrompt(state.members, state.events);
+      const raw = await solveJuggle(userMessage);
+      const full: JuggleResult = { ...(raw as unknown as JuggleResult), solvedAt: Date.now() };
       await AsyncStorage.setItem(juggleKey(), JSON.stringify(full));
       setJuggleResult(full);
       setIsSorted(true);
