@@ -1258,7 +1258,7 @@ function EventCard({
   }
 
   return (
-    <View style={styles.eventCard}>
+    <View style={[styles.eventCard, menuOpen && { zIndex: 50 }]}>
       <View style={styles.eventCardMain}>
         <View style={styles.eventTimePill}>
           <Text style={styles.eventTimeText}>{timeLabel}</Text>
@@ -1293,7 +1293,7 @@ function EventCard({
             </View>
           )}
         </View>
-        <View>
+        <View style={{ zIndex: 60 }}>
           <TouchableOpacity
             style={styles.eventMenuBtn}
             onPress={showActions}
@@ -1325,13 +1325,6 @@ function EventCard({
           )}
         </View>
       </View>
-      {/* Dismiss menu when tapping outside */}
-      {menuOpen && (
-        <Pressable
-          style={StyleSheet.absoluteFill}
-          onPress={() => setMenuOpen(false)}
-        />
-      )}
     </View>
   );
 }
