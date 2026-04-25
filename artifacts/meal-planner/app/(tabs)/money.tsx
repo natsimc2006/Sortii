@@ -1207,6 +1207,7 @@ export default function MoneyScreen() {
       pressureItems={pressureItems}
       apptsTodayTomorrow={todayTomorrowAppts}
       tonightsDinner={tonightsDinner}
+      dinnersPlanned={filledMeals.length}
       formatMoney={formatMoneyRound}
       onBack={() => {
         setShowOverwhelm(false);
@@ -1215,6 +1216,10 @@ export default function MoneyScreen() {
       onSeeEverything={() => {
         setShowOverwhelm(false);
         router.push("/(tabs)");
+      }}
+      onDinnerPress={() => {
+        setShowOverwhelm(false);
+        router.push("/(tabs)/meals");
       }}
     />
     </View>

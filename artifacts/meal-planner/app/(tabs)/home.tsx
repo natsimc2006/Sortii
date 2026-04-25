@@ -484,16 +484,14 @@ export default function HomeTab() {
                 </View>
               </View>
             </TouchableOpacity>
-            {!tonightRecipe && (
-              <TouchableOpacity
-                onPress={() => router.push("/(tabs)/cook-with" as any)}
-                style={styles.fridgeShortcut}
-                activeOpacity={0.7}
-              >
-                <Feather name="search" size={11} color={TEAL} />
-                <Text style={styles.fridgeShortcutText}>Fridge Rescue →</Text>
-              </TouchableOpacity>
-            )}
+            <TouchableOpacity
+              onPress={() => router.push("/(tabs)/cook-with" as any)}
+              style={styles.fridgeShortcut}
+              activeOpacity={0.7}
+            >
+              <Feather name="search" size={11} color={TEAL} />
+              <Text style={styles.fridgeShortcutText}>Fridge Rescue →</Text>
+            </TouchableOpacity>
           </View>
 
           {/* C — Family */}

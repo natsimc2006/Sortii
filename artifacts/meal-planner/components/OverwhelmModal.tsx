@@ -25,9 +25,11 @@ export interface OverwhelmModalProps {
   pressureItems: PressureItem[];
   apptsTodayTomorrow: Appointment[];
   tonightsDinner: string | null;
+  dinnersPlanned: number;
   formatMoney: (n: number) => string;
   onBack: () => void;
   onSeeEverything: () => void;
+  onDinnerPress?: () => void;
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────
@@ -49,15 +51,23 @@ function getDayLabel(dateStr: string): string {
   return date.toLocaleDateString("en-AU", { weekday: "long" });
 }
 
+interface FocusItem {
+  icon: string;
+  text: string;
+  onPress?: () => void;
+}
+
 function buildItems(
   pressureItems: PressureItem[],
   apptsTodayTomorrow: Appointment[],
   tonightsDinner: string | null,
+  dinnersPlanned: number,
   formatMoney: (n: number) => string,
-): Array<{ icon: string; text: string }> {
+  onDinnerPress?: () => void,
+): FocusItem[] {
   const todayStr = getDateStr(0);
   const tomorrowStr = getDateStr(1);
-  const urgent: Array<{ icon: string; text: string }> = [];
+  const urgent: FocusItem[] = [];
 
   // Priority 1 — bills/expenses due today or tomorrow (max 2 slots)
   const urgentBills = pressureItems.filter(
@@ -84,14 +94,31 @@ function buildItems(
     }
   }
 
-  // Priority 3 — always one handled item (anchor to something sorted)
-  const handledText = tonightsDinner
-    ? `Dinner tonight — ${tonightsDinner}. Sorted.`
-    : "Dinner is planned this week. Sorted.";
-  const handled = { icon: "✅", text: handledText };
+  // Priority 3 — dinner state anchor
+  let dinnerItem: FocusItem;
+  if (tonightsDinner) {
+    // Tonight's specific dinner is known — always show it as sorted
+    dinnerItem = { icon: "✅", text: `Dinner tonight — ${tonightsDinner}. Sorted.` };
+  } else if (dinnersPlanned === 0) {
+    // Nothing planned — surface this clearly, make it tappable
+    dinnerItem = {
+      icon: "⬜",
+      text: "Dinners aren't sorted yet.\nTakes 60 seconds. →",
+      onPress: onDinnerPress,
+    };
+  } else if (dinnersPlanned <= 4) {
+    const remaining = 7 - dinnersPlanned;
+    dinnerItem = {
+      icon: "🔲",
+      text: `Dinners mostly sorted. ${remaining} night${remaining === 1 ? "" : "s"} still need something.`,
+    };
+  } else {
+    // 5–7 dinners
+    dinnerItem = { icon: "✅", text: "Dinner is sorted this week." };
+  }
 
-  // Max 3 total, always ends on the handled item
-  return [...urgent.slice(0, 2), handled];
+  // Max 3 total, always ends on the dinner anchor
+  return [...urgent.slice(0, 2), dinnerItem];
 }
 
 // ─── Component ────────────────────────────────────────────────────
@@ -101,13 +128,15 @@ export default function OverwhelmModal({
   pressureItems,
   apptsTodayTomorrow,
   tonightsDinner,
+  dinnersPlanned,
   formatMoney,
   onBack,
   onSeeEverything,
+  onDinnerPress,
 }: OverwhelmModalProps) {
   const items = useMemo(
-    () => buildItems(pressureItems, apptsTodayTomorrow, tonightsDinner, formatMoney),
-    [pressureItems, apptsTodayTomorrow, tonightsDinner, formatMoney],
+    () => buildItems(pressureItems, apptsTodayTomorrow, tonightsDinner, dinnersPlanned, formatMoney, onDinnerPress),
+    [pressureItems, apptsTodayTomorrow, tonightsDinner, dinnersPlanned, formatMoney, onDinnerPress],
   );
 
   const handleBack = () => {
@@ -119,6 +148,11 @@ export default function OverwhelmModal({
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     onSeeEverything();
   };
+
+  // Footer calm/action text — "Start there." when dinner isn't sorted yet
+  const footerText = dinnersPlanned === 0 && !tonightsDinner
+    ? "Start there."
+    : "Everything else can wait.";
 
   return (
     <Modal
@@ -141,19 +175,29 @@ export default function OverwhelmModal({
 
           {/* The 3 items */}
           <View style={styles.itemsWrap}>
-            {items.map((item, i) => (
-              <View key={i} style={styles.itemRow}>
-                <Text style={styles.itemIcon}>{item.icon}</Text>
-                <Text style={styles.itemText}>{item.text}</Text>
-              </View>
-            ))}
+            {items.map((item, i) => {
+              const row = (
+                <View key={i} style={styles.itemRow}>
+                  <Text style={styles.itemIcon}>{item.icon}</Text>
+                  <Text style={[styles.itemText, item.onPress && { color: TEAL }]}>{item.text}</Text>
+                </View>
+              );
+              if (item.onPress) {
+                return (
+                  <TouchableOpacity key={i} activeOpacity={0.75} onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); item.onPress!(); }}>
+                    {row}
+                  </TouchableOpacity>
+                );
+              }
+              return row;
+            })}
           </View>
 
           {/* Divider */}
           <View style={styles.divider} />
 
-          {/* Footer calm message */}
-          <Text style={styles.waitText}>Everything else can wait.</Text>
+          {/* Footer calm/start message */}
+          <Text style={styles.waitText}>{footerText}</Text>
 
           {/* Exit actions */}
           <View style={styles.exitLinks}>

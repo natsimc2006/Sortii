@@ -769,19 +769,10 @@ function JuggleResultsContent({
   const dashHeadline = (() => {
     if (impossible > 0) return "Almost there — one thing needs your call.";
     if (adultPlans.length === 0) return "Sorted.";
-    const MEDICAL_RE = /doctor|gp|dentist|hospital|physio|appointment|clinic/i;
     const parts = adultPlans.map((plan) => {
       const first = plan.adult.split(" ")[0];
-      const hasTransport = plan.schedule.some((s) => !!s.child);
-      const allPersonal  = plan.schedule.every((s) => !s.child);
-      if (hasTransport && allPersonal) return `${first} handles the rest`;
-      if (hasTransport) return `${first}'s got the pickups`;
-      if (allPersonal) {
-        const act = plan.schedule[0]?.activity ?? "";
-        if (MEDICAL_RE.test(act)) return `${first} heads straight to ${act.toLowerCase()}`;
-        return `${first} is on ${act.toLowerCase() || "their thing"}`;
-      }
-      return `${first} covers the rest`;
+      const primaryActivity = plan.schedule[0]?.activity ?? "their thing";
+      return `${first} has ${primaryActivity}`;
     });
     return parts
       .map((p) => p.charAt(0).toUpperCase() + p.slice(1) + ".")
@@ -924,6 +915,25 @@ function JuggleResultsContent({
           </Text>
         </View>
       ) : null}
+
+      {/* ── 5b. Simple week note (passive, no CTA) ── */}
+      {(() => {
+        const allChildOnly = adultPlans.length > 0 && adultPlans.every((p) => p.schedule.every((s) => !!s.child));
+        const showNote =
+          adultMembers.length >= 2 &&
+          ws.total_events >= 1 &&
+          ws.total_events <= 2 &&
+          tight === 0 &&
+          impossible === 0 &&
+          conflicts.length === 0 &&
+          allChildOnly;
+        if (!showNote) return null;
+        return (
+          <Text style={{ fontSize: 13, fontFamily: "Inter_400Regular", color: "#AAA", lineHeight: 19, paddingHorizontal: 4 }}>
+            Either one of you could cover both — so the other gets a free morning if it works out.
+          </Text>
+        );
+      })()}
 
       {/* ── 6. Actions ── */}
       <View style={styles.resultActionsRow}>
