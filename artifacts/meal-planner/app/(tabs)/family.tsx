@@ -729,12 +729,28 @@ function JuggleResultsContent({
     return lines.join("\n");
   }
 
-  // Dashboard headline + summary line
-  const dashHeadline = impossible > 0
-    ? "Almost there."
-    : tight > 0
-    ? "Sorted. Here's what the week looks like."
-    : "Sorted. Here's what the week looks like.";
+  // Dashboard headline — narrative sentence built from adult plans
+  const dashHeadline = (() => {
+    if (impossible > 0) return "Almost there — one thing needs your call.";
+    if (adultPlans.length === 0) return "Sorted.";
+    const MEDICAL_RE = /doctor|gp|dentist|hospital|physio|appointment|clinic/i;
+    const parts = adultPlans.map((plan) => {
+      const first = plan.adult.split(" ")[0];
+      const hasTransport = plan.schedule.some((s) => !!s.child);
+      const allPersonal  = plan.schedule.every((s) => !s.child);
+      if (hasTransport && allPersonal) return `${first} handles the rest`;
+      if (hasTransport) return `${first}'s got the pickups`;
+      if (allPersonal) {
+        const act = plan.schedule[0]?.activity ?? "";
+        if (MEDICAL_RE.test(act)) return `${first} heads straight to ${act.toLowerCase()}`;
+        return `${first} is on ${act.toLowerCase() || "their thing"}`;
+      }
+      return `${first} covers the rest`;
+    });
+    return parts
+      .map((p) => p.charAt(0).toUpperCase() + p.slice(1) + ".")
+      .join(" ") + " Done.";
+  })();
 
   const dashSummaryLine = (() => {
     const parts: string[] = [];
@@ -806,70 +822,7 @@ function JuggleResultsContent({
 
       <View style={{ paddingHorizontal: 16, gap: 16, paddingTop: 18 }}>
 
-      {/* ── 2. THE PLAN table ── */}
-      {planRows.length > 0 && (
-        <View style={styles.jugglePlanCard}>
-          <View style={{ gap: 2 }}>
-            <Text style={styles.juggleSectionLabel}>THE PLAN</Text>
-            <Text style={styles.jugglePlanSub}>What's happening</Text>
-          </View>
-          <View style={[styles.jugglePlanRowHeader]}>
-            <Text style={[styles.jugglePlanCellTime, styles.jugglePlanHeaderText]}>TIME</Text>
-            <Text style={[styles.jugglePlanCellWho, styles.jugglePlanHeaderText]}>WHO</Text>
-            <Text style={[styles.jugglePlanCellWhere, styles.jugglePlanHeaderText]}>WHERE</Text>
-            <View style={{ width: 28 }} />
-          </View>
-          {planRows.map((row, i) => {
-            const travelWarning = travelEstimates.find(
-              (t) => (t.from_event_id === row.event_id || t.to_event_id === row.event_id) &&
-                     (t.status === "tight" || t.status === "impossible")
-            );
-            const isSwapped = !!swapOverrides[row.event_id];
-            const hasConflict = isSwapped && hasTimeConflict(row.event_id, row.adult, row.time);
-            return (
-            <View key={i}>
-              <View style={[styles.jugglePlanDataRow, { backgroundColor: i % 2 === 0 ? "#fff" : "#FAFAF8" }]}>
-                <View style={styles.jugglePlanCellTime}>
-                  <View style={styles.juggleTimePill}>
-                    <Text style={styles.juggleTimePillText}>{row.time}{row.endTime ? `–${row.endTime}` : ""}</Text>
-                  </View>
-                </View>
-                <View style={styles.jugglePlanCellWho}>
-                  <Text style={styles.jugglePlanWhoText}>
-                    {row.adult}{row.child ? ` · ${row.child}` : ""}
-                  </Text>
-                  {hasConflict && (
-                    <Text style={{ fontSize: 10, color: "#A07010", fontFamily: "Inter_500Medium" }}>⚠ clash</Text>
-                  )}
-                </View>
-                <View style={styles.jugglePlanCellWhere}>
-                  <Text style={styles.jugglePlanWhereText} numberOfLines={2}>
-                    {[row.location, row.activity].filter(Boolean).join(" · ")}
-                  </Text>
-                </View>
-                <TouchableOpacity
-                  onPress={() => { setSwapRow(row); setSwapPick(row.adult); }}
-                  hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-                  style={{ width: 28, alignItems: "center", justifyContent: "center" }}
-                >
-                  <Text style={{ fontSize: 14, color: TEAL }}>⇌</Text>
-                </TouchableOpacity>
-              </View>
-              {travelWarning && (
-                <View style={{ paddingHorizontal: 12, paddingBottom: 6, backgroundColor: i % 2 === 0 ? "#fff" : "#FAFAF8" }}>
-                  <Text style={{ fontSize: 11, fontFamily: "Inter_500Medium", color: travelWarning.status === "impossible" ? "#C0695A" : "#A07010" }}>
-                    {travelWarning.status === "impossible" ? "⚠ " : "⏱ "}
-                    {travelWarning.note ?? `${travelWarning.estimated_drive_display} drive — ${travelWarning.status}`}
-                  </Text>
-                </View>
-              )}
-            </View>
-            );
-          })}
-        </View>
-      )}
-
-      {/* ── 3. WHO'S DOING THE RUNNING ── */}
+      {/* ── 2. WHO'S DOING THE RUNNING ── */}
       {adultPlans.length > 0 && (
         <View style={{ gap: 10 }}>
           <Text style={styles.juggleSectionLabel}>WHO'S GOT WHAT</Text>
@@ -1904,6 +1857,11 @@ function AddEventSheet({
               return (
                 <View style={styles.formField}>
                   <Text style={styles.formLabel}>WHO'S RESPONSIBLE FOR THIS?</Text>
+                  {!lockedAdult && (
+                    <Text style={{ fontSize: 12, fontFamily: "Inter_400Regular", color: TEXT_MUTED, fontStyle: "italic", marginBottom: 6 }}>
+                      Optional — we'll figure it out if you leave this blank.
+                    </Text>
+                  )}
                   {lockedAdult ? (
                     <Text style={{ fontSize: 14, fontFamily: "Inter_400Regular", color: TEXT_MUTED, fontStyle: "italic" }}>
                       {lockedAdult.name} — it's their appointment
@@ -3632,7 +3590,7 @@ const styles = StyleSheet.create({
   juggleAdultName: { fontSize: 16, fontFamily: "Inter_700Bold", color: TEXT },
   juggleScheduleRow: { flexDirection: "row", alignItems: "flex-start", gap: 10 },
   juggleTimePill: {
-    backgroundColor: "#2B2B2B", borderRadius: 20,
+    backgroundColor: TEAL, borderRadius: 20,
     paddingHorizontal: 8, paddingVertical: 3, flexShrink: 0,
   },
   juggleTimePillText: { color: "#fff", fontSize: 11, fontFamily: "Inter_600SemiBold" },
