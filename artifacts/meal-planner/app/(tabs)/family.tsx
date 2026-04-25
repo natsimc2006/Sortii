@@ -1692,6 +1692,7 @@ function AddEventSheet({
   const [newContactPhone, setNewContactPhone]     = useState("");
   const [carpoolEntryName, setCarpoolEntryName]   = useState("");
   const [carpoolEntryMobile, setCarpoolEntryMobile] = useState("");
+  const carpoolNameRef = React.useRef<TextInput>(null);
 
   // Derived: is the form valid enough to save?
   const isFormValid = draft.title.trim().length > 0 && draft.time.trim().length > 0 && (draft.endTime ?? "").trim().length > 0;
@@ -2050,6 +2051,7 @@ function AddEventSheet({
 
               {/* Input row for a new contact */}
               <TextInput
+                ref={carpoolNameRef}
                 style={[styles.formInput, { marginBottom: 8 }]}
                 value={carpoolEntryName}
                 onChangeText={setCarpoolEntryName}
@@ -2097,12 +2099,12 @@ function AddEventSheet({
               {/* "+ Add another" shown when at least one contact exists and inputs are empty */}
               {(draft.carpoolContacts ?? []).length > 0 && !carpoolEntryName.trim() && (
                 <TouchableOpacity
-                  onPress={() => {}}
+                  onPress={() => carpoolNameRef.current?.focus()}
                   style={{ marginTop: 8 }}
-                  activeOpacity={1}
+                  activeOpacity={0.7}
                 >
                   <Text style={{ color: TEAL, fontFamily: "Inter_500Medium", fontSize: 13 }}>
-                    + Add another
+                    + Add another contact
                   </Text>
                 </TouchableOpacity>
               )}
