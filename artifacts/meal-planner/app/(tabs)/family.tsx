@@ -1232,6 +1232,7 @@ function EventCard({
   onDelete: () => void;
   aiDriver?: string;
 }) {
+  const [menuOpen, setMenuOpen] = React.useState(false);
   const driverDisplay = aiDriver ?? (event.driverId ? members.find((m) => m.id === event.driverId)?.name : null);
   const involved = event.personIds
     .map((id) => members.find((m) => m.id === id))
@@ -1245,12 +1246,14 @@ function EventCard({
         { options: ["Cancel", "Edit event", "Remove event"], cancelButtonIndex: 0, destructiveButtonIndex: 2 },
         (idx) => { if (idx === 1) onEdit(); if (idx === 2) onDelete(); }
       );
-    } else {
+    } else if (Platform.OS === "android") {
       Alert.alert(event.title, undefined, [
         { text: "Edit event", onPress: onEdit },
         { text: "Remove event", onPress: onDelete, style: "destructive" },
         { text: "Cancel", style: "cancel" },
       ]);
+    } else {
+      setMenuOpen((v) => !v);
     }
   }
 
@@ -1290,15 +1293,45 @@ function EventCard({
             </View>
           )}
         </View>
-        <TouchableOpacity
-          style={styles.eventMenuBtn}
-          onPress={showActions}
-          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-          activeOpacity={0.7}
-        >
-          <Feather name="more-horizontal" size={16} color={TEXT_MUTED} />
-        </TouchableOpacity>
+        <View>
+          <TouchableOpacity
+            style={styles.eventMenuBtn}
+            onPress={showActions}
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+            activeOpacity={0.7}
+          >
+            <Feather name="more-horizontal" size={16} color={menuOpen ? TEAL : TEXT_MUTED} />
+          </TouchableOpacity>
+          {menuOpen && (
+            <View style={styles.eventInlineMenu}>
+              <TouchableOpacity
+                style={styles.eventInlineMenuItem}
+                onPress={() => { setMenuOpen(false); onEdit(); }}
+                activeOpacity={0.75}
+              >
+                <Feather name="edit-2" size={13} color={TEXT} />
+                <Text style={styles.eventInlineMenuText}>Edit</Text>
+              </TouchableOpacity>
+              <View style={styles.eventInlineMenuDivider} />
+              <TouchableOpacity
+                style={styles.eventInlineMenuItem}
+                onPress={() => { setMenuOpen(false); onDelete(); }}
+                activeOpacity={0.75}
+              >
+                <Feather name="trash-2" size={13} color="#C0695A" />
+                <Text style={[styles.eventInlineMenuText, { color: "#C0695A" }]}>Remove</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+        </View>
       </View>
+      {/* Dismiss menu when tapping outside */}
+      {menuOpen && (
+        <Pressable
+          style={StyleSheet.absoluteFill}
+          onPress={() => setMenuOpen(false)}
+        />
+      )}
     </View>
   );
 }
@@ -2964,9 +2997,19 @@ const styles = StyleSheet.create({
   dayEventConnector: { height: 1, backgroundColor: BORDER, marginHorizontal: 4, opacity: 0.6 },
 
   // Event card
-  eventCard: { backgroundColor: CARD_BG, borderRadius: 12, borderWidth: 1, borderColor: BORDER, borderLeftWidth: 3, overflow: "hidden" },
+  eventCard: { backgroundColor: CARD_BG, borderRadius: 12, borderWidth: 1, borderColor: BORDER, borderLeftWidth: 3 },
   eventCardMain: { flexDirection: "row", gap: 10, padding: 11, alignItems: "flex-start" },
   eventMenuBtn: { alignSelf: "flex-start", paddingLeft: 4, paddingTop: 1 },
+  eventInlineMenu: {
+    position: "absolute", top: 26, right: 0, zIndex: 100,
+    backgroundColor: "#fff", borderRadius: 10,
+    borderWidth: 1, borderColor: BORDER,
+    shadowColor: "#000", shadowOpacity: 0.10, shadowRadius: 8, shadowOffset: { width: 0, height: 3 },
+    elevation: 6, minWidth: 130, overflow: "hidden",
+  },
+  eventInlineMenuItem: { flexDirection: "row", alignItems: "center", gap: 8, paddingHorizontal: 14, paddingVertical: 11 },
+  eventInlineMenuText: { fontSize: 14, fontFamily: "Inter_500Medium", color: TEXT },
+  eventInlineMenuDivider: { height: 1, backgroundColor: BORDER, marginHorizontal: 10 },
   eventTimePill: {
     backgroundColor: TEAL_TINT, borderRadius: 8, paddingHorizontal: 8, paddingVertical: 5,
     alignSelf: "flex-start", flexShrink: 0, flexDirection: "row", alignItems: "center",
