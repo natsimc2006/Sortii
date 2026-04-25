@@ -5,8 +5,9 @@
 
 const base = require("./app.json");
 
-const googleClientId    = process.env.GOOGLE_CLIENT_ID    ?? null;
-const googleIosClientId = process.env.GOOGLE_IOS_CLIENT_ID ?? null;
+const googleClientId         = process.env.GOOGLE_CLIENT_ID             ?? null;
+const googleIosClientId      = process.env.GOOGLE_IOS_CLIENT_ID         ?? null;
+const googleIosClientIdRev   = process.env.GOOGLE_IOS_CLIENT_ID_REVERSED ?? "";
 
 console.error(
   "[Sortii Config] GOOGLE_CLIENT_ID:",    googleClientId    ? "present ✓" : "MISSING ✗"
@@ -25,11 +26,15 @@ module.exports = {
     infoPlist: {
       ...base.expo.ios.infoPlist,
       ITSAppUsesNonExemptEncryption: false,
+      CFBundleURLSchemes: [googleIosClientIdRev],
     },
   },
 
   extra: {
     ...(base.expo.extra ?? {}),
+    eas: {
+      projectId: "0665bcc7-d4cb-4b6c-93a7-3e284255f03e",
+    },
     googleClientId,
     googleIosClientId,
   },
