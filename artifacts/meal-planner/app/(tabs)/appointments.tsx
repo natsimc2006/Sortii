@@ -724,6 +724,14 @@ export default function AppointmentsScreen() {
     return () => sub.remove();
   }, []);
 
+  // SSR hydration fix: correct form.date to the user's LOCAL date.
+  // new Date() on the Replit server returns UTC, which is off by +10/+11 hours
+  // for AU users — so "Friday UTC" shows as "Saturday" once the browser runs.
+  // This useEffect runs only on the client after hydration.
+  useEffect(() => {
+    setForm((prev) => ({ ...prev, date: todayStr() }));
+  }, []);
+
   // ── Calendar connection: Apple ─────────────────────────────────────────────
   async function handleConnectApple() {
     if (Platform.OS === "web") {
@@ -848,7 +856,8 @@ export default function AppointmentsScreen() {
     const daysToSaturday = (6 - dayOfWeek + 7) % 7 || 7;
     const saturdayDate = new Date(today);
     saturdayDate.setDate(today.getDate() + daysToSaturday);
-    const saturdayStr = saturdayDate.toISOString().slice(0, 10);
+    // Use local date getters — toISOString() gives UTC which is wrong for AU/NZ
+    const saturdayStr = `${saturdayDate.getFullYear()}-${String(saturdayDate.getMonth() + 1).padStart(2, "0")}-${String(saturdayDate.getDate()).padStart(2, "0")}`;
 
     const saturdayEvents = calEvents.filter((e) => isoToDateStr(e.startTime) === saturdayStr);
     for (const ev of saturdayEvents) {
@@ -928,8 +937,9 @@ export default function AppointmentsScreen() {
   const today2 = new Date();
   const dayOfWeek2 = today2.getDay();
   const daysToSat = (6 - dayOfWeek2 + 7) % 7 || 7;
-  const satStr2 = new Date(today2.getFullYear(), today2.getMonth(), today2.getDate() + daysToSat)
-    .toISOString().slice(0, 10);
+  // Use local date getters — toISOString() gives UTC which is wrong for AU/NZ
+  const _satD = new Date(today2.getFullYear(), today2.getMonth(), today2.getDate() + daysToSat);
+  const satStr2 = `${_satD.getFullYear()}-${String(_satD.getMonth() + 1).padStart(2, "0")}-${String(_satD.getDate()).padStart(2, "0")}`;
   const saturdayCalEvents = calEvents.filter((e) => isoToDateStr(e.startTime) === satStr2);
   const showSaturdayBulk = saturdayCalEvents.length >= 3;
 

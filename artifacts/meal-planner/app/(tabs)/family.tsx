@@ -39,12 +39,10 @@ import {
   RepeatType,
 } from "@/utils/familyTypes";
 import { loadFamilyState, saveFamilyState } from "@/utils/familyStore";
-import { buildJugglePrompt } from "@/utils/buildJugglePrompt";
-import { solveJuggle } from "@/services/juggleSolver";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { SortiiCalEvent, FAMILY_PUSHED_KEY } from "@/utils/calendarTypes";
 import { loadFamilyPushedEvents, removeEventFromFamily } from "@/utils/appointmentService";
-import { loadAppointments, Appointment } from "@/utils/appointmentStore";
+import { loadAppointments, saveAppointments, Appointment } from "@/utils/appointmentStore";
 
 // ── Brand tokens ───────────────────────────────────────────────────────────────
 const TEAL         = "#2A8F88";
@@ -418,6 +416,31 @@ const BUSYNESS_CONFIG: Record<BusynessLevel, { label: string; color: string }> =
   steady: { label: "Steady week", color: GOLD },
   busy:   { label: "Busy week",   color: ORANGE },
 };
+
+// ── Local-timezone date helpers ────────────────────────────────────────────────
+// ALWAYS use these instead of .toISOString() for date strings —
+// toISOString() converts to UTC which gives the wrong date for AU/NZ users.
+function localDateStr(d: Date): string {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
+const DAYS_JS_TO_SORTII: DayOfWeek[] = [
+  "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday",
+];
+
+const DAY_TO_JS: Record<DayOfWeek, number> = {
+  Sunday: 0, Monday: 1, Tuesday: 2, Wednesday: 3,
+  Thursday: 4, Friday: 5, Saturday: 6,
+};
+
+/** Returns the YYYY-MM-DD date for the nearest future (or today) occurrence of dayName. */
+function nextDateForDay(dayName: DayOfWeek): string {
+  const now   = new Date();
+  const today = now.getDay();
+  const diff  = (DAY_TO_JS[dayName] - today + 7) % 7;
+  const d     = new Date(now.getFullYear(), now.getMonth(), now.getDate() + diff);
+  return localDateStr(d);
+}
 
 // ── Blank event draft ──────────────────────────────────────────────────────────
 function blankDraft(): Omit<FamilyEvent, "id"> {
@@ -2007,6 +2030,55 @@ function AddEventSheet({
                 </View>
               ))}
 
+              {/* Quick-pick chips from the global carpool contacts list */}
+              {carpoolContacts.filter((gc) =>
+                !(draft.carpoolContacts ?? []).some((dc) => dc.name.toLowerCase() === gc.name.toLowerCase())
+              ).length > 0 && (
+                <View style={{ marginBottom: 10 }}>
+                  <Text style={{ fontSize: 11, fontFamily: "Inter_500Medium", color: "#aaa", marginBottom: 6 }}>
+                    Saved contacts — tap to add:
+                  </Text>
+                  <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 6 }}>
+                    {carpoolContacts
+                      .filter((gc) =>
+                        !(draft.carpoolContacts ?? []).some(
+                          (dc) => dc.name.toLowerCase() === gc.name.toLowerCase()
+                        )
+                      )
+                      .map((gc) => (
+                        <TouchableOpacity
+                          key={gc.id}
+                          onPress={() => {
+                            const childForEvent = draft.personIds
+                              .map((id) => members.find((m) => m.id === id))
+                              .find((m) => m?.role === "child")?.name ?? "";
+                            const entry: CarpoolContactEntry = {
+                              name: gc.name,
+                              relationship: "contact",
+                              canHelpWith: childForEvent ? [childForEvent] : [],
+                              phone: gc.phone,
+                              notes: "",
+                            };
+                            setField("carpoolContacts", [...(draft.carpoolContacts ?? []), entry]);
+                            Keyboard.dismiss();
+                          }}
+                          style={{
+                            flexDirection: "row", alignItems: "center", gap: 4,
+                            backgroundColor: TEAL + "14", borderWidth: 1, borderColor: TEAL + "40",
+                            borderRadius: 20, paddingHorizontal: 10, paddingVertical: 5,
+                          }}
+                          activeOpacity={0.75}
+                        >
+                          <Feather name="user-check" size={11} color={TEAL} />
+                          <Text style={{ fontFamily: "Inter_500Medium", fontSize: 12, color: TEAL }}>
+                            {gc.name}
+                          </Text>
+                        </TouchableOpacity>
+                      ))}
+                  </View>
+                </View>
+              )}
+
               {/* Input row for a new contact */}
               <TextInput
                 ref={carpoolNameRef}
@@ -2042,6 +2114,17 @@ function AddEventSheet({
                     };
                     const next = [...(draft.carpoolContacts ?? []), newEntry];
                     setField("carpoolContacts", next);
+                    // Auto-save to global list if name not already there
+                    const alreadySaved = carpoolContacts.some(
+                      (gc) => gc.name.toLowerCase() === carpoolEntryName.trim().toLowerCase()
+                    );
+                    if (!alreadySaved) {
+                      onAddCarpoolContact({
+                        id: Date.now().toString(),
+                        name: carpoolEntryName.trim(),
+                        phone: carpoolEntryMobile.trim(),
+                      });
+                    }
                     setCarpoolEntryName("");
                     setCarpoolEntryMobile("");
                     Keyboard.dismiss();
@@ -2653,6 +2736,7 @@ export default function FamilyScreen() {
   async function handleSaveEvent(draft: Omit<FamilyEvent, "id">) {
     const wasEditing  = !!editingEvent;
     const prevCount   = state.events.length;
+    const savedId     = editingEvent?.id ?? Date.now().toString();
     const next: FamilyState = editingEvent
       ? {
           ...state,
@@ -2660,11 +2744,49 @@ export default function FamilyScreen() {
             e.id === editingEvent.id ? { ...draft, id: editingEvent.id } : e
           ),
         }
-      : { ...state, events: [...state.events, { ...draft, id: Date.now().toString() }] };
+      : { ...state, events: [...state.events, { ...draft, id: savedId }] };
     setShowForm(false);
     setEditingEvent(null);
     await persistState(next);
     setIsSorted(false);
+
+    // ── Bidirectional sync: Family appointment → Appointments store ────────────
+    // If event is marked as appointment, mirror it into the Appointments tab so
+    // the user doesn't have to enter it twice.  Use deterministic id "fam_<id>"
+    // so edits/deletes stay linked.
+    if (draft.isAppointment) {
+      const apptId = `fam_${savedId}`;
+      const date   = nextDateForDay(draft.day as DayOfWeek);
+      const person = draft.assignedAdult ||
+        draft.personIds.map((pid) => state.members.find((m) => m.id === pid)?.name).filter(Boolean).join(", ") || "";
+      const newAppt: Appointment = {
+        id: apptId,
+        title: draft.title,
+        category: "Medical",
+        date,
+        startTime: draft.time || "09:00",
+        endTime: draft.endTime || undefined,
+        person,
+        locationName: draft.location || "",
+        suburb: "",
+        notes: draft.notes || "",
+        checklist: [],
+        reminderEnabled: false,
+        recurringEnabled: draft.isRecurring ?? (draft.repeat !== "none"),
+        isDone: false,
+        isCancelled: false,
+        appointmentCost: null,
+        availabilityBlock: null,
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+      };
+      const existing = await loadAppointments();
+      const filtered = existing.filter((a) => a.id !== apptId);
+      await saveAppointments([...filtered, newAppt]);
+      setApptItems([...filtered, newAppt]); // refresh in-memory
+    }
+    // ── End bidirectional sync ─────────────────────────────────────────────────
+
     const bannerType: BannerType =
       wasEditing ? "edited" : prevCount === 0 ? "first" : "subsequent";
     showBanner(bannerType, draft.title);
@@ -2729,24 +2851,56 @@ export default function FamilyScreen() {
         )
     );
     const adults = uniqueMembers.filter((m) => m.role === "adult");
-    if (adults.length === 0 || (state.events.length === 0 && pushedCalEvents.length === 0)) return;
 
-    console.log("[Sortii] Sort triggered — adults:", adults.length, "events:", state.events.length, "cal:", pushedCalEvents.length);
+    // Compute this week's range using local dates (not UTC / toISOString)
+    const _now    = new Date();
+    const _jsDay  = _now.getDay();
+    const _diff   = _jsDay === 0 ? -6 : 1 - _jsDay;
+    const _wStart = new Date(_now.getFullYear(), _now.getMonth(), _now.getDate() + _diff);
+    const _wEnd   = new Date(_wStart.getFullYear(), _wStart.getMonth(), _wStart.getDate() + 6);
+    const _ws     = localDateStr(_wStart);
+    const _we     = localDateStr(_wEnd);
+
+    // Convert this week's Appointments into FamilyEvent format for Claude.
+    // Exclude any that were synced FROM this Family tab (id starts with "fam_")
+    // to avoid double-counting.
+    const existingIds = new Set(state.events.map((e) => e.id));
+    const apptAsEvents: FamilyEvent[] = apptItems
+      .filter((a) => !a.isDone && !a.isCancelled && a.date >= _ws && a.date <= _we && !a.id.startsWith("fam_"))
+      .map((a): FamilyEvent => {
+        const apptDate = new Date(`${a.date}T00:00:00`);
+        const dayName  = DAYS_JS_TO_SORTII[apptDate.getDay()] ?? "Monday";
+        const personMember = uniqueMembers.find((m) => m.name === a.person);
+        return {
+          id: a.id,
+          title: a.title,
+          day: dayName,
+          time: a.startTime || "09:00",
+          endTime: a.endTime || "",
+          personIds: personMember ? [personMember.id] : [],
+          isAppointment: true,
+          assignedAdult: a.person || undefined,
+          priority: "must",
+          location: [a.locationName, a.suburb].filter(Boolean).join(", ") || undefined,
+          notes: a.notes || undefined,
+          driverId: undefined,
+          repeat: "none",
+        };
+      })
+      .filter((e) => !existingIds.has(e.id)); // deduplicate
+
+    const allEvents = [...state.events, ...apptAsEvents];
+
+    if (adults.length === 0 || (allEvents.length === 0 && pushedCalEvents.length === 0)) return;
+
+    console.log("[Sortii] Sort triggered — adults:", adults.length, "events:", allEvents.length, "appts:", apptAsEvents.length, "cal:", pushedCalEvents.length);
     setSortError(null);
     setFamilyStep("sorting");
 
     try {
-      const globalContacts: CarpoolContactEntry[] = carpoolContacts.map((c) => ({
-        name: c.name,
-        relationship: "contact",
-        canHelpWith: [],
-        phone: c.phone,
-        notes: "",
-      }));
-      console.log("Events being sent to Claude:", JSON.stringify(state.events, null, 2));
-      const userMessage = buildJugglePrompt(uniqueMembers, state.events, globalContacts, juggleFreeText);
-      const raw = await solveJuggle(userMessage);
-      const full: JuggleResult = { ...(raw as unknown as JuggleResult), solvedAt: Date.now() };
+      // On-device solver — works offline, no API key needed.
+      const memberLookup = new Map<string, FamilyMember>(uniqueMembers.map((m) => [m.id, m]));
+      const full: JuggleResult = solveJuggleOnDevice(adults, allEvents, pushedCalEvents, memberLookup);
       await AsyncStorage.setItem(juggleKey(), JSON.stringify(full));
       setJuggleResult(full);
       setIsSorted(true);
@@ -2793,8 +2947,9 @@ export default function FamilyScreen() {
     const diff = jsDay === 0 ? -6 : 1 - jsDay;
     const weekStart = new Date(today.getFullYear(), today.getMonth(), today.getDate() + diff);
     const weekEnd   = new Date(weekStart.getFullYear(), weekStart.getMonth(), weekStart.getDate() + 6);
-    const ws = weekStart.toISOString().slice(0, 10);
-    const we = weekEnd.toISOString().slice(0, 10);
+    // Use localDateStr — NOT toISOString() which converts to UTC and gives the wrong date for AU/NZ.
+    const ws = localDateStr(weekStart);
+    const we = localDateStr(weekEnd);
     return apptItems
       .filter((a) => !a.isDone && !a.isCancelled && a.date >= ws && a.date <= we)
       .sort((a, b) => a.date.localeCompare(b.date) || a.startTime.localeCompare(b.startTime));
