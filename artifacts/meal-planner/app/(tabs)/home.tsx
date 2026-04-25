@@ -309,7 +309,7 @@ export default function HomeTab() {
         } else if (bills.length === 0 && hasMoneySetup) {
           setCrossSellMsg({
             title: "Track your bills in one place.",
-            sub: "Add recurring bills to complete your financial picture — they'll flow into your budget.",
+            sub: "Add bills once — they'll flow into your week.",
             route: "/(tabs)/bills",
             color: TEAL,
           });
@@ -389,7 +389,7 @@ export default function HomeTab() {
                 </View>
               </View>
               <Text style={styles.welcomeTipBody}>
-                Tap the Meals card below to get your dinners sorted — takes about 60 seconds.
+                Start with meals below — takes about a minute.
               </Text>
               <View style={styles.welcomeTipActions}>
                 <TouchableOpacity
@@ -397,7 +397,7 @@ export default function HomeTab() {
                   style={styles.welcomeTipCta}
                   activeOpacity={0.8}
                 >
-                  <Text style={styles.welcomeTipCtaText}>Sort my meals →</Text>
+                  <Text style={styles.welcomeTipCtaText}>Sort meals →</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                   onPress={async () => {
@@ -476,7 +476,7 @@ export default function HomeTab() {
                     {tonightRecipe ? tonightRecipe.name : "Dinners not sorted yet."}
                   </Text>
                   <Text style={[styles.cardSub, { color: tonightRecipe ? TEAL : TEXT_MUTED }]}>
-                    {tonightRecipe ? "Sorted. ✓" : "Takes 60 seconds. →"}
+                    {tonightRecipe ? "Sorted. ✓" : "Takes about a minute. →"}
                   </Text>
                 </View>
                 <View style={[styles.cardChevron, { backgroundColor: (tonightRecipe ? TEAL : GOLD) + "12" }]}>
@@ -568,8 +568,8 @@ export default function HomeTab() {
                   <View style={styles.cardRow}>
                     <View style={{ flex: 1 }}>
                       <Text style={[styles.cardLabel, { color: GOLD }]}>MONEY</Text>
-                      <Text style={styles.cardTitle}>Curious how this week looks financially?</Text>
-                      <Text style={[styles.cardSub, { color: TEAL }]}>Set it up →</Text>
+                      <Text style={styles.cardTitle}>Want a quick money check?</Text>
+                      <Text style={[styles.cardSub, { color: TEAL }]}>Add your numbers →</Text>
                     </View>
                     <View style={[styles.cardChevron, { backgroundColor: GOLD + "12" }]}>
                       <Feather name="chevron-right" size={16} color={GOLD} />
@@ -723,7 +723,7 @@ export default function HomeTab() {
                 <View style={[styles.comingUpCard, { padding: 14 }]}>
                   <Text style={[styles.cardLabel, { color: TEXT_MUTED, marginBottom: 6 }]}>WHAT'S COMING UP</Text>
                   <Text style={[styles.comingUpLine, { color: TEXT_MUTED }]}>
-                    A quiet one. {plannedCount} dinner{plannedCount !== 1 ? "s" : ""} sorted. Not much to worry about.
+                    A quiet one. Not much to worry about.
                   </Text>
                 </View>
               );
@@ -771,7 +771,7 @@ export default function HomeTab() {
                   const timeStr   = mn === "00" ? `${hr}${period}` : `${hr}:${mn}${period}`;
                   return `${dayName} ${dd} ${mo} · ${timeStr}${nextAppt.person ? ` · ${nextAppt.person}` : ""}`;
                 })()
-              : "Tap to add appointments →";
+              : "Add something coming up →";
             return (
               <TouchableOpacity
                 onPress={() => router.push("/(tabs)/appointments")}
@@ -805,7 +805,7 @@ export default function HomeTab() {
                   ? `${billsData.dueSoon} bill${billsData.dueSoon > 1 ? "s" : ""} due this week.`
                   : "Nothing urgent on the bill front.";
             const billSub    = !billsData
-              ? "Tap to start tracking bills →"
+              ? "Start tracking bills →"
               : billsData.overdue > 0
                 ? "Tap to see what needs sorting →"
                 : billsData.dueSoon > 0
@@ -850,7 +850,7 @@ export default function HomeTab() {
                     activeOpacity={0.8}
                     style={[styles.crossSellCta, { backgroundColor: crossSellMsg.color }]}
                   >
-                    <Text style={styles.crossSellCtaText}>Set it up →</Text>
+                    <Text style={styles.crossSellCtaText}>Add your numbers →</Text>
                   </TouchableOpacity>
                   <TouchableOpacity
                     onPress={async () => {

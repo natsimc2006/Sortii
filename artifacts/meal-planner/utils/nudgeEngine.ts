@@ -104,8 +104,8 @@ const EMPTY_WEEK_NUDGES = [
     sub: "Add one thing when you're ready. No pressure.",
   },
   {
-    message: "Nothing planned yet this week.",
-    sub: "Could be worth a quick look when you've got a moment.",
+    message: "Nothing in yet this week.",
+    sub: "Might be worth a quick glance.",
   },
 ];
 

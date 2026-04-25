@@ -38,7 +38,7 @@ export function SwapSheet({ visible, onPickForMe, onLetMeChoose, onClose }: Swap
       <View style={[styles.sheet, { paddingBottom: Math.max(insets.bottom, 12) + 16 }]}>
         <View style={styles.handle} />
 
-        <Text style={[styles.title, { color: C.text }]}>Switch meal</Text>
+        <Text style={[styles.title, { color: C.text }]}>Swap meal</Text>
 
         <TouchableOpacity
           onPress={() => {

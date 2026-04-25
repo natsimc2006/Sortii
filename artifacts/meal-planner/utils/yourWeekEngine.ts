@@ -284,7 +284,7 @@ function buildDynamicSuggestions(
     if (impact > 0) {
       const entLabel = isOverOrTight
         ? "Money's a bit tighter this week."
-        : "One or two things worth knowing.";
+        : "A couple of things worth knowing.";
       const entReason = isOverOrTight
         ? "One quieter night in could help."
         : "Entertainment spend is nudging up a little.";

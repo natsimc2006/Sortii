@@ -3076,7 +3076,7 @@ export default function FamilyScreen() {
                   ? "Planning next week. Add events and we'll sort them."
                   : "What's on this week? We'll untangle the rest."
                 : hasMembers
-                ? "Add events as they come up. Sortii will sort the rest."
+                ? "Add things as they come up. We'll sort the rest."
                 : "Your family's week, in one place."}
             </Text>
           </View>

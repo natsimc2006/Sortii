@@ -164,7 +164,7 @@ export function WeeklyGlanceCard({
         </View>
       )}
 
-      <Text style={wgStyles.cta}>See full timeline →</Text>
+      <Text style={wgStyles.cta}>See the full plan →</Text>
     </TouchableOpacity>
   );
 }

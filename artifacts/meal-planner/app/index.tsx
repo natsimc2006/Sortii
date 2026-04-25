@@ -327,9 +327,9 @@ export default function OnboardingScreen() {
           activeOpacity={0.85}
           style={styles.primaryBtn}
         >
-          <Text style={styles.primaryBtnText}>Set up my week →</Text>
+          <Text style={styles.primaryBtnText}>Get my week sorted →</Text>
         </TouchableOpacity>
-        <Text style={styles.welcomeNote}>Takes about 30 seconds. No account required.</Text>
+        <Text style={styles.welcomeNote}>Takes about 30 seconds. No sign-up needed.</Text>
       </Animated.View>
     </View>
   );

@@ -1,0 +1,219 @@
+You are updating the full UX copy layer of the Sortii app.
+
+IMPORTANT:
+- Do NOT change any logic, flows, data, or component structure
+- Do NOT rename variables or break bindings
+- ONLY update visible user-facing text (labels, helper text, empty states, CTAs, nudges)
+
+--------------------------------------------------
+
+BRAND VOICE DEFINITION (STRICT)
+
+Sortii = calm, capable, quietly witty life assistant.
+
+Tone rules:
+- Clear > clever
+- Short > long
+- Calm > energetic
+- Reassuring > instructive
+- Observational dry wit > obvious humour
+
+AVOID:
+- Over-explaining
+- Corporate/product language
+- “Tap / Click / Submit” where possible
+- Overly cheerful or try-hard tone
+- Long sentences
+
+AIM FOR:
+- Light, confident phrasing
+- Subtle British-style dry wit
+- Feels like the app has things handled
+- Removes pressure, not adds to it
+
+--------------------------------------------------
+
+GLOBAL WRITING RULES
+
+- Max ~8–10 words per sentence where possible
+- Use contractions naturally (we’ll, it’s)
+- Prefer statements over instructions
+- CTAs should feel like nudges, not commands
+- Every screen should reduce mental load
+
+--------------------------------------------------
+
+COPY REWRITE INSTRUCTIONS BY AREA
+
+--------------------------------------------------
+ONBOARDING / ENTRY
+
+"Set up my week"
+→ "Get my week sorted →"
+
+"Takes about 30 seconds. No account required."
+→ "Takes about 30 seconds. No sign-up needed."
+
+--------------------------------------------------
+HOME SCREEN
+
+"Good evening"
+→ keep (dynamic)
+
+"Not much on yet. Plenty of time."
+→ keep
+
+"Nothing planned yet this week."
+→ "Nothing in yet this week."
+
+"Could be worth a quick look when you've got a moment."
+→ "Might be worth a quick glance."
+
+"Welcome to Sortii"
+→ keep
+
+"Tap the Meals card below to get your dinners sorted — takes about 60 seconds."
+→ "Start with meals below — takes about a minute."
+
+CTA:
+"Sort my meals"
+→ "Sort meals →"
+
+--------------------------------------------------
+MEALS CARD
+
+"Dinners not sorted yet."
+→ keep
+
+"Takes 60 seconds."
+→ "Takes about a minute."
+
+"Switch meal"
+→ "Swap meal"
+
+"Nothing left to decide. That's the point."
+→ keep
+
+--------------------------------------------------
+FAMILY CARD
+
+"Nothing on the family radar this week."
+→ keep
+
+"A rare and peaceful sight."
+→ keep
+
+"Add events as they come up. Sortii will sort the rest."
+→ "Add things as they come up. We’ll sort the rest."
+
+--------------------------------------------------
+MONEY CARD (HOME)
+
+"Curious how this week looks financially?"
+→ "Want a quick money check?"
+
+"Set it up"
+→ "Add your numbers →"
+
+--------------------------------------------------
+MONEY SETUP SCREEN
+
+"Make it yours."
+→ keep
+
+"Give us rough numbers. We'll do the thinking."
+→ "Rough numbers are fine — we’ll handle the rest."
+
+"See my week"
+→ "See the week →"
+
+"Skip for now — I'll add this later"
+→ "Skip for now"
+
+--------------------------------------------------
+MONEY RESULTS
+
+"This week's fine. Nothing to worry about."
+→ keep
+
+"breathing room this week"
+→ keep
+
+"Solid week. Nothing unexpected landing."
+→ keep
+
+"A few quick wins"
+→ "A couple of quick wins"
+
+"One or two things worth knowing."
+→ "A couple of things worth knowing."
+
+"Give this a go"
+→ "Worth a try →"
+
+--------------------------------------------------
+WHAT’S COMING UP
+
+"A quiet one. 0 dinners sorted. Not much to worry about."
+→ "A quiet one. Not much to worry about."
+
+"Sat's doing a bit much."
+→ keep
+
+"See full timeline"
+→ "See the full plan →"
+
+--------------------------------------------------
+APPOINTMENTS
+
+"Nothing coming up yet."
+→ keep
+
+"Tap to add appointments"
+→ "Add something coming up →"
+
+--------------------------------------------------
+BILLS
+
+"No bills added yet."
+→ keep
+
+"Tap to start tracking bills"
+→ "Start tracking bills →"
+
+"Track your bills in one place."
+→ keep
+
+"Add recurring bills to complete your financial picture — they'll flow into your budget."
+→ "Add bills once — they’ll flow into your week."
+
+--------------------------------------------------
+FOCUS MODE
+
+"Right now, just focus on this."
+→ keep
+
+"Dinner is planned this week. Sorted."
+→ keep
+
+"Everything else can wait."
+→ keep
+
+"Back to home"
+→ "Back to home →"
+
+"See everything"
+→ "See the full week →"
+
+--------------------------------------------------
+
+FINAL STEP
+
+After updating all text:
+- Review each screen for consistency
+- Ensure tone feels like ONE voice, not mixed styles
+- Ensure no text feels overly corporate or robotic
+- Ensure everything feels lighter and simpler than before
+
+Do not output explanations.
+Apply changes directly to UI text only.

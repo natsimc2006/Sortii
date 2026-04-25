@@ -392,7 +392,7 @@ export default function MoneySetupScreen() {
         <View style={{ flex: 1, marginHorizontal: 12 }}>
           <Text style={[styles.pageTitle, { color: C.text }]}>Make it yours.</Text>
           <Text style={[styles.pageHelper, { color: C.textSecondary }]}>
-            Give us rough numbers. We'll do the thinking.
+            Rough numbers are fine — we'll handle the rest.
           </Text>
         </View>
         <TouchableOpacity
@@ -630,7 +630,7 @@ export default function MoneySetupScreen() {
           ]}
         >
           <Text style={[styles.primaryCtaText, !canSave && { color: "#888" }]}>
-            {saving ? "Saving…" : "See my week"}
+            {saving ? "Saving…" : "See the week"}
           </Text>
           {canSave && <Feather name={saving ? "loader" : "arrow-right"} size={18} color="#fff" />}
         </TouchableOpacity>
@@ -649,7 +649,7 @@ export default function MoneySetupScreen() {
           style={styles.skipBtn}
         >
           <Text style={[styles.skipText, { color: C.textMuted }]}>
-            Skip for now — I'll add this later
+            Skip for now
           </Text>
         </TouchableOpacity>
       </View>

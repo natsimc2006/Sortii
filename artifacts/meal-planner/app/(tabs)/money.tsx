@@ -72,11 +72,11 @@ function pressureDayLabel(dateStr: string): string {
 // ─── Quick win confirm messages ───────────────────────────────
 
 const WIN_CTA: Record<string, string> = {
-  skip_takeaway:      "Give this a go",
+  skip_takeaway:      "Worth a try →",
   pause_subscription: "Try this",
-  skip_coffee:        "Give this a go",
+  skip_coffee:        "Worth a try →",
   grocery_trim:       "Apply this",
-  skip_entertainment: "Give this a go",
+  skip_entertainment: "Worth a try →",
   leftover_night:     "Apply this",
   eating_out_nomeal:  "Sort some dinners",
   freezer_check:      "Try this",
@@ -505,7 +505,7 @@ function QuickWinsSection({
         style={styles.quickWinsHeader}
         activeOpacity={0.7}
       >
-        <Text style={styles.quickWinsTitle}>💡 A few quick wins</Text>
+        <Text style={styles.quickWinsTitle}>💡 A couple of quick wins</Text>
         <Feather name={open ? "chevron-up" : "chevron-down"} size={17} color={PLUM} />
       </TouchableOpacity>
 

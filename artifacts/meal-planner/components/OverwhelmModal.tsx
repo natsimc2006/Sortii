@@ -103,7 +103,7 @@ function buildItems(
     // Nothing planned — surface this clearly, make it tappable
     dinnerItem = {
       icon: "⬜",
-      text: "Dinners aren't sorted yet.\nTakes 60 seconds. →",
+      text: "Dinners aren't sorted yet.\nTakes about a minute. →",
       onPress: onDinnerPress,
     };
   } else if (dinnersPlanned <= 4) {
@@ -202,10 +202,10 @@ export default function OverwhelmModal({
           {/* Exit actions */}
           <View style={styles.exitLinks}>
             <TouchableOpacity onPress={handleBack} style={styles.backCta} activeOpacity={0.85}>
-              <Text style={styles.backCtaText}>Back to home</Text>
+              <Text style={styles.backCtaText}>Back to home →</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={handleSeeEverything} activeOpacity={0.7}>
-              <Text style={styles.seeEverythingLink}>See everything  →</Text>
+              <Text style={styles.seeEverythingLink}>See the full week →</Text>
             </TouchableOpacity>
           </View>
 

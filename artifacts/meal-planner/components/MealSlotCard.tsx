@@ -322,7 +322,7 @@ export function MealSlotCard({
         hitSlop={{ top: 4, bottom: 4, left: 4, right: 4 }}
       >
         <Feather name="refresh-cw" size={12} color="#5E3A4C" />
-        <Text style={styles.switchMealText}>Switch meal</Text>
+        <Text style={styles.switchMealText}>Swap meal</Text>
       </TouchableOpacity>
 
       {swapBadge && onSwapBadgePress && (
