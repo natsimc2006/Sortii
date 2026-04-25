@@ -306,7 +306,7 @@ export default function OnboardingScreen() {
       {/* ── Feature cards ── */}
       <View style={styles.valueProps}>
         {[
-          { anim: line1, border: "#2A8F88", icon: "🍽️", text: "Dinners done. No thinking needed." },
+          { anim: line1, border: "#2A8F88", icon: "🥗", text: "Dinners done. No thinking needed." },
           { anim: line2, border: "#5E3A4C", icon: "📅", text: "Your whole week, at a glance." },
           { anim: line3, border: "#D29A22", icon: "💰", text: "Money tracked. No spreadsheet." },
         ].map(({ anim, border, icon, text }) => (
@@ -359,7 +359,7 @@ const styles = StyleSheet.create({
   valueProps: {
     flex: 1,
     justifyContent: "center",
-    paddingBottom: 120,
+    paddingBottom: 60,
   },
   featureCard: {
     backgroundColor: "#FFFFFF",
