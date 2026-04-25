@@ -6,6 +6,7 @@ import {
   Animated,
   Keyboard,
   KeyboardAvoidingView,
+  Modal,
   Platform,
   Pressable,
   SafeAreaView,
@@ -663,13 +664,14 @@ function JuggleResultsContent({
   const adultPlans    = juggleResult.adult_plans ?? [];
   const conflicts     = juggleResult.conflicts ?? [];
   const travelEstimates = (juggleResult.travel_estimates ?? []) as TravelEstimate[];
+  const swapOverrides = juggleResult.swapOverrides ?? {};
   const planRows = adultPlans.flatMap((p) =>
     p.schedule.map((s) => {
       const evtItem = (juggleResult.events ?? []).find((e) => e.id === s.event_id);
       return {
         time:     s.time,
         endTime:  evtItem?.end_time ?? null as string | null,
-        adult:    p.adult,
+        adult:    swapOverrides[s.event_id] ?? p.adult,
         child:    s.child,
         activity: s.activity,
         location: s.location,
@@ -680,6 +682,28 @@ function JuggleResultsContent({
 
   const impossible = ws.impossible_clashes ?? 0;
   const tight      = ws.tight_windows ?? 0;
+
+  const [swapRow, setSwapRow]   = useState<typeof planRows[0] | null>(null);
+  const [swapPick, setSwapPick] = useState<string>("");
+
+  const adultMembers = members.filter((m) => m.role === "adult");
+
+  // Map each adult → short schedule blurb (their current plan rows)
+  const adultRowSummary = React.useMemo(() => {
+    const map: Record<string, string> = {};
+    planRows.forEach((r) => {
+      const blurb = `${r.activity} ${r.time}${r.endTime ? `–${r.endTime}` : ""}`;
+      map[r.adult] = map[r.adult] ? `${map[r.adult]}, ${blurb}` : blurb;
+    });
+    return map;
+  }, [planRows]);
+
+  // Returns true if the given adult already covers another row at the same time
+  function hasTimeConflict(eventId: string, adult: string, time: string): boolean {
+    return planRows.some(
+      (r) => r.event_id !== eventId && r.adult === adult && r.time === time
+    );
+  }
 
   function buildShareText() {
     const lines: string[] = ["WEEKEND PLAN", ""];
@@ -788,12 +812,15 @@ function JuggleResultsContent({
             <Text style={[styles.jugglePlanCellTime, styles.jugglePlanHeaderText]}>TIME</Text>
             <Text style={[styles.jugglePlanCellWho, styles.jugglePlanHeaderText]}>WHO</Text>
             <Text style={[styles.jugglePlanCellWhere, styles.jugglePlanHeaderText]}>WHERE</Text>
+            <View style={{ width: 28 }} />
           </View>
           {planRows.map((row, i) => {
             const travelWarning = travelEstimates.find(
               (t) => (t.from_event_id === row.event_id || t.to_event_id === row.event_id) &&
                      (t.status === "tight" || t.status === "impossible")
             );
+            const isSwapped = !!swapOverrides[row.event_id];
+            const hasConflict = isSwapped && hasTimeConflict(row.event_id, row.adult, row.time);
             return (
             <View key={i}>
               <View style={[styles.jugglePlanDataRow, { backgroundColor: i % 2 === 0 ? "#fff" : "#FAFAF8" }]}>
@@ -806,12 +833,22 @@ function JuggleResultsContent({
                   <Text style={styles.jugglePlanWhoText}>
                     {row.adult}{row.child ? ` · ${row.child}` : ""}
                   </Text>
+                  {hasConflict && (
+                    <Text style={{ fontSize: 10, color: "#A07010", fontFamily: "Inter_500Medium" }}>⚠ clash</Text>
+                  )}
                 </View>
                 <View style={styles.jugglePlanCellWhere}>
                   <Text style={styles.jugglePlanWhereText} numberOfLines={2}>
                     {[row.location, row.activity].filter(Boolean).join(" · ")}
                   </Text>
                 </View>
+                <TouchableOpacity
+                  onPress={() => { setSwapRow(row); setSwapPick(row.adult); }}
+                  hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                  style={{ width: 28, alignItems: "center", justifyContent: "center" }}
+                >
+                  <Text style={{ fontSize: 14, color: TEAL }}>⇌</Text>
+                </TouchableOpacity>
               </View>
               {travelWarning && (
                 <View style={{ paddingHorizontal: 12, paddingBottom: 6, backgroundColor: i % 2 === 0 ? "#fff" : "#FAFAF8" }}>
@@ -925,6 +962,105 @@ function JuggleResultsContent({
       </TouchableOpacity>
 
       </View>{/* end paddingHorizontal wrapper */}
+
+      {/* ── Swap bottom sheet ── */}
+      <Modal
+        visible={!!swapRow}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setSwapRow(null)}
+      >
+        <Pressable
+          style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.35)" }}
+          onPress={() => setSwapRow(null)}
+        />
+        <View style={{
+          backgroundColor: "#fff",
+          borderTopLeftRadius: 20,
+          borderTopRightRadius: 20,
+          paddingHorizontal: 20,
+          paddingTop: 20,
+          paddingBottom: 36,
+          gap: 16,
+          position: "absolute",
+          bottom: 0,
+          left: 0,
+          right: 0,
+        }}>
+          {/* Handle bar */}
+          <View style={{ width: 36, height: 4, borderRadius: 2, backgroundColor: "#DDD", alignSelf: "center", marginBottom: 4 }} />
+          <Text style={{ fontFamily: "PlayfairDisplay_700Bold", fontSize: 18, color: "#1C1C1E" }}>
+            Who should cover this?
+          </Text>
+          {swapRow && (
+            <Text style={{ fontFamily: "Inter_400Regular", fontSize: 13, color: "#6E6E73" }}>
+              {swapRow.activity}{swapRow.child ? ` · ${swapRow.child}` : ""}{swapRow.time ? ` · ${swapRow.time}` : ""}
+            </Text>
+          )}
+          <View style={{ gap: 8 }}>
+            {adultMembers.map((adult) => {
+              const selected = swapPick === adult.name;
+              const summary  = adultRowSummary[adult.name];
+              return (
+                <TouchableOpacity
+                  key={adult.id}
+                  onPress={() => setSwapPick(adult.name)}
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    padding: 12,
+                    borderRadius: 10,
+                    borderWidth: 1.5,
+                    borderColor: selected ? TEAL : "#E5E5EA",
+                    backgroundColor: selected ? TEAL + "10" : "#FAFAF8",
+                    gap: 12,
+                  }}
+                >
+                  <View style={{ width: 10, height: 10, borderRadius: 5, backgroundColor: adult.color ?? TEAL }} />
+                  <View style={{ flex: 1 }}>
+                    <Text style={{ fontFamily: "Inter_600SemiBold", fontSize: 14, color: "#1C1C1E" }}>{adult.name}</Text>
+                    {summary ? (
+                      <Text style={{ fontFamily: "Inter_400Regular", fontSize: 12, color: "#6E6E73" }} numberOfLines={1}>
+                        {summary}
+                      </Text>
+                    ) : (
+                      <Text style={{ fontFamily: "Inter_400Regular", fontSize: 12, color: "#6E6E73" }}>Nothing on yet</Text>
+                    )}
+                  </View>
+                  {selected && <Feather name="check" size={16} color={TEAL} />}
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+          <View style={{ flexDirection: "row", gap: 10, marginTop: 4 }}>
+            <TouchableOpacity
+              onPress={() => setSwapRow(null)}
+              style={{
+                flex: 1, paddingVertical: 14, borderRadius: 10,
+                borderWidth: 1, borderColor: "#E5E5EA",
+                alignItems: "center",
+              }}
+            >
+              <Text style={{ fontFamily: "Inter_500Medium", fontSize: 15, color: "#6E6E73" }}>Never mind</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => {
+                if (swapRow && swapPick && onSwapApplied) {
+                  onSwapApplied(swapRow.event_id, swapPick);
+                }
+                setSwapRow(null);
+              }}
+              style={{
+                flex: 1, paddingVertical: 14, borderRadius: 10,
+                backgroundColor: GOLD,
+                alignItems: "center",
+              }}
+            >
+              <Text style={{ fontFamily: "Inter_600SemiBold", fontSize: 15, color: "#fff" }}>Swap →</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </ScrollView>
   );
 }
@@ -2496,6 +2632,10 @@ export default function FamilyScreen() {
   }
 
   async function handleAddMember(name: string, role: "adult" | "child") {
+    const nameExists = state.members.some(
+      (m) => m.name.toLowerCase().trim() === name.toLowerCase().trim()
+    );
+    if (nameExists) return;
     const usedColors = state.members.map((m) => m.color);
     const color = MEMBER_COLORS.find((c) => !usedColors.includes(c)) ?? MEMBER_COLORS[0]!;
     const member: FamilyMember = { id: Date.now().toString(), name, role, color };
@@ -2529,7 +2669,13 @@ export default function FamilyScreen() {
   }
 
   async function handleSortJuggle() {
-    const adults = state.members.filter((m) => m.role === "adult");
+    const uniqueMembers = state.members.filter(
+      (member, index, self) =>
+        index === self.findIndex(
+          (m) => m.name.toLowerCase().trim() === member.name.toLowerCase().trim()
+        )
+    );
+    const adults = uniqueMembers.filter((m) => m.role === "adult");
     if (adults.length === 0 || (state.events.length === 0 && pushedCalEvents.length === 0)) return;
 
     console.log("[Sortii] Sort triggered — adults:", adults.length, "events:", state.events.length, "cal:", pushedCalEvents.length);
@@ -2537,7 +2683,7 @@ export default function FamilyScreen() {
     setFamilyStep("sorting");
 
     try {
-      const userMessage = buildJugglePrompt(state.members, state.events);
+      const userMessage = buildJugglePrompt(uniqueMembers, state.events);
       const raw = await solveJuggle(userMessage);
       const full: JuggleResult = { ...(raw as unknown as JuggleResult), solvedAt: Date.now() };
       await AsyncStorage.setItem(juggleKey(), JSON.stringify(full));
