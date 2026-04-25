@@ -864,32 +864,22 @@ export default function MealsScreen() {
           );
         })}
 
-        {/* Cook With What's Already Here — rescue entry */}
+        {/* Fridge Rescue — always shown below meal list */}
         <TouchableOpacity
-          style={[
-            styles.rescueEntry,
-            { backgroundColor: TEAL + "0D", borderColor: TEAL + "28" },
-          ]}
+          style={styles.rescueEntry}
           onPress={() => router.push("/(tabs)/cook-with" as any)}
           activeOpacity={0.78}
         >
-          <View
-            style={[
-              styles.rescueEntryIcon,
-              { backgroundColor: TEAL + "18" },
-            ]}
-          >
-            <Feather name="search" size={14} color={TEAL} />
+          <View style={styles.rescueEntryIcon}>
+            <Feather name="search" size={20} color={TEAL} />
           </View>
-          <View style={{ flex: 1, gap: 2 }}>
-            <Text style={[styles.rescueEntryTitle, { color: C.text }]}>
-              Fridge Rescue
-            </Text>
-            <Text style={[styles.rescueEntrySub, { color: C.textMuted }]}>
+          <View style={{ flex: 1, gap: 3 }}>
+            <Text style={styles.rescueEntryTitle}>Fridge Rescue</Text>
+            <Text style={styles.rescueEntrySub}>
               Tell me what you've got and I'll sort dinner.
             </Text>
           </View>
-          <Feather name="chevron-right" size={15} color={C.textMuted} />
+          <Feather name="chevron-right" size={16} color={TEAL} />
         </TouchableOpacity>
 
         {/* Easy night quiet confirmation line */}
@@ -1505,25 +1495,29 @@ const styles = StyleSheet.create({
     gap: 12,
     marginHorizontal: 0,
     marginBottom: 16,
-    padding: 13,
-    borderRadius: 13,
-    borderWidth: 1,
+    padding: 16,
+    borderRadius: 12,
+    backgroundColor: "#E6F3F0",
+    borderWidth: 0,
   },
   rescueEntryIcon: {
-    width: 30,
-    height: 30,
-    borderRadius: 9,
+    width: 36,
+    height: 36,
+    borderRadius: 10,
+    backgroundColor: "#2A8F8820",
     alignItems: "center",
     justifyContent: "center",
   },
   rescueEntryTitle: {
-    fontSize: 13,
+    fontSize: 15,
     fontFamily: "Inter_600SemiBold",
-    lineHeight: 18,
+    color: "#2B2B2B",
+    lineHeight: 20,
   },
   rescueEntrySub: {
-    fontSize: 12,
+    fontSize: 13,
     fontFamily: "Inter_400Regular",
+    color: "#777777",
   },
   dayBlock: { gap: 8, marginBottom: 20 },
   dayLabelRow: {

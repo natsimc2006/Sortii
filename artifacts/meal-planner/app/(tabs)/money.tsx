@@ -595,25 +595,38 @@ function SavingsGoalCard({
 // ─── Meal Plan Saving Card ───────────────────────────────────
 
 function MealPlanSavingCard({
-  mealPlanSaving,
-  numMeals,
+  mealsPlanned,
+  weeklyGroceryEstimate,
   fmt,
-  appendLine,
 }: {
-  mealPlanSaving: number;
-  numMeals: number;
+  mealsPlanned: number;
+  weeklyGroceryEstimate: number;
   fmt: (n: number) => string;
-  appendLine?: string;
 }) {
-  if (mealPlanSaving <= 0 || !isFinite(mealPlanSaving)) return null;
+  // Never show the card when no dinners are planned
+  if (mealsPlanned === 0) return null;
+
+  const usualSpendPerMeal      = weeklyGroceryEstimate / 7;
+  const typicalTakeawayPerMeal = usualSpendPerMeal * 1.8;
+  const estimatedSaving        = Math.round(mealsPlanned * (typicalTakeawayPerMeal - usualSpendPerMeal));
+  const fullWeekSaving         = Math.round(7 * (typicalTakeawayPerMeal - usualSpendPerMeal));
+
+  if (estimatedSaving <= 0 || !isFinite(estimatedSaving)) return null;
+
+  const savingCopy = mealsPlanned === 7
+    ? "Cooking all 7 — full saving unlocked."
+    : `Cooking ${mealsPlanned} of 7 dinners this week.`;
+  const savingSubtext = mealsPlanned < 7
+    ? `Add more to unlock the full ~${fmt(fullWeekSaving)} saving.`
+    : null;
+
   return (
     <View style={styles.mealSavingCard}>
       <Text style={styles.mealSavingEyebrow}>THIS WEEK'S DINNER SAVING</Text>
-      <Text style={styles.mealSavingBig}>~{fmt(mealPlanSaving)}</Text>
-      <Text style={styles.mealSavingDesc}>Cooking this plan vs. your usual spend.</Text>
-      <Text style={styles.mealSavingCount}>{numMeals} dinners sorted this week.</Text>
-      {appendLine ? (
-        <Text style={styles.mealSavingAppend}>{appendLine}</Text>
+      <Text style={styles.mealSavingBig}>~{fmt(estimatedSaving)}</Text>
+      <Text style={styles.mealSavingDesc}>{savingCopy}</Text>
+      {savingSubtext ? (
+        <Text style={styles.mealSavingAppend}>{savingSubtext}</Text>
       ) : null}
     </View>
   );
@@ -850,8 +863,6 @@ export default function MoneyScreen() {
   const weeklyBreathingRoom = money ? result.remaining + appliedSavingsTotal : 0;
   const pressureTotal = pressureItems.reduce((s, p) => s + p.amount, 0);
   const adjustedBreathingRoom = weeklyBreathingRoom - pressureTotal;
-  const mealPlanSaving = Math.max(0, Math.round(result.estimatedDinnerSpend - dinnerPlanCost));
-
   type MoneyTabState = "calm" | "tight" | "stretched";
   const moneyTabState: MoneyTabState = hasMoneySetup
     ? adjustedBreathingRoom > 50 ? "calm"
@@ -997,8 +1008,8 @@ export default function MoneyScreen() {
 
           {/* 2. Meal plan saving card */}
           <MealPlanSavingCard
-            mealPlanSaving={mealPlanSaving}
-            numMeals={filledMeals.length}
+            mealsPlanned={filledMeals.length}
+            weeklyGroceryEstimate={money && money.groceriesWeekly > 0 ? money.groceriesWeekly : (money?.weeklyIncome ?? 0) * 0.65}
             fmt={formatMoneyRound}
           />
 
@@ -1091,8 +1102,8 @@ export default function MoneyScreen() {
           </View>
 
           <MealPlanSavingCard
-            mealPlanSaving={mealPlanSaving}
-            numMeals={filledMeals.length}
+            mealsPlanned={filledMeals.length}
+            weeklyGroceryEstimate={money && money.groceriesWeekly > 0 ? money.groceriesWeekly : (money?.weeklyIncome ?? 0) * 0.65}
             fmt={formatMoneyRound}
           />
 
@@ -1133,10 +1144,9 @@ export default function MoneyScreen() {
           </View>
 
           <MealPlanSavingCard
-            mealPlanSaving={mealPlanSaving}
-            numMeals={filledMeals.length}
+            mealsPlanned={filledMeals.length}
+            weeklyGroceryEstimate={money && money.groceriesWeekly > 0 ? money.groceriesWeekly : (money?.weeklyIncome ?? 0) * 0.65}
             fmt={formatMoneyRound}
-            appendLine="That's one less thing."
           />
 
           {/* Overwhelm mode entry point (Phase 4) */}
