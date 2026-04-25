@@ -317,7 +317,7 @@ export default function OnboardingScreen() {
         ))}
       </View>
 
-      {/* ── CTA ── */}
+      {/* ── CTA — absolutely pinned to bottom ── */}
       <Animated.View style={[styles.ctaWrap, { opacity: ctaAnim, paddingBottom }]}>
         <TouchableOpacity
           onPress={() => {
@@ -357,7 +357,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     gap: 20,
-    marginBottom: 24,
+    paddingBottom: 120,
   },
   valueProp: {
     flexDirection: "row",
@@ -380,7 +380,13 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   ctaWrap: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    paddingHorizontal: 24,
     gap: 12,
+    backgroundColor: "#FFFFFF",
   },
   welcomeNote: {
     fontFamily: "Inter_400Regular",
