@@ -3042,7 +3042,7 @@ export default function FamilyScreen() {
     );
   }
 
-  const hasEvents          = state.events.length > 0 || pushedCalEvents.length > 0;
+  const hasEvents          = state.events.length > 0 || pushedCalEvents.length > 0 || thisWeekAppts.length > 0;
 
   const hasMembers         = state.members.length > 0;
   const hasAdults          = state.members.some((m) => m.role === "adult");
@@ -3113,43 +3113,73 @@ export default function FamilyScreen() {
             {/* Day-by-day events — clean list, no plan outputs pre-sort */}
             <View style={styles.weekSection}>
               <Text style={styles.sectionLabel}>{sortWeek === 0 ? "THIS WEEK" : "NEXT WEEK"}</Text>
-              {daysWithEvents.map((day) => (
-                <DaySection
-                  key={day}
-                  day={day}
-                  events={result?.eventsByDay[day] ?? []}
-                  members={state.members}
-                  onEditEvent={openEditEvent}
-                  onDeleteEvent={handleDeleteEvent}
-                  juggleDriverMap={juggleDriverMap}
-                />
-              ))}
-              {/* This-week appointments — shown as distinct "Appointment" items */}
-              {thisWeekAppts.length > 0 && (
-                <View style={styles.apptSection}>
-                  <Text style={styles.apptSectionLabel}>APPOINTMENTS</Text>
-                  {thisWeekAppts.map((a) => {
-                    const timeLabel = a.startTime || "All day";
-                    const dateLabel = a.date
-                      ? new Date(a.date).toLocaleDateString("en-AU", { weekday: "short", day: "numeric", month: "short" })
-                      : "";
-                    return (
-                      <View key={a.id} style={styles.apptItemRow}>
-                        <View style={styles.apptTimePill}>
-                          <Text style={styles.apptTimeText}>{timeLabel}</Text>
-                        </View>
-                        <View style={{ flex: 1 }}>
-                          <Text style={styles.apptTitle} numberOfLines={1}>{a.title}</Text>
-                          {dateLabel ? <Text style={styles.apptDate}>{dateLabel}</Text> : null}
-                        </View>
-                        <View style={styles.apptBadge}>
-                          <Text style={styles.apptBadgeText}>Appt</Text>
+              {(() => {
+                const apptsByDay: Partial<Record<DayOfWeek, Appointment[]>> = {};
+                for (const a of thisWeekAppts) {
+                  const d = new Date(`${a.date}T00:00:00`);
+                  const day = DAYS_JS_TO_SORTII[d.getDay()];
+                  if (day) (apptsByDay[day] = apptsByDay[day] ?? []).push(a);
+                }
+                const allDays = ALL_DAYS.filter(
+                  (d) => (result?.eventsByDay[d]?.length ?? 0) > 0 || (apptsByDay[d]?.length ?? 0) > 0
+                );
+                return allDays.map((day) => {
+                  const famEvs = result?.eventsByDay[day] ?? [];
+                  const dayAppts = apptsByDay[day] ?? [];
+                  const isWeekend = day === "Saturday" || day === "Sunday";
+                  return (
+                    <View key={day} style={styles.daySection}>
+                      <View style={[styles.dayHeader, isWeekend && styles.dayHeaderWeekend]}>
+                        <Text style={[styles.dayLabel, isWeekend && { color: GOLD }]}>{day}</Text>
+                        <View style={[styles.eventCountBadge, isWeekend && { backgroundColor: GOLD + "18" }]}>
+                          <Text style={[styles.eventCountText, isWeekend && { color: GOLD }]}>
+                            {famEvs.length + dayAppts.length}
+                          </Text>
                         </View>
                       </View>
-                    );
-                  })}
-                </View>
-              )}
+                      <View style={styles.daySectionEvents}>
+                        {famEvs.map((ev, idx) => (
+                          <React.Fragment key={ev.id}>
+                            <EventCard
+                              event={ev}
+                              members={state.members}
+                              onEdit={() => openEditEvent(ev)}
+                              onDelete={() => handleDeleteEvent(ev.id)}
+                              aiDriver={juggleDriverMap?.get(ev.id)}
+                            />
+                            {(idx < famEvs.length - 1 || dayAppts.length > 0) && (
+                              <View style={styles.dayEventConnector} />
+                            )}
+                            {juggleDriverMap && idx < famEvs.length - 1 && (() => {
+                              const hint = getTravelHint(ev, famEvs[idx + 1]!, juggleDriverMap);
+                              if (!hint) return null;
+                              return (
+                                <View style={styles.travelHintRow}>
+                                  <Feather name="navigation" size={11} color={ORANGE} />
+                                  <Text style={styles.travelHintText}>{hint}</Text>
+                                </View>
+                              );
+                            })()}
+                          </React.Fragment>
+                        ))}
+                        {dayAppts.map((a) => (
+                          <View key={a.id} style={styles.apptItemRow}>
+                            <View style={styles.apptTimePill}>
+                              <Text style={styles.apptTimeText}>{a.startTime || "All day"}</Text>
+                            </View>
+                            <View style={{ flex: 1 }}>
+                              <Text style={styles.apptTitle} numberOfLines={1}>{a.title}</Text>
+                            </View>
+                            <View style={styles.apptBadge}>
+                              <Text style={styles.apptBadgeText}>Appt</Text>
+                            </View>
+                          </View>
+                        ))}
+                      </View>
+                    </View>
+                  );
+                });
+              })()}
 
               {/* Pushed calendar events */}
               {pushedCalEvents.length > 0 && (
