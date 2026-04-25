@@ -65,7 +65,10 @@ const DAY_ABBR: Record<DayOfWeek, string> = {
 import { SK } from "@/utils/storageKeys";
 import { getCurrentUserId } from "@/utils/currentUser";
 
-function juggleKey() { return SK.juggle(getCurrentUserId()); }
+function juggleKey(weekOffset: number = 0) {
+  const base = SK.juggle(getCurrentUserId());
+  return weekOffset === 0 ? base : `${base}_w${weekOffset}`;
+}
 const HELPERS_KEY       = "@sortii_helpers_v1";
 
 // ── Family helpers ─────────────────────────────────────────────────────────────
@@ -433,12 +436,22 @@ const DAY_TO_JS: Record<DayOfWeek, number> = {
   Thursday: 4, Friday: 5, Saturday: 6,
 };
 
-/** Returns the YYYY-MM-DD date for the nearest future (or today) occurrence of dayName. */
-function nextDateForDay(dayName: DayOfWeek): string {
-  const now   = new Date();
-  const today = now.getDay();
-  const diff  = (DAY_TO_JS[dayName] - today + 7) % 7;
-  const d     = new Date(now.getFullYear(), now.getMonth(), now.getDate() + diff);
+// Monday-anchored offset (Mon=0 … Sun=6) — used to anchor dates to the correct calendar week.
+const DAY_FROM_MON: Record<DayOfWeek, number> = {
+  Monday: 0, Tuesday: 1, Wednesday: 2, Thursday: 3, Friday: 4, Saturday: 5, Sunday: 6,
+};
+
+/**
+ * Returns the YYYY-MM-DD date for `dayName` in the Mon-Sun week that is
+ * `weekOffset` weeks ahead of the current week (0 = this week, 1 = next week).
+ * Always uses local-timezone arithmetic — never toISOString().
+ */
+function dateForDayInWeek(dayName: DayOfWeek, weekOffset: number = 0): string {
+  const now = new Date();
+  const jsDay = now.getDay();
+  const diffToMon = jsDay === 0 ? -6 : 1 - jsDay; // days from today to this Monday
+  const monDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() + diffToMon + weekOffset * 7);
+  const d = new Date(monDate.getFullYear(), monDate.getMonth(), monDate.getDate() + DAY_FROM_MON[dayName]);
   return localDateStr(d);
 }
 
@@ -2653,6 +2666,8 @@ export default function FamilyScreen() {
   const [apptItems,       setApptItems]       = useState<Appointment[]>([]);
   const [carpoolContacts, setCarpoolContacts] = useState<CarpoolContact[]>([]);
   const [juggleFreeText, setJuggleFreeText]   = useState("");
+  // 0 = this week, 1 = next week — controls both the appt feed and the juggle sort
+  const [sortWeek, setSortWeek]               = useState<0 | 1>(0);
 
   // Compute a map from eventId → AI-assigned adult name (including swaps)
   const juggleDriverMap = React.useMemo(() => {
@@ -2705,6 +2720,17 @@ export default function FamilyScreen() {
   useEffect(() => { load(); }, [load]);
   useEffect(() => () => { if (bannerTimer.current) clearTimeout(bannerTimer.current); }, []);
 
+  // When the user switches weeks, load (or clear) the stored result for that week.
+  useEffect(() => {
+    AsyncStorage.getItem(juggleKey(sortWeek)).then((raw) => {
+      if (raw) {
+        try { setJuggleResult(JSON.parse(raw)); setIsSorted(true); } catch {}
+      } else {
+        setJuggleResult(null); setIsSorted(false);
+      }
+    });
+  }, [sortWeek]);
+
   async function persistState(next: FamilyState) {
     setState(next);
     setResult(computeFamilyWeek(next));
@@ -2756,7 +2782,8 @@ export default function FamilyScreen() {
     // so edits/deletes stay linked.
     if (draft.isAppointment) {
       const apptId = `fam_${savedId}`;
-      const date   = nextDateForDay(draft.day as DayOfWeek);
+      // Pin the appointment to the correct calendar week (this or next) based on sortWeek
+      const date   = dateForDayInWeek(draft.day as DayOfWeek, sortWeek);
       const person = draft.assignedAdult ||
         draft.personIds.map((pid) => state.members.find((m) => m.id === pid)?.name).filter(Boolean).join(", ") || "";
       const newAppt: Appointment = {
@@ -2840,7 +2867,7 @@ export default function FamilyScreen() {
       swapOverrides: { ...(juggleResult.swapOverrides ?? {}), [event_id]: adult },
     };
     setJuggleResult(updated);
-    await AsyncStorage.setItem(juggleKey(), JSON.stringify(updated));
+    await AsyncStorage.setItem(juggleKey(sortWeek), JSON.stringify(updated));
   }
 
   async function handleSortJuggle() {
@@ -2852,11 +2879,12 @@ export default function FamilyScreen() {
     );
     const adults = uniqueMembers.filter((m) => m.role === "adult");
 
-    // Compute this week's range using local dates (not UTC / toISOString)
+    // Compute the target week's date range using local dates (not UTC / toISOString).
+    // sortWeek=0 → this Mon-Sun; sortWeek=1 → next Mon-Sun.
     const _now    = new Date();
     const _jsDay  = _now.getDay();
     const _diff   = _jsDay === 0 ? -6 : 1 - _jsDay;
-    const _wStart = new Date(_now.getFullYear(), _now.getMonth(), _now.getDate() + _diff);
+    const _wStart = new Date(_now.getFullYear(), _now.getMonth(), _now.getDate() + _diff + sortWeek * 7);
     const _wEnd   = new Date(_wStart.getFullYear(), _wStart.getMonth(), _wStart.getDate() + 6);
     const _ws     = localDateStr(_wStart);
     const _we     = localDateStr(_wEnd);
@@ -2901,7 +2929,7 @@ export default function FamilyScreen() {
       // On-device solver — works offline, no API key needed.
       const memberLookup = new Map<string, FamilyMember>(uniqueMembers.map((m) => [m.id, m]));
       const full: JuggleResult = solveJuggleOnDevice(adults, allEvents, pushedCalEvents, memberLookup);
-      await AsyncStorage.setItem(juggleKey(), JSON.stringify(full));
+      await AsyncStorage.setItem(juggleKey(sortWeek), JSON.stringify(full));
       setJuggleResult(full);
       setIsSorted(true);
       setFamilyStep("results");
@@ -2945,7 +2973,8 @@ export default function FamilyScreen() {
     const today = new Date();
     const jsDay = today.getDay();
     const diff = jsDay === 0 ? -6 : 1 - jsDay;
-    const weekStart = new Date(today.getFullYear(), today.getMonth(), today.getDate() + diff);
+    // Use sortWeek offset so the correct week's appointments are shown in the family view
+    const weekStart = new Date(today.getFullYear(), today.getMonth(), today.getDate() + diff + sortWeek * 7);
     const weekEnd   = new Date(weekStart.getFullYear(), weekStart.getMonth(), weekStart.getDate() + 6);
     // Use localDateStr — NOT toISOString() which converts to UTC and gives the wrong date for AU/NZ.
     const ws = localDateStr(weekStart);
@@ -2953,7 +2982,7 @@ export default function FamilyScreen() {
     return apptItems
       .filter((a) => !a.isDone && !a.isCancelled && a.date >= ws && a.date <= we)
       .sort((a, b) => a.date.localeCompare(b.date) || a.startTime.localeCompare(b.startTime));
-  }, [apptItems]);
+  }, [apptItems, sortWeek]);
 
   if (loading) return <View style={{ flex: 1, backgroundColor: BG }} />;
 
@@ -3033,7 +3062,9 @@ export default function FamilyScreen() {
             <Text style={styles.pageTitle}>Family</Text>
             <Text style={styles.pageSub}>
               {hasEvents
-                ? "What's on this week? We'll untangle the rest."
+                ? sortWeek === 1
+                  ? "Planning next week. Add events and we'll sort them."
+                  : "What's on this week? We'll untangle the rest."
                 : hasMembers
                 ? "Add events as they come up. Sortii will sort the rest."
                 : "Your family's week, in one place."}
@@ -3048,12 +3079,30 @@ export default function FamilyScreen() {
           onRemove={handleRemoveMember}
         />
 
+        {/* ── Week selector — This week / Next week ── */}
+        {hasMembers && (
+          <View style={styles.weekSelectorRow}>
+            {([{ v: 0 as const, label: "This week" }, { v: 1 as const, label: "Next week" }]).map(({ v, label }) => (
+              <TouchableOpacity
+                key={v}
+                onPress={() => setSortWeek(v)}
+                style={[styles.weekSelectorChip, sortWeek === v && styles.weekSelectorChipActive]}
+                activeOpacity={0.75}
+              >
+                <Text style={[styles.weekSelectorText, sortWeek === v && styles.weekSelectorTextActive]}>
+                  {label}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
+
         {/* ── Events or empty states ── */}
         {hasEvents ? (
           <>
             {/* Day-by-day events — clean list, no plan outputs pre-sort */}
             <View style={styles.weekSection}>
-              <Text style={styles.sectionLabel}>THIS WEEK</Text>
+              <Text style={styles.sectionLabel}>{sortWeek === 0 ? "THIS WEEK" : "NEXT WEEK"}</Text>
               {daysWithEvents.map((day) => (
                 <DaySection
                   key={day}
@@ -3926,6 +3975,18 @@ const styles = StyleSheet.create({
   carpoolAddBtnText: {
     fontSize: 14, fontFamily: "DMSans_600SemiBold", color: "#fff",
   },
+
+  // Week selector chips (This week / Next week)
+  weekSelectorRow: { flexDirection: "row", gap: 8 },
+  weekSelectorChip: {
+    paddingHorizontal: 14, paddingVertical: 7, borderRadius: 20,
+    backgroundColor: "#F0EBE3", borderWidth: 1, borderColor: "#E0D9CF",
+  },
+  weekSelectorChipActive: {
+    backgroundColor: TEAL_TINT, borderColor: TEAL + "50",
+  },
+  weekSelectorText: { fontSize: 13, fontFamily: "Inter_500Medium", color: TEXT_MUTED },
+  weekSelectorTextActive: { color: TEAL, fontFamily: "Inter_600SemiBold" },
 
   // "Add another event" persistent button
   addAnotherBtn: {

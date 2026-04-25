@@ -157,7 +157,7 @@ function timeAgo(d: Date): string {
   return `${hrs}h ago`;
 }
 
-type DateGroup = "today" | "tomorrow" | "this_week" | "later" | "past";
+type DateGroup = "today" | "tomorrow" | "this_week" | "next_week" | "later" | "past";
 
 function getGroup(dateStr: string): DateGroup {
   const today = new Date(); today.setHours(0, 0, 0, 0);
@@ -167,6 +167,7 @@ function getGroup(dateStr: string): DateGroup {
   if (diff === 0) return "today";
   if (diff === 1) return "tomorrow";
   if (diff <= 6)  return "this_week";
+  if (diff <= 13) return "next_week";
   return "later";
 }
 
@@ -587,7 +588,7 @@ function ConnectionCards({ onConnectApple, onConnectGoogle, onManual }: Connecti
 // ── Main Screen ────────────────────────────────────────────────────────────────
 
 type ApptView = "overview" | "form" | "detail";
-type Filter   = "all" | "today" | "week" | "needs_prep";
+type Filter   = "all" | "today" | "week" | "next_week" | "needs_prep";
 
 export default function AppointmentsScreen() {
   const router = useRouter();
@@ -879,6 +880,7 @@ export default function AppointmentsScreen() {
     const g = getGroup(a.date);
     if (filter === "today")      return g === "today";
     if (filter === "week")       return g === "today" || g === "tomorrow" || g === "this_week";
+    if (filter === "next_week")  return g === "next_week";
     if (filter === "needs_prep") return needsPrep(a);
     return true;
   }).sort((a, b) => a.date.localeCompare(b.date) || a.startTime.localeCompare(b.startTime));
@@ -887,6 +889,7 @@ export default function AppointmentsScreen() {
     { label: "Today",     key: "today"     as DateGroup | "done", items: visible.filter((a) => getGroup(a.date) === "today"     && !a.isDone) },
     { label: "Tomorrow",  key: "tomorrow"  as DateGroup | "done", items: visible.filter((a) => getGroup(a.date) === "tomorrow"  && !a.isDone) },
     { label: "This week", key: "this_week" as DateGroup | "done", items: visible.filter((a) => getGroup(a.date) === "this_week" && !a.isDone) },
+    { label: "Next week", key: "next_week" as DateGroup | "done", items: visible.filter((a) => getGroup(a.date) === "next_week" && !a.isDone) },
     { label: "Coming up", key: "later"     as DateGroup | "done", items: visible.filter((a) => getGroup(a.date) === "later"     && !a.isDone) },
     { label: "Done",      key: "done"      as DateGroup | "done", items: visible.filter((a) => a.isDone || getGroup(a.date) === "past") },
   ] as { label: string; key: DateGroup | "done"; items: Appointment[] }[]).filter((g) => g.items.length > 0);
@@ -895,8 +898,9 @@ export default function AppointmentsScreen() {
   const upcomingCalEvents = calEvents.filter((e) => {
     const dateStr = isoToDateStr(e.startTime);
     const g = getGroup(dateStr);
-    if (filter === "today")  return g === "today";
-    if (filter === "week")   return g === "today" || g === "tomorrow" || g === "this_week";
+    if (filter === "today")     return g === "today";
+    if (filter === "week")      return g === "today" || g === "tomorrow" || g === "this_week";
+    if (filter === "next_week") return g === "next_week";
     if (filter === "needs_prep") return false;
     return g !== "past";
   });
@@ -909,6 +913,7 @@ export default function AppointmentsScreen() {
     const label =
       g === "today"     ? "Today"
       : g === "tomorrow"  ? "Tomorrow"
+      : g === "next_week" ? formatDateShort(dateStr)
       : g === "this_week" ? formatDateShort(dateStr)
       : g === "later"     ? formatDateShort(dateStr)
       : "Earlier";
@@ -944,9 +949,10 @@ export default function AppointmentsScreen() {
   const showSaturdayBulk = saturdayCalEvents.length >= 3;
 
   // Summary counts
-  const countToday   = items.filter((a) => !a.isDone && !a.isCancelled && getGroup(a.date) === "today").length;
-  const countWeek    = items.filter((a) => !a.isDone && !a.isCancelled && ["today","tomorrow","this_week"].includes(getGroup(a.date))).length;
-  const countPrep    = items.filter(needsPrep).length;
+  const countToday    = items.filter((a) => !a.isDone && !a.isCancelled && getGroup(a.date) === "today").length;
+  const countWeek     = items.filter((a) => !a.isDone && !a.isCancelled && ["today","tomorrow","this_week"].includes(getGroup(a.date))).length;
+  const countNextWeek = items.filter((a) => !a.isDone && !a.isCancelled && getGroup(a.date) === "next_week").length;
+  const countPrep     = items.filter(needsPrep).length;
   const anyConnected = appleConnected || googleConnected;
   const noContent    = apptGroups.length === 0 && calGroups.length === 0;
 
@@ -1569,6 +1575,7 @@ export default function AppointmentsScreen() {
     { key: "all",       label: "All"        },
     { key: "today",     label: "Today"      },
     { key: "week",      label: "This week"  },
+    { key: "next_week", label: "Next week"  },
     { key: "needs_prep",label: "Needs prep" },
   ];
 
@@ -1671,6 +1678,16 @@ export default function AppointmentsScreen() {
             <Text style={[styles.summaryChipNum, { color: PLUM }]}>{countWeek}</Text>
             <Text style={styles.summaryChipLabel}>This week</Text>
           </View>
+          {countNextWeek > 0 && (
+            <TouchableOpacity
+              style={[styles.summaryChip, { backgroundColor: GOLD + "15" }]}
+              onPress={() => setFilter("next_week")}
+              activeOpacity={0.75}
+            >
+              <Text style={[styles.summaryChipNum, { color: GOLD }]}>{countNextWeek}</Text>
+              <Text style={styles.summaryChipLabel}>Next week</Text>
+            </TouchableOpacity>
+          )}
           {countPrep > 0 && (
             <View style={[styles.summaryChip, { backgroundColor: ORANGE + "18" }]}>
               <Text style={[styles.summaryChipNum, { color: ORANGE }]}>{countPrep}</Text>
