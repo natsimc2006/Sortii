@@ -1,7 +1,14 @@
 import { Platform } from "react-native";
 
 function apiBase(): string {
-  return Platform.OS === "web" ? "" : "http://localhost:8080";
+  if (Platform.OS === "web") return "";
+  // On native (iOS/Android), localhost points to the device itself, not the
+  // Replit server. Use the same public dev-domain that the web app uses so
+  // the proxy can route /api/juggle correctly.
+  const domain = process.env.EXPO_PUBLIC_DOMAIN;
+  if (domain) return `https://${domain}`;
+  // Local fallback for simulators running against a local server
+  return "http://localhost:8080";
 }
 
 export async function solveJuggle(userMessage: string): Promise<Record<string, unknown>> {
