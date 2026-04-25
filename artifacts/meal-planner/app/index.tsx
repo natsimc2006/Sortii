@@ -303,16 +303,19 @@ export default function OnboardingScreen() {
       {/* ── Logo ── */}
       <Image source={sortiiLogo1} style={styles.welcomeLogo} resizeMode="contain" />
 
-      {/* ── Value props ── */}
+      {/* ── Feature cards ── */}
       <View style={styles.valueProps}>
         {[
-          { anim: line1, color: TEAL,  text: "Dinners done. No thinking needed." },
-          { anim: line2, color: PLUM,  text: "Your whole week, at a glance." },
-          { anim: line3, color: GOLD,  text: "Money tracked. No spreadsheet." },
-        ].map(({ anim, color, text }) => (
-          <Animated.View key={text} style={[styles.valueProp, { opacity: anim }]}>
-            <View style={[styles.valuePropDot, { backgroundColor: color }]} />
-            <Text style={styles.valuePropText}>{text}</Text>
+          { anim: line1, border: "#2A8F88", icon: "🍽️", text: "Dinners done. No thinking needed." },
+          { anim: line2, border: "#5E3A4C", icon: "📅", text: "Your whole week, at a glance." },
+          { anim: line3, border: "#D29A22", icon: "💰", text: "Money tracked. No spreadsheet." },
+        ].map(({ anim, border, icon, text }) => (
+          <Animated.View
+            key={text}
+            style={[styles.featureCard, { borderLeftColor: border, opacity: anim }]}
+          >
+            <Text style={styles.featureCardIcon}>{icon}</Text>
+            <Text style={styles.featureCardText}>{text}</Text>
           </Animated.View>
         ))}
       </View>
@@ -356,28 +359,27 @@ const styles = StyleSheet.create({
   valueProps: {
     flex: 1,
     justifyContent: "center",
-    gap: 20,
     paddingBottom: 120,
   },
-  valueProp: {
+  featureCard: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 12,
+    borderLeftWidth: 4,
     flexDirection: "row",
     alignItems: "center",
-    gap: 16,
   },
-  valuePropDot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    flexShrink: 0,
-    marginTop: 2,
+  featureCardIcon: {
+    fontSize: 22,
+    marginRight: 12,
   },
-  valuePropText: {
+  featureCardText: {
     fontFamily: "DMSans_600SemiBold",
     fontWeight: "600",
-    fontSize: 17,
+    fontSize: 16,
     color: "#2B2B2B",
-    lineHeight: 23,
-    flex: 1,
+    flexShrink: 1,
   },
   ctaWrap: {
     position: "absolute",
