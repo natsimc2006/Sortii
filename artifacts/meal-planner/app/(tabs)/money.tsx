@@ -686,6 +686,9 @@ export default function MoneyScreen() {
 
   // Phase 4 — Overwhelm mode
   const [showOverwhelm, setShowOverwhelm] = useState(false);
+
+  // Inline "What could give this week?" expansion (stretched state)
+  const [showCanWait, setShowCanWait] = useState(false);
   const [allAppts, setAllAppts] = useState<ApptItem[]>([]);
 
   // Money nudge dismiss state
@@ -993,17 +996,15 @@ export default function MoneyScreen() {
                 <Text style={styles.calmBadgeText}>All good ✓</Text>
               </View>
             </View>
-            {adjustedBreathingRoom > 0 ? (
-              <>
-                <Text style={styles.calmHeroBig}>
-                  ~{formatMoneyRound(adjustedBreathingRoom)}
-                </Text>
-                <Text style={styles.calmHeroLabel}>breathing room this week</Text>
-              </>
-            ) : (
-              <Text style={styles.calmHeading}>This week looks fine.</Text>
-            )}
-            <Text style={styles.calmSubtext}>Nothing unexpected landing.</Text>
+            <Text style={styles.calmHeroBig}>
+              ~{formatMoneyRound(Math.max(0, adjustedBreathingRoom))}
+            </Text>
+            <Text style={styles.calmHeroLabel}>breathing room this week</Text>
+            <Text style={styles.calmSubtext}>
+              {adjustedBreathingRoom > 100
+                ? "Solid week. Nothing unexpected landing."
+                : "A little tight but workable."}
+            </Text>
           </View>
 
           {/* 2. Meal plan saving card */}
@@ -1076,13 +1077,21 @@ export default function MoneyScreen() {
         /* ── STATE 2 — Tight ─────────────────────────────────── */
         <>
           <View style={styles.tightCard}>
-            <View style={styles.tightIconRow}>
-              <Text style={styles.tightIcon}>⚠</Text>
-              <Text style={styles.tightHeading}>Tighter than usual this week.</Text>
+            <View style={styles.calmHeroTopRow}>
+              <Text style={styles.calmHeroEyebrow}>THIS WEEK</Text>
+              <View style={[styles.calmBadge, { backgroundColor: GOLD + "22", borderColor: GOLD + "55" }]}>
+                <Text style={[styles.calmBadgeText, { color: GOLD }]}>Keep an eye on it</Text>
+              </View>
             </View>
+            <Text style={[styles.calmHeroBig, { fontSize: 20, marginTop: 8 }]}>
+              ~{formatMoneyRound(Math.max(0, adjustedBreathingRoom))} left. Tight but possible.
+            </Text>
+            <Text style={[styles.calmSubtext, { color: GOLD }]}>
+              One unplanned thing and it tips. Worth knowing.
+            </Text>
 
             {pressureItems.length > 0 && (
-              <View style={styles.pressureList}>
+              <View style={[styles.pressureList, { marginTop: 10 }]}>
                 {pressureItems.map((p, i) => (
                   <Text key={i} style={styles.pressureItem}>
                     · {p.name} — {formatMoneyRound(p.amount)} due {pressureDayLabel(p.dateStr)}
@@ -1090,15 +1099,6 @@ export default function MoneyScreen() {
                 ))}
               </View>
             )}
-
-            <View style={styles.tightDivider} />
-
-            <Text style={[
-              styles.tightBreathing,
-              adjustedBreathingRoom < 20 && { color: GOLD },
-            ]}>
-              Breathing room this week: ~{formatMoneyRound(Math.max(0, adjustedBreathingRoom))}
-            </Text>
           </View>
 
           <MealPlanSavingCard
@@ -1113,9 +1113,13 @@ export default function MoneyScreen() {
       ) : (
         /* ── STATE 3 — Stretched ─────────────────────────────── */
         <>
-          <View style={styles.stretchedCard}>
+          {/* Hero card with red left accent border */}
+          <View style={[styles.stretchedCard, { borderLeftColor: RED, borderLeftWidth: 4 }]}>
             <Text style={styles.stretchedHeading}>This week is stretched.</Text>
-            <Text style={styles.stretchedSubtext}>
+            <Text style={[styles.stretchedSubtext, { marginTop: 4 }]}>
+              You're ~{formatMoneyRound(Math.abs(adjustedBreathingRoom))} over on paper.
+            </Text>
+            <Text style={[styles.stretchedReassurance, { marginTop: 6 }]}>
               Here's what's hitting all at once.
             </Text>
 
@@ -1132,34 +1136,66 @@ export default function MoneyScreen() {
               </View>
             )}
 
-            <View style={styles.tightDivider} />
-
-            <Text style={styles.stretchedBreathing}>
-              Breathing room:{" "}
-              <Text style={{ color: RED }}>
-                −{formatMoneyRound(Math.abs(adjustedBreathingRoom))} over
+            {/* Inline toggle — "Want to see what can wait?" */}
+            <TouchableOpacity
+              activeOpacity={0.7}
+              style={styles.overwhelmLink}
+              onPress={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                setShowCanWait((v) => !v);
+              }}
+            >
+              <Text style={styles.overwhelmLinkText}>
+                {showCanWait ? "Hide ↑" : "Want to see what can wait? →"}
               </Text>
-              {" "}— tighter than usual.
-            </Text>
+            </TouchableOpacity>
           </View>
+
+          {/* Inline expansion — "What could give this week?" */}
+          {showCanWait && (() => {
+            const discretionary: { name: string; weekly: number; action: string }[] = [];
+            const ls = lifestyleSpend;
+            if ((ls?.entertainment ?? 0) > 0)
+              discretionary.push({ name: "Entertainment", weekly: Math.round((ls!.entertainment) / 4.33), action: "Pause this →" });
+            if ((money?.eatingOutWeekly ?? 0) > 0)
+              discretionary.push({ name: "Takeaway", weekly: Math.round(money!.eatingOutWeekly!), action: "Cut back →" });
+            if ((ls?.coffee ?? 0) > 0)
+              discretionary.push({ name: "Coffee & café", weekly: Math.round(ls!.coffee), action: "Skip a few →" });
+            discretionary.sort((a, b) => b.weekly - a.weekly);
+            return (
+              <View style={styles.canWaitPanel}>
+                <Text style={styles.canWaitTitle}>What could give this week?</Text>
+                {discretionary.length === 0 ? (
+                  <Text style={styles.canWaitEmpty}>No lifestyle spend entered yet.</Text>
+                ) : discretionary.map((item) => (
+                  <View key={item.name} style={styles.canWaitRow}>
+                    <Text style={styles.canWaitName}>{item.name}</Text>
+                    <Text style={styles.canWaitAmount}>~{formatMoneyRound(item.weekly)}</Text>
+                    <TouchableOpacity
+                      activeOpacity={0.7}
+                      onPress={() => {
+                        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                        setToastMsg(`Good call. That's ~${formatMoneyRound(item.weekly)} back this week.`);
+                        if (toastTimer.current) clearTimeout(toastTimer.current);
+                        toastTimer.current = setTimeout(() => setToastMsg(null), 3000);
+                      }}
+                    >
+                      <Text style={styles.canWaitAction}>{item.action}</Text>
+                    </TouchableOpacity>
+                  </View>
+                ))}
+                <Text style={styles.canWaitFooter}>
+                  These are optional. Committed costs — mortgage, bills, groceries — stay.
+                </Text>
+              </View>
+            );
+          })()}
 
           <MealPlanSavingCard
             mealsPlanned={filledMeals.length}
             weeklyGroceryEstimate={money && money.groceriesWeekly > 0 ? money.groceriesWeekly : (money?.weeklyIncome ?? 0) * 0.65}
             fmt={formatMoneyRound}
           />
-
-          {/* Overwhelm mode entry point (Phase 4) */}
-          <TouchableOpacity
-            activeOpacity={0.7}
-            style={styles.overwhelmLink}
-            onPress={() => {
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-              setShowOverwhelm(true);
-            }}
-          >
-            <Text style={styles.overwhelmLinkText}>Want to see what can wait? →</Text>
-          </TouchableOpacity>
         </>
       )}
     </ScrollView>
@@ -1838,9 +1874,41 @@ const styles = StyleSheet.create({
 
   // ── Overwhelm mode entry link ─────────────────────────────────
   overwhelmLink: {
-    alignSelf: "flex-start", paddingVertical: 4,
+    alignSelf: "flex-start", paddingVertical: 4, marginTop: 8,
   },
   overwhelmLinkText: {
     fontSize: 14, fontFamily: "Inter_400Regular", color: TEAL,
+  },
+
+  // ── "What could give?" inline panel ───────────────────────────
+  canWaitPanel: {
+    backgroundColor: "#FFF8F7",
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: "rgba(184,101,87,0.20)",
+    padding: 16,
+    gap: 12,
+  },
+  canWaitTitle: {
+    fontSize: 15, fontFamily: "DMSans_700Bold", color: "#2B2B2B",
+  },
+  canWaitRow: {
+    flexDirection: "row", alignItems: "center", gap: 8,
+  },
+  canWaitName: {
+    flex: 1, fontSize: 14, fontFamily: "Inter_400Regular", color: "#2B2B2B",
+  },
+  canWaitAmount: {
+    fontSize: 14, fontFamily: "Inter_600SemiBold", color: "#2B2B2B", minWidth: 44, textAlign: "right",
+  },
+  canWaitAction: {
+    fontSize: 13, fontFamily: "Inter_500Medium", color: TEAL, minWidth: 90, textAlign: "right",
+  },
+  canWaitEmpty: {
+    fontSize: 13, fontFamily: "Inter_400Regular", color: "#AAA",
+  },
+  canWaitFooter: {
+    fontSize: 12, fontFamily: "Inter_400Regular", color: "#AAA",
+    lineHeight: 17, marginTop: 4,
   },
 });

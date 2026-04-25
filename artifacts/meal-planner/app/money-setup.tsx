@@ -326,11 +326,13 @@ export default function MoneySetupScreen() {
     saveMoneySetup(
       {
         weeklyIncome,
-        fixedWeeklyCosts: w_mortgage + w_bills,
+        // Include subscriptions in fixed costs. eatingOutWeekly holds takeaway.
+        // otherWeeklySpend is coffee + entertainment only — NOT takeaway, to avoid double-count.
+        fixedWeeklyCosts: w_mortgage + w_bills + w_subs,
         groceriesWeekly:  w_groceries,
         eatingOutWeekly:  w_takeaway,
         otherWeeklySpend: hasAnyLifestyle
-          ? w_coffee + w_takeaway + w_entertain
+          ? w_coffee + w_entertain
           : undefined,
         rawIncome:       incomeVal,
         incomePeriod:    incomeFreq,
