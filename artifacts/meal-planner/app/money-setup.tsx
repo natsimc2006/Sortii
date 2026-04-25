@@ -378,7 +378,7 @@ export default function MoneySetupScreen() {
   return (
     <KeyboardAvoidingView
       style={{ flex: 1, backgroundColor: C.background }}
-      behavior="padding"
+      behavior={Platform.OS === "web" ? undefined : "padding"}
     >
       {/* Header */}
       <View style={[styles.header, { paddingTop, borderBottomColor: "rgba(37,133,127,0.18)" }]}>
