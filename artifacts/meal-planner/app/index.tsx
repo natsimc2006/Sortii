@@ -348,7 +348,7 @@ const styles = StyleSheet.create({
   // ── Welcome ─────────────────────────────────────────────────────
   welcomeLogo: {
     width: "100%",
-    height: 110,
+    height: 220,
     marginTop: 32,
     marginBottom: 8,
     alignSelf: "center",
