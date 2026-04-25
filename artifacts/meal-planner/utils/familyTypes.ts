@@ -15,6 +15,15 @@ export interface FamilyMember {
   color: string;
 }
 
+export interface CarpoolContactEntry {
+  name: string;
+  relationship: string;
+  canHelpWith: string[];
+  phone: string;
+  notes: string;
+  mobile?: string;
+}
+
 export interface FamilyEvent {
   id: string;
   title: string;
@@ -24,8 +33,11 @@ export interface FamilyEvent {
   location?: string;
   personIds: string[];
   driverId?: string;
+  assignedAdult?: string;
+  priority?: "must" | "nice";
+  isRecurring?: boolean;
   carpoolContact?: string;
-  carpoolContacts?: { name: string; mobile?: string }[];
+  carpoolContacts?: CarpoolContactEntry[];
   repeat: RepeatType;
   notes?: string;
   isAppointment?: boolean;

@@ -1,74 +1,96 @@
-import type { FamilyEvent, FamilyMember } from "./familyTypes";
-import { formatTime } from "./familyEngine";
+import type { FamilyEvent, FamilyMember, CarpoolContactEntry } from "./familyTypes";
 
 /**
- * Transforms family members and events into the formatted string prompt
- * that the juggle-solve API endpoint expects.
+ * Builds the user message sent to Claude's juggle-solve endpoint.
+ * Maps from FamilyMember[] + FamilyEvent[] to the structured text format
+ * the API system prompt expects.
  */
 export function buildJugglePrompt(
   members: FamilyMember[],
-  events: FamilyEvent[]
+  events: FamilyEvent[],
+  globalContacts: CarpoolContactEntry[] = [],
+  freeText: string = "",
 ): string {
-  const adults   = members.filter((m) => m.role === "adult").map((m) => m.name);
-  const children = members.filter((m) => m.role === "child").map((m) => m.name);
+  const adultsStr = members
+    .filter((m) => m.role === "adult" && m.name.trim())
+    .map((m) => `- ${m.name} (can drive)`)
+    .join("\n");
 
-  const eventLines = events.map((ev) => {
-    const personNames = ev.personIds
-      .map((id) => members.find((m) => m.id === id)?.name)
-      .filter(Boolean)
-      .join(", ");
+  const eventsStr = events
+    .filter((e) => e.title.trim() && e.time.trim())
+    .map((e, i) => {
+      const childMembers = e.personIds
+        .map((id) => members.find((m) => m.id === id))
+        .filter((m) => m?.role === "child");
+      const child =
+        childMembers.map((m) => m!.name).join(", ") || e.title;
 
-    const driverName = ev.driverId
-      ? (members.find((m) => m.id === ev.driverId)?.name ?? "unassigned")
-      : "unassigned";
+      const assignedAdult =
+        e.assignedAdult ||
+        (e.driverId
+          ? (members.find((m) => m.id === e.driverId)?.name ?? "unassigned")
+          : "unassigned");
 
-    const isAppointment = ev.isAppointment ?? false;
+      const priority = e.priority ?? (e.isAppointment ? "must" : "must");
+      const isRecurring = e.isRecurring ?? e.repeat !== "none";
 
-    const coverage = isAppointment
-      ? `${driverName}'s own appointment — they must attend`
-      : `${driverName} is primary driver — needs to be there for drop-off/pick-up`;
+      return [
+        `Event ${i + 1} (ID: ${e.id}):`,
+        `  Child/person: ${child}`,
+        `  Activity: ${e.title}`,
+        `  Location: ${e.location || "unspecified"}`,
+        `  Day: ${e.day}`,
+        `  Start: ${e.time || "unspecified"}`,
+        `  End: ${e.endTime || "unspecified"}`,
+        `  Assigned adult: ${assignedAdult}`,
+        `  Priority: ${priority}`,
+        `  Recurring: ${isRecurring ? "yes — weekly commitment" : "no — one-off"}`,
+        `  Notes: ${e.notes || "none"}`,
+      ].join("\n");
+    })
+    .join("\n\n");
 
-    const startDisplay = formatTime(ev.time) || ev.time;
-    const endDisplay   = ev.endTime ? `–${formatTime(ev.endTime) || ev.endTime}` : "";
-
-    // Prefer per-event carpoolContacts array, fall back to legacy string field
-    let carpoolLine: string;
-    if (ev.carpoolContacts && ev.carpoolContacts.length > 0) {
-      carpoolLine = `Carpool contacts: ${ev.carpoolContacts.map((c) => c.mobile ? `${c.name} (${c.mobile})` : c.name).join(", ")}`;
-    } else if (ev.carpoolContact) {
-      carpoolLine = `Carpool contacts: ${ev.carpoolContact}`;
-    } else {
-      carpoolLine = "No carpool contacts listed";
+  const allContacts: CarpoolContactEntry[] = [...globalContacts];
+  events.forEach((e) => {
+    if (e.carpoolContacts && e.carpoolContacts.length > 0) {
+      e.carpoolContacts.forEach((c) => {
+        const defaultChild =
+          e.personIds
+            .map((id) => members.find((m) => m.id === id))
+            .find((m) => m?.role === "child")?.name ?? e.title;
+        allContacts.push({
+          ...c,
+          canHelpWith:
+            c.canHelpWith && c.canHelpWith.length > 0
+              ? c.canHelpWith
+              : [defaultChild],
+        });
+      });
+    } else if (e.carpoolContact) {
+      allContacts.push({
+        name: e.carpoolContact,
+        relationship: "contact",
+        canHelpWith: [],
+        phone: "",
+        notes: "",
+      });
     }
+  });
 
-    return [
-      `Event: ${ev.title}`,
-      `Child/person: ${personNames || driverName}`,
-      `Day: ${ev.day}`,
-      `Time: ${startDisplay}${endDisplay}`,
-      `Location: ${ev.location || "not specified"}`,
-      `Type: ${ev.repeat !== "none" ? "Recurring weekly" : "One-off"}`,
-      `Priority: ${isAppointment ? "must — medical appointment, do not reschedule" : "must"}`,
-      `Coverage needed: ${coverage}`,
-      carpoolLine,
-    ].join("\n");
-  }).join("\n\n");
+  const contactsStr =
+    allContacts.length > 0
+      ? `\n\nCarpool contacts available:\n${allContacts
+          .map(
+            (c) =>
+              `- Name: ${c.name}\n  Relationship: ${c.relationship || "contact"}\n  Can help with: ${(c.canHelpWith || []).join(", ") || "any child"}\n  Phone: ${c.phone || c.mobile || "not provided"}\n  Notes: ${c.notes || "none"}`,
+          )
+          .join("\n")}`
+      : "";
 
-  return `
-Family: ${adults.join(", ")} (adults), ${children.join(", ")} (children)
-Location context: Lake Macquarie / Hunter region, NSW Australia
+  const freeTextStr =
+    freeText && freeText.trim()
+      ? `\n\nAdditional context (read carefully — this may affect assignments and timing):\n${freeText}`
+      : "";
 
-Events requiring coverage this week:
-
-${eventLines}
-
-Instructions:
-- Assign one adult per child event (drop-off and pick-up)
-- Medical appointments are fixed — never suggest rescheduling them
-- Where one adult has two overlapping commitments, check if another adult can cover via handoff
-- Factor in drive time between locations. Morisset to Wangi Wangi is ~12 min. Wangi Wangi to Rathmines is ~10 min. Morisset to Rathmines is ~15 min.
-- If a handoff is possible (adult finishes nearby in time to cover), name it explicitly: who, what time, where
-- Prefer handoff solutions over rescheduling suggestions
-- If carpool contacts are listed for a child, surface them by name in conflict suggestions for that child only
-`.trim();
+  return `Available adults:\n${adultsStr}\n\nWeekend events:\n${eventsStr}${contactsStr}${freeTextStr}\n\nLocation context: Lake Macquarie / Hunter region, NSW Australia. Estimate suburban drive times accordingly.\n\nPlease solve this schedule.`;
 }

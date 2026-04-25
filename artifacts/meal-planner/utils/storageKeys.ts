@@ -47,6 +47,7 @@ export const SK = {
 
   // Family
   carpoolContacts: (uid: string) => userKey(uid, "carpoolContacts"),
+  juggleFreeText:  (uid: string) => userKey(uid, "juggleFreeText"),
 
   // UI state (dismissals / nudges)
   welcomeTip:     (uid: string) => userKey(uid, "welcomeTip"),

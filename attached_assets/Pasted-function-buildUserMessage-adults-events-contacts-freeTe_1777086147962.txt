@@ -1,0 +1,55 @@
+function buildUserMessage(adults, events, contacts, freeText) {
+  const adultsStr = adults
+    .filter(a => a.name.trim())
+    .map(a => `- ${a.name} (${a.canDrive !== false ? 'can drive' : 'no car'})`)
+    .join('\n');
+
+  const eventsStr = events
+    .filter(e => (e.child || e.assignedTo || '').trim() && e.activity.trim())
+    .map((e, i) => {
+      const child = e.child || e.assignedTo || 'unspecified';
+      return [
+        `Event ${i + 1} (ID: ${e.id}):`,
+        `  Child/person: ${child}`,
+        `  Activity: ${e.activity}`,
+        `  Location: ${e.location || 'unspecified'}`,
+        `  Day: ${e.day || 'Saturday'}`,
+        `  Start: ${e.startTime || 'unspecified'}`,
+        `  End: ${e.endTime || 'unspecified'}`,
+        `  Assigned adult: ${e.assignedAdult || 'unassigned'}`,
+        `  Priority: ${e.priority || 'must'}`,
+        `  Recurring: ${e.isRecurring ? 'yes — weekly commitment' : 'no — one-off'}`,
+        `  Notes: ${e.notes || 'none'}`,
+      ].join('\n');
+    })
+    .join('\n\n');
+
+  const allContacts = [];
+  // Global contacts
+  if (contacts && contacts.length > 0) {
+    contacts.forEach(c => allContacts.push(c));
+  }
+  // Per-event carpool contacts
+  events.forEach(e => {
+    if (e.carpoolContacts && e.carpoolContacts.length > 0) {
+      e.carpoolContacts.forEach(c => {
+        allContacts.push({
+          ...c,
+          canHelpWith: c.canHelpWith?.length > 0 ? c.canHelpWith : [e.child || e.assignedTo],
+        });
+      });
+    }
+  });
+
+  const contactsStr = allContacts.length > 0
+    ? `\n\nCarpool contacts available:\n${allContacts.map(c =>
+        `- Name: ${c.name}\n  Relationship: ${c.relationship || 'contact'}\n  Can help with: ${(c.canHelpWith || []).join(', ') || 'any child'}\n  Phone: ${c.phone || 'not provided'}\n  Notes: ${c.notes || 'none'}`
+      ).join('\n')}`
+    : '';
+
+  const freeTextStr = freeText && freeText.trim()
+    ? `\n\nAdditional context (read carefully — this may affect assignments and timing):\n${freeText}`
+    : '';
+
+  return `Available adults:\n${adultsStr}\n\nWeekend events:\n${eventsStr}${contactsStr}${freeTextStr}\n\nLocation context: Lake Macquarie / Hunter region, NSW Australia. Estimate suburban drive times accordingly.\n\nPlease solve this schedule.`;
+}

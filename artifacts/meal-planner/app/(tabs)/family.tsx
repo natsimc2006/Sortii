@@ -30,6 +30,7 @@ import {
   parseTime,
 } from "@/utils/familyEngine";
 import {
+  CarpoolContactEntry,
   DayOfWeek,
   FamilyEvent,
   FamilyMember,
@@ -425,6 +426,8 @@ function blankDraft(): Omit<FamilyEvent, "id"> {
     personIds: [], driverId: undefined, carpoolContact: "", carpoolContacts: [],
     repeat: "none", notes: "",
     isAppointment: false,
+    assignedAdult: "",
+    priority: "must",
   };
 }
 
@@ -1691,7 +1694,7 @@ function AddEventSheet({
   const [carpoolEntryMobile, setCarpoolEntryMobile] = useState("");
 
   // Derived: is the form valid enough to save?
-  const isFormValid = draft.title.trim().length > 0 && draft.time.trim().length > 0;
+  const isFormValid = draft.title.trim().length > 0 && draft.time.trim().length > 0 && (draft.endTime ?? "").trim().length > 0;
 
   // Derived: does the form have any data entered?
   const formHasData = draft.title.trim().length > 0
@@ -1745,6 +1748,7 @@ function AddEventSheet({
     const errs: string[] = [];
     if (!draft.title.trim()) errs.push("Add a title for this event.");
     if (!draft.time.trim())  errs.push("Tap the Start time field to pick a time.");
+    if (!draft.endTime?.trim()) errs.push("Add an end time so we can check for clashes.");
     if (errs.length) { setErrors(errs); return; }
 
     const parsedTime = parseTime(draft.time) || draft.time;
@@ -1873,6 +1877,33 @@ function AddEventSheet({
               </View>
             )}
 
+            {/* WHO'S RESPONSIBLE FOR THIS? — adult selector */}
+            {members.some((m) => m.role === "adult") && (
+              <View style={styles.formField}>
+                <Text style={styles.formLabel}>WHO'S RESPONSIBLE FOR THIS?</Text>
+                <View style={styles.chipGroup}>
+                  {members.filter((m) => m.role === "adult").map((m) => {
+                    const active = draft.assignedAdult === m.name;
+                    return (
+                      <TouchableOpacity
+                        key={m.id}
+                        style={[styles.repeatChip, active && styles.repeatChipSelected]}
+                        onPress={() => {
+                          Keyboard.dismiss();
+                          setField("assignedAdult", active ? "" : m.name);
+                        }}
+                        activeOpacity={0.75}
+                      >
+                        <Text style={[styles.repeatChipText, active && styles.repeatChipTextSelected]}>
+                          {m.name}
+                        </Text>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </View>
+              </View>
+            )}
+
             {/* Day */}
             <View style={styles.formField}>
               <Text style={styles.formLabel}>Which day?</Text>
@@ -1914,7 +1945,7 @@ function AddEventSheet({
                   activeOpacity={0.75}
                 >
                   <Text style={draft.endTime ? styles.formTimeFieldText : styles.formTimeFieldPlaceholder}>
-                    {draft.endTime ? labelForTime(draft.endTime) : "End time (opt.)"}
+                    {draft.endTime ? labelForTime(draft.endTime) : "End time"}
                   </Text>
                   <Feather name="clock" size={14} color={TEXT_MUTED} />
                 </TouchableOpacity>
@@ -1933,6 +1964,31 @@ function AddEventSheet({
               />
             </View>
 
+            {/* HOW IMPORTANT IS THIS? — priority toggle */}
+            <View style={styles.formField}>
+              <Text style={styles.formLabel}>HOW IMPORTANT IS THIS?</Text>
+              <View style={{ flexDirection: "row", gap: 8 }}>
+                {([
+                  { val: "must" as const, label: "Must happen" },
+                  { val: "nice" as const, label: "Nice if possible" },
+                ] as const).map(({ val, label }) => {
+                  const active = (draft.priority ?? "must") === val;
+                  return (
+                    <TouchableOpacity
+                      key={val}
+                      style={[styles.repeatChip, active && styles.repeatChipSelected]}
+                      onPress={() => { Keyboard.dismiss(); setField("priority", val); }}
+                      activeOpacity={0.75}
+                    >
+                      <Text style={[styles.repeatChipText, active && styles.repeatChipTextSelected]}>
+                        {label}
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
+            </View>
+
             {/* WHO COULD HELP WITH THIS? — per-event carpool contacts */}
             <View style={styles.formField}>
               <Text style={{ fontSize: 11, fontFamily: "Inter_600SemiBold", color: "#999", textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 4 }}>
@@ -1948,7 +2004,7 @@ function AddEventSheet({
                   <View style={{ flex: 1, flexDirection: "row", alignItems: "center", gap: 6 }}>
                     <Feather name="user" size={13} color={TEAL} />
                     <Text style={{ fontFamily: "Inter_500Medium", fontSize: 14, color: TEXT }}>
-                      {c.name}{c.mobile ? ` · ${c.mobile}` : ""}
+                      {c.name}{(c.phone || c.mobile) ? ` · ${c.phone || c.mobile}` : ""}
                     </Text>
                   </View>
                   <TouchableOpacity
@@ -1985,10 +2041,17 @@ function AddEventSheet({
                 <TouchableOpacity
                   onPress={() => {
                     if (!carpoolEntryName.trim()) return;
-                    const next = [
-                      ...(draft.carpoolContacts ?? []),
-                      { name: carpoolEntryName.trim(), mobile: carpoolEntryMobile.trim() || undefined },
-                    ];
+                    const childForEvent = draft.personIds
+                      .map((id) => members.find((m) => m.id === id))
+                      .find((m) => m?.role === "child")?.name ?? "";
+                    const newEntry: CarpoolContactEntry = {
+                      name: carpoolEntryName.trim(),
+                      relationship: "contact",
+                      canHelpWith: childForEvent ? [childForEvent] : [],
+                      phone: carpoolEntryMobile.trim(),
+                      notes: "",
+                    };
+                    const next = [...(draft.carpoolContacts ?? []), newEntry];
                     setField("carpoolContacts", next);
                     setCarpoolEntryName("");
                     setCarpoolEntryMobile("");
@@ -2040,17 +2103,17 @@ function AddEventSheet({
               </View>
             </View>
 
-            {/* Notes */}
+            {/* Notes / ANYTHING ELSE? */}
             <View style={styles.formField}>
-              <Text style={styles.formLabel}>Notes (optional)</Text>
+              <Text style={styles.formLabel}>ANYTHING ELSE?</Text>
               <TextInput
                 style={[styles.formInput, styles.formTextArea]}
                 value={draft.notes ?? ""}
                 onChangeText={(v) => setField("notes", v)}
-                placeholder="Anything else worth knowing…"
+                placeholder="e.g. parking takes 10 min, or starts 15 min late most weeks"
                 placeholderTextColor="#bbb"
                 multiline
-                numberOfLines={3}
+                numberOfLines={2}
                 textAlignVertical="top"
               />
             </View>
@@ -2082,7 +2145,7 @@ function AddEventSheet({
             </Text>
           </TouchableOpacity>
           {!isFormValid && (
-            <Text style={styles.validationHint}>Just need a name, day and time.</Text>
+            <Text style={styles.validationHint}>Need a name, start time and end time.</Text>
           )}
         </View>
       </Animated.View>
@@ -2517,6 +2580,7 @@ export default function FamilyScreen() {
   const [pushedCalEvents, setPushedCalEvents] = useState<SortiiCalEvent[]>([]);
   const [apptItems,       setApptItems]       = useState<Appointment[]>([]);
   const [carpoolContacts, setCarpoolContacts] = useState<CarpoolContact[]>([]);
+  const [juggleFreeText, setJuggleFreeText]   = useState("");
 
   // Compute a map from eventId → AI-assigned adult name (including swaps)
   const juggleDriverMap = React.useMemo(() => {
@@ -2536,12 +2600,13 @@ export default function FamilyScreen() {
 
   const load = useCallback(async () => {
     const uid = getCurrentUserId();
-    const [s, savedJuggle, savedHelpers, appts, savedCarpool] = await Promise.all([
+    const [s, savedJuggle, savedHelpers, appts, savedCarpool, savedFreeText] = await Promise.all([
       loadFamilyState(),
       AsyncStorage.getItem(juggleKey()),
       AsyncStorage.getItem(HELPERS_KEY),
       loadAppointments(),
       AsyncStorage.getItem(SK.carpoolContacts(uid)),
+      AsyncStorage.getItem(SK.juggleFreeText(uid)),
     ]);
     setState(s);
     setResult(computeFamilyWeek(s));
@@ -2554,6 +2619,9 @@ export default function FamilyScreen() {
     }
     if (savedCarpool) {
       try { setCarpoolContacts(JSON.parse(savedCarpool)); } catch {}
+    }
+    if (savedFreeText) {
+      setJuggleFreeText(savedFreeText);
     }
     try {
       const pushed = await loadFamilyPushedEvents();
@@ -2679,7 +2747,15 @@ export default function FamilyScreen() {
     setFamilyStep("sorting");
 
     try {
-      const userMessage = buildJugglePrompt(uniqueMembers, state.events);
+      const globalContacts: CarpoolContactEntry[] = carpoolContacts.map((c) => ({
+        name: c.name,
+        relationship: "contact",
+        canHelpWith: [],
+        phone: c.phone,
+        notes: "",
+      }));
+      console.log("Events being sent to Claude:", JSON.stringify(state.events, null, 2));
+      const userMessage = buildJugglePrompt(uniqueMembers, state.events, globalContacts, juggleFreeText);
       const raw = await solveJuggle(userMessage);
       const full: JuggleResult = { ...(raw as unknown as JuggleResult), solvedAt: Date.now() };
       await AsyncStorage.setItem(juggleKey(), JSON.stringify(full));
@@ -2701,6 +2777,11 @@ export default function FamilyScreen() {
     const next = [...carpoolContacts, c];
     setCarpoolContacts(next);
     await AsyncStorage.setItem(carpoolKey(), JSON.stringify(next));
+  }
+
+  async function handleFreeTextChange(text: string) {
+    setJuggleFreeText(text);
+    await AsyncStorage.setItem(SK.juggleFreeText(getCurrentUserId()), text);
   }
 
   async function handleAddHelper(name: string, contact?: string) {
@@ -2961,6 +3042,35 @@ export default function FamilyScreen() {
               <Feather name="plus" size={15} color="#fff" />
               <Text style={styles.addAnotherBtnText}>Add another event</Text>
             </TouchableOpacity>
+
+            {/* ANYTHING WE SHOULD KNOW? — global free-text context for Claude */}
+            <View style={{ marginTop: 8 }}>
+              <Text style={{
+                fontSize: 11, fontFamily: "Inter_600SemiBold", color: "#999",
+                textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 8,
+              }}>
+                ANYTHING WE SHOULD KNOW?
+              </Text>
+              <TextInput
+                style={{
+                  backgroundColor: "#F7F3EB",
+                  borderColor: "#E6E1D7",
+                  borderWidth: 1,
+                  borderRadius: 10,
+                  fontSize: 14,
+                  fontFamily: "Inter_400Regular",
+                  padding: 12,
+                  minHeight: 80,
+                  color: TEXT,
+                }}
+                value={juggleFreeText}
+                onChangeText={handleFreeTextChange}
+                placeholder="e.g. Morisset to Wangi Wangi takes longer on Saturday mornings, or Tom's football usually runs 10 min late"
+                placeholderTextColor="#bbb"
+                multiline
+                textAlignVertical="top"
+              />
+            </View>
           </>
         ) : hasMembers ? (
           /* Members exist, no events yet */
