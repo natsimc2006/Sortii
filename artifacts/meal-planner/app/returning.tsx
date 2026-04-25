@@ -18,7 +18,7 @@ import { usePlanner } from "@/context/PlannerContext";
 import { useUserWeek } from "@/context/UserWeekContext";
 
 const C = Colors.light;
-const sortiiLogo = require("@/assets/images/sortii-logo1-full.png");
+const sortiiLogo = require("@/assets/images/sortii-logo.png");
 
 export default function ReturningScreen() {
   const router = useRouter();

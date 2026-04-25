@@ -16,7 +16,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { getAuthUser, saveAuthUser, signInWithGoogleAuth } from "@/utils/authStore";
 import { setCurrentUserId } from "@/utils/currentUser";
 
-const sortiiLogo1 = require("@/assets/images/sortii-logo1-full.png");
+const sortiiLogo1 = require("@/assets/images/sortii-logo.png");
 
 const TEAL  = "#2A8F88";
 const CREAM = "#F8F4EE";

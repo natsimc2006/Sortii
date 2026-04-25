@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "Sortii - Dinner. Sorted.",
+    "name": "Sortii",
     "slug": "sortiidinnersorted",
     "owner": "natsimc",
     "version": "1.0.0",
@@ -33,7 +33,7 @@
       "output": "static",
       "bundler": "metro",
       "favicon": "./assets/images/favicon.png",
-      "name": "Sortii – Dinner. Sorted.",
+      "name": "Sortii",
       "shortName": "Sortii",
       "description": "Your weekly meal planner. Plan dinners, build your shopping list, and eat well.",
       "themeColor": "#2A8F88",

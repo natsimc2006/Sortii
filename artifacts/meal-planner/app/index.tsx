@@ -21,7 +21,7 @@ import { saveHouseholdProfile } from "@/utils/householdProfile";
 import { loadFamilyState, saveFamilyState } from "@/utils/familyStore";
 import { MEMBER_COLORS } from "@/utils/familyTypes";
 
-const sortiiLogo1 = require("@/assets/images/sortii-logo1-full.png");
+const sortiiLogo1 = require("@/assets/images/sortii-logo.png");
 
 const TEAL       = "#2A8F88";
 const TEAL_TINT  = "#E6F3F0";
