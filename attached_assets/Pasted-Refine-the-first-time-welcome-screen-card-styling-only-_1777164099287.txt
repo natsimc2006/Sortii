@@ -1,0 +1,76 @@
+Refine the first-time welcome screen card styling only.
+
+The previous update moved in the right direction, but the three benefit cards still feel too small and too plain compared with the rest of Sortii.
+
+Do not change:
+- onboarding logic
+- CTA behaviour
+- navigation
+- text copy
+- app state
+
+Only adjust layout and styling on the first welcome screen.
+
+Required changes:
+
+1. Make the three benefit cards larger and more premium
+- Increase card height to around 76–84px.
+- Increase horizontal padding.
+- Cards should use almost the full available content width, matching the CTA button width.
+- Reduce any overly narrow max-width causing the cards to feel small.
+- Use border #E5E2D8.
+- Use background #FFFDF9.
+- Use soft shadow similar to the tweak modal cards.
+- Border radius around 14–18px.
+
+2. Strengthen the icon tile treatment
+- Increase icon tile size to around 48px.
+- Use rounded square with radius 12–14px.
+- Centre icon inside tile.
+- Keep the soft tinted backgrounds:
+  - Meals: #E6EFE5
+  - Week: #F2E8EC
+  - Money: #FFF4D8
+- If using emoji, increase emoji size slightly so it does not look tiny.
+
+3. Improve text layout
+- Keep the same copy, but allow text to wrap naturally if needed.
+- Text should sit comfortably beside the icon, not cramped.
+- Use font size around 16px.
+- Use font weight 700.
+- Use colour #2F342F.
+- Add enough gap between icon tile and text, around 16px.
+
+4. Make accent rails more intentional
+- Left accent rail should be visible but elegant.
+- Width around 5px.
+- It should run full card height.
+- It should inherit card border radius on the left side.
+- Colours:
+  - Meals: #2F948C
+  - Week: #6E3F58
+  - Money: #D6A23A
+
+5. Tighten vertical layout
+- Move the card stack slightly higher so the screen does not have a large empty gap between logo and cards.
+- Keep the logo centred and premium.
+- Keep the CTA near the bottom, but ensure the layout feels balanced.
+- The card stack should visually sit between the logo and CTA, not feel like it is floating too low.
+
+6. Match the app’s internal card language
+Use the same visual language as the “What do you want to tweak?” modal:
+- larger cards
+- stronger rounded shapes
+- soft tinted icon blocks
+- clear accent colour
+- premium spacing
+- not tiny list rows
+
+Target feel:
+This screen should feel like a polished Sortii welcome screen, not a list of three compact bullets.
+
+Test on iPhone preview and ensure:
+- cards align with CTA width
+- cards are readable
+- no overlap with bottom CTA
+- no content is hidden by safe areas

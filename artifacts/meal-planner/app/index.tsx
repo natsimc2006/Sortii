@@ -306,9 +306,9 @@ export default function OnboardingScreen() {
       {/* ── Feature cards ── */}
       <View style={styles.valueProps}>
         {[
-          { anim: line1, accent: "#2A8F88", tileBg: "#E6EFE5", icon: "🥗", text: "Dinners done. No thinking needed." },
-          { anim: line2, accent: "#5E3A4C", tileBg: "#F2E8EC", icon: "📅", text: "Your whole week, at a glance." },
-          { anim: line3, accent: "#D29A22", tileBg: "#FFF4D8", icon: "💰", text: "Money tracked. No spreadsheet." },
+          { anim: line1, accent: "#2F948C", tileBg: "#E6EFE5", icon: "🥗", text: "Dinners done. No thinking needed." },
+          { anim: line2, accent: "#6E3F58", tileBg: "#F2E8EC", icon: "📅", text: "Your whole week, at a glance." },
+          { anim: line3, accent: "#D6A23A", tileBg: "#FFF4D8", icon: "💰", text: "Money tracked. No spreadsheet." },
         ].map(({ anim, accent, tileBg, icon, text }) => (
           <Animated.View key={text} style={[styles.featureCardShadow, { opacity: anim }]}>
             <View style={styles.featureCardInner}>
@@ -355,28 +355,28 @@ const styles = StyleSheet.create({
   // ── Welcome ─────────────────────────────────────────────────────
   welcomeLogo: {
     width: "100%",
-    height: 220,
-    marginTop: 32,
-    marginBottom: 8,
+    height: 190,
+    marginTop: 28,
+    marginBottom: 4,
     alignSelf: "center",
   },
   valueProps: {
     flex: 1,
     justifyContent: "center",
-    paddingBottom: 60,
+    paddingBottom: 40,
   },
   featureCardShadow: {
-    borderRadius: 14,
+    borderRadius: 16,
     backgroundColor: "#FFFDF9",
-    shadowColor: "#3D2B1F",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 6,
-    elevation: 3,
-    marginBottom: 12,
+    shadowColor: "#2F342F",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.09,
+    shadowRadius: 8,
+    elevation: 4,
+    marginBottom: 14,
   },
   featureCardInner: {
-    borderRadius: 14,
+    borderRadius: 16,
     borderWidth: 1,
     borderColor: "#E5E2D8",
     flexDirection: "row",
@@ -384,33 +384,33 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFFDF9",
   },
   featureCardRail: {
-    width: 4,
+    width: 5,
   },
   featureCardContent: {
     flex: 1,
     flexDirection: "row",
     alignItems: "center",
-    paddingVertical: 16,
-    paddingHorizontal: 14,
-    gap: 14,
+    paddingVertical: 18,
+    paddingHorizontal: 16,
+    gap: 16,
   },
   featureCardTile: {
-    width: 42,
-    height: 42,
-    borderRadius: 10,
+    width: 48,
+    height: 48,
+    borderRadius: 13,
     alignItems: "center",
     justifyContent: "center",
     flexShrink: 0,
   },
   featureCardTileIcon: {
-    fontSize: 20,
+    fontSize: 23,
   },
   featureCardText: {
     fontFamily: "DMSans_700Bold",
     fontSize: 16,
     color: "#2F342F",
     flexShrink: 1,
-    lineHeight: 22,
+    lineHeight: 23,
   },
   ctaWrap: {
     position: "absolute",
