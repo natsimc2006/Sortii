@@ -1,3 +1,4 @@
+import { normaliseConflicts } from "@/services/juggleSolver";
 import { Feather } from "@expo/vector-icons";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
@@ -273,6 +274,8 @@ function solveJuggleOnDevice(
   // Detect overlaps per adult per day
   const conflicts: JuggleConflict[] = [];
   const adultEventsMap = new Map<string, FamilyEvent[]>();
+  const handoffPickups = new Map<string, JuggleScheduleItem[]>();
+  for (const a of adults) handoffPickups.set(a.id, []);
   for (const [evId, adultId] of assignments.entries()) {
     const ev = events.find((e) => e.id === evId);
     if (!ev) continue;
@@ -334,21 +337,36 @@ function solveJuggleOnDevice(
             }
           }
 
-          const description = `${adult.name} has overlapping commitments on ${day}.\n${a.title} runs until ${aEndLabel}. ${b.title} is at ${b.time}.`;
+          let conflictType: JuggleConflict["type"] = "overlap";
+          let conflictSeverity: JuggleConflict["severity"] = "warning";
+          let description = `${adult.name} has overlapping commitments on ${day}.\n${a.title} runs until ${aEndLabel}. ${b.title} is at ${b.time}.`;
           let recommendation = "";
+          let conflictOptions: string[] = [];
 
           if (handoffCandidates.length > 0) {
-            // Priority 1 — handoff is possible
+            // Priority 1 — commit to handoff, mark as resolved
+            conflictType = "resolved";
+            conflictSeverity = "resolved";
             const best = handoffCandidates[0]!;
-            const coverVerb = aChild
-              ? `collect ${aChild} from ${a.title} at ${aEndLabel}`
-              : `cover ${a.title} at ${aEndLabel}`;
+            const pickupLabel = aChild ? `${aChild}` : a.title;
+            const pickupActivity = aChild
+              ? `${aChild} pickup — ${a.title}`
+              : `${a.title} handoff`;
             if (best.lastEvent) {
               const lastEvEndLabel = _fromMins(best.availableAt);
-              recommendation = `${best.adult.name} finishes ${best.lastEvent.title} at ${lastEvEndLabel} — they could ${coverVerb} while ${adult.name} heads to ${b.title}.`;
+              recommendation = `${best.adult.name} finishes ${best.lastEvent.title} at ${lastEvEndLabel}. ${best.adult.name} collects ${pickupLabel} at ${aEndLabel}. ${adult.name} heads to ${b.title}. Done.`;
             } else {
-              recommendation = `${best.adult.name} is free — they could ${coverVerb} while ${adult.name} heads to ${b.title}.`;
+              recommendation = `${best.adult.name} collects ${pickupLabel} at ${aEndLabel}. ${adult.name} heads to ${b.title}. Done.`;
             }
+            description = `${adult.name}: ${a.title} ends ${aEndLabel}, ${b.title} at ${b.time} — handoff sorted.`;
+            // Record pickup for the covering adult's schedule
+            handoffPickups.get(best.adult.id)?.push({
+              time: aEndLabel,
+              child: aChild,
+              activity: pickupActivity,
+              location: a.location || null,
+              event_id: `${a.id}-handoff`,
+            });
           } else if (aIsRecurring && !bIsRecurring && !bIsMedical) {
             // Priority 2a — reschedule the one-off (b), never reschedule recurring
             recommendation = `${b.title} is a one-off — moving it to after ${aEndLabel} keeps everything else in place.`;
@@ -358,28 +376,32 @@ function solveJuggleOnDevice(
           } else if (aIsMedical || bIsMedical) {
             // Priority 3 — medical appointment is fixed, no handoff available
             recommendation = "This one needs sorting manually.";
+            conflictOptions = [`Keep ${a.title}`, `Keep ${b.title}`];
           } else {
             // Priority 2c — both non-recurring, no handoff
             recommendation = `Both "${a.title}" and "${b.title}" are on at the same time — which takes priority?`;
+            conflictOptions = [`Keep ${a.title}`, `Keep ${b.title}`];
           }
 
           conflicts.push({
-            id: `overlap-${a.id}-${b.id}`, type: "overlap", severity: "warning",
+            id: `overlap-${a.id}-${b.id}`,
+            type: conflictType,
+            severity: conflictSeverity,
             description,
             involved_events: [a.id, b.id], involved_adults: [adult.name],
             suggested_contacts: handoffCandidates.map((h) => h.adult.name),
             recommendation,
-            options: [],
+            options: conflictOptions,
           });
         }
       }
     }
   }
 
-  // Build adult_plans
+  // Build adult_plans — include any handoff pickups committed during conflict resolution
   const adultPlans: JuggleAdultPlan[] = adults.map((adult) => {
     const evList = adultEventsMap.get(adult.id) ?? [];
-    const schedule: JuggleScheduleItem[] = evList
+    const baseSchedule: JuggleScheduleItem[] = evList
       .sort((a, b) => {
         const dd = (DAY_ORDER[a.day] ?? 0) - (DAY_ORDER[b.day] ?? 0);
         return dd !== 0 ? dd : _toMins(a.time) - _toMins(b.time);
@@ -390,20 +412,26 @@ function solveJuggleOnDevice(
           .find((m) => m?.role === "child")?.name ?? null;
         return { time: ev.time || "09:00", child, activity: ev.title, location: ev.location || null, event_id: ev.id };
       });
+    const pickups = handoffPickups.get(adult.id) ?? [];
+    const schedule = [...baseSchedule, ...pickups].sort((a, b) => _toMins(a.time) - _toMins(b.time));
     return { adult: adult.name, can_drive: true, schedule, free_windows: [] };
   });
 
   const totalEvents = juggleEvents.length + calEvents.length;
+  const unresolvedCount = conflicts.filter((c) => c.severity !== "resolved").length;
+  const resolvedCount   = conflicts.filter((c) => c.severity === "resolved").length;
   const smartNote = totalEvents === 0 ? null
-    : conflicts.length > 0
-    ? `${conflicts.length} overlap${conflicts.length > 1 ? "s" : ""} to sort — see below.`
+    : unresolvedCount > 0
+    ? `${unresolvedCount} clash${unresolvedCount > 1 ? "es" : ""} still need sorting — see below.`
+    : resolvedCount > 0
+    ? null
     : totalEvents === 1 ? "One event. One adult. Done."
     : "All events assigned. Nothing clashing.";
 
   return {
     weekend_summary: {
       total_events: totalEvents,
-      conflicts_resolved: 0,
+      conflicts_resolved: resolvedCount,
       tight_windows: 0,
       impossible_clashes: conflicts.filter((c) => c.severity === "impossible").length,
     },
@@ -933,19 +961,27 @@ function JuggleResultsContent({
       )}
 
       {/* ── 5. Worth knowing (smart_note) ── */}
-      {juggleResult.smart_note ? (
-        <View style={{
-          backgroundColor: PLUM + "12", borderRadius: 12,
-          padding: 14, borderLeftWidth: 3, borderLeftColor: PLUM,
-        }}>
-          <Text style={{ fontSize: 11, fontFamily: "Inter_700Bold", color: PLUM, letterSpacing: 0.8, marginBottom: 4 }}>
-            WORTH KNOWING
-          </Text>
-          <Text style={{ fontSize: 13, fontFamily: "Inter_400Regular", color: PLUM, lineHeight: 19 }}>
-            {juggleResult.smart_note}
-          </Text>
-        </View>
-      ) : null}
+      {(() => {
+        const note = juggleResult.smart_note;
+        const shouldShowSmartNote =
+          !!note &&
+          !note.toLowerCase().includes("overlap to sort") &&
+          !note.toLowerCase().includes("see below");
+        if (!shouldShowSmartNote) return null;
+        return (
+          <View style={{
+            backgroundColor: PLUM + "12", borderRadius: 12,
+            padding: 14, borderLeftWidth: 3, borderLeftColor: PLUM,
+          }}>
+            <Text style={{ fontSize: 11, fontFamily: "Inter_700Bold", color: PLUM, letterSpacing: 0.8, marginBottom: 4 }}>
+              WORTH KNOWING
+            </Text>
+            <Text style={{ fontSize: 13, fontFamily: "Inter_400Regular", color: PLUM, lineHeight: 19 }}>
+              {note}
+            </Text>
+          </View>
+        );
+      })()}
 
       {/* ── 5b. Simple week note (passive, no CTA) ── */}
       {(() => {
@@ -3069,7 +3105,12 @@ export default function FamilyScreen() {
     try {
       // On-device solver — works offline, no API key needed.
       const memberLookup = new Map<string, FamilyMember>(uniqueMembers.map((m) => [m.id, m]));
-      const full: JuggleResult = solveJuggleOnDevice(adults, allEvents, pushedCalEvents, memberLookup);
+      const raw: JuggleResult = solveJuggleOnDevice(adults, allEvents, pushedCalEvents, memberLookup);
+      // Safety-net: promote any hedged handoffs Claude may have missed
+      const full: JuggleResult = {
+        ...raw,
+        conflicts: normaliseConflicts(raw.conflicts as unknown as Record<string, unknown>[]) as unknown as JuggleConflict[],
+      };
       await AsyncStorage.setItem(juggleKey(sortWeek), JSON.stringify(full));
       setJuggleResult(full);
       setIsSorted(true);
