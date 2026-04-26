@@ -791,7 +791,7 @@ function JuggleResultsContent({
     const parts: string[] = [];
     if (ws.total_events > 0) parts.push(`${ws.total_events} ${ws.total_events === 1 ? "event" : "events"}`);
     if (impossible > 0)       parts.push(`${impossible} ${impossible === 1 ? "clash" : "clashes"} to sort`);
-    else if (tight > 0)       parts.push(`${tight} tight spot${tight > 1 ? "s" : ""}, manageable`);
+    else if (tight > 0)       parts.push(`${tight} tight window${tight > 1 ? "s" : ""}, manageable`);
     else                      parts.push("nothing clashing");
     if (ws.conflicts_resolved > 0 && impossible === 0) parts.push(`${ws.conflicts_resolved} sorted ✓`);
     return parts.join("  ·  ");
@@ -826,9 +826,9 @@ function JuggleResultsContent({
               </View>
             )}
             {tight > 0 && (
-              <View style={[styles.resultChip, { backgroundColor: GOLD + "18", borderColor: GOLD + "33" }]}>
-                <Text style={[styles.resultChipText, { color: "#A07010" }]}>
-                  {tight} tight {tight === 1 ? "spot" : "spots"}
+              <View style={[styles.resultChip, { backgroundColor: "#E6F3F0", borderColor: TEAL + "33" }]}>
+                <Text style={[styles.resultChipText, { color: TEAL }]}>
+                  {tight} tight {tight === 1 ? "window" : "windows"}
                 </Text>
               </View>
             )}
@@ -871,15 +871,28 @@ function JuggleResultsContent({
                 </View>
                 {plan.schedule.map((s, i) => {
                   const evtForTime = (juggleResult.events ?? []).find((e) => e.id === s.event_id);
+                  // FIX 1 — collapse "11:30–11:30" to "11:30"
+                  const timeDisplay =
+                    !evtForTime?.end_time || evtForTime.end_time === s.time
+                      ? s.time
+                      : `${s.time}–${evtForTime.end_time}`;
+                  // FIX 3 — pick-up entries show the child's venue, not the travel origin
+                  const actLower = s.activity.toLowerCase();
+                  const isPickup =
+                    actLower.includes("pick up") ||
+                    actLower.includes("pickup") ||
+                    actLower.includes("collect");
+                  const displayLocation =
+                    isPickup && evtForTime?.location ? evtForTime.location : s.location;
                   return (
                   <View key={i} style={styles.juggleScheduleRow}>
                     <View style={styles.juggleTimePill}>
-                      <Text style={styles.juggleTimePillText}>{s.time}{evtForTime?.end_time ? `–${evtForTime.end_time}` : ""}</Text>
+                      <Text style={styles.juggleTimePillText}>{timeDisplay}</Text>
                     </View>
                     <View style={{ flex: 1, gap: 1 }}>
                       <Text style={styles.juggleScheduleActivity}>{s.activity}</Text>
                       {s.child ? <Text style={styles.juggleScheduleChild}>with {s.child}</Text> : null}
-                      {s.location ? <Text style={styles.juggleScheduleLocation}>{s.location}</Text> : null}
+                      {displayLocation ? <Text style={styles.juggleScheduleLocation}>{displayLocation}</Text> : null}
                     </View>
                   </View>
                   );
