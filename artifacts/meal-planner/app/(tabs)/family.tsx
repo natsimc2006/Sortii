@@ -416,11 +416,12 @@ function solveJuggleOnDevice(
     }
   }
 
-  // Post-assignment travel validation — checks consecutive events at different locations
-  for (const [adultId, evList] of adultEventsMap.entries()) {
+  // ── Travel validation pass 1: detect conflicts + attempt auto-reassignment ──────
+  // Snapshot the entries before mutation so the loop doesn't see mid-run changes
+  const _travelReassigned = new Set<string>(); // event IDs moved to a new adult
+  for (const [adultId, evList] of [...adultEventsMap.entries()]) {
     const adult = adults.find((a) => a.id === adultId);
     if (!adult) continue;
-    // Sort by day then start time
     const sorted = [...evList].sort((a, b) => {
       const dd = (DAY_ORDER[a.day] ?? 0) - (DAY_ORDER[b.day] ?? 0);
       return dd !== 0 ? dd : _toMins(a.time) - _toMins(b.time);
@@ -428,16 +429,73 @@ function solveJuggleOnDevice(
     for (let i = 0; i < sorted.length - 1; i++) {
       const curr = sorted[i]!;
       const next = sorted[i + 1]!;
-      if (curr.day !== next.day) continue; // different days — fine
+      if (_travelReassigned.has(next.id)) continue; // already moved
+      if (curr.day !== next.day) continue;
       const locA = (curr.location ?? "").trim().toLowerCase();
       const locB = (next.location ?? "").trim().toLowerCase();
-      if (!locA || !locB || locA === locB) continue; // no location data or same place
+      if (!locA || !locB || locA === locB) continue;
       const currEnd   = _toMins(curr.endTime) || _toMins(curr.time) + 60;
       const nextStart = _toMins(next.time);
-      if (nextStart < currEnd) continue; // already caught by overlap detection
+      if (nextStart < currEnd) continue; // time-overlap already handled above
       const available = nextStart - currEnd;
       const needed    = getTravelTime(curr.location, next.location);
-      if (needed > available) {
+      if (needed <= available) continue; // no conflict
+
+      const nextEnd = _toMins(next.endTime) || _toMins(next.time) + 60;
+      let reassigned = false;
+
+      // Try reassigning 'next' to another available adult with feasible travel
+      for (const oa of adults) {
+        if (oa.id === adultId) continue;
+        const oaDayEvs = (adultEventsMap.get(oa.id) ?? []).filter((e) => e.day === next.day);
+
+        // No time clash during 'next' window
+        const hasTimeConflict = oaDayEvs.some((e) => {
+          const eStart = _toMins(e.time);
+          const eEnd   = _toMins(e.endTime) || _toMins(e.time) + 60;
+          return eStart < nextEnd && eEnd > nextStart;
+        });
+        if (hasTimeConflict) continue;
+
+        // Can oa travel from their last location to next.location in time?
+        const oaBeforeEvs = oaDayEvs
+          .filter((e) => (_toMins(e.endTime) || _toMins(e.time) + 60) <= nextStart)
+          .sort((e1, e2) => (_toMins(e2.endTime) || _toMins(e2.time) + 60) - (_toMins(e1.endTime) || _toMins(e1.time) + 60));
+
+        if (oaBeforeEvs.length > 0) {
+          const lastEv    = oaBeforeEvs[0]!;
+          const lastEvEnd = _toMins(lastEv.endTime) || _toMins(lastEv.time) + 60;
+          if (lastEvEnd + getTravelTime(lastEv.location, next.location) > nextStart) continue;
+        }
+
+        // ✅ Reassignment valid — move 'next' from adultId to oa
+        assignments.set(next.id, oa.id);
+        adultEventsMap.set(adultId, (adultEventsMap.get(adultId) ?? []).filter((e) => e.id !== next.id));
+        if (!adultEventsMap.has(oa.id)) adultEventsMap.set(oa.id, []);
+        adultEventsMap.get(oa.id)!.push(next);
+        _travelReassigned.add(next.id);
+
+        const nextChild = next.personIds
+          .map((id) => memberLookup.get(id))
+          .find((m) => m?.role === "child")?.name ?? null;
+        const afterLabel = oaBeforeEvs.length > 0 ? ` after ${oaBeforeEvs[0]!.title}` : "";
+        conflicts.push({
+          id: `travel-${curr.id}-${next.id}`,
+          type: "resolved",
+          severity: "resolved",
+          description: `${adult.name} couldn't travel ${curr.location} → ${next.location} in time — ${oa.name} covers ${next.title}.`,
+          involved_events: [curr.id, next.id],
+          involved_adults: [adult.name, oa.name],
+          suggested_contacts: [],
+          recommendation: `${oa.name} takes ${nextChild ? nextChild + " to " : ""}${next.title}${afterLabel}. ${adult.name} stays at ${curr.title} until ${_fromMins(currEnd)}. Done.`,
+          options: [],
+        });
+        reassigned = true;
+        break;
+      }
+
+      if (!reassigned) {
+        // No auto-resolution possible — surface to user
         const severity: JuggleConflict["severity"] = available === 0 ? "impossible" : "tight";
         const warning = available === 0
           ? `🚫 Not possible — no travel time between ${curr.location} and ${next.location}.`
@@ -454,6 +512,49 @@ function solveJuggleOnDevice(
           options: [],
         });
       }
+    }
+  }
+
+  // ── Travel validation pass 2: catch any new conflicts from reassignment ────────
+  const _flaggedTravelIds = new Set(conflicts.map((c) => c.id));
+  for (const [adultId, evList] of adultEventsMap.entries()) {
+    const adult = adults.find((a) => a.id === adultId);
+    if (!adult) continue;
+    const sorted = [...evList].sort((a, b) => {
+      const dd = (DAY_ORDER[a.day] ?? 0) - (DAY_ORDER[b.day] ?? 0);
+      return dd !== 0 ? dd : _toMins(a.time) - _toMins(b.time);
+    });
+    for (let i = 0; i < sorted.length - 1; i++) {
+      const curr = sorted[i]!;
+      const next = sorted[i + 1]!;
+      if (curr.day !== next.day) continue;
+      const locA = (curr.location ?? "").trim().toLowerCase();
+      const locB = (next.location ?? "").trim().toLowerCase();
+      if (!locA || !locB || locA === locB) continue;
+      const currEnd   = _toMins(curr.endTime) || _toMins(curr.time) + 60;
+      const nextStart = _toMins(next.time);
+      if (nextStart < currEnd) continue;
+      const available = nextStart - currEnd;
+      const needed    = getTravelTime(curr.location, next.location);
+      if (needed <= available) continue;
+      const conflictId = `travel-${curr.id}-${next.id}`;
+      if (_flaggedTravelIds.has(conflictId)) continue; // already handled in pass 1
+      // New conflict introduced by reassignment — flag it without further recursion
+      const severity: JuggleConflict["severity"] = available === 0 ? "impossible" : "tight";
+      const warning = available === 0
+        ? `🚫 Not possible — no travel time between ${curr.location} and ${next.location}.`
+        : `⚠️ ${adult.name} — ${needed} mins to get from ${curr.location} to ${next.location}, only ${available} min${available === 1 ? "" : "s"} available.`;
+      conflicts.push({
+        id: conflictId,
+        type: "travel",
+        severity,
+        description: `${adult.name}: ${needed} min drive from ${curr.location} to ${next.location}, ${available} min gap.`,
+        involved_events: [curr.id, next.id],
+        involved_adults: [adult.name],
+        suggested_contacts: [],
+        recommendation: warning,
+        options: [],
+      });
     }
   }
 
