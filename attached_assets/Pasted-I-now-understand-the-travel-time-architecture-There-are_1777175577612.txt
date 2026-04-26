@@ -1,0 +1,59 @@
+I now understand the travel time architecture. There are two bugs to fix. 
+Please do not rebuild the existing systems — extend them.
+
+BUG 1: Travel check is missing for the assigned person's own schedule.
+
+Currently getTravelTime is only called when checking handoff candidates 
+(line 333). It is never called to verify whether the person already 
+assigned to consecutive events can travel between them in time.
+
+Fix: After the solver assigns events to adults, add a post-assignment 
+validation pass that:
+- For each adult, sorts their assigned events by start time
+- For each consecutive pair of events at different locations, calls 
+  getTravelTime(event1.location, event2.location)
+- Checks whether (event1.endTime + travelTime) <= event2.startTime
+- If not, flags this as a TRAVEL_CONFLICT (separate from TIME_CLASH)
+- A TRAVEL_CONFLICT should surface as a "⚠️ tight gap" or 
+  "🚫 not enough travel time" warning in the plan view, 
+  shown against the specific person
+
+BUG 2: The TRAVEL_MATRIX is missing Lake Mac location pairs.
+
+Add these entries to the TRAVEL_MATRIX (times in minutes, 
+all verified for the Lake Macquarie area):
+
+"morisset|wangi wangi": 18,
+"rathmines|wangi wangi": 12,
+"warners bay|wangi wangi": 14,
+"morisset|toronto": 20,
+"toronto|warners bay": 8,
+"toronto|rathmines": 15,
+"toronto|wangi wangi": 22,
+"belmont|warners bay": 10,
+"belmont|toronto": 12,
+"belmont|morisset": 25,
+"belmont|rathmines": 14,
+"belmont|wangi wangi": 18,
+"newcastle|morisset": 35,
+"newcastle|toronto": 28,
+"newcastle|warners bay": 22,
+"newcastle|rathmines": 20,
+
+Keep all existing matrix entries. Keep the alphabetical key sorting 
+logic. Keep the 15-minute default for unknown pairs.
+
+BUG 3: Surface travel conflicts clearly in the UI.
+
+In the "Sorted. Here's the plan" view:
+- If any adult has a TRAVEL_CONFLICT, the header should show 
+  "⚠️ 1 travel conflict" not "all clear"
+- On the person's card, below their event list, show the specific 
+  warning: "⚠️ [Name] — [X] mins to get from [Location A] to 
+  [Location B], only [Y] mins available"
+- If the gap is literally 0 minutes (same end/start time, 
+  different locations), use: "🚫 Not possible — no travel 
+  time between [A] and [B]"
+
+Do not change the handoff candidate logic — that part is working. 
+Only add the post-assignment validation pass and the expanded matrix.

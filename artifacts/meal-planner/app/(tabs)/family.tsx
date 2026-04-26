@@ -118,7 +118,7 @@ export interface JuggleEventItem {
 }
 export interface JuggleConflict {
   id: string;
-  type: "overlap" | "unassigned" | "tight" | "impossible" | "resolved";
+  type: "overlap" | "unassigned" | "tight" | "impossible" | "resolved" | "travel";
   severity: "tight" | "warning" | "impossible" | "resolved";
   description: string;
   involved_events: string[];
@@ -186,9 +186,27 @@ function _fromMins(mins: number): string {
 
 // Travel time matrix (minutes) — key is "locationA|locationB" sorted alphabetically lowercase
 const TRAVEL_MATRIX: Record<string, number> = {
+  // Original entries
   "morisset|rathmines": 12,
   "rathmines|warners bay": 10,
   "morisset|warners bay": 15,
+  // Extended Lake Mac coverage
+  "morisset|wangi wangi": 18,
+  "rathmines|wangi wangi": 12,
+  "warners bay|wangi wangi": 14,
+  "morisset|toronto": 20,
+  "toronto|warners bay": 8,
+  "toronto|rathmines": 15,
+  "toronto|wangi wangi": 22,
+  "belmont|warners bay": 10,
+  "belmont|toronto": 12,
+  "belmont|morisset": 25,
+  "belmont|rathmines": 14,
+  "belmont|wangi wangi": 18,
+  "newcastle|morisset": 35,
+  "newcastle|toronto": 28,
+  "newcastle|warners bay": 22,
+  "newcastle|rathmines": 20,
 };
 
 function getTravelTime(locA: string | null | undefined, locB: string | null | undefined): number {
@@ -394,6 +412,47 @@ function solveJuggleOnDevice(
             options: conflictOptions,
           });
         }
+      }
+    }
+  }
+
+  // Post-assignment travel validation — checks consecutive events at different locations
+  for (const [adultId, evList] of adultEventsMap.entries()) {
+    const adult = adults.find((a) => a.id === adultId);
+    if (!adult) continue;
+    // Sort by day then start time
+    const sorted = [...evList].sort((a, b) => {
+      const dd = (DAY_ORDER[a.day] ?? 0) - (DAY_ORDER[b.day] ?? 0);
+      return dd !== 0 ? dd : _toMins(a.time) - _toMins(b.time);
+    });
+    for (let i = 0; i < sorted.length - 1; i++) {
+      const curr = sorted[i]!;
+      const next = sorted[i + 1]!;
+      if (curr.day !== next.day) continue; // different days — fine
+      const locA = (curr.location ?? "").trim().toLowerCase();
+      const locB = (next.location ?? "").trim().toLowerCase();
+      if (!locA || !locB || locA === locB) continue; // no location data or same place
+      const currEnd   = _toMins(curr.endTime) || _toMins(curr.time) + 60;
+      const nextStart = _toMins(next.time);
+      if (nextStart < currEnd) continue; // already caught by overlap detection
+      const available = nextStart - currEnd;
+      const needed    = getTravelTime(curr.location, next.location);
+      if (needed > available) {
+        const severity: JuggleConflict["severity"] = available === 0 ? "impossible" : "tight";
+        const warning = available === 0
+          ? `🚫 Not possible — no travel time between ${curr.location} and ${next.location}.`
+          : `⚠️ ${adult.name} — ${needed} mins to get from ${curr.location} to ${next.location}, only ${available} min${available === 1 ? "" : "s"} available.`;
+        conflicts.push({
+          id: `travel-${curr.id}-${next.id}`,
+          type: "travel",
+          severity,
+          description: `${adult.name}: ${needed} min drive from ${curr.location} to ${next.location}, ${available} min gap.`,
+          involved_events: [curr.id, next.id],
+          involved_adults: [adult.name],
+          suggested_contacts: [],
+          recommendation: warning,
+          options: [],
+        });
       }
     }
   }
@@ -760,9 +819,11 @@ function JuggleResultsContent({
   const [swapToast, setSwapToast]                       = useState<string | null>(null);
 
   // Split conflicts by resolution status
-  const resolvedConflicts   = conflicts.filter(c => c.severity === "resolved" || c.type === "resolved");
-  const unresolvedConflicts = conflicts.filter(c => c.severity !== "resolved" && c.type !== "resolved");
-  const allSorted = unresolvedConflicts.length === 0 && (resolvedConflicts.length > 0 || ws.conflicts_resolved > 0);
+  const travelConflicts     = conflicts.filter(c => c.type === "travel");
+  const nonTravelConflicts  = conflicts.filter(c => c.type !== "travel");
+  const resolvedConflicts   = nonTravelConflicts.filter(c => c.severity === "resolved" || c.type === "resolved");
+  const unresolvedConflicts = nonTravelConflicts.filter(c => c.severity !== "resolved" && c.type !== "resolved");
+  const allSorted = unresolvedConflicts.length === 0 && travelConflicts.length === 0 && (resolvedConflicts.length > 0 || ws.conflicts_resolved > 0);
 
   const adultMembers = members.filter((m) => m.role === "adult");
 
@@ -820,11 +881,12 @@ function JuggleResultsContent({
   const dashSummaryLine = (() => {
     const parts: string[] = [];
     if (ws.total_events > 0) parts.push(`${ws.total_events} ${ws.total_events === 1 ? "event" : "events"}`);
-    if (impossible > 0)                    parts.push(`${impossible} ${impossible === 1 ? "clash" : "clashes"} to sort`);
-    else if (unresolvedConflicts.length > 0) parts.push(`${unresolvedConflicts.length} still needs a decision`);
-    else if (tight > 0)                    parts.push(`${tight} tight spot${tight > 1 ? "s" : ""}, manageable`);
-    else if (allSorted)                    parts.push("all sorted ✓");
-    else                                   parts.push("nothing clashing");
+    if (impossible > 0)                       parts.push(`${impossible} ${impossible === 1 ? "clash" : "clashes"} to sort`);
+    else if (unresolvedConflicts.length > 0)  parts.push(`${unresolvedConflicts.length} still needs a decision`);
+    else if (travelConflicts.length > 0)      parts.push(`${travelConflicts.length} travel ${travelConflicts.length === 1 ? "conflict" : "conflicts"}`);
+    else if (tight > 0)                       parts.push(`${tight} tight spot${tight > 1 ? "s" : ""}, manageable`);
+    else if (allSorted)                       parts.push("all sorted ✓");
+    else                                      parts.push("nothing clashing");
     return parts.join("  ·  ");
   })();
 
@@ -875,7 +937,14 @@ function JuggleResultsContent({
                 </Text>
               </View>
             )}
-            {impossible === 0 && tight === 0 && unresolvedConflicts.length === 0 && resolvedConflicts.length === 0 && ws.conflicts_resolved === 0 && (
+            {travelConflicts.length > 0 && (
+              <View style={[styles.resultChip, { backgroundColor: GOLD + "18", borderColor: GOLD + "44" }]}>
+                <Text style={[styles.resultChipText, { color: "#A07010" }]}>
+                  ⚠️ {travelConflicts.length} travel {travelConflicts.length === 1 ? "conflict" : "conflicts"}
+                </Text>
+              </View>
+            )}
+            {impossible === 0 && tight === 0 && unresolvedConflicts.length === 0 && resolvedConflicts.length === 0 && travelConflicts.length === 0 && ws.conflicts_resolved === 0 && (
               <View style={[styles.resultChip, { backgroundColor: TEAL + "18", borderColor: TEAL + "33" }]}>
                 <Text style={[styles.resultChipText, { color: TEAL }]}>all clear ✓</Text>
               </View>
@@ -913,6 +982,15 @@ function JuggleResultsContent({
                   </View>
                   );
                 })}
+                {/* Inline travel warnings for this adult */}
+                {travelConflicts
+                  .filter((c) => c.involved_adults.includes(plan.adult))
+                  .map((c, i) => (
+                    <View key={`tw-${i}`} style={styles.travelWarningRow}>
+                      <Text style={styles.travelWarningText}>{c.recommendation}</Text>
+                    </View>
+                  ))
+                }
                 {(() => {
                   const insight = buildFreeWindowInsight(plan);
                   return insight ? (
@@ -4094,6 +4172,17 @@ const styles = StyleSheet.create({
   juggleSortedDesc:     { fontSize: 15, fontFamily: "Inter_600SemiBold", color: "#2B2B2B", lineHeight: 21 },
   juggleSortedRec:      { fontSize: 14, fontFamily: "Inter_400Regular",  color: TEAL, lineHeight: 20, fontStyle: "italic" },
   juggleSortedSwapLink: { fontSize: 13, fontFamily: "Inter_500Medium",   color: TEAL, textDecorationLine: "underline" },
+
+  // Travel warning — shown inline on an adult's WHO'S GOT WHAT card
+  travelWarningRow: {
+    marginTop: 8, paddingTop: 8,
+    borderTopWidth: 1, borderTopColor: GOLD + "44",
+    backgroundColor: GOLD + "0D", borderRadius: 8, padding: 8,
+  },
+  travelWarningText: {
+    fontSize: 12, fontFamily: "Inter_500Medium",
+    color: "#7A5A00", lineHeight: 18,
+  },
 
   carpoolClashBox: {
     flexDirection: "row", alignItems: "flex-start", gap: 8,
