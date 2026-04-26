@@ -1,0 +1,100 @@
+Update the first-time welcome / onboarding entry screen only.
+
+Goal:
+Make the three benefit cards visually match the richer Sortii card style used elsewhere in the app, especially the “What do you want to tweak?” modal cards.
+
+Do not change:
+- onboarding logic
+- CTA behaviour
+- navigation
+- app state
+- any flows after this screen
+
+Only update the visual styling of the first screen.
+
+Current issue:
+The first screen feels too plain compared with the rest of the app. The three rows look like simple white cards with text, but they should feel more like Sortii feature cards: soft, warm, calm, lightly coloured, with icon tiles and subtle accent borders.
+
+Update the three intro cards as follows:
+
+1. Card structure
+- Each benefit should be a rounded rectangular card.
+- Use white / warm off-white card background: #FFFDF9.
+- Add subtle border: #E5E2D8.
+- Add very soft shadow.
+- Keep generous padding.
+- Cards should sit stacked vertically with consistent spacing.
+- Keep them aligned with the main content width and CTA width.
+
+2. Accent rails
+Add a coloured vertical accent rail on the left of each card:
+- Meals: teal / sage accent #2F948C or existing Sortii teal
+- Week view: plum accent #6E3F58 or existing plum
+- Money: mustard accent #D6A23A
+
+The rail should be around 4–5px wide and follow the card’s rounded left edge.
+
+3. Icon tiles
+Replace the plain emoji-only feel with soft icon tiles:
+- Each card should have a small rounded square icon tile on the left.
+- Icon tile should use a pale tint matching the card theme.
+- Meals tile: pale teal tint #E6EFE5
+- Week tile: pale plum tint #F2E8EC
+- Money tile: pale mustard tint #FFF4D8
+
+Inside each tile, keep the existing emoji or use matching app icons if already available:
+- Meals: dinner / cutlery icon
+- Week: calendar icon
+- Money: money bag / wallet icon
+
+Do not use harsh emoji-only styling if icon components already exist in the project. Prefer the project’s existing icon system.
+
+4. Text styling
+Keep the copy:
+- “Dinners done. No thinking needed.”
+- “Your whole week, at a glance.”
+- “Money tracked. No spreadsheet.”
+
+But style it like product card copy:
+- font weight 700 or 800
+- dark text #2F342F
+- size around 16–17px
+- vertically centred with icon tile
+- avoid oversized text
+
+5. Layout
+The screen should still feel spacious and premium.
+Keep:
+- logo centred near the upper third
+- CTA pinned near bottom
+- helper text below CTA
+- white background
+- no extra clutter
+
+Adjust vertical spacing so the cards feel intentionally placed, not floating too low or too high.
+
+6. CTA
+Keep existing CTA text:
+“Get my week sorted →”
+
+Keep the teal button style, but ensure it visually matches the app:
+- background #2F948C or existing primary teal
+- rounded corners
+- bold white text
+- full-width within content margin
+- no changes to behaviour
+
+7. Brand feel
+The final screen should feel:
+- calmer
+- warmer
+- more premium
+- visually connected to the rest of Sortii
+- less like plain bullet points
+- more like three soft product promise cards
+
+Check the result on iPhone-sized screens and ensure:
+- no overlap with dynamic island
+- cards do not crowd the CTA
+- bottom helper text remains visible
+- safe area spacing is respected

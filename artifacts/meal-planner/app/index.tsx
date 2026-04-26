@@ -306,16 +306,20 @@ export default function OnboardingScreen() {
       {/* ── Feature cards ── */}
       <View style={styles.valueProps}>
         {[
-          { anim: line1, border: "#2A8F88", icon: "🥗", text: "Dinners done. No thinking needed." },
-          { anim: line2, border: "#5E3A4C", icon: "📅", text: "Your whole week, at a glance." },
-          { anim: line3, border: "#D29A22", icon: "💰", text: "Money tracked. No spreadsheet." },
-        ].map(({ anim, border, icon, text }) => (
-          <Animated.View
-            key={text}
-            style={[styles.featureCard, { borderLeftColor: border, opacity: anim }]}
-          >
-            <Text style={styles.featureCardIcon}>{icon}</Text>
-            <Text style={styles.featureCardText}>{text}</Text>
+          { anim: line1, accent: "#2A8F88", tileBg: "#E6EFE5", icon: "🥗", text: "Dinners done. No thinking needed." },
+          { anim: line2, accent: "#5E3A4C", tileBg: "#F2E8EC", icon: "📅", text: "Your whole week, at a glance." },
+          { anim: line3, accent: "#D29A22", tileBg: "#FFF4D8", icon: "💰", text: "Money tracked. No spreadsheet." },
+        ].map(({ anim, accent, tileBg, icon, text }) => (
+          <Animated.View key={text} style={[styles.featureCardShadow, { opacity: anim }]}>
+            <View style={styles.featureCardInner}>
+              <View style={[styles.featureCardRail, { backgroundColor: accent }]} />
+              <View style={styles.featureCardContent}>
+                <View style={[styles.featureCardTile, { backgroundColor: tileBg }]}>
+                  <Text style={styles.featureCardTileIcon}>{icon}</Text>
+                </View>
+                <Text style={styles.featureCardText}>{text}</Text>
+              </View>
+            </View>
           </Animated.View>
         ))}
       </View>
@@ -361,33 +365,52 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     paddingBottom: 60,
   },
-  featureCard: {
-    backgroundColor: "#FFFFFF",
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: "#E6E1D7",
-    borderLeftWidth: 4,
-    paddingVertical: 16,
-    paddingHorizontal: 16,
+  featureCardShadow: {
+    borderRadius: 14,
+    backgroundColor: "#FFFDF9",
+    shadowColor: "#3D2B1F",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 6,
+    elevation: 3,
     marginBottom: 12,
+  },
+  featureCardInner: {
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: "#E5E2D8",
+    flexDirection: "row",
+    overflow: "hidden",
+    backgroundColor: "#FFFDF9",
+  },
+  featureCardRail: {
+    width: 4,
+  },
+  featureCardContent: {
+    flex: 1,
     flexDirection: "row",
     alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.06,
-    shadowRadius: 4,
-    elevation: 2,
+    paddingVertical: 16,
+    paddingHorizontal: 14,
+    gap: 14,
   },
-  featureCardIcon: {
-    fontSize: 22,
-    marginRight: 14,
+  featureCardTile: {
+    width: 42,
+    height: 42,
+    borderRadius: 10,
+    alignItems: "center",
+    justifyContent: "center",
+    flexShrink: 0,
+  },
+  featureCardTileIcon: {
+    fontSize: 20,
   },
   featureCardText: {
-    fontFamily: "DMSans_600SemiBold",
-    fontWeight: "600",
+    fontFamily: "DMSans_700Bold",
     fontSize: 16,
-    color: "#2B2B2B",
+    color: "#2F342F",
     flexShrink: 1,
+    lineHeight: 22,
   },
   ctaWrap: {
     position: "absolute",
