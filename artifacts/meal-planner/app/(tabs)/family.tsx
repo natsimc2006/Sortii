@@ -2009,14 +2009,12 @@ function AddEventSheet({
             </View>
 
             {/* Location */}
-            <View style={styles.formField}>
+            <View style={[styles.formField, { zIndex: 20 }]}>
               <Text style={styles.formLabel}>Location (optional)</Text>
-              <TextInput
-                style={styles.formInput}
+              <LocationAutocomplete
                 value={draft.location ?? ""}
-                onChangeText={(v) => setField("location", v)}
-                placeholder="e.g. Memorial Park, Highbury Fields"
-                placeholderTextColor="#bbb"
+                onSelect={(v) => setField("location", v)}
+                inputStyle={styles.formInput}
               />
             </View>
 
@@ -2670,6 +2668,105 @@ function HelperSection({
 }
 
 // ── Main screen ────────────────────────────────────────────────────────────────
+// ── Places Autocomplete ────────────────────────────────────────────────────────
+const GEO_API_KEY = process.env.EXPO_PUBLIC_GOOGLE_GEO_API_KEY ?? "";
+
+interface PlacePrediction {
+  place_id: string;
+  description: string;
+  structured_formatting: { main_text: string; secondary_text: string };
+}
+
+function LocationAutocomplete({
+  value,
+  onSelect,
+  inputStyle,
+}: {
+  value: string;
+  onSelect: (name: string) => void;
+  inputStyle: object;
+}) {
+  const [query, setQuery]           = useState(value);
+  const [suggestions, setSuggestions] = useState<PlacePrediction[]>([]);
+  const [open, setOpen]             = useState(false);
+  const debounce                    = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => { setQuery(value); }, [value]);
+
+  function fetchSuggestions(text: string) {
+    if (debounce.current) clearTimeout(debounce.current);
+    if (!GEO_API_KEY || text.trim().length < 2) {
+      setSuggestions([]); setOpen(false); return;
+    }
+    debounce.current = setTimeout(async () => {
+      try {
+        const url =
+          `https://maps.googleapis.com/maps/api/place/autocomplete/json` +
+          `?input=${encodeURIComponent(text)}&components=country:au&types=geocode&key=${GEO_API_KEY}`;
+        const res  = await fetch(url);
+        const data = (await res.json()) as { status: string; predictions: PlacePrediction[] };
+        const preds = data.predictions ?? [];
+        setSuggestions(preds);
+        setOpen(preds.length > 0);
+      } catch {
+        setSuggestions([]); setOpen(false);
+      }
+    }, 300);
+  }
+
+  function handleSelect(pred: PlacePrediction) {
+    const name = pred.structured_formatting.main_text;
+    setQuery(name);
+    onSelect(name);
+    setSuggestions([]);
+    setOpen(false);
+    Keyboard.dismiss();
+  }
+
+  return (
+    <View style={{ zIndex: 20 }}>
+      <TextInput
+        style={inputStyle}
+        value={query}
+        onChangeText={(t) => { setQuery(t); onSelect(t); fetchSuggestions(t); }}
+        placeholder="e.g. Rathmines, Morisset, Wangi Wangi"
+        placeholderTextColor="#bbb"
+        onFocus={() => { if (suggestions.length > 0) setOpen(true); }}
+        onBlur={() => setTimeout(() => setOpen(false), 160)}
+      />
+      {open && (
+        <View style={{
+          position: "absolute", top: 48, left: 0, right: 0,
+          backgroundColor: "#fff", borderRadius: 12,
+          borderWidth: 1, borderColor: "#E2DDD6",
+          zIndex: 100, elevation: 8,
+          ...Platform.select({ web: { boxShadow: "0px 4px 16px rgba(0,0,0,0.12)" } }),
+        }}>
+          {suggestions.slice(0, 5).map((pred, idx) => (
+            <TouchableOpacity
+              key={pred.place_id}
+              onPress={() => handleSelect(pred)}
+              style={{
+                paddingHorizontal: 14, paddingVertical: 11,
+                borderBottomWidth: idx < Math.min(suggestions.length, 5) - 1 ? 1 : 0,
+                borderBottomColor: "#F0ECE6",
+              }}
+            >
+              <Text style={{ fontSize: 14, fontFamily: "Inter_600SemiBold", color: TEXT }}>
+                {pred.structured_formatting.main_text}
+              </Text>
+              <Text style={{ fontSize: 12, fontFamily: "Inter_400Regular", color: TEXT_MUTED }}>
+                {pred.structured_formatting.secondary_text}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+      )}
+    </View>
+  );
+}
+// ──────────────────────────────────────────────────────────────────────────────
+
 export default function FamilyScreen() {
   const insets        = useSafeAreaInsets();
   const paddingTop    = insets.top + 8;
