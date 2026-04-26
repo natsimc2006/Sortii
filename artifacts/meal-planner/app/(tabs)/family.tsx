@@ -729,8 +729,14 @@ function JuggleResultsContent({
     })
   ).sort((a, b) => a.time.localeCompare(b.time));
 
-  const impossible = ws.impossible_clashes ?? 0;
-  const tight      = ws.tight_windows ?? 0;
+  const impossible    = ws.impossible_clashes ?? 0;
+  const tight         = ws.tight_windows ?? 0;
+  const trueClashes   = conflicts.filter(
+    (c) => c.severity === "impossible" && !c.recommendation
+  ).length;
+  const tightWindows  = conflicts.filter(
+    (c) => c.severity === "tight" || (c.severity !== "impossible" && !!c.recommendation)
+  ).length;
 
   const [swapRow, setSwapRow]   = useState<typeof planRows[0] | null>(null);
   const [swapPick, setSwapPick] = useState<string>("");
@@ -840,14 +846,21 @@ function JuggleResultsContent({
                 </Text>
               </View>
             )}
-            {impossible === 0 && conflicts.length > 0 && (
+            {trueClashes > 0 && (
               <View style={[styles.resultChip, { backgroundColor: GOLD, borderColor: GOLD }]}>
                 <Text style={[styles.resultChipText, { color: "#fff" }]}>
-                  {conflicts.length} {conflicts.length === 1 ? "clash" : "clashes"} to sort
+                  {trueClashes} {trueClashes === 1 ? "clash" : "clashes"} to sort
                 </Text>
               </View>
             )}
-            {impossible === 0 && tight === 0 && conflicts.length === 0 && (
+            {tightWindows > 0 && trueClashes === 0 && (
+              <View style={[styles.resultChip, { backgroundColor: "#E6F3F0", borderColor: TEAL + "33" }]}>
+                <Text style={[styles.resultChipText, { color: TEAL }]}>
+                  {tightWindows} tight {tightWindows === 1 ? "window" : "windows"}
+                </Text>
+              </View>
+            )}
+            {trueClashes === 0 && tightWindows === 0 && tight === 0 && conflicts.length === 0 && (
               <View style={[styles.resultChip, { backgroundColor: TEAL + "18", borderColor: TEAL + "33" }]}>
                 <Text style={[styles.resultChipText, { color: TEAL }]}>all clear ✓</Text>
               </View>
@@ -1024,18 +1037,29 @@ function JuggleResultsContent({
         );
       })()}
 
-      {/* ── 4. Tight spot / conflicts ── */}
-      {conflicts.length > 0 && (
-        <View style={styles.juggleConflictCard}>
-          <Text style={styles.juggleConflictLabel}>HEADS UP</Text>
-          {conflicts.map((c, i) => (
-            <View key={i} style={i > 0 ? { marginTop: 12, paddingTop: 12, borderTopWidth: 1, borderTopColor: "#F3E0DC" } : undefined}>
-              <Text style={styles.juggleConflictDesc}>⚠ {c.description}</Text>
-              {c.recommendation ? <Text style={styles.juggleConflictRec}>{c.recommendation}</Text> : null}
-            </View>
-          ))}
-        </View>
-      )}
+      {/* ── 4. Conflicts — SORTED ✓ (teal) when resolved, HEADS UP (red) when not ── */}
+      {conflicts.map((c, i) => {
+        const isResolved = !!(c.recommendation && c.recommendation.length > 0);
+        return isResolved ? (
+          <View
+            key={i}
+            style={[styles.juggleConflictCard, {
+              borderLeftColor: TEAL,
+              borderColor: TEAL + "33",
+              backgroundColor: "#E6F3F0",
+            }]}
+          >
+            <Text style={[styles.juggleConflictLabel, { color: TEAL }]}>SORTED ✓</Text>
+            <Text style={styles.juggleConflictDesc}>{c.description}</Text>
+            <Text style={[styles.juggleConflictRec, { color: TEAL }]}>{c.recommendation}</Text>
+          </View>
+        ) : (
+          <View key={i} style={styles.juggleConflictCard}>
+            <Text style={styles.juggleConflictLabel}>HEADS UP</Text>
+            <Text style={styles.juggleConflictDesc}>⚠ {c.description}</Text>
+          </View>
+        );
+      })}
 
       {/* ── 5. Worth knowing (smart_note) ── */}
       {juggleResult.smart_note ? (
