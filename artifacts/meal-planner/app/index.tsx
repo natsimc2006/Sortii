@@ -33,6 +33,13 @@ const BORDER     = "#EDE9E3";
 const PLUM       = "#5E3A4C";
 const GOLD       = "#D29A22";
 
+const ROT_LINES = [
+  "What's for dinner… sorted.",
+  "That Saturday juggle… handled.",
+  "Where the money went… clear.",
+  "The week ahead… a bit calmer.",
+] as const;
+
 const HOUSEHOLD_HINTS: Record<number, string> = {
   1: "Just you. Easy week.",
   2: "Two people. Sorted.",
@@ -69,6 +76,15 @@ export default function OnboardingScreen() {
   const line3   = useRef(new Animated.Value(0)).current;
   const ctaAnim = useRef(new Animated.Value(0)).current;
 
+  // Rotating tagline
+  const rotOpacity = useRef(new Animated.Value(1)).current;
+  const [rotIdx, setRotIdx] = useState(0);
+
+  // Step-1 CTA animation
+  const btnScale    = useRef(new Animated.Value(1)).current;
+  const [isFinishing, setIsFinishing] = useState(false);
+  const [btnLabel,    setBtnLabel]    = useState<string>("Done →");
+
   const paddingBottom = Platform.OS === "web" ? 40 : insets.bottom + 16;
   const paddingTop    = Platform.OS === "web" ? 60 : insets.top + 8;
 
@@ -98,6 +114,32 @@ export default function OnboardingScreen() {
     );
     return () => timers.forEach(clearTimeout);
   }, [step]);
+
+  // ── Rotating tagline ─────────────────────────────────────────────
+  useEffect(() => {
+    if (step !== 0) return;
+    const id = setInterval(() => {
+      Animated.timing(rotOpacity, { toValue: 0, duration: 200, useNativeDriver: true }).start(() => {
+        setRotIdx(i => (i + 1) % ROT_LINES.length);
+        Animated.timing(rotOpacity, { toValue: 1, duration: 300, useNativeDriver: true }).start();
+      });
+    }, 2750);
+    return () => clearInterval(id);
+  }, [step]);
+
+  // ── Step-1 CTA micro-animation ────────────────────────────────────
+  const handleFinish = () => {
+    if (isFinishing) return;
+    setIsFinishing(true);
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    Animated.sequence([
+      Animated.timing(btnScale, { toValue: 0.97, duration: 80,  useNativeDriver: true }),
+      Animated.timing(btnScale, { toValue: 1.0,  duration: 200, useNativeDriver: true }),
+    ]).start();
+    setBtnLabel("Sorting your week…");
+    setTimeout(() => setBtnLabel("Sorted."),      700);
+    setTimeout(() => finishOnboarding(),           950);
+  };
 
   // ── Complete onboarding — no meal generation ─────────────────────
   const finishOnboarding = async () => {
@@ -281,16 +323,16 @@ export default function OnboardingScreen() {
             </View>
           </View>
 
-          <TouchableOpacity
-            onPress={() => {
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-              finishOnboarding();
-            }}
-            activeOpacity={0.85}
-            style={styles.primaryBtn}
-          >
-            <Text style={styles.primaryBtnText}>Done →</Text>
-          </TouchableOpacity>
+          <Animated.View style={{ transform: [{ scale: btnScale }] }}>
+            <TouchableOpacity
+              onPress={handleFinish}
+              disabled={isFinishing}
+              activeOpacity={0.88}
+              style={styles.primaryBtn}
+            >
+              <Text style={styles.primaryBtnText}>{btnLabel}</Text>
+            </TouchableOpacity>
+          </Animated.View>
         </ScrollView>
       </View>
     );
@@ -303,6 +345,11 @@ export default function OnboardingScreen() {
     <View style={[styles.root, { paddingTop }]}>
       {/* ── Logo ── */}
       <Image source={sortiiLogo1} style={styles.welcomeLogo} resizeMode="contain" />
+
+      {/* ── Rotating tagline ── */}
+      <Animated.Text style={[styles.rotatingLine, { opacity: rotOpacity }]}>
+        {ROT_LINES[rotIdx]}
+      </Animated.Text>
 
       {/* ── Feature cards ── */}
       <View style={styles.valueProps}>
@@ -362,6 +409,15 @@ const styles = StyleSheet.create({
     marginTop: 28,
     marginBottom: 4,
     alignSelf: "center",
+  },
+  rotatingLine: {
+    fontFamily: "Inter_400Regular",
+    fontSize: 14,
+    color: "#5F7C6A",
+    textAlign: "center",
+    marginTop: 6,
+    marginBottom: 20,
+    letterSpacing: 0.15,
   },
   valueProps: {
     flex: 1,
