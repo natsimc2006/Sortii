@@ -1,5 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { FamilyMember, FamilyState } from "./familyTypes";
+import { FamilyMember, FamilyEvent, FamilyState } from "./familyTypes";
 import { SK } from "./storageKeys";
 import { getCurrentUserId } from "./currentUser";
 
@@ -18,6 +18,27 @@ function dedupMembers(members: FamilyMember[]): FamilyMember[] {
   );
 }
 
+/**
+ * If any personId on an event belongs to an adult, this is a personal
+ * appointment for that adult — force assignedAdult to their name so
+ * Claude receives the correct assignment and never re-routes it.
+ */
+function sanitiseEventAssignments(state: FamilyState): FamilyState {
+  const memberMap = new Map<string, FamilyMember>(
+    state.members.map((m) => [m.id, m])
+  );
+  const events: FamilyEvent[] = state.events.map((ev) => {
+    const adultPerson = ev.personIds
+      .map((id) => memberMap.get(id))
+      .find((m) => m?.role === "adult");
+    if (adultPerson) {
+      return { ...ev, assignedAdult: adultPerson.name };
+    }
+    return ev;
+  });
+  return { ...state, events };
+}
+
 export async function loadFamilyState(): Promise<FamilyState> {
   try {
     const raw = await AsyncStorage.getItem(key());
@@ -33,6 +54,7 @@ export async function loadFamilyState(): Promise<FamilyState> {
 }
 
 export async function saveFamilyState(state: FamilyState): Promise<void> {
-  const clean: FamilyState = { ...state, members: dedupMembers(state.members) };
+  const sanitised = sanitiseEventAssignments(state);
+  const clean: FamilyState = { ...sanitised, members: dedupMembers(sanitised.members) };
   await AsyncStorage.setItem(key(), JSON.stringify(clean));
 }
