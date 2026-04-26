@@ -2992,7 +2992,7 @@ export default function FamilyScreen() {
 
       const calLines = pushedCalEvents.length > 0
         ? `\n\nCalendar events:\n${pushedCalEvents.map((c, i) =>
-            `Cal ${i + 1}: ${c.title} | ${c.day} ${c.startTime}–${c.endTime} | ${c.location || "no location"}`
+            `Cal ${i + 1}: ${c.title} | ${c.startTime}–${c.endTime ?? "open"} | ${c.location || "no location"}`
           ).join("\n")}`
         : "";
 
@@ -3014,7 +3014,7 @@ export default function FamilyScreen() {
       console.log("=== END CLAUDE MESSAGE ===");
 
       const rawResult = await solveJuggle(userMessage);
-      const full: JuggleResult = { ...(rawResult as JuggleResult), solvedAt: Date.now() };
+      const full: JuggleResult = { ...(rawResult as unknown as JuggleResult), solvedAt: Date.now() };
 
       await AsyncStorage.setItem(juggleKey(sortWeek), JSON.stringify(full));
       setJuggleResult(full);
