@@ -3134,10 +3134,43 @@ export default function FamilyScreen() {
         ? `\n\nAdditional context from parent:\n${juggleFreeText.trim()}`
         : "";
 
+      // ── Carpool contacts ─────────────────────────────────────────────────────
+      // Global contacts (CarpoolContact: id/name/phone) + per-event contacts
+      // (CarpoolContactEntry: richer type). Built as string lines separately
+      // to avoid type-union assignment issues.
+      const globalContactLines = carpoolContacts.map((c) =>
+        `- ${c.name} (contact)${c.phone ? ` · ${c.phone}` : ""}`
+      );
+      const perEventEntries: CarpoolContactEntry[] = allEvents.flatMap((ev) => {
+        if (!ev.carpoolContacts?.length) return [];
+        const childName = ev.personIds
+          .map((id) => memberLookup.get(id)?.name)
+          .filter(Boolean)
+          .join(", ");
+        return ev.carpoolContacts.map((c) => ({
+          ...c,
+          canHelpWith: c.canHelpWith?.length ? c.canHelpWith : childName ? [childName] : [],
+        }));
+      });
+      const perEventContactLines = perEventEntries
+        .filter((pc) => !carpoolContacts.some(
+          (gc) => gc.name.toLowerCase() === pc.name.toLowerCase()
+        ))
+        .map((c) =>
+          `- ${c.name} (${c.relationship || "contact"}) — can help with: ${
+            (c.canHelpWith ?? []).join(", ") || "any child"
+          }${c.phone ? ` · ${c.phone}` : ""}${c.mobile ? ` · ${c.mobile}` : ""}`
+        );
+      const allContactLines = [...globalContactLines, ...perEventContactLines];
+      const contactLines = allContactLines.length > 0
+        ? `\n\nCarpool contacts:\n${allContactLines.join("\n")}`
+        : "\n\nCarpool contacts: none saved yet.";
+      // ────────────────────────────────────────────────────────────────────────
+
       const userMessage =
         `Available adults:\n${adultLines}\n\nWeekend events:\n${eventLines}${calLines}` +
         `${travelContext}\n\nRegion: Lake Macquarie / Hunter, NSW Australia.` +
-        `${freeTextSection}\n\nPlease solve this schedule.`;
+        `${contactLines}${freeTextSection}\n\nPlease solve this schedule.`;
 
       console.log("=== SENDING TO CLAUDE ===");
       console.log(userMessage);
