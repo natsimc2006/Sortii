@@ -43,6 +43,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { SortiiCalEvent, FAMILY_PUSHED_KEY } from "@/utils/calendarTypes";
 import { loadFamilyPushedEvents, removeEventFromFamily } from "@/utils/appointmentService";
 import { loadAppointments, saveAppointments, Appointment } from "@/utils/appointmentStore";
+import { solveJuggle } from "@/services/juggleSolver";
 
 // ── Brand tokens ───────────────────────────────────────────────────────────────
 const TEAL         = "#2A8F88";
@@ -2943,10 +2944,9 @@ export default function FamilyScreen() {
     setFamilyStep("sorting");
 
     try {
-      // On-device solver — works offline, no API key needed.
       const memberLookup = new Map<string, FamilyMember>(uniqueMembers.map((m) => [m.id, m]));
 
-      // ── DIAGNOSTIC LOG — remove once assignment persistence is confirmed ──
+      // ── Diagnostic: log exact solver input ──────────────────────────────────
       console.log("=== SOLVER INPUT ===");
       console.log("MEMBERS:", uniqueMembers.map((m) => `${m.name} (${m.role})`).join(", "));
       console.log("EVENTS:");
@@ -2963,7 +2963,59 @@ export default function FamilyScreen() {
       console.log("=== END SOLVER INPUT ===");
       // ────────────────────────────────────────────────────────────────────────
 
-      const full: JuggleResult = solveJuggleOnDevice(adults, allEvents, pushedCalEvents, memberLookup);
+      // ── Build user message for Claude ────────────────────────────────────────
+      const adultLines = adults
+        .filter((a) => a.name.trim())
+        .map((a) => `- ${a.name} (can drive)`)
+        .join("\n");
+
+      const eventLines = allEvents.map((ev, i) => {
+        const personNames = ev.personIds
+          .map((id) => memberLookup.get(id)?.name ?? id)
+          .filter(Boolean)
+          .join(", ");
+        return [
+          `Event ${i + 1} (ID: ${ev.id}):`,
+          `  Person: ${personNames || ev.assignedAdult || "unspecified"}`,
+          `  Activity: ${ev.title}`,
+          `  Location: ${ev.location || "unspecified"}`,
+          `  Day: ${ev.day}`,
+          `  Start: ${ev.time || "unspecified"}`,
+          `  End: ${ev.endTime || "unspecified"}`,
+          `  Assigned adult: ${ev.assignedAdult || "unassigned"}`,
+          `  Priority: ${ev.priority || "must"}`,
+          `  Type: ${ev.isAppointment ? "appointment" : "activity"}`,
+          `  Recurring: ${ev.repeat && ev.repeat !== "none" ? "yes — weekly" : "no — one-off"}`,
+          `  Notes: ${ev.notes || "none"}`,
+        ].join("\n");
+      }).join("\n\n");
+
+      const calLines = pushedCalEvents.length > 0
+        ? `\n\nCalendar events:\n${pushedCalEvents.map((c, i) =>
+            `Cal ${i + 1}: ${c.title} | ${c.day} ${c.startTime}–${c.endTime} | ${c.location || "no location"}`
+          ).join("\n")}`
+        : "";
+
+      const freeTextSection = juggleFreeText.trim()
+        ? `\n\nAdditional context from parent:\n${juggleFreeText.trim()}`
+        : "";
+
+      const userMessage = [
+        `Available adults:\n${adultLines}`,
+        `\n\nWeekend events:\n${eventLines}${calLines}`,
+        `\n\nLocation context: Lake Macquarie / Hunter region, NSW Australia.`,
+        ` Morisset to Wangi Wangi ~12 min. Wangi Wangi to Rathmines ~10 min. Morisset to Rathmines ~18 min.`,
+        freeTextSection,
+        `\n\nPlease solve this schedule.`,
+      ].join("");
+
+      console.log("=== SENDING TO CLAUDE ===");
+      console.log(userMessage);
+      console.log("=== END CLAUDE MESSAGE ===");
+
+      const rawResult = await solveJuggle(userMessage);
+      const full: JuggleResult = { ...(rawResult as JuggleResult), solvedAt: Date.now() };
+
       await AsyncStorage.setItem(juggleKey(sortWeek), JSON.stringify(full));
       setJuggleResult(full);
       setIsSorted(true);
