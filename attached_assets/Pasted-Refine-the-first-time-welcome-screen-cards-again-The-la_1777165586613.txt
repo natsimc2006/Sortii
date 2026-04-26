@@ -1,0 +1,85 @@
+Refine the first-time welcome screen cards again.
+
+The layout and shadows are now better, but the cards still do not visually match the Sortii modal card style.
+
+Do not change:
+- screen logic
+- onboarding flow
+- CTA behaviour
+- logo
+- copy text
+- navigation
+
+Only update the three benefit cards visually.
+
+Current issue:
+The cards are still mostly plain white cards with small emoji tiles. They need to feel like the coloured Sortii feature cards from the “What do you want to tweak?” modal.
+
+Required visual change:
+Each welcome card should become a lightly themed feature card, not a white card with a side stripe.
+
+CARD 1: Meals
+- Border colour: #2F948C
+- Background: very pale teal tint #F3FAF8 or #E6EFE5 at low opacity
+- Left icon tile: #E6EFE5
+- Icon colour: #2F948C
+- Use a proper app icon if available, preferably cutlery / meal / calendar-meal style
+- Avoid emoji if icon components are available
+
+CARD 2: Week
+- Border colour: #6E3F58
+- Background: very pale plum tint #F8F0F4 or #F2E8EC at low opacity
+- Left icon tile: #F2E8EC
+- Icon colour: #6E3F58
+- Use a proper calendar icon if available
+- Avoid emoji if icon components are available
+
+CARD 3: Money
+- Border colour: #D6A23A
+- Background: very pale mustard tint #FFF8E6 or #FFF4D8 at low opacity
+- Left icon tile: #FFF4D8
+- Icon colour: #D6A23A
+- Use a proper wallet / dollar / money icon if available
+- Avoid emoji if icon components are available
+
+Card styling:
+- Remove the plain white-only card look.
+- Keep soft shadow, but subtle.
+- Keep rounded corners around 16px.
+- Keep card height around 82px.
+- Keep card width aligned with CTA.
+- Keep the left accent rail, but it should feel integrated with the border and themed background.
+- Accent rail width around 5px.
+- The whole card should read as a coloured category card, similar to the modal cards.
+
+Icon styling:
+- Replace emoji icons with the existing icon library used elsewhere in the app if possible.
+- Use the same icon family already used in bottom nav / modal cards.
+- Icon tile size around 48px.
+- Icon size around 24px.
+- Icon should be a single flat line icon, not colourful emoji.
+
+Text styling:
+- Keep text dark #2F342F.
+- Font weight 700.
+- Font size around 16px.
+- Keep text vertically centred.
+- Allow line wrapping for the meals card if needed.
+
+Important:
+Do not make the cards loud or saturated. The style should be:
+soft tint background + coloured border + matching icon tile + proper line icon.
+
+Target result:
+The welcome screen should feel visually connected to the in-app modal cards:
+- Meals card feels teal
+- Week card feels plum
+- Money card feels mustard
+- Icons look like the app UI, not emoji stickers
+- Overall look is polished, warm and premium
+
+After changes, check the screen on iPhone size:
+- all three cards remain readable
+- spacing still feels balanced
+- CTA remains visible
+- no content is pushed below the safe area
