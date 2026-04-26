@@ -1,5 +1,5 @@
 import * as Haptics from "expo-haptics";
-import { Feather } from "@expo/vector-icons";
+import { Feather, Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
 import {
@@ -307,16 +307,18 @@ export default function OnboardingScreen() {
       {/* ── Feature cards ── */}
       <View style={styles.valueProps}>
         {([
-          { anim: line1, accent: "#2F948C", cardBg: "#F3FAF8", tileBg: "#E6EFE5", icon: "coffee",       text: "Dinners done. No thinking needed." },
-          { anim: line2, accent: "#6E3F58", cardBg: "#F8F0F4", tileBg: "#F2E8EC", icon: "calendar",     text: "Your whole week, at a glance." },
-          { anim: line3, accent: "#D6A23A", cardBg: "#FFF8E6", tileBg: "#FFF4D8", icon: "dollar-sign",  text: "Money tracked. No spreadsheet." },
-        ] as const).map(({ anim, accent, cardBg, tileBg, icon, text }) => (
+          { anim: line1, accent: "#2F948C", cardBg: "#F3FAF8", tileBg: "#E6EFE5", icon: "restaurant-outline", set: "ion",    text: "Dinners done. No thinking needed." },
+          { anim: line2, accent: "#6E3F58", cardBg: "#F8F0F4", tileBg: "#F2E8EC", icon: "calendar",            set: "feather", text: "Your whole week, at a glance." },
+          { anim: line3, accent: "#D6A23A", cardBg: "#FFF8E6", tileBg: "#FFF4D8", icon: "dollar-sign",         set: "feather", text: "Money tracked. No spreadsheet." },
+        ] as const).map(({ anim, accent, cardBg, tileBg, icon, set, text }) => (
           <Animated.View key={text} style={[styles.featureCardShadow, { backgroundColor: cardBg, opacity: anim }]}>
             <View style={[styles.featureCardInner, { backgroundColor: cardBg, borderColor: accent }]}>
               <View style={[styles.featureCardRail, { backgroundColor: accent }]} />
               <View style={styles.featureCardContent}>
                 <View style={[styles.featureCardTile, { backgroundColor: tileBg }]}>
-                  <Feather name={icon} size={24} color={accent} />
+                  {set === "ion"
+                    ? <Ionicons name={icon as any} size={24} color={accent} />
+                    : <Feather name={icon as any} size={24} color={accent} />}
                 </View>
                 <Text style={styles.featureCardText}>{text}</Text>
               </View>
