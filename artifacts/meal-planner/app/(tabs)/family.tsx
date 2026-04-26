@@ -327,10 +327,17 @@ function solveJuggleOnDevice(
             } else {
               const lastEv = eventsBefore[0]!;
               const lastEvEnd = _toMins(lastEv.endTime) || _toMins(lastEv.time) + 60;
+              // DISABLED — local travel validation overrides Claude's handoff reasoning.
+              // The travel check below was causing false "not possible" flags because
+              // it doesn't account for adult availability and uses an approximate matrix.
+              // Claude handles travel estimation via the system prompt.
+              /*
               const travel = getTravelTime(lastEv.location, a.location);
               if (lastEvEnd + travel <= aEnd) {
                 handoffCandidates.push({ adult: oa, lastEvent: lastEv, availableAt: lastEvEnd });
               }
+              */
+              handoffCandidates.push({ adult: oa, lastEvent: lastEv, availableAt: lastEvEnd });
             }
           }
 
