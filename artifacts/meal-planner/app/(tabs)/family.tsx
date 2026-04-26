@@ -191,8 +191,8 @@ const TRAVEL_MATRIX: Record<string, number> = {
   "rathmines|warners bay": 10,
   "morisset|warners bay": 15,
   // Extended Lake Mac coverage
-  "morisset|wangi wangi": 18,
-  "rathmines|wangi wangi": 12,
+  "morisset|wangi wangi": 12,
+  "rathmines|wangi wangi": 10,
   "warners bay|wangi wangi": 14,
   "morisset|toronto": 20,
   "toronto|warners bay": 8,
@@ -246,13 +246,19 @@ function solveJuggleOnDevice(
   const assignments = new Map<string, string>(); // eventId → adultId
 
   for (const ev of events) {
-    // Check if an adult is explicitly named in personIds
+    // Priority 1 — explicit assignedAdult field (user-picked in the form, persisted by name)
+    const namedAdult = ev.assignedAdult
+      ? adults.find((a) => a.name === ev.assignedAdult)
+      : null;
+    // Priority 2 — an adult member in personIds
     const explicitAdult = ev.personIds
       .map((id) => memberLookup.get(id))
       .find((m) => m?.role === "adult");
 
     let chosen: FamilyMember;
-    if (explicitAdult) {
+    if (namedAdult) {
+      chosen = namedAdult;
+    } else if (explicitAdult) {
       chosen = explicitAdult;
     } else {
       let best = adults[0]!;
@@ -3341,7 +3347,7 @@ export default function FamilyScreen() {
     const ws = localDateStr(weekStart);
     const we = localDateStr(weekEnd);
     return apptItems
-      .filter((a) => !a.isDone && !a.isCancelled && a.date >= ws && a.date <= we)
+      .filter((a) => !a.isDone && !a.isCancelled && a.date >= ws && a.date <= we && !a.id.startsWith("fam_"))
       .sort((a, b) => a.date.localeCompare(b.date) || a.startTime.localeCompare(b.startTime));
   }, [apptItems, sortWeek]);
 
