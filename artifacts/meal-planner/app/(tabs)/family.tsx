@@ -117,8 +117,8 @@ export interface JuggleEventItem {
 }
 export interface JuggleConflict {
   id: string;
-  type: "overlap" | "unassigned" | "tight";
-  severity: "tight" | "warning" | "impossible";
+  type: "overlap" | "unassigned" | "tight" | "impossible" | "resolved";
+  severity: "tight" | "warning" | "impossible" | "resolved";
   description: string;
   involved_events: string[];
   involved_adults: string[];
@@ -726,6 +726,16 @@ function JuggleResultsContent({
   const [swapRow, setSwapRow]   = useState<typeof planRows[0] | null>(null);
   const [swapPick, setSwapPick] = useState<string>("");
 
+  // Carpool swap sheet state (for resolved conflicts)
+  const [carpoolSheetConflict, setCarpoolSheetConflict] = useState<JuggleConflict | null>(null);
+  const [sortedOverrides, setSortedOverrides]           = useState<Record<string, string>>({});
+  const [swapToast, setSwapToast]                       = useState<string | null>(null);
+
+  // Split conflicts by resolution status
+  const resolvedConflicts   = conflicts.filter(c => c.severity === "resolved" || c.type === "resolved");
+  const unresolvedConflicts = conflicts.filter(c => c.severity !== "resolved" && c.type !== "resolved");
+  const allSorted = unresolvedConflicts.length === 0 && (resolvedConflicts.length > 0 || ws.conflicts_resolved > 0);
+
   const adultMembers = members.filter((m) => m.role === "adult");
 
   // Map each adult → short schedule blurb (their current plan rows)
@@ -782,10 +792,11 @@ function JuggleResultsContent({
   const dashSummaryLine = (() => {
     const parts: string[] = [];
     if (ws.total_events > 0) parts.push(`${ws.total_events} ${ws.total_events === 1 ? "event" : "events"}`);
-    if (impossible > 0)       parts.push(`${impossible} ${impossible === 1 ? "clash" : "clashes"} to sort`);
-    else if (tight > 0)       parts.push(`${tight} tight spot${tight > 1 ? "s" : ""}, manageable`);
-    else                      parts.push("nothing clashing");
-    if (ws.conflicts_resolved > 0 && impossible === 0) parts.push(`${ws.conflicts_resolved} sorted ✓`);
+    if (impossible > 0)                    parts.push(`${impossible} ${impossible === 1 ? "clash" : "clashes"} to sort`);
+    else if (unresolvedConflicts.length > 0) parts.push(`${unresolvedConflicts.length} still needs a decision`);
+    else if (tight > 0)                    parts.push(`${tight} tight spot${tight > 1 ? "s" : ""}, manageable`);
+    else if (allSorted)                    parts.push("all sorted ✓");
+    else                                   parts.push("nothing clashing");
     return parts.join("  ·  ");
   })();
 
@@ -824,21 +835,19 @@ function JuggleResultsContent({
                 </Text>
               </View>
             )}
-            {ws.conflicts_resolved > 0 && impossible === 0 && conflicts.length === 0 && (
+            {allSorted && (
               <View style={[styles.resultChip, { backgroundColor: TEAL + "18", borderColor: TEAL + "33" }]}>
-                <Text style={[styles.resultChipText, { color: TEAL }]}>
-                  {ws.conflicts_resolved} sorted ✓
-                </Text>
+                <Text style={[styles.resultChipText, { color: TEAL }]}>all sorted ✓</Text>
               </View>
             )}
-            {impossible === 0 && conflicts.length > 0 && (
+            {impossible === 0 && unresolvedConflicts.length > 0 && (
               <View style={[styles.resultChip, { backgroundColor: GOLD, borderColor: GOLD }]}>
                 <Text style={[styles.resultChipText, { color: "#fff" }]}>
-                  {conflicts.length} {conflicts.length === 1 ? "clash" : "clashes"} to sort
+                  {unresolvedConflicts.length} {unresolvedConflicts.length === 1 ? "still needs" : "still need"} a decision
                 </Text>
               </View>
             )}
-            {impossible === 0 && tight === 0 && conflicts.length === 0 && (
+            {impossible === 0 && tight === 0 && unresolvedConflicts.length === 0 && resolvedConflicts.length === 0 && ws.conflicts_resolved === 0 && (
               <View style={[styles.resultChip, { backgroundColor: TEAL + "18", borderColor: TEAL + "33" }]}>
                 <Text style={[styles.resultChipText, { color: TEAL }]}>all clear ✓</Text>
               </View>
@@ -888,16 +897,38 @@ function JuggleResultsContent({
         </View>
       )}
 
-      {/* ── 4. Tight spot / conflicts ── */}
-      {conflicts.length > 0 && (
-        <View style={styles.juggleConflictCard}>
-          <Text style={styles.juggleConflictLabel}>HEADS UP</Text>
-          {conflicts.map((c, i) => (
-            <View key={i} style={i > 0 ? { marginTop: 12, paddingTop: 12, borderTopWidth: 1, borderTopColor: "#F3E0DC" } : undefined}>
-              <Text style={styles.juggleConflictDesc}>⚠ {c.description}</Text>
-              {c.recommendation ? <Text style={styles.juggleConflictRec}>{c.recommendation}</Text> : null}
+      {/* ── 4. Conflicts — resolved as teal SORTED, unresolved as red HEADS UP ── */}
+      {(resolvedConflicts.length > 0 || unresolvedConflicts.length > 0) && (
+        <View style={{ gap: 10 }}>
+          {resolvedConflicts.map((c, i) => (
+            <View key={`sorted-${i}`} style={styles.juggleSortedCard}>
+              <Text style={styles.juggleSortedLabel}>SORTED ✓</Text>
+              <Text style={styles.juggleSortedDesc}>
+                {sortedOverrides[c.id] ?? c.description}
+              </Text>
+              {c.recommendation && !sortedOverrides[c.id] && (
+                <Text style={styles.juggleSortedRec}>{c.recommendation}</Text>
+              )}
+              <TouchableOpacity
+                onPress={() => setCarpoolSheetConflict(c)}
+                activeOpacity={0.75}
+                style={{ marginTop: 8 }}
+              >
+                <Text style={styles.juggleSortedSwapLink}>Not available? Swap in a contact →</Text>
+              </TouchableOpacity>
             </View>
           ))}
+          {unresolvedConflicts.length > 0 && (
+            <View style={styles.juggleConflictCard}>
+              <Text style={styles.juggleConflictLabel}>HEADS UP</Text>
+              {unresolvedConflicts.map((c, i) => (
+                <View key={i} style={i > 0 ? { marginTop: 12, paddingTop: 12, borderTopWidth: 1, borderTopColor: "#F3E0DC" } : undefined}>
+                  <Text style={styles.juggleConflictDesc}>⚠ {c.description}</Text>
+                  {c.recommendation ? <Text style={styles.juggleConflictRec}>{c.recommendation}</Text> : null}
+                </View>
+              ))}
+            </View>
+          )}
         </View>
       )}
 
@@ -1066,6 +1097,106 @@ function JuggleResultsContent({
           </View>
         </View>
     </Modal>
+
+    {/* ── Carpool contact swap sheet (for resolved conflicts) ── */}
+    <Modal
+      visible={!!carpoolSheetConflict}
+      transparent
+      animationType="slide"
+      onRequestClose={() => setCarpoolSheetConflict(null)}
+    >
+      <Pressable
+        style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.35)" }}
+        onPress={() => setCarpoolSheetConflict(null)}
+      />
+      <View style={{
+        backgroundColor: "#fff",
+        borderTopLeftRadius: 20, borderTopRightRadius: 20,
+        paddingHorizontal: 20, paddingTop: 20, paddingBottom: 44,
+        gap: 14,
+        position: "absolute", bottom: 0, left: 0, right: 0,
+      }}>
+        <View style={{ width: 36, height: 4, borderRadius: 2, backgroundColor: "#DDD", alignSelf: "center", marginBottom: 2 }} />
+        <Text style={{ fontFamily: "PlayfairDisplay_700Bold", fontSize: 18, color: "#1C1C1E" }}>
+          Who else could cover this?
+        </Text>
+        {carpoolSheetConflict && (
+          <Text style={{ fontFamily: "Inter_400Regular", fontSize: 13, color: "#6E6E73" }}>
+            {carpoolSheetConflict.description}
+          </Text>
+        )}
+        <View style={{ gap: 8 }}>
+          {carpoolContacts.length === 0 ? (
+            <Text style={{ fontFamily: "Inter_400Regular", fontSize: 14, color: "#8A8A8E" }}>
+              No contacts saved yet.
+            </Text>
+          ) : (
+            carpoolContacts.map((contact) => (
+              <TouchableOpacity
+                key={contact.id}
+                onPress={() => {
+                  if (!carpoolSheetConflict) return;
+                  setSortedOverrides(prev => ({
+                    ...prev,
+                    [carpoolSheetConflict.id]: `Sorted. ${contact.name} is covering this one.`,
+                  }));
+                  setCarpoolSheetConflict(null);
+                  setSwapToast(`Done. ${contact.name} is on the run.`);
+                  setTimeout(() => setSwapToast(null), 3000);
+                }}
+                activeOpacity={0.8}
+                style={{
+                  flexDirection: "row", alignItems: "center",
+                  padding: 12, borderRadius: 10,
+                  borderWidth: 1.5, borderColor: "#E5E5EA",
+                  backgroundColor: "#FAFAF8", gap: 12,
+                }}
+              >
+                <View style={{ flex: 1 }}>
+                  <Text style={{ fontFamily: "Inter_600SemiBold", fontSize: 14, color: "#1C1C1E" }}>
+                    {contact.name}
+                  </Text>
+                  {contact.phone ? (
+                    <Text style={{ fontFamily: "Inter_400Regular", fontSize: 12, color: "#6E6E73" }}>
+                      {contact.phone}
+                    </Text>
+                  ) : null}
+                </View>
+                <Text style={{ fontFamily: "Inter_600SemiBold", fontSize: 13, color: GOLD }}>
+                  Assign →
+                </Text>
+              </TouchableOpacity>
+            ))
+          )}
+        </View>
+        <TouchableOpacity
+          onPress={() => setCarpoolSheetConflict(null)}
+          style={{ paddingVertical: 12, alignItems: "center" }}
+        >
+          <Text style={{ fontFamily: "Inter_500Medium", fontSize: 14, color: "#8A8A8E" }}>
+            Keep the current plan
+          </Text>
+        </TouchableOpacity>
+      </View>
+    </Modal>
+
+    {/* ── Swap toast ── */}
+    {swapToast ? (
+      <View
+        pointerEvents="none"
+        style={{
+          position: "absolute", bottom: 90, left: 20, right: 20,
+          backgroundColor: TEAL, borderRadius: 12,
+          paddingVertical: 12, paddingHorizontal: 16,
+          alignItems: "center",
+        }}
+      >
+        <Text style={{ fontFamily: "Inter_600SemiBold", fontSize: 14, color: "#fff" }}>
+          {swapToast}
+        </Text>
+      </View>
+    ) : null}
+
     </View>
   );
 }
@@ -3905,6 +4036,23 @@ const styles = StyleSheet.create({
   juggleConflictDesc: { fontSize: 14, fontFamily: "Inter_600SemiBold", color: TEXT, lineHeight: 20 },
   juggleConflictRec: { fontSize: 13, fontFamily: "Inter_500Medium", color: TEAL, marginTop: 4, fontStyle: "italic" },
   juggleConflictOption: { fontSize: 13, fontFamily: "Inter_400Regular", color: TEXT_MUTED, marginTop: 2 },
+
+  // Juggle results — resolved conflicts (SORTED teal card)
+  juggleSortedCard: {
+    backgroundColor: "#E6F3F0", borderRadius: 14, borderWidth: 1, borderColor: "#B2D8D3",
+    borderLeftWidth: 4, borderLeftColor: "#2A8F88", padding: 14, gap: 6,
+    ...Platform.select({
+      web: { boxShadow: "0px 2px 8px rgba(0,0,0,0.05)" },
+      default: { shadowColor: "#000", shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 4, elevation: 1 },
+    }),
+  },
+  juggleSortedLabel: {
+    color: TEAL, fontSize: 11, fontFamily: "Inter_700Bold",
+    textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 2,
+  },
+  juggleSortedDesc:     { fontSize: 15, fontFamily: "Inter_600SemiBold", color: "#2B2B2B", lineHeight: 21 },
+  juggleSortedRec:      { fontSize: 14, fontFamily: "Inter_400Regular",  color: TEAL, lineHeight: 20, fontStyle: "italic" },
+  juggleSortedSwapLink: { fontSize: 13, fontFamily: "Inter_500Medium",   color: TEAL, textDecorationLine: "underline" },
 
   carpoolClashBox: {
     flexDirection: "row", alignItems: "flex-start", gap: 8,

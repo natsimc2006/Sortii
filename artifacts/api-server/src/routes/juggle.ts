@@ -40,9 +40,11 @@ RULES
     CORRECT EXAMPLE for this scenario — Mum: Doctors (Rathmines, 11:00am). Dad: Drop Izzy at netball (Wangi Wangi, 10:30am) → drive ~12min → collect Tom from football (Morisset, 11:00am) → drive ~12min → collect Izzy from netball (Wangi Wangi, 11:30am). Mum goes directly to Doctors — no transport duties, no conflict. This chain is feasible. Output it as the solution with zero impossible clashes.
     WRONG EXAMPLE — do NOT do this: assigning Mum both a transport duty (10:30am) and a medical appointment (11:00am) in different locations with only 15 min gap. That is the conflict you must eliminate by using the algorithm above.
 15. IMPORTANT: Each event in the input has a "Type" field. One-off events may be rescheduled. Recurring (weekly) events must NEVER be suggested for rescheduling.
-16. PRIORITY ORDER for conflicts (only apply after the conflict elimination algorithm in rule 14 has run): (1) Can another adult cover via handoff? Name them and the drive time. (2) Reschedule the one-off (not the recurring). (3) Flag as manual if both are unmoveable.
-17. Personal appointments: if the "Child/person" field contains an adult name (e.g. "Mum", "Dad") and the event is a personal appointment (doctor, GP, dentist, hospital, physio, etc.), that adult MUST attend personally. Do NOT assign another adult to cover this event. The question is only whether another adult can free up this adult's other obligations so they can attend — not whether someone else can attend in their place.
-18. DOUBLE-CHECK before finalising output: for every adult who has a personal/medical appointment, scan their adult_plans schedule. If ANY transport duty in their schedule overlaps with that appointment's window (including 15-min travel margin), re-run Step 2 of rule 14. A valid solution must never have an adult simultaneously on a transport run and at their own medical appointment.
+16. When a viable handoff solution exists (another adult can cover a conflicting commitment within travel time), commit to it as THE PLAN — not as a suggestion. Set the resolution as the assigned_adult for that event. Do not leave the conflict open. Mark conflicts_resolved = 1 in weekend_summary. The conflict object should still exist in the conflicts array but set its type to "resolved" and severity to "resolved".
+17. A "resolved" conflict means: the app has already assigned the best adult to each event. The description field should read as a confirmation of what has been sorted, not a warning. Copy format for resolved conflicts: "Sorted. [Adult] takes [child] to [activity] while [other adult] heads to [their event]." Never use warning language (⚠, "cannot", "impossible", "clashes") for resolved conflicts.
+18. PRIORITY ORDER for conflicts (only apply after the conflict elimination algorithm in rule 14 has run): (1) Can another adult cover via handoff? Name them and the drive time. (2) Reschedule the one-off (not the recurring). (3) Flag as manual if both are unmoveable.
+19. Personal appointments: if the "Child/person" field contains an adult name (e.g. "Mum", "Dad") and the event is a personal appointment (doctor, GP, dentist, hospital, physio, etc.), that adult MUST attend personally. Do NOT assign another adult to cover this event. The question is only whether another adult can free up this adult's other obligations so they can attend — not whether someone else can attend in their place.
+20. DOUBLE-CHECK before finalising output: for every adult who has a personal/medical appointment, scan their adult_plans schedule. If ANY transport duty in their schedule overlaps with that appointment's window (including 15-min travel margin), re-run Step 2 of rule 14. A valid solution must never have an adult simultaneously on a transport run and at their own medical appointment.
 
 TONE: Plain English. Warm, practical, never alarming. Free windows = breathing space, not system data. Make the call — the parent is tired.
 
@@ -73,8 +75,8 @@ OUTPUT RULES (critical — violation causes a 500 error):
     "assigned_adult":"string","adult_must_stay":false,"priority":"must|nice","child_colour_index":0
   }],
   "conflicts": [{
-    "id":"string","type":"overlap|unassigned|tight|impossible",
-    "severity":"tight|warning|impossible",
+    "id":"string","type":"overlap|unassigned|tight|impossible|resolved",
+    "severity":"tight|warning|impossible|resolved",
     "description":"string — plain English, max 12 words",
     "involved_events":["event_id"],"involved_adults":["string"],
     "suggested_contacts":["string"],
