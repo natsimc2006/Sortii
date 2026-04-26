@@ -3316,8 +3316,47 @@ export default function FamilyScreen() {
         ? `\n\nFamily is based in: ${homeSuburb.trim()}, Australia.`
         : `\n\nRegion: Australia.`;
 
+      // ── Pre-calculate time overlaps before sending to Claude ─────────────────
+      function timeToMinutes(t: string | undefined | null): number {
+        if (!t) return 0;
+        const [h = 0, m = 0] = t.split(":").map(Number);
+        return h * 60 + m;
+      }
+
+      function getOverlappingPairs(evs: FamilyEvent[]) {
+        const pairs: Array<{ event1: string; event2: string }> = [];
+        for (let i = 0; i < evs.length; i++) {
+          for (let j = i + 1; j < evs.length; j++) {
+            const a = evs[i]!;
+            const b = evs[j]!;
+            if (a.day !== b.day) continue;
+            const aStart = timeToMinutes(a.time);
+            const aEnd   = timeToMinutes(a.endTime || a.time);
+            const bStart = timeToMinutes(b.time);
+            const bEnd   = timeToMinutes(b.endTime || b.time);
+            if (aStart < bEnd && bStart < aEnd) {
+              pairs.push({
+                event1: `${a.title} (${a.time}–${a.endTime ?? a.time}, ${a.location ?? "no location"})`,
+                event2: `${b.title} (${b.time}–${b.endTime ?? b.time}, ${b.location ?? "no location"})`,
+              });
+            }
+          }
+        }
+        return pairs;
+      }
+
+      const overlappingPairs  = getOverlappingPairs(allEvents);
+      const overlapWarnings   = overlappingPairs.length > 0
+        ? `\nCRITICAL — THE FOLLOWING EVENTS OVERLAP IN TIME AND CANNOT BE COVERED BY THE SAME ADULT:\n${
+            overlappingPairs
+              .map((p) => `- "${p.event1}" overlaps with "${p.event2}" — different adults required, no exceptions`)
+              .join("\n")
+          }\n`
+        : "";
+      // ────────────────────────────────────────────────────────────────────────
+
       const userMessage =
-        `Available adults:\n${adultLines}\n\nWeekend events:\n${eventLines}${calLines}` +
+        `Available adults:\n${adultLines}\n\nWeekend events:\n${eventLines}${calLines}\n${overlapWarnings}` +
         `${travelContext}${regionLine}` +
         `${contactLines}${freeTextSection}\n\nPlease solve this schedule.`;
 
