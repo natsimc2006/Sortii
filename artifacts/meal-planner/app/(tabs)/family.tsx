@@ -910,6 +910,120 @@ function JuggleResultsContent({
         </View>
       )}
 
+      {/* ── 3b. NEEDS COVER — unassigned events with carpool contact prompts ── */}
+      {(() => {
+        const coveredIds = new Set(
+          adultPlans.flatMap((p) => p.schedule.map((s) => s.event_id))
+        );
+        const uncoveredEvents = (juggleResult.events ?? []).filter(
+          (e) =>
+            !coveredIds.has(e.id) ||
+            (!e.assigned_adult || e.assigned_adult.toLowerCase() === "unassigned")
+        );
+        if (uncoveredEvents.length === 0) return null;
+        return (
+          <View style={{
+            backgroundColor: PLUM + "10",
+            borderRadius: 12,
+            borderLeftWidth: 3,
+            borderLeftColor: PLUM,
+            padding: 14,
+            gap: 12,
+          }}>
+            <Text style={{ fontSize: 11, fontFamily: "Inter_700Bold", color: PLUM, letterSpacing: 0.8 }}>
+              NEEDS COVER
+            </Text>
+            {uncoveredEvents.map((ev) => {
+              const timeLabel = ev.start_time || "";
+              const relevantContacts = carpoolContacts.length > 0
+                ? carpoolContacts
+                : null;
+              return (
+                <View key={ev.id} style={{ gap: 6 }}>
+                  <View style={{ flexDirection: "row", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
+                    <Text style={{ fontSize: 13, fontFamily: "Inter_600SemiBold", color: PLUM, flex: 1, flexShrink: 1 }}>
+                      {ev.child ? `${ev.child}'s ` : ""}{ev.activity}
+                    </Text>
+                    <View style={{
+                      backgroundColor: PLUM + "22", paddingHorizontal: 8, paddingVertical: 2,
+                      borderRadius: 99, flexShrink: 0,
+                    }}>
+                      <Text style={{ fontSize: 10, fontFamily: "Inter_600SemiBold", color: PLUM }}>
+                        {ev.day} {timeLabel}
+                      </Text>
+                    </View>
+                  </View>
+                  {ev.location ? (
+                    <Text style={{ fontSize: 11, fontFamily: "Inter_400Regular", color: PLUM + "BB" }}>
+                      📍 {ev.location}
+                    </Text>
+                  ) : null}
+                  {relevantContacts && relevantContacts.length > 0 ? (
+                    <>
+                      <Text style={{ fontSize: 11, fontFamily: "Inter_400Regular", color: PLUM + "BB", marginTop: 2 }}>
+                        Could anyone on your list help?
+                      </Text>
+                      {relevantContacts.map((c) => (
+                        <TouchableOpacity
+                          key={c.id}
+                          activeOpacity={0.8}
+                          style={{
+                            flexDirection: "row", alignItems: "center",
+                            backgroundColor: "#fff", borderRadius: 8,
+                            padding: 10, gap: 8,
+                            borderWidth: 1, borderColor: PLUM + "33",
+                          }}
+                          onPress={() => {
+                            const timeStr = timeLabel ? ` at ${timeLabel}` : "";
+                            const actStr  = ev.child
+                              ? `${ev.child}'s ${ev.activity}`
+                              : ev.activity;
+                            const locStr  = ev.location ? ` (${ev.location})` : "";
+                            Share.share({
+                              message: `Hey ${c.name}, any chance you could help with ${actStr}${timeStr} this ${ev.day.toLowerCase()}${locStr}? 🙏`,
+                            });
+                          }}
+                        >
+                          <View style={{
+                            width: 28, height: 28, borderRadius: 14,
+                            backgroundColor: PLUM + "22",
+                            alignItems: "center", justifyContent: "center",
+                          }}>
+                            <Text style={{ fontSize: 12, fontFamily: "Inter_700Bold", color: PLUM }}>
+                              {c.name.charAt(0).toUpperCase()}
+                            </Text>
+                          </View>
+                          <View style={{ flex: 1 }}>
+                            <Text style={{ fontSize: 13, fontFamily: "Inter_600SemiBold", color: "#333" }}>
+                              {c.name}
+                            </Text>
+                            {c.phone ? (
+                              <Text style={{ fontSize: 11, fontFamily: "Inter_400Regular", color: TEXT_MUTED }}>
+                                {c.phone}
+                              </Text>
+                            ) : null}
+                          </View>
+                          <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
+                            <Feather name="send" size={12} color={PLUM} />
+                            <Text style={{ fontSize: 11, fontFamily: "Inter_600SemiBold", color: PLUM }}>
+                              Ask
+                            </Text>
+                          </View>
+                        </TouchableOpacity>
+                      ))}
+                    </>
+                  ) : (
+                    <Text style={{ fontSize: 11, fontFamily: "Inter_400Regular", color: PLUM + "BB" }}>
+                      No carpool contacts saved yet — add them to event details.
+                    </Text>
+                  )}
+                </View>
+              );
+            })}
+          </View>
+        );
+      })()}
+
       {/* ── 4. Tight spot / conflicts ── */}
       {conflicts.length > 0 && (
         <View style={styles.juggleConflictCard}>
@@ -2270,11 +2384,13 @@ function AddEventSheet({
 
 // ── ManagePeopleSection ────────────────────────────────────────────────────────
 function ManagePeopleSection({
-  members, onAdd, onRemove,
+  members, onAdd, onRemove, homeSuburb, onHomeSuburbChange,
 }: {
   members: FamilyMember[];
   onAdd: (name: string, role: "adult" | "child") => void;
   onRemove: (id: string) => void;
+  homeSuburb: string;
+  onHomeSuburbChange: (v: string) => void;
 }) {
   // Collapsed by default once setup is complete; expanded when empty
   const [expanded, setExpanded] = useState(members.length === 0);
@@ -2371,6 +2487,25 @@ function ManagePeopleSection({
               </TouchableOpacity>
             </View>
           ))}
+        </View>
+      )}
+
+      {/* WHERE ARE YOU BASED? */}
+      {!adding && (
+        <View style={{ marginTop: 10, gap: 4 }}>
+          <Text style={[styles.formLabel, { fontSize: 10 }]}>WHERE ARE YOU BASED?</Text>
+          <Text style={{ fontSize: 11, fontFamily: "Inter_400Regular", color: TEXT_MUTED, marginBottom: 2 }}>
+            Helps us work out travel times from home.
+          </Text>
+          <TextInput
+            style={[styles.addPersonInput, { backgroundColor: "#F7F3EB", borderColor: BORDER }]}
+            value={homeSuburb}
+            onChangeText={onHomeSuburbChange}
+            placeholder="e.g. Charlestown, Cardiff, Toronto"
+            placeholderTextColor="#bbb"
+            returnKeyType="done"
+            onSubmitEditing={() => Keyboard.dismiss()}
+          />
         </View>
       )}
 
@@ -2795,6 +2930,7 @@ export default function FamilyScreen() {
   const [apptItems,       setApptItems]       = useState<Appointment[]>([]);
   const [carpoolContacts, setCarpoolContacts] = useState<CarpoolContact[]>([]);
   const [juggleFreeText, setJuggleFreeText]   = useState("");
+  const [homeSuburb,     setHomeSuburb]       = useState("");
   // 0 = this week, 1 = next week — controls both the appt feed and the juggle sort
   const [sortWeek, setSortWeek]               = useState<0 | 1>(0);
 
@@ -2814,15 +2950,18 @@ export default function FamilyScreen() {
 
   const carpoolKey = () => SK.carpoolContacts(getCurrentUserId());
 
+  const FAMILY_SETTINGS_KEY = "sortii_family_settings";
+
   const load = useCallback(async () => {
     const uid = getCurrentUserId();
-    const [s, savedJuggle, savedHelpers, appts, savedCarpool, savedFreeText] = await Promise.all([
+    const [s, savedJuggle, savedHelpers, appts, savedCarpool, savedFreeText, savedSettings] = await Promise.all([
       loadFamilyState(),
       AsyncStorage.getItem(juggleKey()),
       AsyncStorage.getItem(HELPERS_KEY),
       loadAppointments(),
       AsyncStorage.getItem(SK.carpoolContacts(uid)),
       AsyncStorage.getItem(SK.juggleFreeText(uid)),
+      AsyncStorage.getItem(FAMILY_SETTINGS_KEY),
     ]);
     setState(s);
     setResult(computeFamilyWeek(s));
@@ -2838,6 +2977,12 @@ export default function FamilyScreen() {
     }
     if (savedFreeText) {
       setJuggleFreeText(savedFreeText);
+    }
+    if (savedSettings) {
+      try {
+        const parsed = JSON.parse(savedSettings) as { homeSuburb?: string };
+        if (parsed.homeSuburb) setHomeSuburb(parsed.homeSuburb);
+      } catch {}
     }
     try {
       const pushed = await loadFamilyPushedEvents();
@@ -3167,9 +3312,13 @@ export default function FamilyScreen() {
         : "\n\nCarpool contacts: none saved yet.";
       // ────────────────────────────────────────────────────────────────────────
 
+      const regionLine = homeSuburb.trim()
+        ? `\n\nFamily is based in: ${homeSuburb.trim()}, Australia.`
+        : `\n\nRegion: Australia.`;
+
       const userMessage =
         `Available adults:\n${adultLines}\n\nWeekend events:\n${eventLines}${calLines}` +
-        `${travelContext}\n\nRegion: Lake Macquarie / Hunter, NSW Australia.` +
+        `${travelContext}${regionLine}` +
         `${contactLines}${freeTextSection}\n\nPlease solve this schedule.`;
 
       console.log("=== SENDING TO CLAUDE ===");
@@ -3327,6 +3476,11 @@ export default function FamilyScreen() {
           members={state.members}
           onAdd={handleAddMember}
           onRemove={handleRemoveMember}
+          homeSuburb={homeSuburb}
+          onHomeSuburbChange={(v) => {
+            setHomeSuburb(v);
+            AsyncStorage.setItem(FAMILY_SETTINGS_KEY, JSON.stringify({ homeSuburb: v }));
+          }}
         />
 
         {/* ── Week selector — This week / Next week ── */}
