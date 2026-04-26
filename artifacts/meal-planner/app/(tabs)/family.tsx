@@ -2945,6 +2945,24 @@ export default function FamilyScreen() {
     try {
       // On-device solver — works offline, no API key needed.
       const memberLookup = new Map<string, FamilyMember>(uniqueMembers.map((m) => [m.id, m]));
+
+      // ── DIAGNOSTIC LOG — remove once assignment persistence is confirmed ──
+      console.log("=== SOLVER INPUT ===");
+      console.log("MEMBERS:", uniqueMembers.map((m) => `${m.name} (${m.role})`).join(", "));
+      console.log("EVENTS:");
+      allEvents.forEach((ev) => {
+        const persons = ev.personIds.map((id) => memberLookup.get(id)?.name ?? id).join(", ");
+        console.log(
+          ` • ${ev.title} | day:${ev.day} | ${ev.time}–${ev.endTime || "?"}`
+          + ` | assignedAdult:${ev.assignedAdult ?? "(none)"}`
+          + ` | location:${ev.location ?? "(none)"}`
+          + ` | persons:[${persons}]`
+          + ` | isAppt:${ev.isAppointment ?? false}`
+        );
+      });
+      console.log("=== END SOLVER INPUT ===");
+      // ────────────────────────────────────────────────────────────────────────
+
       const full: JuggleResult = solveJuggleOnDevice(adults, allEvents, pushedCalEvents, memberLookup);
       await AsyncStorage.setItem(juggleKey(sortWeek), JSON.stringify(full));
       setJuggleResult(full);
