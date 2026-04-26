@@ -1,4 +1,3 @@
-import { normaliseConflicts } from "@/services/juggleSolver";
 import { Feather } from "@expo/vector-icons";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
@@ -118,8 +117,8 @@ export interface JuggleEventItem {
 }
 export interface JuggleConflict {
   id: string;
-  type: "overlap" | "unassigned" | "tight" | "impossible" | "resolved" | "travel";
-  severity: "tight" | "warning" | "impossible" | "resolved";
+  type: "overlap" | "unassigned" | "tight";
+  severity: "tight" | "warning" | "impossible";
   description: string;
   involved_events: string[];
   involved_adults: string[];
@@ -186,27 +185,9 @@ function _fromMins(mins: number): string {
 
 // Travel time matrix (minutes) — key is "locationA|locationB" sorted alphabetically lowercase
 const TRAVEL_MATRIX: Record<string, number> = {
-  // Original entries
   "morisset|rathmines": 12,
   "rathmines|warners bay": 10,
   "morisset|warners bay": 15,
-  // Extended Lake Mac coverage
-  "morisset|wangi wangi": 12,
-  "rathmines|wangi wangi": 10,
-  "warners bay|wangi wangi": 14,
-  "morisset|toronto": 20,
-  "toronto|warners bay": 8,
-  "toronto|rathmines": 15,
-  "toronto|wangi wangi": 22,
-  "belmont|warners bay": 10,
-  "belmont|toronto": 12,
-  "belmont|morisset": 25,
-  "belmont|rathmines": 14,
-  "belmont|wangi wangi": 18,
-  "newcastle|morisset": 35,
-  "newcastle|toronto": 28,
-  "newcastle|warners bay": 22,
-  "newcastle|rathmines": 20,
 };
 
 function getTravelTime(locA: string | null | undefined, locB: string | null | undefined): number {
@@ -246,19 +227,13 @@ function solveJuggleOnDevice(
   const assignments = new Map<string, string>(); // eventId → adultId
 
   for (const ev of events) {
-    // Priority 1 — explicit assignedAdult field (user-picked in the form, persisted by name)
-    const namedAdult = ev.assignedAdult
-      ? adults.find((a) => a.name === ev.assignedAdult)
-      : null;
-    // Priority 2 — an adult member in personIds
+    // Check if an adult is explicitly named in personIds
     const explicitAdult = ev.personIds
       .map((id) => memberLookup.get(id))
       .find((m) => m?.role === "adult");
 
     let chosen: FamilyMember;
-    if (namedAdult) {
-      chosen = namedAdult;
-    } else if (explicitAdult) {
+    if (explicitAdult) {
       chosen = explicitAdult;
     } else {
       let best = adults[0]!;
@@ -298,8 +273,6 @@ function solveJuggleOnDevice(
   // Detect overlaps per adult per day
   const conflicts: JuggleConflict[] = [];
   const adultEventsMap = new Map<string, FamilyEvent[]>();
-  const handoffPickups = new Map<string, JuggleScheduleItem[]>();
-  for (const a of adults) handoffPickups.set(a.id, []);
   for (const [evId, adultId] of assignments.entries()) {
     const ev = events.find((e) => e.id === evId);
     if (!ev) continue;
@@ -361,36 +334,21 @@ function solveJuggleOnDevice(
             }
           }
 
-          let conflictType: JuggleConflict["type"] = "overlap";
-          let conflictSeverity: JuggleConflict["severity"] = "warning";
-          let description = `${adult.name} has overlapping commitments on ${day}.\n${a.title} runs until ${aEndLabel}. ${b.title} is at ${b.time}.`;
+          const description = `${adult.name} has overlapping commitments on ${day}.\n${a.title} runs until ${aEndLabel}. ${b.title} is at ${b.time}.`;
           let recommendation = "";
-          let conflictOptions: string[] = [];
 
           if (handoffCandidates.length > 0) {
-            // Priority 1 — commit to handoff, mark as resolved
-            conflictType = "resolved";
-            conflictSeverity = "resolved";
+            // Priority 1 — handoff is possible
             const best = handoffCandidates[0]!;
-            const pickupLabel = aChild ? `${aChild}` : a.title;
-            const pickupActivity = aChild
-              ? `${aChild} pickup — ${a.title}`
-              : `${a.title} handoff`;
+            const coverVerb = aChild
+              ? `collect ${aChild} from ${a.title} at ${aEndLabel}`
+              : `cover ${a.title} at ${aEndLabel}`;
             if (best.lastEvent) {
               const lastEvEndLabel = _fromMins(best.availableAt);
-              recommendation = `${best.adult.name} finishes ${best.lastEvent.title} at ${lastEvEndLabel}. ${best.adult.name} collects ${pickupLabel} at ${aEndLabel}. ${adult.name} heads to ${b.title}. Done.`;
+              recommendation = `${best.adult.name} finishes ${best.lastEvent.title} at ${lastEvEndLabel} — they could ${coverVerb} while ${adult.name} heads to ${b.title}.`;
             } else {
-              recommendation = `${best.adult.name} collects ${pickupLabel} at ${aEndLabel}. ${adult.name} heads to ${b.title}. Done.`;
+              recommendation = `${best.adult.name} is free — they could ${coverVerb} while ${adult.name} heads to ${b.title}.`;
             }
-            description = `${adult.name}: ${a.title} ends ${aEndLabel}, ${b.title} at ${b.time} — handoff sorted.`;
-            // Record pickup for the covering adult's schedule
-            handoffPickups.get(best.adult.id)?.push({
-              time: aEndLabel,
-              child: aChild,
-              activity: pickupActivity,
-              location: a.location || null,
-              event_id: `${a.id}-handoff`,
-            });
           } else if (aIsRecurring && !bIsRecurring && !bIsMedical) {
             // Priority 2a — reschedule the one-off (b), never reschedule recurring
             recommendation = `${b.title} is a one-off — moving it to after ${aEndLabel} keeps everything else in place.`;
@@ -400,174 +358,28 @@ function solveJuggleOnDevice(
           } else if (aIsMedical || bIsMedical) {
             // Priority 3 — medical appointment is fixed, no handoff available
             recommendation = "This one needs sorting manually.";
-            conflictOptions = [`Keep ${a.title}`, `Keep ${b.title}`];
           } else {
             // Priority 2c — both non-recurring, no handoff
             recommendation = `Both "${a.title}" and "${b.title}" are on at the same time — which takes priority?`;
-            conflictOptions = [`Keep ${a.title}`, `Keep ${b.title}`];
           }
 
           conflicts.push({
-            id: `overlap-${a.id}-${b.id}`,
-            type: conflictType,
-            severity: conflictSeverity,
+            id: `overlap-${a.id}-${b.id}`, type: "overlap", severity: "warning",
             description,
             involved_events: [a.id, b.id], involved_adults: [adult.name],
             suggested_contacts: handoffCandidates.map((h) => h.adult.name),
             recommendation,
-            options: conflictOptions,
+            options: [],
           });
         }
       }
     }
   }
 
-  // ── Travel validation pass 1: detect conflicts + attempt auto-reassignment ──────
-  // Snapshot the entries before mutation so the loop doesn't see mid-run changes
-  const _travelReassigned = new Set<string>(); // event IDs moved to a new adult
-  for (const [adultId, evList] of [...adultEventsMap.entries()]) {
-    const adult = adults.find((a) => a.id === adultId);
-    if (!adult) continue;
-    const sorted = [...evList].sort((a, b) => {
-      const dd = (DAY_ORDER[a.day] ?? 0) - (DAY_ORDER[b.day] ?? 0);
-      return dd !== 0 ? dd : _toMins(a.time) - _toMins(b.time);
-    });
-    for (let i = 0; i < sorted.length - 1; i++) {
-      const curr = sorted[i]!;
-      const next = sorted[i + 1]!;
-      if (_travelReassigned.has(next.id)) continue; // already moved
-      if (curr.day !== next.day) continue;
-      const locA = (curr.location ?? "").trim().toLowerCase();
-      const locB = (next.location ?? "").trim().toLowerCase();
-      if (!locA || !locB || locA === locB) continue;
-      const currEnd   = _toMins(curr.endTime) || _toMins(curr.time) + 60;
-      const nextStart = _toMins(next.time);
-      if (nextStart < currEnd) continue; // time-overlap already handled above
-      const available = nextStart - currEnd;
-      const needed    = getTravelTime(curr.location, next.location);
-      if (needed <= available) continue; // no conflict
-
-      const nextEnd = _toMins(next.endTime) || _toMins(next.time) + 60;
-      let reassigned = false;
-
-      // Try reassigning 'next' to another available adult with feasible travel
-      for (const oa of adults) {
-        if (oa.id === adultId) continue;
-        const oaDayEvs = (adultEventsMap.get(oa.id) ?? []).filter((e) => e.day === next.day);
-
-        // No time clash during 'next' window
-        const hasTimeConflict = oaDayEvs.some((e) => {
-          const eStart = _toMins(e.time);
-          const eEnd   = _toMins(e.endTime) || _toMins(e.time) + 60;
-          return eStart < nextEnd && eEnd > nextStart;
-        });
-        if (hasTimeConflict) continue;
-
-        // Can oa travel from their last location to next.location in time?
-        const oaBeforeEvs = oaDayEvs
-          .filter((e) => (_toMins(e.endTime) || _toMins(e.time) + 60) <= nextStart)
-          .sort((e1, e2) => (_toMins(e2.endTime) || _toMins(e2.time) + 60) - (_toMins(e1.endTime) || _toMins(e1.time) + 60));
-
-        if (oaBeforeEvs.length > 0) {
-          const lastEv    = oaBeforeEvs[0]!;
-          const lastEvEnd = _toMins(lastEv.endTime) || _toMins(lastEv.time) + 60;
-          if (lastEvEnd + getTravelTime(lastEv.location, next.location) > nextStart) continue;
-        }
-
-        // ✅ Reassignment valid — move 'next' from adultId to oa
-        assignments.set(next.id, oa.id);
-        adultEventsMap.set(adultId, (adultEventsMap.get(adultId) ?? []).filter((e) => e.id !== next.id));
-        if (!adultEventsMap.has(oa.id)) adultEventsMap.set(oa.id, []);
-        adultEventsMap.get(oa.id)!.push(next);
-        _travelReassigned.add(next.id);
-
-        const nextChild = next.personIds
-          .map((id) => memberLookup.get(id))
-          .find((m) => m?.role === "child")?.name ?? null;
-        const afterLabel = oaBeforeEvs.length > 0 ? ` after ${oaBeforeEvs[0]!.title}` : "";
-        conflicts.push({
-          id: `travel-${curr.id}-${next.id}`,
-          type: "resolved",
-          severity: "resolved",
-          description: `${adult.name} couldn't travel ${curr.location} → ${next.location} in time — ${oa.name} covers ${next.title}.`,
-          involved_events: [curr.id, next.id],
-          involved_adults: [adult.name, oa.name],
-          suggested_contacts: [],
-          recommendation: `${oa.name} takes ${nextChild ? nextChild + " to " : ""}${next.title}${afterLabel}. ${adult.name} stays at ${curr.title} until ${_fromMins(currEnd)}. Done.`,
-          options: [],
-        });
-        reassigned = true;
-        break;
-      }
-
-      if (!reassigned) {
-        // No auto-resolution possible — surface to user
-        const severity: JuggleConflict["severity"] = available === 0 ? "impossible" : "tight";
-        const warning = available === 0
-          ? `🚫 Not possible — no travel time between ${curr.location} and ${next.location}.`
-          : `⚠️ ${adult.name} — ${needed} mins to get from ${curr.location} to ${next.location}, only ${available} min${available === 1 ? "" : "s"} available.`;
-        conflicts.push({
-          id: `travel-${curr.id}-${next.id}`,
-          type: "travel",
-          severity,
-          description: `${adult.name}: ${needed} min drive from ${curr.location} to ${next.location}, ${available} min gap.`,
-          involved_events: [curr.id, next.id],
-          involved_adults: [adult.name],
-          suggested_contacts: [],
-          recommendation: warning,
-          options: [],
-        });
-      }
-    }
-  }
-
-  // ── Travel validation pass 2: catch any new conflicts from reassignment ────────
-  const _flaggedTravelIds = new Set(conflicts.map((c) => c.id));
-  for (const [adultId, evList] of adultEventsMap.entries()) {
-    const adult = adults.find((a) => a.id === adultId);
-    if (!adult) continue;
-    const sorted = [...evList].sort((a, b) => {
-      const dd = (DAY_ORDER[a.day] ?? 0) - (DAY_ORDER[b.day] ?? 0);
-      return dd !== 0 ? dd : _toMins(a.time) - _toMins(b.time);
-    });
-    for (let i = 0; i < sorted.length - 1; i++) {
-      const curr = sorted[i]!;
-      const next = sorted[i + 1]!;
-      if (curr.day !== next.day) continue;
-      const locA = (curr.location ?? "").trim().toLowerCase();
-      const locB = (next.location ?? "").trim().toLowerCase();
-      if (!locA || !locB || locA === locB) continue;
-      const currEnd   = _toMins(curr.endTime) || _toMins(curr.time) + 60;
-      const nextStart = _toMins(next.time);
-      if (nextStart < currEnd) continue;
-      const available = nextStart - currEnd;
-      const needed    = getTravelTime(curr.location, next.location);
-      if (needed <= available) continue;
-      const conflictId = `travel-${curr.id}-${next.id}`;
-      if (_flaggedTravelIds.has(conflictId)) continue; // already handled in pass 1
-      // New conflict introduced by reassignment — flag it without further recursion
-      const severity: JuggleConflict["severity"] = available === 0 ? "impossible" : "tight";
-      const warning = available === 0
-        ? `🚫 Not possible — no travel time between ${curr.location} and ${next.location}.`
-        : `⚠️ ${adult.name} — ${needed} mins to get from ${curr.location} to ${next.location}, only ${available} min${available === 1 ? "" : "s"} available.`;
-      conflicts.push({
-        id: conflictId,
-        type: "travel",
-        severity,
-        description: `${adult.name}: ${needed} min drive from ${curr.location} to ${next.location}, ${available} min gap.`,
-        involved_events: [curr.id, next.id],
-        involved_adults: [adult.name],
-        suggested_contacts: [],
-        recommendation: warning,
-        options: [],
-      });
-    }
-  }
-
-  // Build adult_plans — include any handoff pickups committed during conflict resolution
+  // Build adult_plans
   const adultPlans: JuggleAdultPlan[] = adults.map((adult) => {
     const evList = adultEventsMap.get(adult.id) ?? [];
-    const baseSchedule: JuggleScheduleItem[] = evList
+    const schedule: JuggleScheduleItem[] = evList
       .sort((a, b) => {
         const dd = (DAY_ORDER[a.day] ?? 0) - (DAY_ORDER[b.day] ?? 0);
         return dd !== 0 ? dd : _toMins(a.time) - _toMins(b.time);
@@ -578,26 +390,20 @@ function solveJuggleOnDevice(
           .find((m) => m?.role === "child")?.name ?? null;
         return { time: ev.time || "09:00", child, activity: ev.title, location: ev.location || null, event_id: ev.id };
       });
-    const pickups = handoffPickups.get(adult.id) ?? [];
-    const schedule = [...baseSchedule, ...pickups].sort((a, b) => _toMins(a.time) - _toMins(b.time));
     return { adult: adult.name, can_drive: true, schedule, free_windows: [] };
   });
 
   const totalEvents = juggleEvents.length + calEvents.length;
-  const unresolvedCount = conflicts.filter((c) => c.severity !== "resolved").length;
-  const resolvedCount   = conflicts.filter((c) => c.severity === "resolved").length;
   const smartNote = totalEvents === 0 ? null
-    : unresolvedCount > 0
-    ? `${unresolvedCount} clash${unresolvedCount > 1 ? "es" : ""} still need sorting — see below.`
-    : resolvedCount > 0
-    ? null
+    : conflicts.length > 0
+    ? `${conflicts.length} overlap${conflicts.length > 1 ? "s" : ""} to sort — see below.`
     : totalEvents === 1 ? "One event. One adult. Done."
     : "All events assigned. Nothing clashing.";
 
   return {
     weekend_summary: {
       total_events: totalEvents,
-      conflicts_resolved: resolvedCount,
+      conflicts_resolved: 0,
       tight_windows: 0,
       impossible_clashes: conflicts.filter((c) => c.severity === "impossible").length,
     },
@@ -920,18 +726,6 @@ function JuggleResultsContent({
   const [swapRow, setSwapRow]   = useState<typeof planRows[0] | null>(null);
   const [swapPick, setSwapPick] = useState<string>("");
 
-  // Carpool swap sheet state (for resolved conflicts)
-  const [carpoolSheetConflict, setCarpoolSheetConflict] = useState<JuggleConflict | null>(null);
-  const [sortedOverrides, setSortedOverrides]           = useState<Record<string, string>>({});
-  const [swapToast, setSwapToast]                       = useState<string | null>(null);
-
-  // Split conflicts by resolution status
-  const travelConflicts     = conflicts.filter(c => c.type === "travel");
-  const nonTravelConflicts  = conflicts.filter(c => c.type !== "travel");
-  const resolvedConflicts   = nonTravelConflicts.filter(c => c.severity === "resolved" || c.type === "resolved");
-  const unresolvedConflicts = nonTravelConflicts.filter(c => c.severity !== "resolved" && c.type !== "resolved");
-  const allSorted = unresolvedConflicts.length === 0 && travelConflicts.length === 0 && (resolvedConflicts.length > 0 || ws.conflicts_resolved > 0);
-
   const adultMembers = members.filter((m) => m.role === "adult");
 
   // Map each adult → short schedule blurb (their current plan rows)
@@ -988,12 +782,10 @@ function JuggleResultsContent({
   const dashSummaryLine = (() => {
     const parts: string[] = [];
     if (ws.total_events > 0) parts.push(`${ws.total_events} ${ws.total_events === 1 ? "event" : "events"}`);
-    if (impossible > 0)                       parts.push(`${impossible} ${impossible === 1 ? "clash" : "clashes"} to sort`);
-    else if (unresolvedConflicts.length > 0)  parts.push(`${unresolvedConflicts.length} still needs a decision`);
-    else if (travelConflicts.length > 0)      parts.push(`${travelConflicts.length} travel ${travelConflicts.length === 1 ? "conflict" : "conflicts"}`);
-    else if (tight > 0)                       parts.push(`${tight} tight spot${tight > 1 ? "s" : ""}, manageable`);
-    else if (allSorted)                       parts.push("all sorted ✓");
-    else                                      parts.push("nothing clashing");
+    if (impossible > 0)       parts.push(`${impossible} ${impossible === 1 ? "clash" : "clashes"} to sort`);
+    else if (tight > 0)       parts.push(`${tight} tight spot${tight > 1 ? "s" : ""}, manageable`);
+    else                      parts.push("nothing clashing");
+    if (ws.conflicts_resolved > 0 && impossible === 0) parts.push(`${ws.conflicts_resolved} sorted ✓`);
     return parts.join("  ·  ");
   })();
 
@@ -1032,26 +824,21 @@ function JuggleResultsContent({
                 </Text>
               </View>
             )}
-            {allSorted && (
+            {ws.conflicts_resolved > 0 && impossible === 0 && conflicts.length === 0 && (
               <View style={[styles.resultChip, { backgroundColor: TEAL + "18", borderColor: TEAL + "33" }]}>
-                <Text style={[styles.resultChipText, { color: TEAL }]}>all sorted ✓</Text>
+                <Text style={[styles.resultChipText, { color: TEAL }]}>
+                  {ws.conflicts_resolved} sorted ✓
+                </Text>
               </View>
             )}
-            {impossible === 0 && unresolvedConflicts.length > 0 && (
+            {impossible === 0 && conflicts.length > 0 && (
               <View style={[styles.resultChip, { backgroundColor: GOLD, borderColor: GOLD }]}>
                 <Text style={[styles.resultChipText, { color: "#fff" }]}>
-                  {unresolvedConflicts.length} {unresolvedConflicts.length === 1 ? "still needs" : "still need"} a decision
+                  {conflicts.length} {conflicts.length === 1 ? "clash" : "clashes"} to sort
                 </Text>
               </View>
             )}
-            {travelConflicts.length > 0 && (
-              <View style={[styles.resultChip, { backgroundColor: GOLD + "18", borderColor: GOLD + "44" }]}>
-                <Text style={[styles.resultChipText, { color: "#A07010" }]}>
-                  ⚠️ {travelConflicts.length} travel {travelConflicts.length === 1 ? "conflict" : "conflicts"}
-                </Text>
-              </View>
-            )}
-            {impossible === 0 && tight === 0 && unresolvedConflicts.length === 0 && resolvedConflicts.length === 0 && travelConflicts.length === 0 && ws.conflicts_resolved === 0 && (
+            {impossible === 0 && tight === 0 && conflicts.length === 0 && (
               <View style={[styles.resultChip, { backgroundColor: TEAL + "18", borderColor: TEAL + "33" }]}>
                 <Text style={[styles.resultChipText, { color: TEAL }]}>all clear ✓</Text>
               </View>
@@ -1089,15 +876,6 @@ function JuggleResultsContent({
                   </View>
                   );
                 })}
-                {/* Inline travel warnings for this adult */}
-                {travelConflicts
-                  .filter((c) => c.involved_adults.includes(plan.adult))
-                  .map((c, i) => (
-                    <View key={`tw-${i}`} style={styles.travelWarningRow}>
-                      <Text style={styles.travelWarningText}>{c.recommendation}</Text>
-                    </View>
-                  ))
-                }
                 {(() => {
                   const insight = buildFreeWindowInsight(plan);
                   return insight ? (
@@ -1110,63 +888,33 @@ function JuggleResultsContent({
         </View>
       )}
 
-      {/* ── 4. Conflicts — resolved as teal SORTED, unresolved as red HEADS UP ── */}
-      {(resolvedConflicts.length > 0 || unresolvedConflicts.length > 0) && (
-        <View style={{ gap: 10 }}>
-          {resolvedConflicts.map((c, i) => (
-            <View key={`sorted-${i}`} style={styles.juggleSortedCard}>
-              <Text style={styles.juggleSortedLabel}>SORTED ✓</Text>
-              <Text style={styles.juggleSortedDesc}>
-                {sortedOverrides[c.id] ?? c.description}
-              </Text>
-              {c.recommendation && !sortedOverrides[c.id] && (
-                <Text style={styles.juggleSortedRec}>{c.recommendation}</Text>
-              )}
-              <TouchableOpacity
-                onPress={() => setCarpoolSheetConflict(c)}
-                activeOpacity={0.75}
-                style={{ marginTop: 8 }}
-              >
-                <Text style={styles.juggleSortedSwapLink}>Not available? Swap in a contact →</Text>
-              </TouchableOpacity>
+      {/* ── 4. Tight spot / conflicts ── */}
+      {conflicts.length > 0 && (
+        <View style={styles.juggleConflictCard}>
+          <Text style={styles.juggleConflictLabel}>HEADS UP</Text>
+          {conflicts.map((c, i) => (
+            <View key={i} style={i > 0 ? { marginTop: 12, paddingTop: 12, borderTopWidth: 1, borderTopColor: "#F3E0DC" } : undefined}>
+              <Text style={styles.juggleConflictDesc}>⚠ {c.description}</Text>
+              {c.recommendation ? <Text style={styles.juggleConflictRec}>{c.recommendation}</Text> : null}
             </View>
           ))}
-          {unresolvedConflicts.length > 0 && (
-            <View style={styles.juggleConflictCard}>
-              <Text style={styles.juggleConflictLabel}>HEADS UP</Text>
-              {unresolvedConflicts.map((c, i) => (
-                <View key={i} style={i > 0 ? { marginTop: 12, paddingTop: 12, borderTopWidth: 1, borderTopColor: "#F3E0DC" } : undefined}>
-                  <Text style={styles.juggleConflictDesc}>⚠ {c.description}</Text>
-                  {c.recommendation ? <Text style={styles.juggleConflictRec}>{c.recommendation}</Text> : null}
-                </View>
-              ))}
-            </View>
-          )}
         </View>
       )}
 
       {/* ── 5. Worth knowing (smart_note) ── */}
-      {(() => {
-        const note = juggleResult.smart_note;
-        const shouldShowSmartNote =
-          !!note &&
-          !note.toLowerCase().includes("overlap to sort") &&
-          !note.toLowerCase().includes("see below");
-        if (!shouldShowSmartNote) return null;
-        return (
-          <View style={{
-            backgroundColor: PLUM + "12", borderRadius: 12,
-            padding: 14, borderLeftWidth: 3, borderLeftColor: PLUM,
-          }}>
-            <Text style={{ fontSize: 11, fontFamily: "Inter_700Bold", color: PLUM, letterSpacing: 0.8, marginBottom: 4 }}>
-              WORTH KNOWING
-            </Text>
-            <Text style={{ fontSize: 13, fontFamily: "Inter_400Regular", color: PLUM, lineHeight: 19 }}>
-              {note}
-            </Text>
-          </View>
-        );
-      })()}
+      {juggleResult.smart_note ? (
+        <View style={{
+          backgroundColor: PLUM + "12", borderRadius: 12,
+          padding: 14, borderLeftWidth: 3, borderLeftColor: PLUM,
+        }}>
+          <Text style={{ fontSize: 11, fontFamily: "Inter_700Bold", color: PLUM, letterSpacing: 0.8, marginBottom: 4 }}>
+            WORTH KNOWING
+          </Text>
+          <Text style={{ fontSize: 13, fontFamily: "Inter_400Regular", color: PLUM, lineHeight: 19 }}>
+            {juggleResult.smart_note}
+          </Text>
+        </View>
+      ) : null}
 
       {/* ── 5b. Simple week note (passive, no CTA) ── */}
       {(() => {
@@ -1318,106 +1066,6 @@ function JuggleResultsContent({
           </View>
         </View>
     </Modal>
-
-    {/* ── Carpool contact swap sheet (for resolved conflicts) ── */}
-    <Modal
-      visible={!!carpoolSheetConflict}
-      transparent
-      animationType="slide"
-      onRequestClose={() => setCarpoolSheetConflict(null)}
-    >
-      <Pressable
-        style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.35)" }}
-        onPress={() => setCarpoolSheetConflict(null)}
-      />
-      <View style={{
-        backgroundColor: "#fff",
-        borderTopLeftRadius: 20, borderTopRightRadius: 20,
-        paddingHorizontal: 20, paddingTop: 20, paddingBottom: 44,
-        gap: 14,
-        position: "absolute", bottom: 0, left: 0, right: 0,
-      }}>
-        <View style={{ width: 36, height: 4, borderRadius: 2, backgroundColor: "#DDD", alignSelf: "center", marginBottom: 2 }} />
-        <Text style={{ fontFamily: "PlayfairDisplay_700Bold", fontSize: 18, color: "#1C1C1E" }}>
-          Who else could cover this?
-        </Text>
-        {carpoolSheetConflict && (
-          <Text style={{ fontFamily: "Inter_400Regular", fontSize: 13, color: "#6E6E73" }}>
-            {carpoolSheetConflict.description}
-          </Text>
-        )}
-        <View style={{ gap: 8 }}>
-          {carpoolContacts.length === 0 ? (
-            <Text style={{ fontFamily: "Inter_400Regular", fontSize: 14, color: "#8A8A8E" }}>
-              No contacts saved yet.
-            </Text>
-          ) : (
-            carpoolContacts.map((contact) => (
-              <TouchableOpacity
-                key={contact.id}
-                onPress={() => {
-                  if (!carpoolSheetConflict) return;
-                  setSortedOverrides(prev => ({
-                    ...prev,
-                    [carpoolSheetConflict.id]: `Sorted. ${contact.name} is covering this one.`,
-                  }));
-                  setCarpoolSheetConflict(null);
-                  setSwapToast(`Done. ${contact.name} is on the run.`);
-                  setTimeout(() => setSwapToast(null), 3000);
-                }}
-                activeOpacity={0.8}
-                style={{
-                  flexDirection: "row", alignItems: "center",
-                  padding: 12, borderRadius: 10,
-                  borderWidth: 1.5, borderColor: "#E5E5EA",
-                  backgroundColor: "#FAFAF8", gap: 12,
-                }}
-              >
-                <View style={{ flex: 1 }}>
-                  <Text style={{ fontFamily: "Inter_600SemiBold", fontSize: 14, color: "#1C1C1E" }}>
-                    {contact.name}
-                  </Text>
-                  {contact.phone ? (
-                    <Text style={{ fontFamily: "Inter_400Regular", fontSize: 12, color: "#6E6E73" }}>
-                      {contact.phone}
-                    </Text>
-                  ) : null}
-                </View>
-                <Text style={{ fontFamily: "Inter_600SemiBold", fontSize: 13, color: GOLD }}>
-                  Assign →
-                </Text>
-              </TouchableOpacity>
-            ))
-          )}
-        </View>
-        <TouchableOpacity
-          onPress={() => setCarpoolSheetConflict(null)}
-          style={{ paddingVertical: 12, alignItems: "center" }}
-        >
-          <Text style={{ fontFamily: "Inter_500Medium", fontSize: 14, color: "#8A8A8E" }}>
-            Keep the current plan
-          </Text>
-        </TouchableOpacity>
-      </View>
-    </Modal>
-
-    {/* ── Swap toast ── */}
-    {swapToast ? (
-      <View
-        pointerEvents="none"
-        style={{
-          position: "absolute", bottom: 90, left: 20, right: 20,
-          backgroundColor: TEAL, borderRadius: 12,
-          paddingVertical: 12, paddingHorizontal: 16,
-          alignItems: "center",
-        }}
-      >
-        <Text style={{ fontFamily: "Inter_600SemiBold", fontSize: 14, color: "#fff" }}>
-          {swapToast}
-        </Text>
-      </View>
-    ) : null}
-
     </View>
   );
 }
@@ -3290,12 +2938,7 @@ export default function FamilyScreen() {
     try {
       // On-device solver — works offline, no API key needed.
       const memberLookup = new Map<string, FamilyMember>(uniqueMembers.map((m) => [m.id, m]));
-      const raw: JuggleResult = solveJuggleOnDevice(adults, allEvents, pushedCalEvents, memberLookup);
-      // Safety-net: promote any hedged handoffs Claude may have missed
-      const full: JuggleResult = {
-        ...raw,
-        conflicts: normaliseConflicts(raw.conflicts as unknown as Record<string, unknown>[]) as unknown as JuggleConflict[],
-      };
+      const full: JuggleResult = solveJuggleOnDevice(adults, allEvents, pushedCalEvents, memberLookup);
       await AsyncStorage.setItem(juggleKey(sortWeek), JSON.stringify(full));
       setJuggleResult(full);
       setIsSorted(true);
@@ -3347,7 +2990,7 @@ export default function FamilyScreen() {
     const ws = localDateStr(weekStart);
     const we = localDateStr(weekEnd);
     return apptItems
-      .filter((a) => !a.isDone && !a.isCancelled && a.date >= ws && a.date <= we && !a.id.startsWith("fam_"))
+      .filter((a) => !a.isDone && !a.isCancelled && a.date >= ws && a.date <= we)
       .sort((a, b) => a.date.localeCompare(b.date) || a.startTime.localeCompare(b.startTime));
   }, [apptItems, sortWeek]);
 
@@ -4262,34 +3905,6 @@ const styles = StyleSheet.create({
   juggleConflictDesc: { fontSize: 14, fontFamily: "Inter_600SemiBold", color: TEXT, lineHeight: 20 },
   juggleConflictRec: { fontSize: 13, fontFamily: "Inter_500Medium", color: TEAL, marginTop: 4, fontStyle: "italic" },
   juggleConflictOption: { fontSize: 13, fontFamily: "Inter_400Regular", color: TEXT_MUTED, marginTop: 2 },
-
-  // Juggle results — resolved conflicts (SORTED teal card)
-  juggleSortedCard: {
-    backgroundColor: "#E6F3F0", borderRadius: 14, borderWidth: 1, borderColor: "#B2D8D3",
-    borderLeftWidth: 4, borderLeftColor: "#2A8F88", padding: 14, gap: 6,
-    ...Platform.select({
-      web: { boxShadow: "0px 2px 8px rgba(0,0,0,0.05)" },
-      default: { shadowColor: "#000", shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 4, elevation: 1 },
-    }),
-  },
-  juggleSortedLabel: {
-    color: TEAL, fontSize: 11, fontFamily: "Inter_700Bold",
-    textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 2,
-  },
-  juggleSortedDesc:     { fontSize: 15, fontFamily: "Inter_600SemiBold", color: "#2B2B2B", lineHeight: 21 },
-  juggleSortedRec:      { fontSize: 14, fontFamily: "Inter_400Regular",  color: TEAL, lineHeight: 20, fontStyle: "italic" },
-  juggleSortedSwapLink: { fontSize: 13, fontFamily: "Inter_500Medium",   color: TEAL, textDecorationLine: "underline" },
-
-  // Travel warning — shown inline on an adult's WHO'S GOT WHAT card
-  travelWarningRow: {
-    marginTop: 8, paddingTop: 8,
-    borderTopWidth: 1, borderTopColor: GOLD + "44",
-    backgroundColor: GOLD + "0D", borderRadius: 8, padding: 8,
-  },
-  travelWarningText: {
-    fontSize: 12, fontFamily: "Inter_500Medium",
-    color: "#7A5A00", lineHeight: 18,
-  },
 
   carpoolClashBox: {
     flexDirection: "row", alignItems: "flex-start", gap: 8,

@@ -500,14 +500,7 @@ export default function HomeTab() {
             const totalThings = familyEventCount + calPushedCount;
             const hasEvents = totalThings > 0;
             const hasSolved = !!juggleResult;
-            const unresolvedConflicts = hasSolved
-              ? juggleResult!.conflicts.filter((c: any) => c.severity !== "resolved" && c.type !== "resolved")
-              : [];
-            const resolvedConflicts = hasSolved
-              ? juggleResult!.conflicts.filter((c: any) => c.severity === "resolved" || c.type === "resolved")
-              : [];
-            const hasConflicts = unresolvedConflicts.length > 0;
-            const hasResolved  = resolvedConflicts.length > 0;
+            const hasConflicts = hasSolved && juggleResult!.conflicts.length > 0;
             const cardColor =
               hasConflicts ? "#E8A838"
               : hasSolved  ? TEAL
@@ -517,17 +510,16 @@ export default function HomeTab() {
               !hasEvents  ? familyLine
               : hasSolved && hasConflicts
                 ? (() => {
-                    const n = unresolvedConflicts.length;
-                    const unassigned = unresolvedConflicts.filter((c: any) => c.type === "unassigned").length;
-                    const overlaps   = unresolvedConflicts.filter((c: any) => c.type === "overlap").length;
+                    const all = juggleResult!.conflicts;
+                    const n = all.length;
+                    const unassigned = all.filter((c: any) => c.type === "unassigned").length;
+                    const overlaps   = all.filter((c: any) => c.type === "overlap").length;
                     if (unassigned > 0 && overlaps === 0)
                       return `${unassigned} event${unassigned > 1 ? "s" : ""} need${unassigned === 1 ? "s" : ""} a driver.`;
                     if (overlaps > 0 && unassigned === 0)
                       return `${overlaps} event${overlaps > 1 ? "s" : ""} clash${overlaps > 1 ? "" : "es"} this week.`;
                     return `${n} thing${n > 1 ? "s" : ""} need${n === 1 ? "s" : ""} sorting out.`;
                   })()
-              : hasSolved && hasResolved
-                ? `Week sorted. ${resolvedConflicts.length} handoff${resolvedConflicts.length > 1 ? "s" : ""} sorted for the weekend.`
               : hasSolved
                 ? `Weekend sorted. ${juggleResult!.events?.length ?? 0} thing${(juggleResult!.events?.length ?? 0) === 1 ? "" : "s"} mapped.`
               : `${totalThings} event${totalThings > 1 ? "s" : ""} this week.`;
@@ -538,8 +530,6 @@ export default function HomeTab() {
               !hasEvents  ? familySub
               : hasSolved && hasConflicts
                 ? "Tap to see what needs a plan →"
-              : hasSolved && hasResolved
-                ? "Tap to see how it's sorted →"
               : hasSolved
                 ? "Tap to see the plan →"
               : calBreakdown ?? "Tap to sort the juggle →";
