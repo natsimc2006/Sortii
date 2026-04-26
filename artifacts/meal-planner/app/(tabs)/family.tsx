@@ -44,6 +44,7 @@ import { SortiiCalEvent, FAMILY_PUSHED_KEY } from "@/utils/calendarTypes";
 import { loadFamilyPushedEvents, removeEventFromFamily } from "@/utils/appointmentService";
 import { loadAppointments, saveAppointments, Appointment } from "@/utils/appointmentStore";
 import { solveJuggle } from "@/services/juggleSolver";
+import { getDriveTimes, buildTravelContext } from "@/services/travelTime";
 
 // ── Brand tokens ───────────────────────────────────────────────────────────────
 const TEAL         = "#2A8F88";
@@ -2976,6 +2977,29 @@ export default function FamilyScreen() {
       console.log("=== END SOLVER INPUT ===");
       // ────────────────────────────────────────────────────────────────────────
 
+      // ── Build location pairs for real drive-time lookup ──────────────────────
+      const locationPairs: Array<{ from: string; to: string }> = [];
+      const sortedByTime = [...allEvents]
+        .filter((ev) => ev.location?.trim())
+        .sort((a, b) => {
+          const [ah = 0, am = 0] = (a.time || "00:00").split(":").map(Number);
+          const [bh = 0, bm = 0] = (b.time || "00:00").split(":").map(Number);
+          return (ah * 60 + am) - (bh * 60 + bm);
+        });
+      for (let i = 0; i < sortedByTime.length - 1; i++) {
+        const from = sortedByTime[i]!.location?.trim();
+        const to   = sortedByTime[i + 1]!.location?.trim();
+        if (from && to && from.toLowerCase() !== to.toLowerCase()) {
+          const already = locationPairs.some(
+            (p) => p.from.toLowerCase() === from.toLowerCase() &&
+                   p.to.toLowerCase() === to.toLowerCase()
+          );
+          if (!already) locationPairs.push({ from, to });
+        }
+      }
+      const driveTimes   = await getDriveTimes(locationPairs);
+      const travelContext = buildTravelContext(driveTimes);
+
       // ── Build user message for Claude ────────────────────────────────────────
       const adultLines = adults
         .filter((a) => a.name.trim())
@@ -3013,14 +3037,10 @@ export default function FamilyScreen() {
         ? `\n\nAdditional context from parent:\n${juggleFreeText.trim()}`
         : "";
 
-      const userMessage = [
-        `Available adults:\n${adultLines}`,
-        `\n\nWeekend events:\n${eventLines}${calLines}`,
-        `\n\nLocation context: Lake Macquarie / Hunter region, NSW Australia.`,
-        ` Morisset to Wangi Wangi ~12 min. Wangi Wangi to Rathmines ~10 min. Morisset to Rathmines ~18 min.`,
-        freeTextSection,
-        `\n\nPlease solve this schedule.`,
-      ].join("");
+      const userMessage =
+        `Available adults:\n${adultLines}\n\nWeekend events:\n${eventLines}${calLines}` +
+        `${travelContext}\n\nRegion: Lake Macquarie / Hunter, NSW Australia.` +
+        `${freeTextSection}\n\nPlease solve this schedule.`;
 
       console.log("=== SENDING TO CLAUDE ===");
       console.log(userMessage);
