@@ -1,0 +1,81 @@
+{showCarpoolPrompt && (
+  <View style={{
+    borderLeftWidth: 4,
+    borderLeftColor: '#5E3A4C',
+    backgroundColor: '#F3E8EE',
+    borderRadius: 12,
+    padding: 16,
+    marginTop: 12,
+    marginHorizontal: 16,
+  }}>
+    <Text style={{
+      fontSize: 11,
+      fontWeight: '700',
+      textTransform: 'uppercase',
+      letterSpacing: 1,
+      color: '#5E3A4C',
+      marginBottom: 8,
+    }}>NEEDS COVER</Text>
+    
+    <Text style={{ fontSize: 15, color: '#2B2B2B', marginBottom: 12 }}>
+      There's a pick-up that nobody's free for.
+    </Text>
+
+    {contacts && contacts.length > 0 ? (
+      contacts.map(c => (
+        <TouchableOpacity
+          key={c.id}
+          style={{
+            backgroundColor: 'white',
+            borderRadius: 8,
+            padding: 12,
+            marginBottom: 8,
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+          }}
+          onPress={() => {
+            // Open share sheet or copy contact
+            if (c.phone) {
+              Linking.openURL(`sms:${c.phone}`);
+            }
+          }}
+        >
+          <View>
+            <Text style={{ fontWeight: '600', fontSize: 14, color: '#2B2B2B' }}>
+              {c.name}
+            </Text>
+            <Text style={{ fontSize: 12, color: '#777', marginTop: 2 }}>
+              {c.relationship}
+              {c.canHelpWith?.length > 0 ? ` · ${c.canHelpWith.join(', ')}` : ''}
+            </Text>
+          </View>
+          <Text style={{ color: '#2A8F88', fontWeight: '600', fontSize: 13 }}>
+            Message →
+          </Text>
+        </TouchableOpacity>
+      ))
+    ) : (
+      <TouchableOpacity
+        onPress={() => {
+          // Navigate to add carpool contact
+          navigation.goBack();
+          // Then trigger add contact flow
+        }}
+        style={{
+          backgroundColor: 'white',
+          borderRadius: 8,
+          padding: 12,
+          alignItems: 'center',
+        }}
+      >
+        <Text style={{ color: '#5E3A4C', fontWeight: '600' }}>
+          + Add a contact who could help
+        </Text>
+        <Text style={{ color: '#999', fontSize: 12, marginTop: 4 }}>
+          Save someone for situations like this
+        </Text>
+      </TouchableOpacity>
+    )}
+  </View>
+)}

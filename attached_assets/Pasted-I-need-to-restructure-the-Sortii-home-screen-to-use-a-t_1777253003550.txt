@@ -1,0 +1,108 @@
+I need to restructure the Sortii home screen to use a two-card layout: "This Week" and "Next Week". Do not change any recipe, planner, or shopping list logic — only the home screen display layer.
+
+── CONTEXT ──
+The current home screen shows the current week's plan. The problem: family shoppers think ahead — they shop at the weekend for the coming week. So the home screen needs to surface both this week (as reference) and next week (as the primary action from Thursday onward).
+
+── STEP 1: DATE UTILITIES ──
+Create or update a utility file (utils/weekUtils.ts or similar) with these functions:
+
+getTodayDayIndex(): number
+  Returns 0=Monday through 6=Sunday based on real device date.
+  Use getDay() and remap Sunday from 0 to 6.
+
+isShopWindow(): boolean
+  Returns true if getTodayDayIndex() >= 3 (Thursday, Friday, Saturday, Sunday)
+
+getThisWeekRange(): { start: Date, end: Date }
+  Returns Monday–Sunday of the current calendar week
+
+getNextWeekRange(): { start: Date, end: Date }
+  Returns Monday–Sunday of the following calendar week
+
+getRemainingMealsThisWeek(meals: Meal[]): Meal[]
+  Filters meals to only those from today onward within this week's range
+
+── STEP 2: HOME SCREEN CARD COMPONENTS ──
+
+Create two card components. Use existing Sortii colour tokens throughout.
+
+--- ThisWeekCard ---
+Props: remainingMeals: Meal[], totalMeals: number
+
+Displays:
+  - Label: "This Week" (teal, uppercase, 11px)
+  - Headline: "{n} dinners left." or "All done." if n === 0
+  - Pill showing how many are already done (e.g. "3 done")
+  - List of all meals for the week, past ones shown struck-through + muted
+  - Buttons (small, secondary): "View plan" | "Shopping list" (only shown if remaining > 0)
+  - Left border accent: teal (#2A8F88)
+
+--- NextWeekCard ---
+Props: nextWeekPlan: Meal[] | null, isShopWindow: boolean, onGenerate: () => void
+
+Has three states:
+
+STATE A — nextWeekPlan is null AND isShopWindow is false:
+  - Label: "Next Week" (muted)
+  - Headline: "Nothing planned."
+  - Copy: "Sort next week whenever you're ready."
+  - Button: "Plan next week" (secondary/teal outline)
+  - Left border accent: light border only (no colour accent)
+
+STATE B — nextWeekPlan is null AND isShopWindow is true:
+  - Background: gold tint (#F6E6BA)
+  - Label: "Next Week" (gold, #D29A22)
+  - Headline: "Not sorted yet."
+  - Pill: "Shop soon" (gold)
+  - Copy: "Weekend's coming. Sort next week now and your list is ready to go."
+  - Button: "Sort next week →" (primary gold button)
+  - Left border accent: gold (#D29A22)
+
+STATE C — nextWeekPlan exists (any day):
+  - Background: plum tint (#F3E8EE)
+  - Label: "Next Week" (plum, #5E3A4C)
+  - Headline: "Sorted. ✓"
+  - Pill: "Ready" (plum)
+  - Copy (if isShopWindow): "Your list is ready. Add to cart whenever you're ready."
+  - Copy (if NOT isShopWindow): "One less thing to think about."
+  - Buttons: "View plan" (secondary) | if isShopWindow also show "Shopping list →" (primary gold)
+  - Left border accent: plum (#5E3A4C)
+
+── STEP 3: HOME SCREEN LAYOUT ──
+
+Update the home screen to render both cards with ordering based on isShopWindow():
+
+if isShopWindow() is TRUE (Thu–Sun):
+  Render: <NextWeekCard /> first (hero position)
+  Render: <ThisWeekCard /> second (reference position)
+
+if isShopWindow() is FALSE (Mon–Wed):
+  Render: <ThisWeekCard /> first (hero position)
+  Render: <NextWeekCard /> second (available but not urgent)
+
+Gap between cards: 12px. Both cards full width.
+
+── STEP 4: SHOPPING LIST SCOPE LOGIC ──
+
+When the user taps "Shopping list" from either card, pass a scope parameter:
+
+If tapped from NextWeekCard (STATE C): scope = next week's date range
+If tapped from ThisWeekCard: scope = remaining meals this week only
+If user is in shop window and next week is unsorted: show inline prompt "Sort next week first to get your full list." with "Sort now →" button — do not open the shopping list
+
+── STEP 5: NEXT WEEK PLAN STORAGE ──
+
+Check how the current week plan is stored. Apply the same storage pattern for next week's plan, keyed by the Monday date of next week (e.g. "plan_2025-05-05"). 
+
+If a stored plan already exists for next week's Monday key, NextWeekCard shows STATE C automatically on load.
+
+── CONSTRAINTS ──
+- Do not modify recipes.json, swapRules.ts, or any shopping list generation logic
+- Do not change onboarding flow
+- Keep all existing This Week planner functionality intact
+- All copy must use existing Sortii brand voice — short, confident, no "successfully" or "please"
+- Colours must use existing token values — do not introduce new hex values
+- Test on both small (iPhone SE) and standard (iPhone 14) screen sizes
+
+── CONFIRMATION ──
+After completing each step, confirm what was built before proceeding to the next step.

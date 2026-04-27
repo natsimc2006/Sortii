@@ -6,6 +6,7 @@ import {
   Animated,
   Keyboard,
   KeyboardAvoidingView,
+  Linking,
   Modal,
   Platform,
   Pressable,
@@ -832,13 +833,6 @@ function JuggleResultsContent({
                 </Text>
               </View>
             )}
-            {tight > 0 && (
-              <View style={[styles.resultChip, { backgroundColor: "#E6F3F0", borderColor: TEAL + "33" }]}>
-                <Text style={[styles.resultChipText, { color: TEAL }]}>
-                  {tight} tight {tight === 1 ? "window" : "windows"}
-                </Text>
-              </View>
-            )}
             {ws.conflicts_resolved > 0 && impossible === 0 && conflicts.length === 0 && (
               <View style={[styles.resultChip, { backgroundColor: TEAL + "18", borderColor: TEAL + "33" }]}>
                 <Text style={[styles.resultChipText, { color: TEAL }]}>
@@ -853,14 +847,14 @@ function JuggleResultsContent({
                 </Text>
               </View>
             )}
-            {tightWindows > 0 && trueClashes === 0 && (
+            {tight > 0 && trueClashes === 0 && (
               <View style={[styles.resultChip, { backgroundColor: "#E6F3F0", borderColor: TEAL + "33" }]}>
                 <Text style={[styles.resultChipText, { color: TEAL }]}>
-                  {tightWindows} tight {tightWindows === 1 ? "window" : "windows"}
+                  {tight} tight {tight === 1 ? "window" : "windows"}
                 </Text>
               </View>
             )}
-            {trueClashes === 0 && tightWindows === 0 && tight === 0 && conflicts.length === 0 && (
+            {trueClashes === 0 && tight === 0 && conflicts.length === 0 && (
               <View style={[styles.resultChip, { backgroundColor: TEAL + "18", borderColor: TEAL + "33" }]}>
                 <Text style={[styles.resultChipText, { color: TEAL }]}>all clear ✓</Text>
               </View>
@@ -923,116 +917,104 @@ function JuggleResultsContent({
         </View>
       )}
 
-      {/* ── 3b. NEEDS COVER — unassigned events with carpool contact prompts ── */}
+      {/* ── 3b. NEEDS COVER — detected from unassigned events + smart_note + conflicts ── */}
       {(() => {
+        // Method 1: events not covered by any adult schedule
         const coveredIds = new Set(
           adultPlans.flatMap((p) => p.schedule.map((s) => s.event_id))
         );
-        const uncoveredEvents = (juggleResult.events ?? []).filter(
+        const hasUnassignedEvents = (juggleResult.events ?? []).some(
           (e) =>
             !coveredIds.has(e.id) ||
             (!e.assigned_adult || e.assigned_adult.toLowerCase() === "unassigned")
         );
-        if (uncoveredEvents.length === 0) return null;
+
+        // Method 2: smart_note mentions a pickup/collect gap
+        const pickupGapDetected = !!(juggleResult.smart_note && (
+          juggleResult.smart_note.toLowerCase().includes("pick-up") ||
+          juggleResult.smart_note.toLowerCase().includes("pickup") ||
+          juggleResult.smart_note.toLowerCase().includes("collect") ||
+          juggleResult.smart_note.toLowerCase().includes("carpool contact")
+        ));
+
+        // Method 3: a conflict description/recommendation mentions a pickup gap
+        const uncoveredConflicts = conflicts.filter((c) =>
+          (c.description || "").toLowerCase().includes("pick") ||
+          (c.description || "").toLowerCase().includes("collect") ||
+          (c.recommendation || "").toLowerCase().includes("carpool")
+        );
+
+        const showCarpoolPrompt = hasUnassignedEvents || pickupGapDetected || uncoveredConflicts.length > 0;
+        if (!showCarpoolPrompt) return null;
+
         return (
           <View style={{
-            backgroundColor: PLUM + "10",
-            borderRadius: 12,
-            borderLeftWidth: 3,
-            borderLeftColor: PLUM,
-            padding: 14,
-            gap: 12,
+            borderLeftWidth: 4, borderLeftColor: PLUM,
+            backgroundColor: PLUM + "18",
+            borderRadius: 12, padding: 16, gap: 10,
           }}>
-            <Text style={{ fontSize: 11, fontFamily: "Inter_700Bold", color: PLUM, letterSpacing: 0.8 }}>
+            <Text style={{
+              fontSize: 11, fontFamily: "Inter_700Bold",
+              textTransform: "uppercase", letterSpacing: 1, color: PLUM,
+            }}>
               NEEDS COVER
             </Text>
-            {uncoveredEvents.map((ev) => {
-              const timeLabel = ev.start_time || "";
-              const relevantContacts = carpoolContacts.length > 0
-                ? carpoolContacts
-                : null;
-              return (
-                <View key={ev.id} style={{ gap: 6 }}>
-                  <View style={{ flexDirection: "row", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
-                    <Text style={{ fontSize: 13, fontFamily: "Inter_600SemiBold", color: PLUM, flex: 1, flexShrink: 1 }}>
-                      {ev.child ? `${ev.child}'s ` : ""}{ev.activity}
+            <Text style={{ fontSize: 15, fontFamily: "Inter_400Regular", color: "#2B2B2B" }}>
+              There's a pick-up that nobody's free for.
+            </Text>
+
+            {carpoolContacts.length > 0 ? (
+              carpoolContacts.map((c) => (
+                <TouchableOpacity
+                  key={c.id}
+                  activeOpacity={0.8}
+                  style={{
+                    backgroundColor: "#fff", borderRadius: 8,
+                    padding: 12, flexDirection: "row",
+                    justifyContent: "space-between", alignItems: "center",
+                    borderWidth: 1, borderColor: PLUM + "22",
+                  }}
+                  onPress={() => {
+                    if (c.phone) {
+                      Linking.openURL(`sms:${c.phone}`);
+                    } else {
+                      Share.share({ message: `Hey ${c.name}, any chance you could help with a pick-up this weekend? 🙏` });
+                    }
+                  }}
+                >
+                  <View style={{ flex: 1, gap: 2 }}>
+                    <Text style={{ fontFamily: "Inter_600SemiBold", fontSize: 14, color: "#2B2B2B" }}>
+                      {c.name}
                     </Text>
-                    <View style={{
-                      backgroundColor: PLUM + "22", paddingHorizontal: 8, paddingVertical: 2,
-                      borderRadius: 99, flexShrink: 0,
-                    }}>
-                      <Text style={{ fontSize: 10, fontFamily: "Inter_600SemiBold", color: PLUM }}>
-                        {ev.day} {timeLabel}
+                    {c.phone ? (
+                      <Text style={{ fontFamily: "Inter_400Regular", fontSize: 12, color: TEXT_MUTED }}>
+                        {c.phone}
                       </Text>
-                    </View>
+                    ) : null}
                   </View>
-                  {ev.location ? (
-                    <Text style={{ fontSize: 11, fontFamily: "Inter_400Regular", color: PLUM + "BB" }}>
-                      📍 {ev.location}
-                    </Text>
-                  ) : null}
-                  {relevantContacts && relevantContacts.length > 0 ? (
-                    <>
-                      <Text style={{ fontSize: 11, fontFamily: "Inter_400Regular", color: PLUM + "BB", marginTop: 2 }}>
-                        Could anyone on your list help?
-                      </Text>
-                      {relevantContacts.map((c) => (
-                        <TouchableOpacity
-                          key={c.id}
-                          activeOpacity={0.8}
-                          style={{
-                            flexDirection: "row", alignItems: "center",
-                            backgroundColor: "#fff", borderRadius: 8,
-                            padding: 10, gap: 8,
-                            borderWidth: 1, borderColor: PLUM + "33",
-                          }}
-                          onPress={() => {
-                            const timeStr = timeLabel ? ` at ${timeLabel}` : "";
-                            const actStr  = ev.child
-                              ? `${ev.child}'s ${ev.activity}`
-                              : ev.activity;
-                            const locStr  = ev.location ? ` (${ev.location})` : "";
-                            Share.share({
-                              message: `Hey ${c.name}, any chance you could help with ${actStr}${timeStr} this ${ev.day.toLowerCase()}${locStr}? 🙏`,
-                            });
-                          }}
-                        >
-                          <View style={{
-                            width: 28, height: 28, borderRadius: 14,
-                            backgroundColor: PLUM + "22",
-                            alignItems: "center", justifyContent: "center",
-                          }}>
-                            <Text style={{ fontSize: 12, fontFamily: "Inter_700Bold", color: PLUM }}>
-                              {c.name.charAt(0).toUpperCase()}
-                            </Text>
-                          </View>
-                          <View style={{ flex: 1 }}>
-                            <Text style={{ fontSize: 13, fontFamily: "Inter_600SemiBold", color: "#333" }}>
-                              {c.name}
-                            </Text>
-                            {c.phone ? (
-                              <Text style={{ fontSize: 11, fontFamily: "Inter_400Regular", color: TEXT_MUTED }}>
-                                {c.phone}
-                              </Text>
-                            ) : null}
-                          </View>
-                          <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
-                            <Feather name="send" size={12} color={PLUM} />
-                            <Text style={{ fontSize: 11, fontFamily: "Inter_600SemiBold", color: PLUM }}>
-                              Ask
-                            </Text>
-                          </View>
-                        </TouchableOpacity>
-                      ))}
-                    </>
-                  ) : (
-                    <Text style={{ fontSize: 11, fontFamily: "Inter_400Regular", color: PLUM + "BB" }}>
-                      No carpool contacts saved yet — add them to event details.
-                    </Text>
-                  )}
-                </View>
-              );
-            })}
+                  <Text style={{ color: TEAL, fontFamily: "Inter_600SemiBold", fontSize: 13 }}>
+                    Message →
+                  </Text>
+                </TouchableOpacity>
+              ))
+            ) : (
+              <TouchableOpacity
+                activeOpacity={0.8}
+                style={{
+                  backgroundColor: "#fff", borderRadius: 8,
+                  padding: 12, alignItems: "center", gap: 4,
+                  borderWidth: 1, borderColor: PLUM + "22",
+                }}
+                onPress={onClose}
+              >
+                <Text style={{ color: PLUM, fontFamily: "Inter_600SemiBold", fontSize: 14 }}>
+                  + Add a contact who could help
+                </Text>
+                <Text style={{ color: TEXT_MUTED, fontFamily: "Inter_400Regular", fontSize: 12 }}>
+                  Save someone for situations like this
+                </Text>
+              </TouchableOpacity>
+            )}
           </View>
         );
       })()}
