@@ -169,6 +169,48 @@ const REPEAT_LABELS: Record<RepeatType, string> = {
   none: "One-off", weekly: "Weekly", fortnightly: "Fortnightly", monthly: "Monthly",
 };
 
+const MONTHLY_WEEK_LABELS: { label: string; value: number }[] = [
+  { label: "1st week", value: 1 },
+  { label: "2nd week", value: 2 },
+  { label: "3rd week", value: 3 },
+  { label: "4th week", value: 4 },
+];
+
+function _getWeekNumber(d: Date): number {
+  const startOfYear = new Date(d.getFullYear(), 0, 1);
+  return Math.ceil(((d.getTime() - startOfYear.getTime()) / 86400000 + startOfYear.getDay() + 1) / 7);
+}
+
+function _getWeekOfMonth(d: Date): number {
+  return Math.ceil(d.getDate() / 7);
+}
+
+function _weekMondayDate(weeksFromNow: number): Date {
+  const now = new Date();
+  const jsDay = now.getDay();
+  const diff = jsDay === 0 ? -6 : 1 - jsDay;
+  return new Date(now.getFullYear(), now.getMonth(), now.getDate() + diff + weeksFromNow * 7);
+}
+
+function eventsForWeek(events: FamilyEvent[], weekMonday: Date): FamilyEvent[] {
+  const targetWeekNum = _getWeekNumber(weekMonday);
+  const targetWeekOfMonth = _getWeekOfMonth(weekMonday);
+  return events.filter((ev) => {
+    if (ev.isAppointment) return false;
+    if (!ev.repeat || ev.repeat === "none") return false;
+    if (ev.repeat === "weekly") return true;
+    if (ev.repeat === "fortnightly") {
+      const origin = ev.createdDate ? new Date(ev.createdDate) : new Date();
+      const originWeek = _getWeekNumber(origin);
+      return Math.abs(targetWeekNum - originWeek) % 2 === 0;
+    }
+    if (ev.repeat === "monthly") {
+      return targetWeekOfMonth === (ev.monthlyWeek ?? 1);
+    }
+    return false;
+  });
+}
+
 const DAY_ORDER: Partial<Record<DayOfWeek, number>> = {
   Monday: 0, Tuesday: 1, Wednesday: 2, Thursday: 3,
   Friday: 4, Saturday: 5, Sunday: 6,
@@ -470,7 +512,7 @@ function blankDraft(): Omit<FamilyEvent, "id"> {
   return {
     title: "", day: "Monday", time: "", endTime: "", location: "",
     personIds: [], driverId: undefined, carpoolContact: "", carpoolContacts: [],
-    repeat: "none", notes: "",
+    repeat: "none", monthlyWeek: null, createdDate: new Date().toISOString(), notes: "",
     isAppointment: false,
     assignedAdult: "",
     priority: "must",
@@ -1507,13 +1549,14 @@ function PlanSummarySheet({
 
 // ── EventCard ──────────────────────────────────────────────────────────────────
 function EventCard({
-  event, members, onEdit, onDelete, aiDriver,
+  event, members, onEdit, onDelete, aiDriver, onAddToWeek,
 }: {
   event: FamilyEvent;
   members: FamilyMember[];
   onEdit: () => void;
   onDelete: () => void;
   aiDriver?: string;
+  onAddToWeek?: () => void;
 }) {
   const [menuOpen, setMenuOpen] = React.useState(false);
   const driverDisplay = aiDriver ?? (event.driverId ? members.find((m) => m.id === event.driverId)?.name : null);
@@ -1525,16 +1568,31 @@ function EventCard({
 
   function showActions() {
     if (Platform.OS === "ios") {
+      const options = onAddToWeek
+        ? ["Cancel", "Edit event", "Add to this week's plan", "Remove event"]
+        : ["Cancel", "Edit event", "Remove event"];
+      const destructiveIndex = options.length - 1;
       ActionSheetIOS.showActionSheetWithOptions(
-        { options: ["Cancel", "Edit event", "Remove event"], cancelButtonIndex: 0, destructiveButtonIndex: 2 },
-        (idx) => { if (idx === 1) onEdit(); if (idx === 2) onDelete(); }
+        { options, cancelButtonIndex: 0, destructiveButtonIndex: destructiveIndex },
+        (idx) => {
+          if (onAddToWeek) {
+            if (idx === 1) onEdit();
+            if (idx === 2) onAddToWeek();
+            if (idx === 3) onDelete();
+          } else {
+            if (idx === 1) onEdit();
+            if (idx === 2) onDelete();
+          }
+        }
       );
     } else if (Platform.OS === "android") {
-      Alert.alert(event.title, undefined, [
+      const buttons: any[] = [
         { text: "Edit event", onPress: onEdit },
-        { text: "Remove event", onPress: onDelete, style: "destructive" },
-        { text: "Cancel", style: "cancel" },
-      ]);
+        ...(onAddToWeek ? [{ text: "Add to this week's plan", onPress: onAddToWeek }] : []),
+        { text: "Remove event", onPress: onDelete, style: "destructive" as const },
+        { text: "Cancel", style: "cancel" as const },
+      ];
+      Alert.alert(event.title, undefined, buttons);
     } else {
       setMenuOpen((v) => !v);
     }
@@ -1595,6 +1653,19 @@ function EventCard({
                 <Feather name="edit-2" size={13} color={TEXT} />
                 <Text style={styles.eventInlineMenuText}>Edit</Text>
               </TouchableOpacity>
+              {onAddToWeek && (
+                <>
+                  <View style={styles.eventInlineMenuDivider} />
+                  <TouchableOpacity
+                    style={styles.eventInlineMenuItem}
+                    onPress={() => { setMenuOpen(false); onAddToWeek(); }}
+                    activeOpacity={0.75}
+                  >
+                    <Feather name="calendar" size={13} color={TEAL} />
+                    <Text style={[styles.eventInlineMenuText, { color: TEAL }]}>Add to this week's plan</Text>
+                  </TouchableOpacity>
+                </>
+              )}
               <View style={styles.eventInlineMenuDivider} />
               <TouchableOpacity
                 style={styles.eventInlineMenuItem}
@@ -2371,7 +2442,11 @@ function AddEventSheet({
                   <TouchableOpacity
                     key={r}
                     style={[styles.repeatChip, draft.repeat === r && styles.repeatChipSelected]}
-                    onPress={() => { Keyboard.dismiss(); setField("repeat", r); }}
+                    onPress={() => {
+                      Keyboard.dismiss();
+                      setField("repeat", r);
+                      if (r !== "monthly") setField("monthlyWeek", null);
+                    }}
                     activeOpacity={0.75}
                   >
                     <Text
@@ -2385,6 +2460,28 @@ function AddEventSheet({
                   </TouchableOpacity>
                 ))}
               </View>
+              {draft.repeat === "monthly" && (
+                <View style={{ marginTop: 10 }}>
+                  <Text style={[styles.formLabel, { marginBottom: 6 }]}>Which week of the month?</Text>
+                  <View style={styles.chipGroup}>
+                    {MONTHLY_WEEK_LABELS.map(({ label, value }) => {
+                      const active = (draft.monthlyWeek ?? 1) === value;
+                      return (
+                        <TouchableOpacity
+                          key={value}
+                          style={[styles.repeatChip, active && styles.repeatChipSelected]}
+                          onPress={() => { Keyboard.dismiss(); setField("monthlyWeek", value); }}
+                          activeOpacity={0.75}
+                        >
+                          <Text style={[styles.repeatChipText, active && styles.repeatChipTextSelected]}>
+                            {label}
+                          </Text>
+                        </TouchableOpacity>
+                      );
+                    })}
+                  </View>
+                </View>
+              )}
             </View>
 
             {/* Notes / ANYTHING ELSE? */}
@@ -3049,7 +3146,8 @@ export default function FamilyScreen() {
   useEffect(() => { load(); }, [load]);
   useEffect(() => () => { if (bannerTimer.current) clearTimeout(bannerTimer.current); }, []);
 
-  // When the user switches weeks, load (or clear) the stored result for that week.
+  // When the user switches weeks, load (or clear) the stored result for that week
+  // and recompute the visible event result using the week filter.
   useEffect(() => {
     AsyncStorage.getItem(juggleKey(sortWeek)).then((raw) => {
       if (raw) {
@@ -3058,11 +3156,22 @@ export default function FamilyScreen() {
         setJuggleResult(null); setIsSorted(false);
       }
     });
+    // Recompute result with filtered events for the selected week
+    setState((prev) => {
+      const filtered = sortWeek === 1
+        ? { ...prev, events: eventsForWeek(prev.events, _weekMondayDate(1)) }
+        : prev;
+      setResult(computeFamilyWeek(filtered));
+      return prev; // don't actually change state
+    });
   }, [sortWeek]);
 
   async function persistState(next: FamilyState) {
     setState(next);
-    setResult(computeFamilyWeek(next));
+    const filtered = sortWeek === 1
+      ? { ...next, events: eventsForWeek(next.events, _weekMondayDate(1)) }
+      : next;
+    setResult(computeFamilyWeek(filtered));
     await saveFamilyState(next);
   }
 
@@ -3246,7 +3355,10 @@ export default function FamilyScreen() {
       })
       .filter((e) => !existingIds.has(e.id)); // deduplicate
 
-    const allEvents = [...state.events, ...apptAsEvents];
+    const baseEvents = sortWeek === 1
+      ? eventsForWeek(state.events, _weekMondayDate(1))
+      : state.events;
+    const allEvents = [...baseEvents, ...apptAsEvents];
 
     if (adults.length === 0 || (allEvents.length === 0 && pushedCalEvents.length === 0)) return;
 
@@ -3541,6 +3653,45 @@ export default function FamilyScreen() {
   const hasTightOrConflict = (result?.insights ?? []).some(
     (i) => i.type === "conflict" || i.type === "tight" || i.type === "child_clash"
   );
+
+  // COMING UP: appointments from the Appointments tab within the next 14 days
+  const upcomingAppts = React.useMemo(() => {
+    const now = new Date();
+    now.setHours(0, 0, 0, 0);
+    const cutoff = new Date(now.getTime() + 14 * 24 * 60 * 60 * 1000);
+    return apptItems
+      .filter((a) => {
+        if (a.isDone || a.isCancelled) return false;
+        const d = new Date(`${a.date}T00:00:00`);
+        return d >= now && d <= cutoff;
+      })
+      .sort((a, b) => a.date.localeCompare(b.date));
+  }, [apptItems]);
+
+  // Add a COMING UP appointment into the current week's event list as a one-off
+  async function handleAddApptToWeek(appt: Appointment) {
+    const jsDay = new Date(`${appt.date}T00:00:00`).getDay();
+    const dayName = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"][jsDay] as DayOfWeek;
+    const newEv: FamilyEvent = {
+      id: `appt_copy_${appt.id}_${Date.now()}`,
+      title: appt.title,
+      day: dayName,
+      time: appt.startTime || "09:00",
+      endTime: appt.endTime || undefined,
+      location: [appt.locationName, appt.suburb].filter(Boolean).join(", ") || undefined,
+      personIds: [],
+      assignedAdult: appt.person || undefined,
+      repeat: "none",
+      monthlyWeek: null,
+      createdDate: new Date().toISOString(),
+      isAppointment: true,
+      notes: appt.notes || undefined,
+    };
+    const updated = { ...state, events: [...state.events, newEv] };
+    await persistState(updated);
+    showBanner("success", `${appt.title} added to plan`);
+  }
+
   // Taller bottom padding when sort CTA is shown in sticky bar
   const navPad = TAB_BAR_HEIGHT + Math.max(insets.bottom, 0);
   const scrollPadBottom = hasEvents ? (needsSort ? 160 + navPad : 112 + navPad) : 80;
@@ -3639,6 +3790,19 @@ export default function FamilyScreen() {
                               onEdit={() => openEditEvent(ev)}
                               onDelete={() => handleDeleteEvent(ev.id)}
                               aiDriver={juggleDriverMap?.get(ev.id)}
+                              onAddToWeek={ev.isAppointment && sortWeek === 1
+                                ? () => {
+                                    const copy: FamilyEvent = {
+                                      ...ev,
+                                      id: `appt_copy_${ev.id}_${Date.now()}`,
+                                      repeat: "none",
+                                      monthlyWeek: null,
+                                      createdDate: new Date().toISOString(),
+                                    };
+                                    persistState({ ...state, events: [...state.events, copy] });
+                                    showBanner("success", `${ev.title} added to plan`);
+                                  }
+                                : undefined}
                             />
                             {(idx < famEvs.length - 1 || dayAppts.length > 0) && (
                               <View style={styles.dayEventConnector} />
@@ -3718,6 +3882,62 @@ export default function FamilyScreen() {
                 <Text style={styles.repeatNoteText}>
                   Regulars carry forward. Nothing to re-enter.
                 </Text>
+              </View>
+            )}
+
+            {/* COMING UP — appointments in the next 14 days */}
+            {upcomingAppts.length > 0 && (
+              <View style={{ marginTop: 20, gap: 8 }}>
+                <Text style={styles.sectionLabel}>COMING UP</Text>
+                {upcomingAppts.map((appt) => {
+                  const d = new Date(`${appt.date}T00:00:00`);
+                  const dateLabel = d.toLocaleDateString("en-AU", { weekday: "short", day: "numeric", month: "short" });
+                  const who = appt.person || "";
+                  return (
+                    <View
+                      key={appt.id}
+                      style={{
+                        flexDirection: "row",
+                        backgroundColor: CARD,
+                        borderRadius: 12,
+                        overflow: "hidden",
+                        borderWidth: 1,
+                        borderColor: "#ede8ec",
+                      }}
+                    >
+                      <View style={{ width: 4, backgroundColor: PLUM }} />
+                      <View style={{ flex: 1, padding: 12, gap: 2 }}>
+                        <Text style={{ fontFamily: "DMSans_600SemiBold", fontSize: 14, color: TEXT }}>
+                          {appt.title}
+                        </Text>
+                        <Text style={{ fontFamily: "Inter_400Regular", fontSize: 12, color: TEXT_MUTED }}>
+                          {dateLabel}{appt.startTime ? ` · ${formatTime(appt.startTime)}` : ""}{appt.locationName ? ` · ${appt.locationName}` : ""}
+                        </Text>
+                        {who ? (
+                          <Text style={{ fontFamily: "Inter_400Regular", fontSize: 12, color: PLUM }}>
+                            {who}
+                          </Text>
+                        ) : null}
+                      </View>
+                      <TouchableOpacity
+                        onPress={() => handleAddApptToWeek(appt)}
+                        style={{
+                          alignSelf: "center",
+                          paddingHorizontal: 12,
+                          paddingVertical: 6,
+                          marginRight: 10,
+                          backgroundColor: TEAL + "15",
+                          borderRadius: 8,
+                        }}
+                        activeOpacity={0.75}
+                      >
+                        <Text style={{ fontFamily: "Inter_600SemiBold", fontSize: 11, color: TEAL }}>
+                          Add to plan
+                        </Text>
+                      </TouchableOpacity>
+                    </View>
+                  );
+                })}
               </View>
             )}
 

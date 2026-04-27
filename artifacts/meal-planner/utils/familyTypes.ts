@@ -39,6 +39,8 @@ export interface FamilyEvent {
   carpoolContact?: string;
   carpoolContacts?: CarpoolContactEntry[];
   repeat: RepeatType;
+  monthlyWeek?: number | null;
+  createdDate?: string;
   notes?: string;
   isAppointment?: boolean;
   originOverride?: string;
