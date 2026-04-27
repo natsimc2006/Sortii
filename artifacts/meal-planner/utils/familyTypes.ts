@@ -41,6 +41,7 @@ export interface FamilyEvent {
   repeat: RepeatType;
   notes?: string;
   isAppointment?: boolean;
+  originOverride?: string;
 }
 
 export interface FamilyState {

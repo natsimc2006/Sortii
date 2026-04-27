@@ -1833,6 +1833,8 @@ function AddEventSheet({
   const [newContactPhone, setNewContactPhone]     = useState("");
   const [carpoolEntryName, setCarpoolEntryName]   = useState("");
   const [carpoolEntryMobile, setCarpoolEntryMobile] = useState("");
+  const [startingFromHome, setStartingFromHome]   = useState(true);
+  const [customOrigin, setCustomOrigin]           = useState("");
   const carpoolNameRef = React.useRef<TextInput>(null);
 
   // Derived: is the form valid enough to save?
@@ -1860,6 +1862,8 @@ function AddEventSheet({
       setErrors([]);
       setCarpoolEntryName("");
       setCarpoolEntryMobile("");
+      setStartingFromHome(true);
+      setCustomOrigin("");
       Animated.parallel([
         Animated.spring(slideY, { toValue: 0, useNativeDriver: true, tension: 80, friction: 12 }),
         Animated.timing(overlayOp, { toValue: 1, duration: 200, useNativeDriver: true }),
@@ -1923,6 +1927,7 @@ function AddEventSheet({
       notes: draft.notes?.trim() || undefined,
       driverId: undefined,
       assignedAdult: correctedAssignedAdult,
+      originOverride: !startingFromHome && customOrigin.trim() ? customOrigin.trim() : undefined,
     });
   }
 
@@ -2137,6 +2142,50 @@ function AddEventSheet({
                 inputStyle={styles.formInput}
               />
             </View>
+
+            {/* STARTING FROM? — shown for early-morning events */}
+            {!!draft.time && (() => {
+              const [h = 12] = draft.time.split(":").map(Number);
+              return h < 11;
+            })() && (
+              <View style={styles.formField}>
+                <Text style={styles.formLabel}>STARTING FROM?</Text>
+                <Text style={{ fontSize: 11, fontFamily: "Inter_400Regular", color: TEXT_MUTED, marginBottom: 8 }}>
+                  Your usual starting point for Saturday runs.
+                </Text>
+                <View style={{ flexDirection: "row", gap: 8, marginBottom: startingFromHome ? 0 : 8 }}>
+                  {[
+                    { label: "Home", value: true },
+                    { label: "Somewhere else", value: false },
+                  ].map(({ label, value }) => {
+                    const active = startingFromHome === value;
+                    return (
+                      <TouchableOpacity
+                        key={label}
+                        style={[styles.repeatChip, active && styles.repeatChipSelected, { flex: 1 }]}
+                        onPress={() => { Keyboard.dismiss(); setStartingFromHome(value); }}
+                        activeOpacity={0.75}
+                      >
+                        <Text style={[styles.repeatChipText, active && styles.repeatChipTextSelected]}>
+                          {label}
+                        </Text>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </View>
+                {!startingFromHome && (
+                  <TextInput
+                    style={styles.formInput}
+                    value={customOrigin}
+                    onChangeText={setCustomOrigin}
+                    placeholder="Where are you coming from?"
+                    placeholderTextColor="#bbb"
+                    returnKeyType="done"
+                    onSubmitEditing={() => Keyboard.dismiss()}
+                  />
+                )}
+              </View>
+            )}
 
             {/* HOW IMPORTANT IS THIS? — priority toggle */}
             <View style={styles.formField}>
@@ -3272,7 +3321,12 @@ export default function FamilyScreen() {
           `  Type: ${ev.isAppointment ? "appointment" : "activity"}`,
           `  Recurring: ${ev.repeat && ev.repeat !== "none" ? "yes — weekly" : "no — one-off"}`,
           `  Notes: ${ev.notes || "none"}`,
-        ].join("\n");
+          ev.originOverride
+            ? `  Starting from: ${ev.originOverride}`
+            : homeSuburb.trim()
+              ? `  Starting from: ${homeSuburb.trim()}`
+              : null,
+        ].filter(Boolean).join("\n");
       }).join("\n\n");
 
       const calLines = pushedCalEvents.length > 0
@@ -3319,7 +3373,7 @@ export default function FamilyScreen() {
       // ────────────────────────────────────────────────────────────────────────
 
       const regionLine = homeSuburb.trim()
-        ? `\n\nFamily is based in: ${homeSuburb.trim()}, Australia.`
+        ? `\n\nFamily starting point: ${homeSuburb.trim()}, NSW Australia.`
         : `\n\nRegion: Australia.`;
 
       // ── Pre-calculate time overlaps before sending to Claude ─────────────────
