@@ -16,6 +16,7 @@ export function userKey(userId: string, domain: string): string {
 export const SK = {
   // Meal planning
   plan:           (uid: string) => userKey(uid, "plan"),
+  planNextWeek:   (uid: string, mondayISO: string) => userKey(uid, `planNextWeek_${mondayISO}`),
   prefs:          (uid: string) => userKey(uid, "prefs"),
   savedPlans:     (uid: string) => userKey(uid, "savedPlans"),
   hiddenRecipes:  (uid: string) => userKey(uid, "hiddenRecipes"),

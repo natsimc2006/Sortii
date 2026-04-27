@@ -1,7 +1,12 @@
 import { Feather } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
-import React, { useEffect, useMemo, useState } from "react";
+import { useFocusEffect } from "expo-router";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { MealPlanEntry } from "@/constants/recipes";
+import { isShopWindow as computeIsShopWindow, getNextWeekMondayISO } from "@/utils/weekUtils";
+import ThisWeekCard from "@/components/ThisWeekCard";
+import NextWeekCard from "@/components/NextWeekCard";
 import OverwhelmModal, { PressureItem } from "@/components/OverwhelmModal";
 import {
   Image,
@@ -171,6 +176,8 @@ export default function HomeTab() {
   const [calGoogleConn, setCalGoogleConn] = useState(false);
   const [calPushedCount, setCalPushedCount] = useState(0);
   const [crossSellMsg, setCrossSellMsg]   = useState<{ title: string; sub: string; route: string; color: string } | null>(null);
+  const [nextWeekPlan, setNextWeekPlan]   = useState<MealPlanEntry[] | null>(null);
+  const [shopWindow, setShopWindow]       = useState(false);
 
   const todayName    = getTodayName();
   const todayIdx     = DAYS.indexOf(todayName);
@@ -201,6 +208,22 @@ export default function HomeTab() {
 
   const greeting = useMemo(() => getGreeting(), []);
   const summary  = useMemo(() => getWeeklySummary(plannedCount), [plannedCount]);
+
+  // Helper: load next-week plan from AsyncStorage
+  const loadNextWeek = useCallback(async () => {
+    const uid = getCurrentUserId();
+    const mondayISO = getNextWeekMondayISO();
+    setShopWindow(computeIsShopWindow());
+    const raw = await AsyncStorage.getItem(SK.planNextWeek(uid, mondayISO));
+    if (raw) {
+      try { setNextWeekPlan(JSON.parse(raw)); } catch { setNextWeekPlan(null); }
+    } else {
+      setNextWeekPlan(null);
+    }
+  }, []);
+
+  // Reload next-week plan whenever home screen gains focus
+  useFocusEffect(useCallback(() => { loadNextWeek(); }, [loadNextWeek]));
 
   useEffect(() => {
     (async () => {
@@ -329,6 +352,34 @@ export default function HomeTab() {
     })();
   }, []);
 
+  // Save the current plan as next week's plan
+  async function handleSaveAsNextWeek() {
+    if (!currentPlan.some((e) => e.slot === "dinner" && e.recipeId)) return;
+    const uid = getCurrentUserId();
+    const mondayISO = getNextWeekMondayISO();
+    await AsyncStorage.setItem(SK.planNextWeek(uid, mondayISO), JSON.stringify(currentPlan));
+    setNextWeekPlan(currentPlan);
+  }
+
+  // "Plan next week" / "Sort next week" action
+  async function handleGenerate() {
+    // If the user already has a current plan, offer to save it as next week
+    const hasCurrentPlan = currentPlan.filter((e) => e.slot === "dinner" && e.recipeId).length >= 3;
+    if (hasCurrentPlan && !nextWeekPlan) {
+      await handleSaveAsNextWeek();
+    } else {
+      router.push("/(tabs)/meals");
+    }
+  }
+
+  // Shopping list navigation — scoped to remaining this-week meals or next week
+  function handleShoppingList(scope: "thisWeek" | "nextWeek") {
+    router.push("/(tabs)/shopping");
+  }
+
+  // Order the cards: shop window → NextWeek first; otherwise → ThisWeek first
+  const shopWindowFirst = shopWindow;
+
   return (
     <SafeAreaView style={styles.safe}>
       <View style={{ flex: 1 }}>
@@ -456,43 +507,54 @@ export default function HomeTab() {
             </ScrollView>
           </View>
 
-          {/* B — Tonight's dinner */}
-          <View style={[styles.card, styles.cardNeutral, styles.cardRailTeal, { padding: 0, overflow: "hidden" }]}>
-            <TouchableOpacity
-              onPress={() =>
-                plannedCount === 0
-                  ? router.push("/(tabs)/preferences?flow=meals")
-                  : router.push("/(tabs)/meals")
-              }
-              activeOpacity={0.8}
-              style={{ padding: 15 }}
-            >
-              <View style={styles.cardRow}>
-                <View style={{ flex: 1 }}>
-                  <Text style={[styles.cardLabel, { color: tonightRecipe ? TEAL : GOLD }]}>
-                    TONIGHT'S DINNER
-                  </Text>
-                  <Text style={styles.cardTitle}>
-                    {tonightRecipe ? tonightRecipe.name : "Dinners not sorted yet."}
-                  </Text>
-                  <Text style={[styles.cardSub, { color: tonightRecipe ? TEAL : TEXT_MUTED }]}>
-                    {tonightRecipe ? "Sorted. ✓" : "Takes about a minute. →"}
-                  </Text>
-                </View>
-                <View style={[styles.cardChevron, { backgroundColor: (tonightRecipe ? TEAL : GOLD) + "12" }]}>
-                  <Feather name="chevron-right" size={16} color={tonightRecipe ? TEAL : GOLD} />
-                </View>
-              </View>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => router.push("/(tabs)/cook-with" as any)}
-              style={styles.fridgeShortcut}
-              activeOpacity={0.7}
-            >
-              <Feather name="search" size={11} color={TEAL} />
-              <Text style={styles.fridgeShortcutText}>Fridge Rescue →</Text>
-            </TouchableOpacity>
+          {/* B — This Week + Next Week meal cards */}
+          <View style={{ gap: 12 }}>
+            {shopWindowFirst ? (
+              <>
+                <NextWeekCard
+                  nextWeekPlan={nextWeekPlan}
+                  isShopWindow={shopWindow}
+                  allRecipes={allRecipes}
+                  onGenerate={handleGenerate}
+                  onViewPlan={() => router.push("/(tabs)/meals")}
+                  onShoppingList={() => handleShoppingList("nextWeek")}
+                />
+                <ThisWeekCard
+                  plan={currentPlan}
+                  allRecipes={allRecipes}
+                  onViewPlan={() => router.push("/(tabs)/meals")}
+                  onShoppingList={() => handleShoppingList("thisWeek")}
+                />
+              </>
+            ) : (
+              <>
+                <ThisWeekCard
+                  plan={currentPlan}
+                  allRecipes={allRecipes}
+                  onViewPlan={() => router.push("/(tabs)/meals")}
+                  onShoppingList={() => handleShoppingList("thisWeek")}
+                />
+                <NextWeekCard
+                  nextWeekPlan={nextWeekPlan}
+                  isShopWindow={shopWindow}
+                  allRecipes={allRecipes}
+                  onGenerate={handleGenerate}
+                  onViewPlan={() => router.push("/(tabs)/meals")}
+                  onShoppingList={() => handleShoppingList("nextWeek")}
+                />
+              </>
+            )}
           </View>
+
+          {/* B2 — Fridge Rescue shortcut */}
+          <TouchableOpacity
+            onPress={() => router.push("/(tabs)/cook-with" as any)}
+            style={styles.fridgeShortcut}
+            activeOpacity={0.7}
+          >
+            <Feather name="search" size={11} color={TEAL} />
+            <Text style={styles.fridgeShortcutText}>Fridge Rescue →</Text>
+          </TouchableOpacity>
 
           {/* C — Family */}
           {(() => {
