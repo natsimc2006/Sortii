@@ -1,5 +1,6 @@
 import { Feather } from "@expo/vector-icons";
 import { useFocusEffect, useRouter } from "expo-router";
+import { SavingsTipCard } from "@/components/SavingsTipCard";
 import React, { useCallback, useState } from "react";
 import {
   Alert,
@@ -797,6 +798,18 @@ export default function BillsScreen() {
             </View>
           ))
         )}
+        <View style={{ marginTop: 16 }}>
+          <SavingsTipCard
+            tipId="tip_energy"
+            icon="⚡"
+            title="Your energy bill is probably higher than it needs to be."
+            body="Step 1 — compare every plan with no sales spin. Step 2 — switch via ShopBack and earn up to $200 cashback on top."
+            primaryLabel="Compare all plans (no bias) →"
+            primaryUrl="https://www.energymadeeasy.gov.au"
+            secondaryLabel="Switch via ShopBack — earn cashback →"
+            secondaryUrl="https://www.shopback.com.au/energy"
+          />
+        </View>
       </ScrollView>
 
       {/* FAB */}

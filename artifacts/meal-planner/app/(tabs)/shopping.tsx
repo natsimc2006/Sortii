@@ -1,5 +1,6 @@
 import { Feather } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { SavingsTipCard } from "@/components/SavingsTipCard";
 import * as Clipboard from "expo-clipboard";
 import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
@@ -761,6 +762,17 @@ export default function ShoppingScreen() {
           <Feather name="share-2" size={18} color="#fff" />
           <Text style={styles.shareBtnText}>Share list</Text>
         </TouchableOpacity>
+
+        <View style={{ marginTop: 16 }}>
+          <SavingsTipCard
+            tipId="tip_grocery"
+            icon="🛒"
+            title="Get money back on this shop."
+            body="ShopBack members earn cashback at Woolies and Coles — free to join, works every week."
+            primaryLabel="Sign up to ShopBack →"
+            primaryUrl="https://www.shopback.com.au"
+          />
+        </View>
       </View>
 
       {/* Share bottom sheet */}

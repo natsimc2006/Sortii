@@ -1,5 +1,6 @@
 import { Feather } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { SavingsTipCard } from "@/components/SavingsTipCard";
 import * as Haptics from "expo-haptics";
 import { useFocusEffect, useRouter } from "expo-router";
 import React, { useState, useRef, useEffect, useCallback } from "react";
@@ -941,12 +942,40 @@ export default function MoneyScreen() {
       />
       <StackedWinsBar total={appliedSavingsTotal} count={appliedWins.size} fmt={formatMoneyRound} />
       {savingsGoal ? (
-        <SavingsGoalCard
-          goal={savingsGoal}
-          weeklyDinnerSaving={weeklySortiiSaving}
-          fmt={formatMoneyRound}
-          onUpdate={goToGoalSetup}
-        />
+        <>
+          <SavingsGoalCard
+            goal={savingsGoal}
+            weeklyDinnerSaving={weeklySortiiSaving}
+            fmt={formatMoneyRound}
+            onUpdate={goToGoalSetup}
+          />
+          {(() => {
+            const g = savingsGoal as Record<string, unknown> & typeof savingsGoal;
+            const isHoliday =
+              g.type === "holiday" ||
+              g.goalType === "holiday" ||
+              g.icon === 0 ||
+              g.iconIndex === 0 ||
+              g.iconKey === "holiday" ||
+              g.category === "holiday" ||
+              (typeof g.name === "string" && g.name.toLowerCase().includes("holiday")) ||
+              (typeof (g as Record<string, unknown>).label === "string" &&
+                ((g as Record<string, unknown>).label as string).toLowerCase().includes("holiday"));
+            if (!isHoliday) return null;
+            return (
+              <View style={{ marginTop: 12 }}>
+                <SavingsTipCard
+                  tipId="tip_holiday"
+                  icon="🌏"
+                  title="Book smarter when you're ready."
+                  body="Hotels through ShopBack earn 8–13% cashback. On a $2,500 stay that's $200–$325 back toward your goal."
+                  primaryLabel="See travel cashback →"
+                  primaryUrl="https://www.shopback.com.au/travel"
+                />
+              </View>
+            );
+          })()}
+        </>
       ) : (
         <TouchableOpacity onPress={goToGoalSetup} activeOpacity={0.7} style={styles.setGoalLink}>
           <Text style={styles.setGoalLinkText}>Set a savings goal →</Text>

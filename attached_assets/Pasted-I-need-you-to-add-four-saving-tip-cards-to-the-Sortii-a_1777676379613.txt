@@ -1,0 +1,188 @@
+I need you to add four saving tip cards to the Sortii app. 
+Read all instructions fully before making any changes.
+
+──────────────────────────────────────
+OVERVIEW
+──────────────────────────────────────
+Add a reusable SavingsTipCard component and place four 
+instances of it across four existing screens. Each card 
+is dismissible — once dismissed it never appears again, 
+stored via AsyncStorage. Do not modify any existing 
+functionality on any screen. Only add the tip cards.
+
+──────────────────────────────────────
+STEP 1 — CREATE THE REUSABLE COMPONENT
+──────────────────────────────────────
+Create a new file: components/SavingsTipCard.tsx
+
+Props:
+- tipId: string — unique key used for AsyncStorage 
+  (e.g. 'tip_grocery', 'tip_energy', 'tip_petrol', 
+  'tip_holiday')
+- icon: string — emoji string
+- title: string
+- body: string
+- primaryLabel: string
+- primaryUrl: string
+- secondaryLabel?: string (optional)
+- secondaryUrl?: string (optional)
+
+Behaviour:
+- On mount, check AsyncStorage for key `tipId`. 
+  If value is 'dismissed', render null immediately.
+- Show an X button (top right). On press, set 
+  AsyncStorage key `tipId` = 'dismissed', then 
+  hide the card.
+- If secondaryLabel and secondaryUrl are provided, 
+  show two buttons stacked vertically.
+- If only primaryLabel/primaryUrl, show one button.
+- All URLs open via Linking.openURL(). 
+- Never use a <form> tag anywhere.
+
+Visual style — match existing Sortii design exactly:
+- Card background: #F3E8EE (plum tint)
+- Left border: 4px solid #5E3A4C (plum)
+- Border radius: 12px
+- Padding: 16px
+- Title: font weight 600, size 14px, color #2B2B2B
+- Body: size 13px, color #555555, marginBottom 12px
+- Primary button: background #5E3A4C, text white, 
+  border radius 8px, padding 10px 16px, font size 13px
+- Secondary button (if present): background transparent,
+  border 1px solid #5E3A4C, text #5E3A4C, border radius 8px,
+  padding 10px 16px, font size 13px, marginTop 8px
+- X button: top-right, color #999, font size 16px, 
+  padding 4px, absolutely positioned
+
+──────────────────────────────────────
+STEP 2 — GROCERY CASHBACK TIP
+──────────────────────────────────────
+Locate the Shopping List screen file.
+
+Add SavingsTipCard below the "Share list" button 
+at the bottom of the screen, with 16px margin above it.
+
+Props:
+- tipId: 'tip_grocery'
+- icon: '🛒'
+- title: 'Get money back on this shop.'
+- body: 'ShopBack members earn cashback at Woolies 
+  and Coles — free to join, works every week.'
+- primaryLabel: 'Sign up to ShopBack →'
+- primaryUrl: 'https://www.shopback.com.au'
+
+No secondary button.
+
+──────────────────────────────────────
+STEP 3 — ENERGY TIP
+──────────────────────────────────────
+Locate the Bills screen file.
+
+Add SavingsTipCard below the bill list (or below the 
+empty state if no bills have been added). 
+Add 16px margin above it.
+
+Props:
+- tipId: 'tip_energy'
+- icon: '⚡'
+- title: 'Your energy bill is probably higher 
+  than it needs to be.'
+- body: 'Step 1 — compare every plan with no sales 
+  spin. Step 2 — switch via ShopBack and earn up to 
+  $200 cashback on top.'
+- primaryLabel: 'Compare all plans (no bias) →'
+- primaryUrl: 'https://www.energymadeeasy.gov.au'
+- secondaryLabel: 'Switch via ShopBack — earn cashback →'
+- secondaryUrl: 'https://www.shopback.com.au/energy'
+
+──────────────────────────────────────
+STEP 4 — HOLIDAY SAVINGS TIP
+──────────────────────────────────────
+Locate the Money screen file.
+
+Find where the savings goal card is rendered. 
+The savings goal data may be stored in state or 
+context — inspect the existing code to find it. 
+Do not change how the savings goal works.
+
+The holiday tip should render BELOW the savings goal 
+card, with 12px margin above it, BUT ONLY when ALL 
+of the following are true:
+  a) A savings goal exists (goal object is not null 
+     or undefined)
+  b) The goal appears to be a holiday goal — check 
+     ALL of these conditions (any one match = show tip):
+       - goal.type === 'holiday'
+       - goal.goalType === 'holiday'
+       - goal.icon === 0
+       - goal.iconIndex === 0
+       - goal.iconKey === 'holiday'
+       - goal.name?.toLowerCase().includes('holiday')
+       - goal.label?.toLowerCase().includes('holiday')
+       - goal.category === 'holiday'
+
+If none of those fields exist or none match, 
+do not show this tip card. Do not guess or 
+assume — only show when a condition clearly matches.
+
+Props:
+- tipId: 'tip_holiday'
+- icon: '🌏'
+- title: 'Book smarter when you\'re ready.'
+- body: 'Hotels through ShopBack earn 8–13% cashback. 
+  On a $2,500 stay that\'s $200–$325 back toward 
+  your goal.'
+- primaryLabel: 'See travel cashback →'
+- primaryUrl: 'https://www.shopback.com.au/travel'
+
+No secondary button.
+
+──────────────────────────────────────
+STEP 5 — PETROL TIP
+──────────────────────────────────────
+Locate the Family tab result screen — the screen 
+that shows the sorted plan with "WHO'S GOT WHAT" 
+and individual family member schedules.
+
+Add SavingsTipCard below the last family member 
+schedule card, above any action buttons at the 
+bottom (Share full plan / Sort again). 
+Add 16px margin above it.
+
+Props:
+- tipId: 'tip_petrol'
+- icon: '⛽'
+- title: 'Petrol prices vary by 20–30c/L 
+  across a suburb.'
+- body: 'PetrolSpy shows real prices near you — 
+  free, no account needed.'
+- primaryLabel: 'Find cheapest petrol near me →'
+- primaryUrl: 'https://www.petrolspy.com.au'
+
+No secondary button.
+
+──────────────────────────────────────
+SAFETY RULES — READ BEFORE WRITING ANY CODE
+──────────────────────────────────────
+1. Do not modify any existing screen logic, state, 
+   navigation, or styling. Only add the tip card 
+   below existing content.
+2. Do not remove or move any existing buttons 
+   (Share list, Sort again, etc.)
+3. Do not import or install any new packages — 
+   use only AsyncStorage (already in project), 
+   Linking (from react-native), and existing 
+   component primitives.
+4. If AsyncStorage is not already imported in a 
+   screen file, import it from 
+   '@react-native-async-storage/async-storage'.
+5. Wrap each tip card in a try/catch around the 
+   AsyncStorage read on mount — if AsyncStorage 
+   fails for any reason, default to showing the card.
+6. The SavingsTipCard must never crash the screen 
+   it lives on. If any prop is missing or undefined, 
+   render null silently.
+7. Do not add any console.log statements.
+8. After completing all changes, list every file 
+   you modified and confirm all four tip cards 
+   are in place.

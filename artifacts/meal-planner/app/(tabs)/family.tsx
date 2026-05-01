@@ -1,5 +1,6 @@
 import { Feather } from "@expo/vector-icons";
 import React, { useCallback, useEffect, useRef, useState } from "react";
+import { SavingsTipCard } from "@/components/SavingsTipCard";
 import {
   ActionSheetIOS,
   Alert,
@@ -1118,6 +1119,17 @@ function JuggleResultsContent({
           </Text>
         );
       })()}
+
+      <View style={{ marginTop: 16 }}>
+        <SavingsTipCard
+          tipId="tip_petrol"
+          icon="⛽"
+          title="Petrol prices vary by 20–30c/L across a suburb."
+          body="PetrolSpy shows real prices near you — free, no account needed."
+          primaryLabel="Find cheapest petrol near me →"
+          primaryUrl="https://www.petrolspy.com.au"
+        />
+      </View>
 
       {/* ── 6. Actions ── */}
       <View style={styles.resultActionsRow}>
