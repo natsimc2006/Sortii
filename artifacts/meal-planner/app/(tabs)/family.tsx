@@ -3689,7 +3689,7 @@ export default function FamilyScreen() {
     };
     const updated = { ...state, events: [...state.events, newEv] };
     await persistState(updated);
-    showBanner("success", `${appt.title} added to plan`);
+    showBanner("first", `${appt.title} added to plan`);
   }
 
   // Taller bottom padding when sort CTA is shown in sticky bar
@@ -3800,7 +3800,7 @@ export default function FamilyScreen() {
                                       createdDate: new Date().toISOString(),
                                     };
                                     persistState({ ...state, events: [...state.events, copy] });
-                                    showBanner("success", `${ev.title} added to plan`);
+                                    showBanner("first", `${ev.title} added to plan`);
                                   }
                                 : undefined}
                             />
@@ -3898,7 +3898,7 @@ export default function FamilyScreen() {
                       key={appt.id}
                       style={{
                         flexDirection: "row",
-                        backgroundColor: CARD,
+                        backgroundColor: CARD_BG,
                         borderRadius: 12,
                         overflow: "hidden",
                         borderWidth: 1,
