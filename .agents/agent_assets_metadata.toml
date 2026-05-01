@@ -12,6 +12,18 @@ uri = "file://artifacts/meal-planner/assets/images/splash-icon.png"
 type = "image"
 title = "generated_image"
 
+[[generated]]
+id = "wZmJ_D-euz06VpDE88bF2"
+uri = "file://artifacts/sortii-launch-deck/public/hero-kitchen.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "pBdCrXrbDM64eqgKjp_LU"
+uri = "file://artifacts/sortii-launch-deck/public/planner-flatlay.png"
+type = "image"
+title = "generated_image"
+
 [[outputs]]
 id = "mKqJJqq5sUuSP3hWqgzsp"
 uri = "file://scripts/recipes-for-pricing.json"

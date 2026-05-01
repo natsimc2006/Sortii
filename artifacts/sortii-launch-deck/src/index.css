@@ -11,14 +11,16 @@
 }
 
 :root {
-  /* Replace these with brand colors */
-  --slide-primary: #4f46e5;
-  --slide-accent: #06b6d4;
-  --slide-bg: #f8fafc;
-  --slide-text: #0f172a;
-  --slide-muted: #64748b;
-  --font-display-family: "Inter", system-ui, sans-serif;
-  --font-body-family: "Inter", system-ui, sans-serif;
+  --slide-primary: #2A8F88;
+  --slide-accent: #D29A22;
+  --slide-bg: #F7F3EB;
+  --slide-text: #2B2B2B;
+  --slide-muted: #7a7167;
+  --slide-plum: #5E3A4C;
+  --slide-teal-dark: #1D6962;
+  --slide-cream-dark: #EDE9E1;
+  --font-display-family: "Playfair Display", Georgia, serif;
+  --font-body-family: "DM Sans", system-ui, sans-serif;
   color-scheme: light;
 }
 

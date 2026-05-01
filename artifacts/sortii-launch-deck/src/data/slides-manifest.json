@@ -1,1 +1,66 @@
-[]
+[
+  {
+    "id": "f3a1b2c4-d5e6-7890-abcd-ef1234567890",
+    "position": 1,
+    "filepath": "src/pages/slides/Slide1Title.tsx",
+    "title": "Sortii — Your Week, Sorted.",
+    "description": "Title slide — deep teal with hero kitchen image, Playfair logo lockup and italic tagline.",
+    "speakerNotes": ""
+  },
+  {
+    "id": "a2b3c4d5-e6f7-8901-bcde-f12345678901",
+    "position": 2,
+    "filepath": "src/pages/slides/Slide2Problem.tsx",
+    "title": "The problem",
+    "description": "It's 5pm — what's for dinner? Two-column layout: scenario left, three truth cards right.",
+    "speakerNotes": ""
+  },
+  {
+    "id": "b3c4d5e6-f7a8-9012-cdef-123456789012",
+    "position": 3,
+    "filepath": "src/pages/slides/Slide3WhatItIs.tsx",
+    "title": "What Sortii is",
+    "description": "Dark teal slide — headline + four pillars: Meals, Budget, Logistics, Relief.",
+    "speakerNotes": ""
+  },
+  {
+    "id": "c4d5e6f7-a8b9-0123-defa-234567890123",
+    "position": 4,
+    "filepath": "src/pages/slides/Slide4PlanAhead.tsx",
+    "title": "This Week. Next Week.",
+    "description": "Image-split layout: planner flatlay right, two-window planning concept left.",
+    "speakerNotes": ""
+  },
+  {
+    "id": "d5e6f7a8-b9c0-1234-efab-345678901234",
+    "position": 5,
+    "filepath": "src/pages/slides/Slide5YourHousehold.tsx",
+    "title": "Built around your household",
+    "description": "Cream slide — headline + three feature cards: household size, budget, dietary needs.",
+    "speakerNotes": ""
+  },
+  {
+    "id": "e6f7a8b9-c0d1-2345-fabc-456789012345",
+    "position": 6,
+    "filepath": "src/pages/slides/Slide6FridgeRescue.tsx",
+    "title": "Fridge Rescue",
+    "description": "Dark teal split — hero Fridge Rescue text left, ingredient-to-recipe card stack right.",
+    "speakerNotes": ""
+  },
+  {
+    "id": "f7a8b9c0-d1e2-3456-abcd-567890123456",
+    "position": 7,
+    "filepath": "src/pages/slides/Slide7HowItWorks.tsx",
+    "title": "The habit loop",
+    "description": "Cream slide — four-step numbered habit loop: weekly reset, daily glance, quick capture, reset mode.",
+    "speakerNotes": ""
+  },
+  {
+    "id": "a8b9c0d1-e2f3-4567-bcde-678901234567",
+    "position": 8,
+    "filepath": "src/pages/slides/Slide8Closing.tsx",
+    "title": "Dinner… sorted.",
+    "description": "Closing — dark teal centred logo lockup with italic tagline and download message.",
+    "speakerNotes": ""
+  }
+]
