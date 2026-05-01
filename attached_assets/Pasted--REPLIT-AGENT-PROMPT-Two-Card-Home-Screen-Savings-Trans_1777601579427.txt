@@ -1,0 +1,238 @@
+# REPLIT AGENT PROMPT
+# Two-Card Home Screen + Savings Transparency Fix
+# Run steps in order. Confirm each step before proceeding to the next.
+
+---
+
+## STEP 1 — DATE UTILITY FUNCTIONS
+
+Create or update `utils/weekUtils.ts` with the following functions. Do not modify any existing functions in this file if they already exist — append only.
+
+```ts
+// Returns 0=Monday through 6=Sunday (remaps JS Sunday from 0 → 6)
+export function getTodayDayIndex(): number {
+  const day = new Date().getDay();
+  return day === 0 ? 6 : day - 1;
+}
+
+// Thu=3, Fri=4, Sat=5, Sun=6 are the "shop window"
+export function isShopWindow(): boolean {
+  return getTodayDayIndex() >= 3;
+}
+
+// Returns Monday–Sunday Date range for the current calendar week
+export function getThisWeekRange(): { start: Date; end: Date } {
+  const today = new Date();
+  const dayIdx = getTodayDayIndex();
+  const monday = new Date(today);
+  monday.setDate(today.getDate() - dayIdx);
+  monday.setHours(0, 0, 0, 0);
+  const sunday = new Date(monday);
+  sunday.setDate(monday.getDate() + 6);
+  sunday.setHours(23, 59, 59, 999);
+  return { start: monday, end: sunday };
+}
+
+// Returns Monday–Sunday Date range for next calendar week
+export function getNextWeekRange(): { start: Date; end: Date } {
+  const { start } = getThisWeekRange();
+  const nextMonday = new Date(start);
+  nextMonday.setDate(start.getDate() + 7);
+  const nextSunday = new Date(nextMonday);
+  nextSunday.setDate(nextMonday.getDate() + 6);
+  nextSunday.setHours(23, 59, 59, 999);
+  return { start: nextMonday, end: nextSunday };
+}
+
+// Key format for storing next week's plan — e.g. "plan_2025-05-05"
+export function getNextWeekKey(): string {
+  const { start } = getNextWeekRange();
+  return `plan_${start.toISOString().split('T')[0]}`;
+}
+```
+
+Confirm: utility file updated with these five functions.
+
+---
+
+## STEP 2 — THIS WEEK CARD COMPONENT
+
+Create `components/ThisWeekCard.tsx`.
+
+Props:
+```ts
+interface ThisWeekCardProps {
+  allMeals: Meal[];         // All 7 meals for this week
+  todayIndex: number;       // 0=Mon through 6=Sun
+  onViewPlan: () => void;
+  onShoppingList: () => void;
+}
+```
+
+Behaviour:
+- `remainingMeals` = allMeals from todayIndex onward
+- `doneMeals` = allMeals before todayIndex
+- `remainingCount` = remainingMeals.length
+
+Display:
+- Label: "This Week" — teal (#2A8F88), 11px, uppercase, letter-spacing 0.1em
+- Headline: `"{remainingCount} dinner{s} left."` or `"All done."` if remainingCount === 0
+- Pill (top right): `"{doneMeals.length} done"` — teal tint background, teal text
+- Meal list: done meals shown with line-through + 50% opacity; remaining meals shown normally, with a small teal dot prefix
+- Buttons (only shown if remainingCount > 0): "View plan" (secondary teal outline) | "Shopping list" (secondary teal outline)
+- Card style: white background, border-left 4px solid #2A8F88, border-radius 14, border 1px solid #E6E1D7
+
+Do not hardcode any meal names — render from the allMeals prop.
+
+Confirm: ThisWeekCard component created and renders correctly with mock data.
+
+---
+
+## STEP 3 — NEXT WEEK CARD COMPONENT
+
+Create `components/NextWeekCard.tsx`.
+
+Props:
+```ts
+interface NextWeekCardProps {
+  nextWeekPlan: Meal[] | null;   // null = not yet sorted
+  isShopWindow: boolean;
+  onGenerate: () => void;        // triggers plan generation for next week
+  onViewPlan: () => void;
+  onShoppingList: () => void;
+}
+```
+
+Render one of three states:
+
+### STATE A — nextWeekPlan is null AND isShopWindow is false
+- Background: white
+- Border-left: 1px solid #E6E1D7 (no accent colour)
+- Label: "Next Week" — muted (#888), 11px uppercase
+- Headline: "Nothing planned."
+- Copy: "Sort next week whenever you're ready."
+- Button: "Plan next week" — secondary teal outline
+
+### STATE B — nextWeekPlan is null AND isShopWindow is true
+- Background: #F6E6BA (gold tint)
+- Border-left: 4px solid #D29A22
+- Label: "Next Week" — #D29A22, 11px uppercase
+- Headline: "Not sorted yet."
+- Pill (top right): "Shop soon" — gold tint bg, #8a6010 text
+- Copy: "Weekend's coming. Sort next week now and your list is ready to go."
+- Button: "Sort next week →" — primary gold button (#D29A22 background, white text)
+
+### STATE C — nextWeekPlan exists (any day)
+- Background: #F3E8EE (plum tint)
+- Border-left: 4px solid #5E3A4C
+- Label: "Next Week" — #5E3A4C, 11px uppercase
+- Headline: "Sorted. ✓"
+- Pill (top right): "Ready" — plum tint bg, #5E3A4C text
+- Copy if isShopWindow: "Your list is ready. Add to cart whenever you're ready."
+- Copy if NOT isShopWindow: "One less thing to think about."
+- Buttons: "View plan" (secondary) | if isShopWindow also show "Shopping list →" (primary gold)
+
+Confirm: NextWeekCard renders all three states correctly with mock props.
+
+---
+
+## STEP 4 — NEXT WEEK PLAN STORAGE
+
+Check how the current week's meal plan is stored (AsyncStorage or equivalent).
+
+Apply the same storage pattern for next week's plan, using the key returned by `getNextWeekKey()` from Step 1.
+
+On home screen load:
+1. Call `getNextWeekKey()` to get this week's next-week key
+2. Read from storage with that key
+3. If a stored plan exists → pass it as `nextWeekPlan` to NextWeekCard (STATE C)
+4. If nothing stored → pass `null` (STATE A or B depending on isShopWindow)
+
+When `onGenerate` is called (user taps "Sort next week"):
+- Run the existing plan generation logic
+- Store the result under `getNextWeekKey()`
+- Update `nextWeekPlan` state to trigger re-render to STATE C
+
+Confirm: next week plan persists across app restarts.
+
+---
+
+## STEP 5 — HOME SCREEN LAYOUT UPDATE
+
+Update the home screen to render both cards with ordering based on `isShopWindow()`.
+
+Layout rules:
+- If `isShopWindow()` is TRUE (Thu–Sun): render NextWeekCard FIRST, ThisWeekCard SECOND
+- If `isShopWindow()` is FALSE (Mon–Wed): render ThisWeekCard FIRST, NextWeekCard SECOND
+- Gap between cards: 12px
+- Both cards full width, no horizontal padding inside the card stack
+
+Shopping list scope when tapped:
+- From ThisWeekCard → scope = remaining meals this week only
+- From NextWeekCard STATE C → scope = next week's full plan
+- From NextWeekCard STATE B (shop window, unsorted) → do NOT open shopping list; instead show an inline message: "Sort next week first to get your full list." with a "Sort now →" button
+
+Remove any existing single-card or single-week-only display — replace entirely with this two-card layout.
+
+Confirm: home screen renders correctly on iPhone SE (375px) and iPhone 14 (390px) screen widths.
+
+---
+
+## STEP 6 — SAVINGS TRANSPARENCY FIX (Money / Budget page)
+
+This is a separate fix on the money or budget tab. Do not touch the home screen components for this step.
+
+### Current problem
+The app shows a saving amount (e.g. "You're saving $X on dinner") but does not explain how this figure is calculated. Users don't understand where it comes from.
+
+### Fix required
+
+Find where the savings figure is calculated and displayed. Update the display to include a transparent breakdown note directly beneath the saving amount.
+
+The calculation logic is:
+```
+savingsAmount = userGroceryBudget - weeklyMealPlanCost
+baselineDinnerSpend = userGroceryBudget * 0.65
+```
+
+Where `0.65` represents the industry average: 65% of a household grocery bill goes on dinner.
+
+Display format — directly below the saving amount figure, add this note in small muted text:
+
+```
+Based on your $[userGroceryBudget]/wk grocery budget.
+Dinner is typically 65% of that (~$[baselineDinnerSpend]/wk).
+Your plan this week costs $[weeklyMealPlanCost].
+```
+
+Style for the note:
+- Font size: 12px
+- Colour: muted (#888888)
+- Line height: 1.5
+- Italic style preferred
+- Positioned directly beneath the savings figure, above any CTA buttons
+- Do NOT use the word "approximately" — use "~" symbol only
+- Do NOT use "based on average" — use "typically"
+
+### Safety rules
+- If `userGroceryBudget` is 0, null, or undefined → suppress the note entirely, show nothing
+- If `weeklyMealPlanCost` is 0, null, or undefined → suppress the note entirely
+- If `baselineDinnerSpend` would be lower than `weeklyMealPlanCost` → suppress the saving claim and note entirely; show no negative saving
+- Round all dollar figures to nearest whole dollar (no cents)
+- Currency symbol should match user locale: $ for AU, £ for UK
+
+Confirm: savings note renders correctly when budget and meal cost are both set, and suppresses correctly when either is missing.
+
+---
+
+## FINAL CHECK
+
+After all steps are complete:
+1. Open home screen on a simulated Thursday — confirm NextWeekCard appears first in gold STATE B
+2. Tap "Sort next week →" — confirm it generates a plan and card shifts to STATE C (plum)
+3. Restart the app — confirm next week plan is still in STATE C (persisted)
+4. Open on a simulated Monday — confirm ThisWeekCard appears first
+5. Open money/budget page with a set grocery budget — confirm savings note renders with correct figures
+6. Set grocery budget to 0 — confirm savings note is suppressed
+
+Report results of each check before closing.

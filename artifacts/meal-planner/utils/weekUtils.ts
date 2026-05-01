@@ -46,6 +46,12 @@ export function getNextWeekMondayISO(): string {
   return start.toISOString().split("T")[0]!;
 }
 
+/** Storage key for next week's plan — e.g. "plan_2025-05-05" */
+export function getNextWeekKey(): string {
+  const { start } = getNextWeekRange();
+  return `plan_${start.toISOString().split("T")[0]!}`;
+}
+
 /** Days from today (inclusive) through Sunday — ordered Mon-Sun indices */
 export function getRemainingDayIndices(): number[] {
   const today = getTodayDayIndex();

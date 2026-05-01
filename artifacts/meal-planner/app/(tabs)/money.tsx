@@ -597,10 +597,12 @@ function SavingsGoalCard({
 function MealPlanSavingCard({
   mealsPlanned,
   weeklyGroceryEstimate,
+  dinnerPlanCost,
   fmt,
 }: {
   mealsPlanned: number;
   weeklyGroceryEstimate: number;
+  dinnerPlanCost: number;
   fmt: (n: number) => string;
 }) {
   // Never show the card when no dinners are planned
@@ -620,11 +622,23 @@ function MealPlanSavingCard({
     ? `Add more to unlock the full ~${fmt(fullWeekSaving)} saving.`
     : null;
 
+  // Savings transparency note
+  const baselineDinnerSpend = Math.round(weeklyGroceryEstimate * 0.65);
+  const showTransparencyNote =
+    weeklyGroceryEstimate > 0 &&
+    dinnerPlanCost > 0 &&
+    baselineDinnerSpend >= dinnerPlanCost;
+
   return (
     <View style={styles.mealSavingCard}>
       <Text style={styles.mealSavingEyebrow}>THIS WEEK'S DINNER SAVING</Text>
       <Text style={styles.mealSavingBig}>~{fmt(estimatedSaving)}</Text>
       <Text style={styles.mealSavingDesc}>{savingCopy}</Text>
+      {showTransparencyNote && (
+        <Text style={styles.mealSavingTransparency}>
+          {`Based on your ${fmt(weeklyGroceryEstimate)}/wk grocery budget.\nDinner is typically 65% of that (~${fmt(baselineDinnerSpend)}/wk).\nYour plan this week costs ${fmt(Math.round(dinnerPlanCost))}.`}
+        </Text>
+      )}
       {savingSubtext ? (
         <Text style={styles.mealSavingAppend}>{savingSubtext}</Text>
       ) : null}
@@ -1011,6 +1025,7 @@ export default function MoneyScreen() {
           <MealPlanSavingCard
             mealsPlanned={filledMeals.length}
             weeklyGroceryEstimate={money && money.groceriesWeekly > 0 ? money.groceriesWeekly : (money?.weeklyIncome ?? 0) * 0.65}
+            dinnerPlanCost={dinnerPlanCost}
             fmt={formatMoneyRound}
           />
 
@@ -1104,6 +1119,7 @@ export default function MoneyScreen() {
           <MealPlanSavingCard
             mealsPlanned={filledMeals.length}
             weeklyGroceryEstimate={money && money.groceriesWeekly > 0 ? money.groceriesWeekly : (money?.weeklyIncome ?? 0) * 0.65}
+            dinnerPlanCost={dinnerPlanCost}
             fmt={formatMoneyRound}
           />
 
@@ -1194,6 +1210,7 @@ export default function MoneyScreen() {
           <MealPlanSavingCard
             mealsPlanned={filledMeals.length}
             weeklyGroceryEstimate={money && money.groceriesWeekly > 0 ? money.groceriesWeekly : (money?.weeklyIncome ?? 0) * 0.65}
+            dinnerPlanCost={dinnerPlanCost}
             fmt={formatMoneyRound}
           />
         </>
@@ -1788,6 +1805,10 @@ const styles = StyleSheet.create({
   mealSavingAppend: {
     fontSize: 13, fontFamily: "Inter_400Regular",
     color: "#888", fontStyle: "italic", lineHeight: 18, marginTop: 4,
+  },
+  mealSavingTransparency: {
+    fontSize: 12, fontFamily: "Inter_400Regular",
+    color: "#888888", fontStyle: "italic", lineHeight: 18, marginTop: 6,
   },
 
   // Snapshot collapsed summary line
