@@ -3594,6 +3594,21 @@ export default function FamilyScreen() {
       .sort((a, b) => a.date.localeCompare(b.date) || a.startTime.localeCompare(b.startTime));
   }, [apptItems, sortWeek]);
 
+  // COMING UP: appointments from the Appointments tab within the next 14 days
+  // Declared here (before early returns) to satisfy the Rules of Hooks.
+  const upcomingAppts = React.useMemo(() => {
+    const now = new Date();
+    now.setHours(0, 0, 0, 0);
+    const cutoff = new Date(now.getTime() + 14 * 24 * 60 * 60 * 1000);
+    return apptItems
+      .filter((a) => {
+        if (a.isDone || a.isCancelled) return false;
+        const d = new Date(`${a.date}T00:00:00`);
+        return d >= now && d <= cutoff;
+      })
+      .sort((a, b) => a.date.localeCompare(b.date));
+  }, [apptItems]);
+
   if (loading) return <View style={{ flex: 1, backgroundColor: BG }} />;
 
   // ── Page 2: Sorting / loading screen ───────────────────────────────────────
@@ -3653,20 +3668,6 @@ export default function FamilyScreen() {
   const hasTightOrConflict = (result?.insights ?? []).some(
     (i) => i.type === "conflict" || i.type === "tight" || i.type === "child_clash"
   );
-
-  // COMING UP: appointments from the Appointments tab within the next 14 days
-  const upcomingAppts = React.useMemo(() => {
-    const now = new Date();
-    now.setHours(0, 0, 0, 0);
-    const cutoff = new Date(now.getTime() + 14 * 24 * 60 * 60 * 1000);
-    return apptItems
-      .filter((a) => {
-        if (a.isDone || a.isCancelled) return false;
-        const d = new Date(`${a.date}T00:00:00`);
-        return d >= now && d <= cutoff;
-      })
-      .sort((a, b) => a.date.localeCompare(b.date));
-  }, [apptItems]);
 
   // Add a COMING UP appointment into the current week's event list as a one-off
   async function handleAddApptToWeek(appt: Appointment) {

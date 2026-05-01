@@ -267,7 +267,7 @@ export default function PreferencesScreen() {
     } else if (isFreshFlow && router.canGoBack()) {
       router.back();
     } else {
-      router.navigate("/(tabs)/planner");
+      router.navigate("/(tabs)/meals");
     }
   };
 
@@ -290,7 +290,7 @@ export default function PreferencesScreen() {
       } else if (isMealsFlow) {
         router.replace("/(tabs)/meals");
       } else {
-        router.replace("/(tabs)/planner");
+        router.replace("/(tabs)/meals");
       }
     }, 1200);
   };
