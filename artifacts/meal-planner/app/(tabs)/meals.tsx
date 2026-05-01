@@ -916,6 +916,48 @@ export default function MealsScreen() {
         )}
       </ScrollView>
 
+      {/* ── Week action bar — sticky, shows when week not complete ──────── */}
+      {!isWeekFull && !confirmAction && !pendingMealAction && (
+        <View
+          style={[
+            styles.weekActionBar,
+            { backgroundColor: C.card, borderTopColor: C.cardBorder },
+          ]}
+        >
+          {isWeekEmpty ? (
+            <TouchableOpacity
+              style={[styles.weekActionPrimary, { backgroundColor: C.primary }]}
+              onPress={handleAutoGenerate}
+              activeOpacity={0.82}
+            >
+              <Feather name="zap" size={14} color="#fff" />
+              <Text style={styles.weekActionPrimaryText}>Sort my week for me</Text>
+            </TouchableOpacity>
+          ) : (
+            <View style={styles.weekActionRow}>
+              <TouchableOpacity
+                style={[styles.weekActionPrimary, { flex: 1, backgroundColor: C.primary }]}
+                onPress={handleFill}
+                activeOpacity={0.82}
+              >
+                <Feather name="plus-circle" size={13} color="#fff" />
+                <Text style={styles.weekActionPrimaryText}>Fill remaining</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.weekActionSecondary, { borderColor: C.cardBorder }]}
+                onPress={handleClear}
+                activeOpacity={0.75}
+              >
+                <Feather name="trash-2" size={13} color={C.textSecondary} />
+                <Text style={[styles.weekActionSecondaryText, { color: C.textSecondary }]}>
+                  Clear
+                </Text>
+              </TouchableOpacity>
+            </View>
+          )}
+        </View>
+      )}
+
       {/* Meal action confirm bar */}
       {pendingMealAction && (
         <View
@@ -1806,5 +1848,42 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginTop: 4,
     marginBottom: 8,
+  },
+
+  weekActionBar: {
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderTopWidth: 1,
+  },
+  weekActionPrimary: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 7,
+    paddingVertical: 13,
+    borderRadius: 14,
+  },
+  weekActionPrimaryText: {
+    fontSize: 14,
+    fontFamily: "Inter_700Bold",
+    color: "#fff",
+  },
+  weekActionRow: {
+    flexDirection: "row",
+    gap: 8,
+  },
+  weekActionSecondary: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 6,
+    paddingVertical: 13,
+    paddingHorizontal: 18,
+    borderRadius: 14,
+    borderWidth: 1,
+  },
+  weekActionSecondaryText: {
+    fontSize: 13,
+    fontFamily: "Inter_600SemiBold",
   },
 });

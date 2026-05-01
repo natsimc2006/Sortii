@@ -45,7 +45,7 @@ function QuickAddSheet({
       sub: "Plan dinner or lunch for a day",
       onPress: () => {
         onClose();
-        router.push("/(tabs)/planner");
+        router.push("/(tabs)/meals");
       },
     },
     {
