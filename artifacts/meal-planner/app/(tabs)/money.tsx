@@ -622,12 +622,14 @@ function MealPlanSavingCard({
     ? `Add more to unlock the full ~${fmt(fullWeekSaving)} saving.`
     : null;
 
-  // Savings transparency note
-  const baselineDinnerSpend = Math.round(weeklyGroceryEstimate * 0.65);
+  // Savings transparency note — prorated to number of planned dinners
+  const baselineDinnerPerNight = weeklyGroceryEstimate * 0.65 / 7;
+  const baselineForPlannedMeals = Math.round(baselineDinnerPerNight * mealsPlanned);
   const showTransparencyNote =
     weeklyGroceryEstimate > 0 &&
     dinnerPlanCost > 0 &&
-    baselineDinnerSpend >= dinnerPlanCost;
+    mealsPlanned > 0 &&
+    baselineForPlannedMeals >= Math.round(dinnerPlanCost);
 
   return (
     <View style={styles.mealSavingCard}>
@@ -636,7 +638,7 @@ function MealPlanSavingCard({
       <Text style={styles.mealSavingDesc}>{savingCopy}</Text>
       {showTransparencyNote && (
         <Text style={styles.mealSavingTransparency}>
-          {`Based on your ${fmt(weeklyGroceryEstimate)}/wk grocery budget.\nDinner is typically 65% of that (~${fmt(baselineDinnerSpend)}/wk).\nYour plan this week costs ${fmt(Math.round(dinnerPlanCost))}.`}
+          {`Based on your ${fmt(Math.round(weeklyGroceryEstimate))}/wk grocery budget.\nDinner is typically 65% of that (~${fmt(Math.round(baselineDinnerPerNight))}/night).\nFor ${mealsPlanned} dinner${mealsPlanned !== 1 ? "s" : ""}, that's ~${fmt(baselineForPlannedMeals)} estimated vs. your ${fmt(Math.round(dinnerPlanCost))} plan.`}
         </Text>
       )}
       {savingSubtext ? (
