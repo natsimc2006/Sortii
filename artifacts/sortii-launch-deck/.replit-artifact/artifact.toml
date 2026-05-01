@@ -1,0 +1,31 @@
+kind = "slides"
+previewPath = "/sortii-launch-deck/"
+title = "Sortii Launch Deck"
+version = "1.0.0"
+id = "artifacts/sortii-launch-deck"
+router = "path"
+
+[[integratedSkills]]
+name = "slides"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/sortii-launch-deck/" ]
+localPort = 21345
+
+[services.development]
+run = "pnpm --filter @workspace/sortii-launch-deck run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/sortii-launch-deck", "run", "build" ]
+publicDir = "artifacts/sortii-launch-deck/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "21345"
+BASE_PATH = "/sortii-launch-deck/"

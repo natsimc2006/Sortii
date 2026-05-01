@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sortii — Single Source of Truth</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F7F3EB;
+    --text: #2B2B2B;
+    --teal: #2A8F88;
+    --teal-tint: #E6F3F0;
+    --teal-dark: #257D78;
+    --gold: #D29A22;
+    --gold-tint: #F6E6BA;
+    --plum: #5E3A4C;
+    --plum-tint: #F3E8EE;
+    --border: #E6E1D7;
+    --red: #B86557;
+    --white: #ffffff;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    line-height: 1.65;
+    padding: 56px 40px;
+    max-width: 860px;
+    margin: 0 auto;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    border-bottom: 1.5px solid var(--border);
+    padding-bottom: 28px;
+    margin-bottom: 48px;
+  }
+  .brand {
+    font-family: 'Playfair Display', serif;
+    font-size: 48px;
+    letter-spacing: -1.5px;
+    color: var(--text);
+    line-height: 1;
+  }
+  .brand span { color: var(--gold); }
+  .doc-meta {
+    text-align: right;
+  }
+  .doc-label {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--plum);
+    display: block;
+    margin-bottom: 4px;
+  }
+  .doc-title-small {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    color: var(--text);
+    font-style: italic;
+  }
+
+  /* ── HERO STATEMENT ── */
+  .hero {
+    background: var(--teal);
+    border-radius: 16px;
+    padding: 36px 40px;
+    margin-bottom: 40px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -40px; right: -40px;
+    width: 200px; height: 200px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.06);
+  }
+  .hero::after {
+    content: '';
+    position: absolute;
+    bottom: -60px; left: 60px;
+    width: 280px; height: 280px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.04);
+  }
+  .hero-label {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: rgba(255,255,255,0.6);
+    margin-bottom: 12px;
+    display: block;
+  }
+  .hero-statement {
+    font-family: 'Playfair Display', serif;
+    font-size: 26px;
+    color: white;
+    line-height: 1.4;
+    font-weight: 700;
+    position: relative;
+    z-index: 1;
+  }
+  .hero-sub {
+    color: rgba(255,255,255,0.75);
+    font-size: 14px;
+    margin-top: 14px;
+    position: relative;
+    z-index: 1;
+    line-height: 1.6;
+  }
+
+  /* ── SECTION HEADERS ── */
+  .section { margin-bottom: 40px; }
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .section-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .dot-teal { background: var(--teal); }
+  .dot-gold { background: var(--gold); }
+  .dot-plum { background: var(--plum); }
+  .dot-red  { background: var(--red); }
+
+  h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text);
+  }
+  h3 {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--plum);
+    margin-bottom: 10px;
+  }
+
+  /* ── CARDS ── */
+  .card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 22px 24px;
+    margin-bottom: 12px;
+  }
+  .card.teal-left { border-left: 3px solid var(--teal); }
+  .card.gold-left  { border-left: 3px solid var(--gold); }
+  .card.plum-left  { border-left: 3px solid var(--plum); }
+  .card.red-left   { border-left: 3px solid var(--red); }
+
+  /* ── GRID ── */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+
+  /* ── PROMISE BLOCK ── */
+  .promise-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .promise-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+  }
+  .promise-card .num {
+    font-family: 'Playfair Display', serif;
+    font-size: 32px;
+    color: var(--teal);
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 6px;
+    display: block;
+  }
+  .promise-card strong { display: block; font-size: 14px; margin-bottom: 4px; }
+  .promise-card p { font-size: 13px; color: #666; margin: 0; }
+
+  /* ── SPINE ── */
+  .spine-row {
+    display: flex;
+    gap: 0;
+    margin-bottom: 12px;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+  .spine-label {
+    background: var(--teal-tint);
+    color: var(--teal-dark);
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    padding: 12px 16px;
+    min-width: 120px;
+    display: flex;
+    align-items: center;
+  }
+  .spine-value {
+    background: var(--white);
+    padding: 12px 18px;
+    font-size: 14px;
+    color: var(--text);
+    flex: 1;
+    display: flex;
+    align-items: center;
+  }
+
+  /* ── HABIT LOOP ── */
+  .loop {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .loop-step {
+    flex: 1;
+    padding: 18px 14px;
+    text-align: center;
+    border-right: 1px solid var(--border);
+    position: relative;
+  }
+  .loop-step:last-child { border-right: none; }
+  .loop-step .step-label {
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--plum);
+    margin-bottom: 6px;
+    display: block;
+  }
+  .loop-step .step-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    display: block;
+    margin-bottom: 4px;
+  }
+  .loop-step .step-desc {
+    font-size: 11.5px;
+    color: #777;
+    line-height: 1.4;
+  }
+  .loop-step .arrow {
+    position: absolute;
+    right: -10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--gold);
+    font-size: 14px;
+    font-weight: 700;
+    z-index: 1;
+    background: var(--white);
+    padding: 2px;
+  }
+
+  /* ── GUARDRAILS ── */
+  .guardrail {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .guardrail:last-child { border-bottom: none; padding-bottom: 0; }
+  .guardrail-icon {
+    font-size: 16px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .guardrail strong { display: block; font-size: 14px; margin-bottom: 2px; }
+  .guardrail p { font-size: 13px; color: #666; margin: 0; }
+
+  /* ── SEQUENCING ── */
+  .seq-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 12px;
+  }
+  .seq-badge {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .badge-teal { background: var(--teal); color: white; }
+  .badge-gold { background: var(--gold); color: white; }
+  .badge-plum { background: var(--plum); color: white; }
+  .seq-content strong { display: block; font-size: 14px; margin-bottom: 2px; }
+  .seq-content p { font-size: 13px; color: #666; margin: 0; }
+
+  /* ── PILL ── */
+  .pill {
+    display: inline-block;
+    padding: 3px 11px;
+    border-radius: 20px;
+    font-size: 11.5px;
+    font-weight: 600;
+    margin: 3px 3px 3px 0;
+  }
+  .pill-teal { background: var(--teal-tint); color: var(--teal-dark); }
+  .pill-gold { background: var(--gold-tint); color: #8a6010; }
+  .pill-plum { background: var(--plum-tint); color: var(--plum); }
+  .pill-red  { background: #F7E9E8; color: var(--red); }
+
+  /* ── DIVIDER ── */
+  .rule { border: none; border-top: 1px solid var(--border); margin: 40px 0; }
+
+  /* ── FOOTER QUOTE ── */
+  .footer-quote {
+    text-align: center;
+    margin-top: 56px;
+    padding-top: 32px;
+    border-top: 1.5px solid var(--border);
+  }
+  .footer-quote p {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-style: italic;
+    color: var(--teal);
+  }
+  .footer-quote small {
+    display: block;
+    margin-top: 8px;
+    font-size: 11px;
+    color: #aaa;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  /* ── NORTH STAR CHECK ── */
+  .check-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .check-item {
+    background: var(--teal-tint);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 13px;
+    color: var(--teal-dark);
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .check-item::before { content: '✓'; font-weight: 700; }
+
+  @media (max-width: 640px) {
+    body { padding: 28px 20px; }
+    .header { flex-direction: column; align-items: flex-start; gap: 16px; }
+    .doc-meta { text-align: left; }
+    .grid-2, .grid-3, .promise-grid, .check-grid { grid-template-columns: 1fr; }
+    .loop { flex-direction: column; }
+    .loop-step { border-right: none; border-bottom: 1px solid var(--border); }
+    .loop-step:last-child { border-bottom: none; }
+    .loop-step .arrow { display: none; }
+    .spine-row { flex-direction: column; }
+    .spine-label { min-width: auto; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="brand">sort<span>ii</span>.</div>
+  <div class="doc-meta">
+    <span class="doc-label">Internal Reference</span>
+    <span class="doc-title-small">Single Source of Truth</span>
+  </div>
+</div>
+
+<!-- HERO -->
+<div class="hero">
+  <span class="hero-label">The one thing Sortii does better than anything else</span>
+  <div class="hero-statement">Show you your actual week in a way your brain can handle.</div>
+  <p class="hero-sub">Not "be more organised." Not a productivity system. Not another thing to maintain.<br>Relief. Specifically: stop feeling ambushed by your own life.</p>
+</div>
+
+<!-- WHAT SORTII IS -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-dot dot-gold"></div>
+    <h2>What Sortii Is</h2>
+  </div>
+
+  <div class="card gold-left">
+    <h3>The One-Sentence Answer</h3>
+    <p style="font-size:16px;font-weight:500;line-height:1.5;">A calm weekly view for the moving parts of life — meals, appointments, family logistics, and upcoming bills — so nothing sneaks up on you.</p>
+  </div>
+
+  <div class="grid-2" style="margin-top:12px;">
+    <div class="card">
+      <h3>❌ Not this</h3>
+      <p style="font-size:13.5px;color:#555;line-height:1.7;">A recipe app. A meal kit. A health tracker. A productivity tool. A colour-coded command centre. A system you have to maintain.</p>
+    </div>
+    <div class="card">
+      <h3>✓ This</h3>
+      <p style="font-size:13.5px;color:#555;line-height:1.7;">A decision remover. A mental load reducer. A soft landing. A place where things stop feeling tangled. Invisible, quiet household intelligence.</p>
+    </div>
+  </div>
+</div>
+
+<hr class="rule">
+
+<!-- WHO IT'S FOR -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-dot dot-teal"></div>
+    <h2>Who It's For</h2>
+  </div>
+  <div class="card teal-left">
+    <h3>The Early User</h3>
+    <p style="font-size:15px;font-weight:500;margin-bottom:10px;">Women 35–50 who are the default household organiser and feel constantly ambushed by their own week.</p>
+    <p style="font-size:13.5px;color:#555;">Appointments scattered across five apps. Bills that jump-scare. Kids' logistics held entirely in one person's head. Meals decided at 5pm under pressure. The mental load is real, relentless, and largely invisible to everyone except the person carrying it.</p>
+    <p style="font-size:13.5px;color:#555;margin-top:8px;">They won't go searching for tools. They'll recognise themselves in Sortii.</p>
+  </div>
+</div>
+
+<hr class="rule">
+
+<!-- THE PRODUCT SPINE -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-dot dot-plum"></div>
+    <h2>The Product Spine</h2>
+  </div>
+
+  <div class="spine-row">
+    <div class="spine-label">Core inputs</div>
+    <div class="spine-value">Meals · Appointments · Kids logistics · Bills & one-off expenses</div>
+  </div>
+  <div class="spine-row">
+    <div class="spine-label">Core output</div>
+    <div class="spine-value">Today · This week · What needs attention soon</div>
+  </div>
+  <div class="spine-row">
+    <div class="spine-label">Signature feature</div>
+    <div class="spine-value">Reset mode — the "I can't cope right now" rescue button</div>
+  </div>
+  <div class="spine-row">
+    <div class="spine-label">Growth model</div>
+    <div class="spine-value">Modules that earn their place by reducing load, never adding it</div>
+  </div>
+  <div class="spine-row">
+    <div class="spine-label">Design rule</div>
+    <div class="spine-value">Useful when incomplete. Never aspirational. No maintenance energy required.</div>
+  </div>
+</div>
+
+<hr class="rule">
+
+<!-- THE EMOTIONAL PROMISE -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-dot dot-gold"></div>
+    <h2>The Emotional Promise</h2>
+  </div>
+  <div class="promise-grid">
+    <div class="promise-card">
+      <span class="num">01</span>
+      <strong>Relief, not productivity</strong>
+      <p>The emotional target is relief. Sortii competes with mental load, not other apps.</p>
+    </div>
+    <div class="promise-card">
+      <span class="num">02</span>
+      <strong>Accept, not explore</strong>
+      <p>Deliver the plan. Users swap if needed. They never browse.</p>
+    </div>
+    <div class="promise-card">
+      <span class="num">03</span>
+      <strong>Intelligence invisible</strong>
+      <p>Smart features are felt through outcomes, never explained as features.</p>
+    </div>
+    <div class="promise-card">
+      <span class="num">04</span>
+      <strong>Surprise prevention</strong>
+      <p>Not "be more organised." Stop life sneaking up on you.</p>
+    </div>
+  </div>
+</div>
+
+<hr class="rule">
+
+<!-- THE HABIT LOOP -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-dot dot-teal"></div>
+    <h2>The Habit Loop</h2>
+  </div>
+  <div class="loop">
+    <div class="loop-step">
+      <span class="step-label">Sun / Mon</span>
+      <span class="step-name">Weekly reset</span>
+      <span class="step-desc">Glance at the week. Fill gaps. Sort 1–2 things. Done.</span>
+      <span class="arrow">›</span>
+    </div>
+    <div class="loop-step">
+      <span class="step-label">Daily</span>
+      <span class="step-name">Dashboard glance</span>
+      <span class="step-desc">Open. See the day. One breath. Close.</span>
+      <span class="arrow">›</span>
+    </div>
+    <div class="loop-step">
+      <span class="step-label">Mid-chaos</span>
+      <span class="step-name">Quick capture</span>
+      <span class="step-desc">Something lands. Add it. Brain releases it.</span>
+      <span class="arrow">›</span>
+    </div>
+    <div class="loop-step">
+      <span class="step-label">Overwhelm</span>
+      <span class="step-name">Reset mode</span>
+      <span class="step-desc">Three tiny steps. Permission to stop. Return Sunday.</span>
+    </div>
+  </div>
+</div>
+
+<hr class="rule">
+
+<!-- SEQUENCING -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-dot dot-plum"></div>
+    <h2>Sequencing — What Gets Built When</h2>
+  </div>
+
+  <div class="seq-row">
+    <div class="seq-badge badge-teal">1</div>
+    <div class="seq-content">
+      <strong>Dinner Sorted — prove the habit (now)</strong>
+      <p>This is not just the first module. It's the proof of concept for the entire platform. If it earns the weekly return habit, everything that follows is justified. If it doesn't, no amount of vision fixes it. Android first (faster review). Australia first, then UK.</p>
+    </div>
+  </div>
+
+  <div class="seq-row">
+    <div class="seq-badge badge-teal">2</div>
+    <div class="seq-content">
+      <strong>Prove unprompted weekly return before anything else</strong>
+      <p>Monetisation is held until this is real. The free tier is always fully useful — no crippled experience. Trust before revenue.</p>
+    </div>
+  </div>
+
+  <div class="seq-row">
+    <div class="seq-badge badge-gold">3</div>
+    <div class="seq-content">
+      <strong>Calm Dashboard — the platform centrepiece</strong>
+      <p>One glance, one breath, one "okay I've got this." Meals, appointments, bills, and kids logistics in one view. Built once the meal habit is proven.</p>
+    </div>
+  </div>
+
+  <div class="seq-row">
+    <div class="seq-badge badge-gold">4</div>
+    <div class="seq-content">
+      <strong>Money Sorted — next module</strong>
+      <p>Meal plan costs feeding directly into budget suggestions is the moat. Manual input first, optional bank connection later. Built with real user data from Dinner Sorted.</p>
+    </div>
+  </div>
+
+  <div class="seq-row">
+    <div class="seq-badge badge-plum">5</div>
+    <div class="seq-content">
+      <strong>Everything else — only if it earns its place</strong>
+      <p>Appointments, bills view, kids juggle, Reset mode, family sharing, AI helper. Each must reduce cognitive load. None ship if they require maintenance energy.</p>
+    </div>
+  </div>
+</div>
+
+<hr class="rule">
+
+<!-- GUARDRAILS -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-dot dot-red"></div>
+    <h2>The Guardrails</h2>
+  </div>
+  <div class="card">
+    <div class="guardrail">
+      <div class="guardrail-icon">🚫</div>
+      <div>
+        <strong>No maintenance energy</strong>
+        <p>If a feature requires the user to lovingly maintain it, it doesn't ship. The overwhelmed user is the exact person least likely to keep it updated.</p>
+      </div>
+    </div>
+    <div class="guardrail">
+      <div class="guardrail-icon">🚫</div>
+      <div>
+        <strong>No busy screens</strong>
+        <p>No dense lists. No flashing badges. No red warning icons unless truly urgent. Sortii should feel like a cup of tea, not a spreadsheet.</p>
+      </div>
+    </div>
+    <div class="guardrail">
+      <div class="guardrail-icon">🚫</div>
+      <div>
+        <strong>No sprawl</strong>
+        <p>Mental load covers almost everything — birthdays, chores, travel, habits. That's how products bloat. Sortii's hard boundary: recurring real-life coordination that causes cognitive drag. Not journalling, not project management, not wellness.</p>
+      </div>
+    </div>
+    <div class="guardrail">
+      <div class="guardrail-icon">🚫</div>
+      <div>
+        <strong>No aspirational design</strong>
+        <p>Must be useful when data is incomplete, messy, or half-entered. The overwhelmed user won't have a perfectly populated app. Design for partial usefulness.</p>
+      </div>
+    </div>
+    <div class="guardrail">
+      <div class="guardrail-icon">🚫</div>
+      <div>
+        <strong>No productivity guilt</strong>
+        <p>No streaks. No "you missed a day" shame. No scores. Sortii is a soft landing, not a scoreboard.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<hr class="rule">
+
+<!-- BRAND VOICE -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-dot dot-gold"></div>
+    <h2>Brand Voice</h2>
+  </div>
+  <div class="grid-2">
+    <div class="card">
+      <h3>Tone</h3>
+      <p style="font-size:13.5px;color:#555;line-height:1.7;">Warm, wry, gently self-aware. British dry wit meets Australian real-life chaos. Not jokes — truths said with a raised eyebrow. Confident, light, cheeky. Never corporate, fluffy, or try-hard.</p>
+      <p style="font-size:13px;color:#999;margin-top:10px;font-style:italic;">UK copy: slightly drier. Trust users to feel the payoff without explaining it.</p>
+    </div>
+    <div class="card">
+      <h3>Copy filter</h3>
+      <p style="font-size:13.5px;color:#555;margin-bottom:8px;">Before any copy ships, ask:</p>
+      <p style="font-size:13.5px;color:#555;font-style:italic;line-height:1.8;">
+        Does this sound like relief or a tool?<br>
+        Would someone say this out loud?<br>
+        Is the intelligence invisible?<br>
+        Does it make things simpler?
+      </p>
+    </div>
+  </div>
+
+  <div style="margin-top:12px;">
+    <span class="pill pill-teal">"Done. Your week's sorted."</span>
+    <span class="pill pill-teal">"Dinner… sorted."</span>
+    <span class="pill pill-gold">"That's one less thing to think about."</span>
+    <span class="pill pill-plum">"Leftovers count. We support this."</span>
+    <span class="pill pill-plum">"Thursday's doing the most, but we'll allow it."</span>
+    <span class="pill pill-gold">"Nothing on today. A rare and beautiful moment."</span>
+  </div>
+</div>
+
+<hr class="rule">
+
+<!-- NORTH STAR CHECK -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-dot dot-teal"></div>
+    <h2>North Star Check</h2>
+  </div>
+  <p style="font-size:13.5px;color:#666;margin-bottom:16px;">Run before shipping anything — a feature, a screen, a line of copy, a module.</p>
+  <div class="check-grid">
+    <div class="check-item">Does this remove a decision?</div>
+    <div class="check-item">Does it feel like relief, not a tool?</div>
+    <div class="check-item">Is the intelligence invisible?</div>
+    <div class="check-item">Would someone say this out loud?</div>
+    <div class="check-item">Does it make things simpler?</div>
+    <div class="check-item">Is it useful when incomplete?</div>
+  </div>
+  <p style="margin-top:14px;font-size:13px;color:#aaa;">If not → don't ship it.</p>
+</div>
+
+<!-- FOOTER -->
+<div class="footer-quote">
+  <p>"Dinner… sorted."</p>
+  <small>Sortii — where life gets lighter, one small untangling at a time.</small>
+</div>
+
+</body>
+</html>
