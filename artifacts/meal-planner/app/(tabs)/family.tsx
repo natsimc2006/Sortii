@@ -4385,44 +4385,6 @@ export default function FamilyScreen() {
               </View>
             )}
 
-            {/* Inline Sort / re-sort card */}
-            {state.events.length >= 1 && (
-              <SortContextCard
-                events={state.events}
-                juggleResult={juggleResult}
-                isSorted={isSorted}
-                sortError={sortError}
-                onSort={handleSortJuggle}
-                onViewPlan={() => setFamilyStep("results")}
-                onReSort={() => handleSortJuggle()}
-              />
-            )}
-
-            {/* Need backup prompt — when tight/conflict insights exist */}
-            {hasTightOrConflict && (
-              <NeedHelpPrompt
-                helpers={helpers}
-                onFindHelp={() => setShowHelpers(true)}
-              />
-            )}
-
-            {/* Helper list — shown when user taps "Find help" */}
-            {showHelpers && (
-              <HelperSection
-                helpers={helpers}
-                onAdd={handleAddHelper}
-                onRemove={handleRemoveHelper}
-              />
-            )}
-
-            {/* Light setup summary strip */}
-            <SetupReadyStrip
-              eventCount={state.events.length}
-              adultCount={state.members.filter((m) => m.role === "adult").length}
-              lastSolvedAt={juggleResult?.solvedAt ?? null}
-              onViewLastPlan={() => setFamilyStep("results")}
-            />
-
             {/* ── 🤝 CARPOOL CREW — collapsible section ── */}
             <View style={{ marginTop: 8, marginBottom: 4 }}>
               <TouchableOpacity
@@ -4546,6 +4508,44 @@ export default function FamilyScreen() {
                 </View>
               )}
             </View>
+
+            {/* Inline Sort / re-sort card */}
+            {state.events.length >= 1 && (
+              <SortContextCard
+                events={state.events}
+                juggleResult={juggleResult}
+                isSorted={isSorted}
+                sortError={sortError}
+                onSort={handleSortJuggle}
+                onViewPlan={() => setFamilyStep("results")}
+                onReSort={() => handleSortJuggle()}
+              />
+            )}
+
+            {/* Need backup prompt — when tight/conflict insights exist */}
+            {hasTightOrConflict && (
+              <NeedHelpPrompt
+                helpers={helpers}
+                onFindHelp={() => setShowHelpers(true)}
+              />
+            )}
+
+            {/* Helper list — shown when user taps "Find help" */}
+            {showHelpers && (
+              <HelperSection
+                helpers={helpers}
+                onAdd={handleAddHelper}
+                onRemove={handleRemoveHelper}
+              />
+            )}
+
+            {/* Light setup summary strip */}
+            <SetupReadyStrip
+              eventCount={state.events.length}
+              adultCount={state.members.filter((m) => m.role === "adult").length}
+              lastSolvedAt={juggleResult?.solvedAt ?? null}
+              onViewLastPlan={() => setFamilyStep("results")}
+            />
 
             {/* ANYTHING WE SHOULD KNOW? — global free-text context for Claude */}
             <View style={{ marginTop: 8 }}>
