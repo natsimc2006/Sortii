@@ -4117,7 +4117,8 @@ export default function FamilyScreen() {
 
   // Taller bottom padding when sort CTA is shown in sticky bar
   const navPad = TAB_BAR_HEIGHT + Math.max(insets.bottom, 0);
-  const scrollPadBottom = hasEvents ? (needsSort ? 160 + navPad : 112 + navPad) : 80;
+  // Sticky bar is taller now (two rows when events exist: plan/resort + add another)
+  const scrollPadBottom = hasEvents ? (needsSort ? 200 + navPad : 160 + navPad) : 80;
 
   return (
     <View style={{ flex: 1, backgroundColor: BG }}>
@@ -4627,31 +4628,9 @@ export default function FamilyScreen() {
       {/* ── Saved toast — appears above sticky bar ── */}
       <SavedToast visible={!!savedBanner} />
 
-      {/* ── Floating "Add another event" — always visible when there's anything on the page ── */}
-      {(hasMembers || hasEvents) && (
-        <View style={{
-          paddingHorizontal: 20,
-          paddingTop: 10,
-          paddingBottom: hasEvents ? 10 : TAB_BAR_HEIGHT + Math.max(insets.bottom, 0) + 10,
-          backgroundColor: BG,
-          borderTopWidth: 1,
-          borderTopColor: "#F0EBE3",
-        }}>
-          <TouchableOpacity
-            style={styles.addAnotherBtn}
-            onPress={openAddEvent}
-            activeOpacity={0.85}
-          >
-            <Feather name="plus" size={15} color="#fff" />
-            <Text style={styles.addAnotherBtnText}>
-              {hasEvents ? "Add another event" : "Add first event"}
-            </Text>
-          </TouchableOpacity>
-        </View>
-      )}
-
-      {/* ── Sticky bar — See the plan + Re-sort when events exist ── */}
-      {hasEvents && (
+      {/* ── Sticky bottom bar ── */}
+      {hasEvents ? (
+        /* When events exist: absolute bar with See the plan, Re-sort, AND Add another event */
         <View style={[styles.sortCtaBar, { paddingBottom: TAB_BAR_HEIGHT + Math.max(insets.bottom, 0) + 8 }]}>
           <View style={styles.sortCtaBarBtns}>
             <TouchableOpacity
@@ -4669,8 +4648,43 @@ export default function FamilyScreen() {
               <Text style={styles.stickyResortBtnText}>Re-sort ↺</Text>
             </TouchableOpacity>
           </View>
+          {/* Add another event — second row, always tappable inside the absolute bar */}
+          <TouchableOpacity
+            style={{
+              flexDirection: "row", alignItems: "center", justifyContent: "center",
+              gap: 6, marginTop: 6,
+              borderWidth: 1.5, borderColor: TEAL, borderRadius: 10,
+              paddingVertical: 9, backgroundColor: "#FFFFFF",
+            }}
+            onPress={openAddEvent}
+            activeOpacity={0.85}
+          >
+            <Feather name="plus" size={14} color={TEAL} />
+            <Text style={{ fontFamily: "Inter_600SemiBold", fontSize: 13, color: TEAL }}>
+              Add another event
+            </Text>
+          </TouchableOpacity>
         </View>
-      )}
+      ) : hasMembers ? (
+        /* No events yet: simple floating add-first-event button above the tab bar */
+        <View style={{
+          paddingHorizontal: 20,
+          paddingTop: 10,
+          paddingBottom: TAB_BAR_HEIGHT + Math.max(insets.bottom, 0) + 10,
+          backgroundColor: BG,
+          borderTopWidth: 1,
+          borderTopColor: "#F0EBE3",
+        }}>
+          <TouchableOpacity
+            style={styles.addAnotherBtn}
+            onPress={openAddEvent}
+            activeOpacity={0.85}
+          >
+            <Feather name="plus" size={15} color="#fff" />
+            <Text style={styles.addAnotherBtnText}>Add first event</Text>
+          </TouchableOpacity>
+        </View>
+      ) : null}
 
       {/* ── Add / Edit form sheet ── */}
       {showForm && (
