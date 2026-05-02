@@ -1208,6 +1208,38 @@ function JuggleResultsContent({
                     <Text style={styles.juggleFreeWindow}>{insight}</Text>
                   ) : null;
                 })()}
+                {/* Send individual list */}
+                {plan.schedule.length > 0 && (
+                  <TouchableOpacity
+                    onPress={() => {
+                      const now = new Date();
+                      const dateLabel = now.toLocaleDateString("en-AU", { weekday: "short", month: "short", day: "numeric" });
+                      const lines: string[] = [`${plan.adult}'s plan — ${dateLabel}`, ""];
+                      plan.schedule.forEach((s) => {
+                        const legPrefix = s.leg === "drop-off" ? "Drop off" : s.leg === "collect" ? "Collect" : "";
+                        const who = s.child ? ` ${s.child}` : "";
+                        const act = legPrefix
+                          ? `${legPrefix}${who} · ${s.activity}`
+                          : `${s.activity}${s.child ? ` with ${s.child}` : ""}`;
+                        lines.push(`${s.time}  ${act}`);
+                        if (s.location) lines.push(`  at ${s.location}`);
+                      });
+                      lines.push("", "Sorted by Sortii.");
+                      Share.share({ message: lines.join("\n") });
+                    }}
+                    activeOpacity={0.8}
+                    style={{
+                      flexDirection: "row", alignItems: "center", justifyContent: "center",
+                      gap: 6, paddingVertical: 9, marginTop: 10,
+                      borderRadius: 10, borderWidth: 1, borderColor: TEAL,
+                    }}
+                  >
+                    <Feather name="send" size={13} color={TEAL} />
+                    <Text style={{ fontFamily: "Inter_600SemiBold", fontSize: 13, color: TEAL }}>
+                      Send {plan.adult.split(" ")[0]}'s list →
+                    </Text>
+                  </TouchableOpacity>
+                )}
               </View>
             );
           })}
@@ -1283,7 +1315,11 @@ function JuggleResultsContent({
                     <Text style={{ fontFamily: "Inter_600SemiBold", fontSize: 14, color: "#2B2B2B" }}>
                       {c.name}
                     </Text>
-                    {c.phone ? (
+                    {c.childName ? (
+                      <Text style={{ fontFamily: "Inter_400Regular", fontSize: 12, color: TEXT_MUTED }}>
+                        {c.name} is in {c.childName}'s carpool — worth a message.
+                      </Text>
+                    ) : c.phone ? (
                       <Text style={{ fontFamily: "Inter_400Regular", fontSize: 12, color: TEXT_MUTED }}>
                         {c.phone}
                       </Text>
@@ -1305,7 +1341,10 @@ function JuggleResultsContent({
                 onPress={onClose}
               >
                 <Text style={{ color: PLUM, fontFamily: "Inter_600SemiBold", fontSize: 14 }}>
-                  + Add a contact who could help
+                  No one in the carpool crew yet — add people you trust and they'll show up here.
+                </Text>
+                <Text style={{ color: TEAL, fontFamily: "Inter_600SemiBold", fontSize: 13, marginTop: 2 }}>
+                  + Add to crew
                 </Text>
                 <Text style={{ color: TEXT_MUTED, fontFamily: "Inter_400Regular", fontSize: 12 }}>
                   Save someone for situations like this
@@ -2235,7 +2274,7 @@ function TimePickerSheet({
 }
 
 // ── AddEventSheet ──────────────────────────────────────────────────────────────
-export interface CarpoolContact { id: string; name: string; phone: string; }
+export interface CarpoolContact { id: string; name: string; phone: string; childName?: string; }
 
 function AddEventSheet({
   visible,
@@ -3475,6 +3514,10 @@ export default function FamilyScreen() {
   const [pushedCalEvents, setPushedCalEvents] = useState<SortiiCalEvent[]>([]);
   const [apptItems,       setApptItems]       = useState<Appointment[]>([]);
   const [carpoolContacts, setCarpoolContacts] = useState<CarpoolContact[]>([]);
+  const [carpoolCrewOpen, setCarpoolCrewOpen] = useState(false);
+  const [crewFormName,    setCrewFormName]    = useState("");
+  const [crewFormPhone,   setCrewFormPhone]   = useState("");
+  const [crewFormChild,   setCrewFormChild]   = useState("");
   const [juggleFreeText, setJuggleFreeText]   = useState("");
   const [homeSuburb,     setHomeSuburb]       = useState("");
   // 0 = this week, 1 = next week — controls both the appt feed and the juggle sort
@@ -3954,6 +3997,12 @@ export default function FamilyScreen() {
     await AsyncStorage.setItem(carpoolKey(), JSON.stringify(next));
   }
 
+  async function handleRemoveCarpoolContact(id: string) {
+    const next = carpoolContacts.filter((c) => c.id !== id);
+    setCarpoolContacts(next);
+    await AsyncStorage.setItem(carpoolKey(), JSON.stringify(next));
+  }
+
   async function handleFreeTextChange(text: string) {
     setJuggleFreeText(text);
     await AsyncStorage.setItem(SK.juggleFreeText(getCurrentUserId()), text);
@@ -4373,6 +4422,130 @@ export default function FamilyScreen() {
               lastSolvedAt={juggleResult?.solvedAt ?? null}
               onViewLastPlan={() => setFamilyStep("results")}
             />
+
+            {/* ── 🤝 CARPOOL CREW — collapsible section ── */}
+            <View style={{ marginTop: 8, marginBottom: 4 }}>
+              <TouchableOpacity
+                onPress={() => setCarpoolCrewOpen((v) => !v)}
+                activeOpacity={0.8}
+                style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingVertical: 6 }}
+              >
+                <View style={{ flex: 1 }}>
+                  <Text style={{ fontSize: 11, fontFamily: "Inter_600SemiBold", color: "#999", textTransform: "uppercase", letterSpacing: 0.8 }}>
+                    🤝 Carpool crew
+                  </Text>
+                  {!carpoolCrewOpen && (
+                    <Text style={{ fontSize: 12, fontFamily: "Inter_400Regular", color: TEXT_MUTED, marginTop: 2 }}>
+                      {carpoolContacts.length > 0
+                        ? `${carpoolContacts.length} ${carpoolContacts.length === 1 ? "contact" : "contacts"} saved`
+                        : "People you can call when the juggle gets real."}
+                    </Text>
+                  )}
+                </View>
+                <Feather name={carpoolCrewOpen ? "chevron-up" : "chevron-down"} size={16} color="#999" />
+              </TouchableOpacity>
+
+              {carpoolCrewOpen && (
+                <View style={{ gap: 10, paddingBottom: 8 }}>
+                  <Text style={{ fontSize: 12, fontFamily: "Inter_400Regular", color: TEXT_MUTED }}>
+                    People you can call when the juggle gets real.
+                  </Text>
+
+                  {/* Existing crew */}
+                  {carpoolContacts.map((c) => (
+                    <View
+                      key={c.id}
+                      style={{
+                        flexDirection: "row", alignItems: "center",
+                        backgroundColor: "#F7F3EB", borderRadius: 10, padding: 12, gap: 10,
+                      }}
+                    >
+                      <View style={{ flex: 1, gap: 2 }}>
+                        <Text style={{ fontFamily: "Inter_600SemiBold", fontSize: 14, color: TEXT }}>{c.name}</Text>
+                        {c.childName ? (
+                          <Text style={{ fontFamily: "Inter_400Regular", fontSize: 12, color: TEXT_MUTED }}>
+                            {c.childName}'s carpool
+                          </Text>
+                        ) : null}
+                        {c.phone ? (
+                          <Text style={{ fontFamily: "Inter_400Regular", fontSize: 12, color: TEXT_MUTED }}>{c.phone}</Text>
+                        ) : null}
+                      </View>
+                      <TouchableOpacity onPress={() => handleRemoveCarpoolContact(c.id)} activeOpacity={0.7} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+                        <Feather name="trash-2" size={16} color="#C0695A" />
+                      </TouchableOpacity>
+                    </View>
+                  ))}
+
+                  {/* Add form */}
+                  <View style={{ backgroundColor: "#F7F3EB", borderRadius: 12, padding: 14, gap: 10 }}>
+                    <TextInput
+                      style={{ backgroundColor: "#fff", borderRadius: 8, padding: 10, fontSize: 14, fontFamily: "Inter_400Regular", color: TEXT, borderWidth: 1, borderColor: "#E6E1D7" }}
+                      placeholder="Name"
+                      placeholderTextColor="#bbb"
+                      value={crewFormName}
+                      onChangeText={setCrewFormName}
+                    />
+                    {state.members.filter((m) => m.role === "child").length > 0 && (
+                      <View style={{ gap: 6 }}>
+                        <Text style={{ fontSize: 12, fontFamily: "Inter_400Regular", color: TEXT_MUTED }}>
+                          Connected to:
+                        </Text>
+                        <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 6 }}>
+                          {state.members
+                            .filter((m) => m.role === "child")
+                            .map((m) => {
+                              const sel = crewFormChild === m.name;
+                              return (
+                                <TouchableOpacity
+                                  key={m.id}
+                                  onPress={() => setCrewFormChild(sel ? "" : m.name)}
+                                  activeOpacity={0.7}
+                                  style={{
+                                    paddingHorizontal: 10, paddingVertical: 5, borderRadius: 20,
+                                    backgroundColor: sel ? TEAL + "20" : "#fff",
+                                    borderWidth: 1, borderColor: sel ? TEAL : "#E6E1D7",
+                                  }}
+                                >
+                                  <Text style={{ fontSize: 12, fontFamily: "Inter_600SemiBold", color: sel ? TEAL : TEXT_MUTED }}>
+                                    {m.name}
+                                  </Text>
+                                </TouchableOpacity>
+                              );
+                            })}
+                        </View>
+                      </View>
+                    )}
+                    <TextInput
+                      style={{ backgroundColor: "#fff", borderRadius: 8, padding: 10, fontSize: 14, fontFamily: "Inter_400Regular", color: TEXT, borderWidth: 1, borderColor: "#E6E1D7" }}
+                      placeholder="Phone (optional)"
+                      placeholderTextColor="#bbb"
+                      value={crewFormPhone}
+                      onChangeText={setCrewFormPhone}
+                      keyboardType="phone-pad"
+                    />
+                    <TouchableOpacity
+                      onPress={() => {
+                        if (!crewFormName.trim()) return;
+                        handleAddCarpoolContact({
+                          id: Date.now().toString(),
+                          name: crewFormName.trim(),
+                          phone: crewFormPhone.trim(),
+                          childName: crewFormChild || undefined,
+                        });
+                        setCrewFormName("");
+                        setCrewFormPhone("");
+                        setCrewFormChild("");
+                      }}
+                      activeOpacity={0.85}
+                      style={{ backgroundColor: TEAL, borderRadius: 10, paddingVertical: 10, alignItems: "center" }}
+                    >
+                      <Text style={{ fontFamily: "Inter_600SemiBold", fontSize: 14, color: "#fff" }}>Add to crew</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              )}
+            </View>
 
             {/* ANYTHING WE SHOULD KNOW? — global free-text context for Claude */}
             <View style={{ marginTop: 8 }}>

@@ -1,0 +1,83 @@
+Add two new features to the Family tab. 
+Build these in a separate pass — do not 
+combine with any other changes.
+
+──────────────────────────────────────
+FEATURE 1 — CARPOOL CREW
+──────────────────────────────────────
+Add a "Carpool crew" section to the Family 
+tab input screen (the screen where users 
+add events and family members).
+
+Behaviour:
+- Collapsible section, collapsed by default, 
+  labelled "🤝 Carpool crew"
+- Subtitle: "People you can call when the 
+  juggle gets real."
+- User can add contacts with: Name, whose 
+  child they're connected to (select from 
+  existing family member names), optional 
+  phone number
+- Contacts stored in AsyncStorage under 
+  key 'carpool_crew'
+- On the plan results screen, when a conflict 
+  cannot be resolved by available adults, 
+  check carpool_crew for contacts connected 
+  to the child involved and surface them:
+  "[Name] is in [child]'s carpool — worth 
+  a message. [tap to open Messages with 
+  number if provided]"
+- If carpool_crew is empty and a conflict 
+  exists, show:
+  "No one in the carpool crew yet — add 
+  people you trust and they'll show up here. 
+  [+ Add to crew]"
+
+──────────────────────────────────────
+FEATURE 2 — SEND INDIVIDUAL LISTS
+──────────────────────────────────────
+On the plan results screen, below each 
+adult's schedule card (the WHO'S GOT WHAT 
+section), add a "Send [name]'s list →" 
+button.
+
+Behaviour:
+- Tapping opens the native share sheet
+- Shares a plain text summary of that 
+  person's events only, formatted as:
+
+  "[Name]'s plan — [date]
+  
+  [time] — [event] with [child] 
+  at [location]
+  [time] — [event] 
+  at [location]
+  
+  Sorted by Sortii."
+
+- Use the same Linking/Share approach 
+  already used elsewhere in the app
+- Style: teal outlined button, same as 
+  existing secondary buttons in the app
+
+──────────────────────────────────────
+STICKY ADD EVENT BUTTON
+──────────────────────────────────────
+On the Family tab input screen, make the 
+"Add event" button (or equivalent primary 
+input CTA) sticky at the bottom of the 
+screen so it remains visible while 
+scrolling through existing events.
+
+Use the same sticky footer pattern used 
+elsewhere in the app (e.g. "Sort my week 
+for me" on the Meals screen, "Share list" 
+on Shopping). Do not reinvent the pattern.
+
+──────────────────────────────────────
+SAFETY RULES
+──────────────────────────────────────
+1. Do not touch sorting logic.
+2. Do not modify Money, Meals, or Bills screens.
+3. AsyncStorage only — no new packages.
+4. After completing, list every file modified.
