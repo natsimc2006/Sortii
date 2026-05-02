@@ -821,8 +821,8 @@ export default function BillsScreen() {
               tipId="tip_energy"
               icon="⚡"
               title="When did you last compare your energy provider?"
-              body="Most households on a default tariff are overpaying. If it's been over 12 months, it's worth a 2-minute check. Step 1 — compare every plan with no sales spin. Step 2 — switch via ShopBack and earn up to $200 cashback on top."
-              primaryLabel="Compare all plans (no bias) →"
+              body={"Most households on a default tariff are overpaying. If it's been over 12 months, it's worth a 2-minute check.\n\nStep 1 — compare every plan free on the government's own tool. Step 2 — switch via ShopBack and earn up to $200 cashback on top. We earn a small referral fee if you switch — the comparison itself is completely independent."}
+              primaryLabel="Compare on Energy Made Easy (government tool) →"
               primaryUrl="https://www.energymadeeasy.gov.au"
               secondaryLabel="Switch via ShopBack — earn cashback →"
               secondaryUrl="https://www.shopback.com.au/energy"
