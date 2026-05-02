@@ -124,8 +124,9 @@ type SwapSheetTarget = {
 
 // ── Quick-action chip definitions ────────────────────────────────────────────
 const QUICK_ACTIONS = [
-  { icon: "shopping-cart", label: "Shopping", route: "/(tabs)/shopping" },
-  { icon: "book-open",     label: "Recipes",  route: "/(tabs)/recipes" },
+  { icon: "shopping-cart", label: "Shopping",      route: "/(tabs)/shopping"  },
+  { icon: "book-open",     label: "Recipes",       route: "/(tabs)/recipes"   },
+  { icon: "search",        label: "Fridge Rescue", route: "/(tabs)/cook-with" },
 ] as const;
 
 function getTodayName() {
@@ -682,15 +683,6 @@ export default function MealsScreen() {
               range={filledCount > 0 ? estimatedCostBand : undefined}
               onPress={() => setActiveChip("budget")}
             />
-            <TouchableOpacity
-              style={styles.fridgeRescueChip}
-              onPress={() => router.push("/(tabs)/cook-with" as any)}
-              activeOpacity={0.72}
-              hitSlop={{ top: 6, bottom: 6, left: 4, right: 4 }}
-            >
-              <Feather name="search" size={10} color={TEAL} />
-              <Text style={styles.fridgeRescueChipText}>Fridge Rescue</Text>
-            </TouchableOpacity>
             <TouchableOpacity
               style={[styles.fridgeRescueChip, { backgroundColor: GOLD + "22", borderColor: GOLD + "50" }]}
               onPress={() => handleQuickNav("/(tabs)/preferences")}

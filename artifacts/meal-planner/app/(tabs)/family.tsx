@@ -1248,32 +1248,24 @@ function JuggleResultsContent({
 
       {/* ── 3b. NEEDS COVER — detected from unassigned events + smart_note + conflicts ── */}
       {(() => {
-        // Method 1: events not covered by any adult schedule
-        const coveredIds = new Set(
-          adultPlans.flatMap((p) => p.schedule.map((s) => s.event_id))
-        );
-        const hasUnassignedEvents = (juggleResult.events ?? []).some(
-          (e) =>
-            !coveredIds.has(e.id) ||
-            (!e.assigned_adult || e.assigned_adult.toLowerCase() === "unassigned")
-        );
-
-        // Method 2: smart_note mentions a pickup/collect gap
+        // Method 1: smart_note explicitly mentions a pickup/collect gap
         const pickupGapDetected = !!(juggleResult.smart_note && (
           juggleResult.smart_note.toLowerCase().includes("pick-up") ||
           juggleResult.smart_note.toLowerCase().includes("pickup") ||
           juggleResult.smart_note.toLowerCase().includes("collect") ||
+          juggleResult.smart_note.toLowerCase().includes("nobody free") ||
           juggleResult.smart_note.toLowerCase().includes("carpool contact")
         ));
 
-        // Method 3: a conflict description/recommendation mentions a pickup gap
+        // Method 2: a conflict description/recommendation explicitly mentions a pickup gap
         const uncoveredConflicts = conflicts.filter((c) =>
           (c.description || "").toLowerCase().includes("pick") ||
           (c.description || "").toLowerCase().includes("collect") ||
-          (c.recommendation || "").toLowerCase().includes("carpool")
+          (c.recommendation || "").toLowerCase().includes("carpool") ||
+          (c.recommendation || "").toLowerCase().includes("nobody free")
         );
 
-        const showCarpoolPrompt = hasUnassignedEvents || pickupGapDetected || uncoveredConflicts.length > 0;
+        const showCarpoolPrompt = pickupGapDetected || uncoveredConflicts.length > 0;
         if (!showCarpoolPrompt) return null;
 
         return (
@@ -2969,13 +2961,11 @@ function AddEventSheet({
 
 // ── ManagePeopleSection ────────────────────────────────────────────────────────
 function ManagePeopleSection({
-  members, onAdd, onRemove, homeSuburb, onHomeSuburbChange,
+  members, onAdd, onRemove,
 }: {
   members: FamilyMember[];
   onAdd: (name: string, role: "adult" | "child") => void;
   onRemove: (id: string) => void;
-  homeSuburb: string;
-  onHomeSuburbChange: (v: string) => void;
 }) {
   // Collapsed by default once setup is complete; expanded when empty
   const [expanded, setExpanded] = useState(members.length === 0);
@@ -3016,23 +3006,13 @@ function ManagePeopleSection({
         <Feather name="users" size={14} color={TEXT_MUTED} />
         <Text style={styles.peopleSectionTitle}>Family members</Text>
         {members.length > 0 && !adding && (
-          <>
-            <TouchableOpacity
-              style={styles.addPersonCtaInline}
-              onPress={() => setAdding(true)}
-              activeOpacity={0.75}
-            >
-              <Feather name="user-plus" size={12} color={TEAL} />
-              <Text style={styles.addPersonCtaInlineText}>Add another</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => setExpanded(false)}
-              activeOpacity={0.7}
-              style={{ marginLeft: "auto" }}
-            >
-              <Text style={styles.peopleDoneLink}>Done</Text>
-            </TouchableOpacity>
-          </>
+          <TouchableOpacity
+            onPress={() => setExpanded(false)}
+            activeOpacity={0.7}
+            style={{ marginLeft: "auto" }}
+          >
+            <Text style={styles.peopleDoneLink}>Done</Text>
+          </TouchableOpacity>
         )}
       </View>
 
@@ -3072,25 +3052,6 @@ function ManagePeopleSection({
               </TouchableOpacity>
             </View>
           ))}
-        </View>
-      )}
-
-      {/* WHERE ARE YOU BASED? */}
-      {!adding && (
-        <View style={{ marginTop: 10, gap: 4 }}>
-          <Text style={[styles.formLabel, { fontSize: 10 }]}>WHERE ARE YOU BASED?</Text>
-          <Text style={{ fontSize: 11, fontFamily: "Inter_400Regular", color: TEXT_MUTED, marginBottom: 2 }}>
-            Helps us work out travel times from home.
-          </Text>
-          <TextInput
-            style={[styles.addPersonInput, { backgroundColor: "#F7F3EB", borderColor: BORDER }]}
-            value={homeSuburb}
-            onChangeText={onHomeSuburbChange}
-            placeholder="e.g. Charlestown, Cardiff, Toronto"
-            placeholderTextColor="#bbb"
-            returnKeyType="done"
-            onSubmitEditing={() => Keyboard.dismiss()}
-          />
         </View>
       )}
 
@@ -3140,7 +3101,25 @@ function ManagePeopleSection({
           <Feather name="user-plus" size={15} color="#fff" />
           <Text style={styles.addPersonCtaFullText}>Add family member</Text>
         </TouchableOpacity>
-      ) : null}
+      ) : (
+        /* CTA to add another person — shown below the member list */
+        <TouchableOpacity
+          style={{
+            flexDirection: "row", alignItems: "center", justifyContent: "center",
+            gap: 7, marginTop: 10,
+            borderWidth: 1.5, borderColor: TEAL, borderRadius: 10,
+            paddingVertical: 10, paddingHorizontal: 16,
+            backgroundColor: TEAL_TINT,
+          }}
+          onPress={() => setAdding(true)}
+          activeOpacity={0.8}
+        >
+          <Feather name="user-plus" size={13} color={TEAL} />
+          <Text style={{ fontFamily: "Inter_600SemiBold", fontSize: 13, color: TEAL }}>
+            Add another person
+          </Text>
+        </TouchableOpacity>
+      )}
     </View>
   );
 }
@@ -4170,12 +4149,43 @@ export default function FamilyScreen() {
           members={state.members}
           onAdd={handleAddMember}
           onRemove={handleRemoveMember}
-          homeSuburb={homeSuburb}
-          onHomeSuburbChange={(v) => {
-            setHomeSuburb(v);
-            AsyncStorage.setItem(FAMILY_SETTINGS_KEY, JSON.stringify({ homeSuburb: v }));
-          }}
         />
+
+        {/* ── Where are you based? — own card below family members ── */}
+        <View style={{
+          backgroundColor: "#FFFFFF",
+          borderRadius: 14,
+          borderWidth: 1,
+          borderColor: BORDER,
+          padding: 14,
+          gap: 6,
+        }}>
+          <Text style={{
+            fontSize: 10, fontFamily: "Inter_700Bold",
+            textTransform: "uppercase", letterSpacing: 1, color: TEXT_MUTED,
+          }}>
+            WHERE ARE YOU BASED?
+          </Text>
+          <Text style={{ fontSize: 12, fontFamily: "Inter_400Regular", color: TEXT_MUTED }}>
+            Helps us estimate travel times from home.
+          </Text>
+          <TextInput
+            style={{
+              backgroundColor: "#F7F3EB", borderColor: BORDER, borderWidth: 1,
+              borderRadius: 10, fontSize: 14, fontFamily: "Inter_400Regular",
+              padding: 12, color: TEXT,
+            }}
+            value={homeSuburb}
+            onChangeText={(v) => {
+              setHomeSuburb(v);
+              AsyncStorage.setItem(FAMILY_SETTINGS_KEY, JSON.stringify({ homeSuburb: v }));
+            }}
+            placeholder="e.g. Charlestown, Cardiff, Toronto"
+            placeholderTextColor="#bbb"
+            returnKeyType="done"
+            onSubmitEditing={() => Keyboard.dismiss()}
+          />
+        </View>
 
         {/* ── Week selector — This week / Next week ── */}
         {hasMembers && (
@@ -4601,14 +4611,6 @@ export default function FamilyScreen() {
               Add events as they come up — pickups, activities, anything that needs coordinating.
               Once you do, we'll untangle the week for you.
             </Text>
-            <TouchableOpacity
-              style={styles.membersReadyCta}
-              onPress={openAddEvent}
-              activeOpacity={0.85}
-            >
-              <Feather name="plus" size={14} color="#fff" />
-              <Text style={styles.membersReadyCtaText}>Add first event</Text>
-            </TouchableOpacity>
           </View>
         ) : (
           /* Truly empty */
