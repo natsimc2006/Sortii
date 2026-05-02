@@ -370,45 +370,74 @@ function solveJuggleOnDevice(
           const aEndMins = _toMins(a.endTime) || _toMins(a.time) + 60;
 
           // ── TYPE B split detection: if event requires only drop-off & collect ──
-          // Only applies when: requiresAdultPresence is false/unset, there is a child,
-          // and this event hasn't already been resolved as a split by a previous pair.
+          // FIX 1: Checks BOTH time availability AND location feasibility (15-min buffer).
+          // FIX 2: Tries original assigned adult first for each leg, then others in order.
+          //        Drop-off adult and collect adult can be different people.
+          const LOCATION_BUFFER = 15; // minutes — hardcoded, not configurable
           const aIsTypeB = (a.requiresAdultPresence ?? false) === false && !!aChild;
           let splitResolved = false;
           if (aIsTypeB && !splitLegs.has(a.id)) {
-            let collectAdult: FamilyMember | null = null;
-            for (const oa of adults) {
-              if (oa.id === adultId) continue;
-              const oaDayEvs = (adultEventsMap.get(oa.id) ?? []).filter((e) => e.day === day);
-              const busyAtCollect = oaDayEvs.some((e) => {
-                const eStart = _toMins(e.time);
-                const eEnd = _toMins(e.endTime) || _toMins(e.time) + 60;
-                return eStart < aEndMins && eEnd > aEndMins;
+            const dropOffMins = _toMins(a.time);
+            const collectMins = aEndMins;
+            const evLoc = a.location || null;
+
+            // Returns true if candidateId can cover a leg:
+            //   a) no event overlapping legTimeMins, AND
+            //   b) most-recent event within 15 min is not at a different location
+            const legClear = (candidateId: string, legTimeMins: number): boolean => {
+              const cEvs = (adultEventsMap.get(candidateId) ?? []).filter(
+                (e) => e.day === day && e.id !== a.id
+              );
+              const timeBusy = cEvs.some((e) => {
+                const s = _toMins(e.time);
+                const en = _toMins(e.endTime) || _toMins(e.time) + 60;
+                return s < legTimeMins && en > legTimeMins;
               });
-              if (!busyAtCollect) { collectAdult = oa; break; }
-            }
-            if (collectAdult) {
+              if (timeBusy) return false;
+              if (evLoc) {
+                const locConflict = cEvs.some((e) => {
+                  const en = _toMins(e.endTime) || _toMins(e.time) + 60;
+                  return (
+                    en <= legTimeMins &&
+                    legTimeMins - en < LOCATION_BUFFER &&
+                    !!e.location && e.location !== evLoc
+                  );
+                });
+                if (locConflict) return false;
+              }
+              return true;
+            };
+
+            // Original adult first, then others — evaluated independently per leg
+            const allAdultIds = [adultId, ...adults.filter((m) => m.id !== adultId).map((m) => m.id)];
+            const dropOffAdultId = allAdultIds.find((id) => legClear(id, dropOffMins)) ?? null;
+            const collectAdultId = allAdultIds.find((id) => legClear(id, collectMins)) ?? null;
+
+            if (dropOffAdultId && collectAdultId) {
+              const dAdult = adults.find((m) => m.id === dropOffAdultId)!;
+              const cAdult = adults.find((m) => m.id === collectAdultId)!;
               const gapMins = _toMins(b.time) - _toMins(a.time);
               const isTight = gapMins < 30;
               const timingNote = isTight
-                ? `${adult.name} heads straight to ${b.title} after the drop-off.`
-                : `${collectAdult.name} has a clear window to collect comfortably.`;
+                ? `${dAdult.name} heads straight to ${b.title} after the drop-off.`
+                : `${cAdult.name} has a clear window to collect comfortably.`;
               splitLegs.set(a.id, {
-                dropOffAdultId: adultId,
-                collectAdultId: collectAdult.id,
+                dropOffAdultId,
+                collectAdultId,
                 endTime: a.endTime || _fromMins(aEndMins),
                 child: aChild,
                 title: a.title,
-                location: a.location || null,
+                location: evLoc,
                 startTime: a.time,
                 timing: isTight ? "tight" : "comfortable",
-                dropOffAdultName: adult.name,
-                collectAdultName: collectAdult.name,
+                dropOffAdultName: dAdult.name,
+                collectAdultName: cAdult.name,
               });
               splitResolutions.push({
                 eventTitle: a.title,
                 child: aChild,
-                dropOffAdult: adult.name,
-                collectAdult: collectAdult.name,
+                dropOffAdult: dAdult.name,
+                collectAdult: cAdult.name,
                 startTime: a.time,
                 endTime: a.endTime || _fromMins(aEndMins),
                 timing: isTight ? "tight" : "comfortable",
@@ -515,6 +544,20 @@ function solveJuggleOnDevice(
         }
         // If splitInfo exists but adult is the collect adult, skip here — collect leg added below
       });
+
+    // FIX 2: Add drop-off legs cross-assigned to this adult (not in their own evList)
+    for (const [evId, splitInfo] of splitLegs.entries()) {
+      if (splitInfo.dropOffAdultId === adult.id && !evList.some((ev) => ev.id === evId)) {
+        schedule.push({
+          time: splitInfo.startTime,
+          child: splitInfo.child,
+          activity: splitInfo.title,
+          location: splitInfo.location,
+          event_id: evId,
+          leg: "drop-off",
+        });
+      }
+    }
 
     // Add collect legs where this adult is the collector
     for (const [evId, splitInfo] of splitLegs.entries()) {
@@ -836,7 +879,7 @@ function JuggleResultsContent({
   onClose: () => void;
   onSortAgain: () => void;
   onShare: (text: string) => void;
-  onSwapApplied?: (event_id: string, adult: string) => void;
+  onSwapApplied?: (legKey: string, adult: string) => void;
 }) {
   type TravelEstimate = {
     from_event_id: string; to_event_id: string;
@@ -883,14 +926,18 @@ function JuggleResultsContent({
   const planRows = displayAdultPlans.flatMap((p) =>
     p.schedule.map((s) => {
       const evtItem = (juggleResult.events ?? []).find((e) => e.id === s.event_id);
+      // FIX 3+4: leg-specific key so swap overrides can target each leg independently
+      const legKey = s.leg ? `${s.event_id}:${s.leg}` : s.event_id;
       return {
         time:     s.time,
         endTime:  evtItem?.end_time ?? null as string | null,
-        adult:    swapOverrides[s.event_id] ?? p.adult,
+        adult:    swapOverrides[legKey] ?? swapOverrides[s.event_id] ?? p.adult,
         child:    s.child,
         activity: s.activity,
         location: s.location,
         event_id: s.event_id,
+        leg:      s.leg as "drop-off" | "collect" | undefined,
+        legKey,
       };
     })
   ).sort((a, b) => a.time.localeCompare(b.time));
@@ -920,9 +967,9 @@ function JuggleResultsContent({
   }, [planRows]);
 
   // Returns true if the given adult already covers another row at the same time
-  function hasTimeConflict(eventId: string, adult: string, time: string): boolean {
+  function hasTimeConflict(legKey: string, adult: string, time: string): boolean {
     return planRows.some(
-      (r) => r.event_id !== eventId && r.adult === adult && r.time === time
+      (r) => r.legKey !== legKey && r.adult === adult && r.time === time
     );
   }
 
@@ -1069,8 +1116,12 @@ function JuggleResultsContent({
                   const displayLocation = s.leg
                     ? null // leg context already includes location
                     : isPickup && evtForTime?.location ? evtForTime.location : s.location;
+                  // FIX 3: Build leg-specific swap key and resolve current assignment
+                  const rowLegKey = s.leg ? `${s.event_id}:${s.leg}` : s.event_id;
+                  const rowAdult = swapOverrides[rowLegKey] ?? swapOverrides[s.event_id] ?? plan.adult;
+                  const rowSwapped = rowAdult !== plan.adult;
                   return (
-                  <View key={i} style={styles.juggleScheduleRow}>
+                  <View key={i} style={[styles.juggleScheduleRow, { alignItems: "flex-start" }]}>
                     <View style={styles.juggleTimePill}>
                       <Text style={styles.juggleTimePillText}>{timeDisplay}</Text>
                     </View>
@@ -1083,6 +1134,25 @@ function JuggleResultsContent({
                       )}
                       {displayLocation ? <Text style={styles.juggleScheduleLocation}>{displayLocation}</Text> : null}
                     </View>
+                    <TouchableOpacity
+                      style={rowSwapped ? styles.juggleSwappedPill : styles.juggleSwapPill}
+                      onPress={() => setSwapRow({
+                        time: s.time,
+                        endTime: evtForTime?.end_time ?? null,
+                        adult: rowAdult,
+                        child: s.child,
+                        activity: s.activity,
+                        location: s.location,
+                        event_id: s.event_id,
+                        leg: s.leg,
+                        legKey: rowLegKey,
+                      })}
+                      activeOpacity={0.7}
+                    >
+                      <Text style={rowSwapped ? styles.juggleSwappedPillText : styles.juggleSwapPillText}>
+                        {rowSwapped ? "✓ Swapped" : "⇄ Swap"}
+                      </Text>
+                    </TouchableOpacity>
                   </View>
                   );
                 })}
@@ -1378,13 +1448,23 @@ function JuggleResultsContent({
           </Text>
           {swapRow && (
             <Text style={{ fontFamily: "Inter_400Regular", fontSize: 13, color: "#6E6E73" }}>
-              {swapRow.activity}{swapRow.child ? ` · ${swapRow.child}` : ""}{swapRow.time ? ` · ${swapRow.time}` : ""}
+              {swapRow.leg === "drop-off"
+                ? `Drop off${swapRow.child ? ` ${swapRow.child}` : ""} · ${swapRow.activity}${swapRow.time ? ` · ${swapRow.time}` : ""}`
+                : swapRow.leg === "collect"
+                ? `Collect${swapRow.child ? ` ${swapRow.child}` : ""} · ${swapRow.activity}${swapRow.time ? ` · ${swapRow.time}` : ""}`
+                : `${swapRow.activity}${swapRow.child ? ` · ${swapRow.child}` : ""}${swapRow.time ? ` · ${swapRow.time}` : ""}`}
             </Text>
           )}
           <View style={{ gap: 8 }}>
             {adultMembers.map((adult) => {
               const selected = swapPick === adult.name;
-              const summary  = adultRowSummary[adult.name];
+              // FIX 4: Show ⚠️ if this adult has another event at the same time
+              const hasConflict = swapRow
+                ? hasTimeConflict(swapRow.legKey, adult.name, swapRow.time)
+                : false;
+              const conflictRow = hasConflict
+                ? planRows.find((r) => r.legKey !== swapRow?.legKey && r.adult === adult.name && r.time === swapRow?.time)
+                : null;
               return (
                 <TouchableOpacity
                   key={adult.id}
@@ -1395,17 +1475,21 @@ function JuggleResultsContent({
                     padding: 12,
                     borderRadius: 10,
                     borderWidth: 1.5,
-                    borderColor: selected ? TEAL : "#E5E5EA",
-                    backgroundColor: selected ? TEAL + "10" : "#FAFAF8",
+                    borderColor: selected ? TEAL : hasConflict ? GOLD + "88" : "#E5E5EA",
+                    backgroundColor: selected ? TEAL + "10" : hasConflict ? GOLD + "0A" : "#FAFAF8",
                     gap: 12,
                   }}
                 >
                   <View style={{ width: 10, height: 10, borderRadius: 5, backgroundColor: adult.color ?? TEAL }} />
                   <View style={{ flex: 1 }}>
                     <Text style={{ fontFamily: "Inter_600SemiBold", fontSize: 14, color: "#1C1C1E" }}>{adult.name}</Text>
-                    {summary ? (
+                    {hasConflict && conflictRow ? (
+                      <Text style={{ fontFamily: "Inter_400Regular", fontSize: 12, color: GOLD }} numberOfLines={1}>
+                        ⚠ has {conflictRow.activity} at this time
+                      </Text>
+                    ) : adultRowSummary[adult.name] ? (
                       <Text style={{ fontFamily: "Inter_400Regular", fontSize: 12, color: "#6E6E73" }} numberOfLines={1}>
-                        {summary}
+                        {adultRowSummary[adult.name]}
                       </Text>
                     ) : (
                       <Text style={{ fontFamily: "Inter_400Regular", fontSize: 12, color: "#6E6E73" }}>Nothing on yet</Text>
@@ -1430,7 +1514,7 @@ function JuggleResultsContent({
             <TouchableOpacity
               onPress={() => {
                 if (swapRow && swapPick && onSwapApplied) {
-                  onSwapApplied(swapRow.event_id, swapPick);
+                  onSwapApplied(swapRow.legKey, swapPick);
                 }
                 setSwapRow(null);
               }}
@@ -3523,11 +3607,11 @@ export default function FamilyScreen() {
     try { await Share.share({ message: result.sharePlanText }); } catch {}
   }
 
-  async function handleSwapApplied(event_id: string, adult: string) {
+  async function handleSwapApplied(legKey: string, adult: string) {
     if (!juggleResult) return;
     const updated: JuggleResult = {
       ...juggleResult,
-      swapOverrides: { ...(juggleResult.swapOverrides ?? {}), [event_id]: adult },
+      swapOverrides: { ...(juggleResult.swapOverrides ?? {}), [legKey]: adult },
     };
     setJuggleResult(updated);
     await AsyncStorage.setItem(juggleKey(sortWeek), JSON.stringify(updated));
