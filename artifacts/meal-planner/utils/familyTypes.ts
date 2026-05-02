@@ -44,6 +44,7 @@ export interface FamilyEvent {
   notes?: string;
   isAppointment?: boolean;
   originOverride?: string;
+  requiresAdultPresence?: boolean;
 }
 
 export interface FamilyState {

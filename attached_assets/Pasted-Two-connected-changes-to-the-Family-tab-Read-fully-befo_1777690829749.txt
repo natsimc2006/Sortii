@@ -1,0 +1,110 @@
+Two connected changes to the Family tab. 
+Read fully before writing any code.
+
+──────────────────────────────────────
+CHANGE 1 — ADD "NEEDS TO STAY?" INPUT
+──────────────────────────────────────
+On the Family tab event input form, add 
+a new optional field below the time inputs:
+
+Label: "Does an adult need to stay?"
+Type: toggle / segmented control
+Options: "Yes" | "No — drop off & collect"
+Default: "No — drop off & collect"
+
+Store this as a boolean on the event object:
+  requiresAdultPresence: true/false
+
+"Yes" = true (adult must be present full duration)
+"No — drop off & collect" = false (event is splittable)
+
+Small helper text below the toggle:
+"For younger kids, swimming lessons, 
+anything where an adult needs to be there."
+
+──────────────────────────────────────
+CHANGE 2 — FIX SPLIT-EVENT PLAN LOGIC
+──────────────────────────────────────
+Find the sorting/resolution logic for the 
+Family plan. Update it to handle two types 
+of events:
+
+TYPE A — requiresAdultPresence: true
+  Treat as a single block. One adult must 
+  cover full start to end time. 
+  No splitting allowed.
+  Conflict = no adult free for full duration.
+
+TYPE B — requiresAdultPresence: false (default)
+  Event can be split into two legs:
+    Leg 1: drop-off (at start time)
+    Leg 2: collect (at end time)
+  
+  Resolution logic for TYPE B:
+  1. Check if original assigned adult 
+     is free for FULL duration
+     → If yes: assign as normal, no split needed
+  2. If not free for full duration, check:
+     a) Is original adult free at START time? 
+        → They do drop-off
+     b) Is another adult free at END time?
+        → They do collect
+     c) If both a and b are true → split resolved
+     d) If only one is true → partial conflict, 
+        flag it
+     e) If neither → full conflict, escalate 
+        to carpool crew if available
+
+When a split is resolved, the plan table 
+must show TWO rows for that event:
+  [start time]  [adult A]  Drop off [child] 
+                           at [location]
+  [end time]    [adult B]  Collect [child] 
+                           from [location]
+
+Not one row. Two explicit rows.
+
+──────────────────────────────────────
+CHANGE 3 — FIX "WORTH KNOWING" CONTENT
+──────────────────────────────────────
+The WORTH KNOWING card currently renders 
+"1 overlap to sort." with no detail.
+
+Update it so it always contains one of:
+
+a) If a split was resolved:
+   "We've split [event name] — [adult A] 
+   drops [child] at [start time], [adult B] 
+   collects at [end time]. Timing is [tight/
+   comfortable] — [one sentence on why]."
+
+b) If a conflict could not be resolved:
+   "[Child] has no one available for [leg] 
+   of [event name]. [Carpool crew suggestion 
+   if available, otherwise '+ Add to crew' 
+   prompt]."
+
+c) If everything resolved cleanly with 
+   no splits needed:
+   Remove WORTH KNOWING card entirely. 
+   Don't show an empty or vague card.
+
+Never render WORTH KNOWING with only 
+a count and no explanation.
+
+──────────────────────────────────────
+SAFETY RULES
+──────────────────────────────────────
+1. Default requiresAdultPresence to false 
+   for all existing events that don't have 
+   this field — do not break existing data.
+2. Do not change Money, Meals, Bills, or 
+   Shopping screens.
+3. Do not add new packages.
+4. The split plan table rows must render 
+   in chronological time order with all 
+   other events.
+5. After completing, confirm:
+   - Where requiresAdultPresence is stored
+   - How the split detection condition works
+   - Every file modified

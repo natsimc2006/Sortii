@@ -136,6 +136,17 @@ export interface JuggleScheduleItem {
   activity: string;
   location: string | null;
   event_id: string;
+  leg?: "drop-off" | "collect";
+}
+export interface SplitResolution {
+  eventTitle: string;
+  child: string | null;
+  dropOffAdult: string;
+  collectAdult: string;
+  startTime: string;
+  endTime: string;
+  timing: "tight" | "comfortable";
+  timingNote: string;
 }
 export interface JuggleFreeWindow {
   from: string;
@@ -164,6 +175,7 @@ export interface JuggleResult {
   smart_note: string | null;
   solvedAt: number;
   swapOverrides?: Record<string, string>;
+  splitResolutions?: SplitResolution[];
 }
 
 const REPEAT_LABELS: Record<RepeatType, string> = {
@@ -318,6 +330,14 @@ function solveJuggleOnDevice(
 
   // Detect overlaps per adult per day
   const conflicts: JuggleConflict[] = [];
+  type SplitLegEntry = {
+    dropOffAdultId: string; collectAdultId: string; endTime: string;
+    child: string | null; title: string; location: string | null;
+    startTime: string; timing: "tight" | "comfortable";
+    dropOffAdultName: string; collectAdultName: string;
+  };
+  const splitLegs = new Map<string, SplitLegEntry>();
+  const splitResolutions: SplitResolution[] = [];
   const adultEventsMap = new Map<string, FamilyEvent[]>();
   for (const [evId, adultId] of assignments.entries()) {
     const ev = events.find((e) => e.id === evId);
@@ -347,7 +367,58 @@ function solveJuggleOnDevice(
           const bIsMedical = isMedicalAppointment(b.title);
           const aChild = a.personIds.map((id) => memberLookup.get(id)).find((m) => m?.role === "child")?.name ?? null;
           const aEndLabel = a.endTime ? a.endTime : _fromMins(_toMins(a.time) + 60);
+          const aEndMins = _toMins(a.endTime) || _toMins(a.time) + 60;
 
+          // ── TYPE B split detection: if event requires only drop-off & collect ──
+          // Only applies when: requiresAdultPresence is false/unset, there is a child,
+          // and this event hasn't already been resolved as a split by a previous pair.
+          const aIsTypeB = (a.requiresAdultPresence ?? false) === false && !!aChild;
+          let splitResolved = false;
+          if (aIsTypeB && !splitLegs.has(a.id)) {
+            let collectAdult: FamilyMember | null = null;
+            for (const oa of adults) {
+              if (oa.id === adultId) continue;
+              const oaDayEvs = (adultEventsMap.get(oa.id) ?? []).filter((e) => e.day === day);
+              const busyAtCollect = oaDayEvs.some((e) => {
+                const eStart = _toMins(e.time);
+                const eEnd = _toMins(e.endTime) || _toMins(e.time) + 60;
+                return eStart < aEndMins && eEnd > aEndMins;
+              });
+              if (!busyAtCollect) { collectAdult = oa; break; }
+            }
+            if (collectAdult) {
+              const gapMins = _toMins(b.time) - _toMins(a.time);
+              const isTight = gapMins < 30;
+              const timingNote = isTight
+                ? `${adult.name} heads straight to ${b.title} after the drop-off.`
+                : `${collectAdult.name} has a clear window to collect comfortably.`;
+              splitLegs.set(a.id, {
+                dropOffAdultId: adultId,
+                collectAdultId: collectAdult.id,
+                endTime: a.endTime || _fromMins(aEndMins),
+                child: aChild,
+                title: a.title,
+                location: a.location || null,
+                startTime: a.time,
+                timing: isTight ? "tight" : "comfortable",
+                dropOffAdultName: adult.name,
+                collectAdultName: collectAdult.name,
+              });
+              splitResolutions.push({
+                eventTitle: a.title,
+                child: aChild,
+                dropOffAdult: adult.name,
+                collectAdult: collectAdult.name,
+                startTime: a.time,
+                endTime: a.endTime || _fromMins(aEndMins),
+                timing: isTight ? "tight" : "comfortable",
+                timingNote,
+              });
+              splitResolved = true;
+            }
+          }
+
+          if (!splitResolved) {
           // ── Priority 1: Find adults who can cover via handoff ──────────────
           const handoffCandidates: Array<{ adult: FamilyMember; lastEvent: FamilyEvent | null; availableAt: number }> = [];
           for (const oa of adults) {
@@ -373,16 +444,6 @@ function solveJuggleOnDevice(
             } else {
               const lastEv = eventsBefore[0]!;
               const lastEvEnd = _toMins(lastEv.endTime) || _toMins(lastEv.time) + 60;
-              // DISABLED — local travel validation overrides Claude's handoff reasoning.
-              // The travel check below was causing false "not possible" flags because
-              // it doesn't account for adult availability and uses an approximate matrix.
-              // Claude handles travel estimation via the system prompt.
-              /*
-              const travel = getTravelTime(lastEv.location, a.location);
-              if (lastEvEnd + travel <= aEnd) {
-                handoffCandidates.push({ adult: oa, lastEvent: lastEv, availableAt: lastEvEnd });
-              }
-              */
               handoffCandidates.push({ adult: oa, lastEvent: lastEv, availableAt: lastEvEnd });
             }
           }
@@ -391,7 +452,6 @@ function solveJuggleOnDevice(
           let recommendation = "";
 
           if (handoffCandidates.length > 0) {
-            // Priority 1 — handoff is possible
             const best = handoffCandidates[0]!;
             const coverVerb = aChild
               ? `collect ${aChild} from ${a.title} at ${aEndLabel}`
@@ -403,16 +463,12 @@ function solveJuggleOnDevice(
               recommendation = `${best.adult.name} is free — they could ${coverVerb} while ${adult.name} heads to ${b.title}.`;
             }
           } else if (aIsRecurring && !bIsRecurring && !bIsMedical) {
-            // Priority 2a — reschedule the one-off (b), never reschedule recurring
             recommendation = `${b.title} is a one-off — moving it to after ${aEndLabel} keeps everything else in place.`;
           } else if (!aIsRecurring && bIsRecurring && !aIsMedical) {
-            // Priority 2b — reschedule the one-off (a), never reschedule recurring
             recommendation = `${a.title} is a one-off — moving it to avoid clashing with the regular ${b.title} keeps everything in place.`;
           } else if (aIsMedical || bIsMedical) {
-            // Priority 3 — medical appointment is fixed, no handoff available
             recommendation = "This one needs sorting manually.";
           } else {
-            // Priority 2c — both non-recurring, no handoff
             recommendation = `Both "${a.title}" and "${b.title}" are on at the same time — which takes priority?`;
           }
 
@@ -424,25 +480,57 @@ function solveJuggleOnDevice(
             recommendation,
             options: [],
           });
+          } // end !splitResolved
         }
       }
     }
   }
 
-  // Build adult_plans
+  // Build adult_plans — split events emit two legs (drop-off + collect) under separate adults
   const adultPlans: JuggleAdultPlan[] = adults.map((adult) => {
     const evList = adultEventsMap.get(adult.id) ?? [];
-    const schedule: JuggleScheduleItem[] = evList
+    const schedule: JuggleScheduleItem[] = [];
+
+    evList
       .sort((a, b) => {
         const dd = (DAY_ORDER[a.day] ?? 0) - (DAY_ORDER[b.day] ?? 0);
         return dd !== 0 ? dd : _toMins(a.time) - _toMins(b.time);
       })
-      .map((ev) => {
-        const child = ev.personIds
-          .map((id) => memberLookup.get(id))
-          .find((m) => m?.role === "child")?.name ?? null;
-        return { time: ev.time || "09:00", child, activity: ev.title, location: ev.location || null, event_id: ev.id };
+      .forEach((ev) => {
+        const splitInfo = splitLegs.get(ev.id);
+        if (splitInfo && splitInfo.dropOffAdultId === adult.id) {
+          schedule.push({
+            time: ev.time || "09:00",
+            child: splitInfo.child,
+            activity: ev.title,
+            location: splitInfo.location,
+            event_id: ev.id,
+            leg: "drop-off",
+          });
+        } else if (!splitInfo) {
+          const child = ev.personIds
+            .map((id) => memberLookup.get(id))
+            .find((m) => m?.role === "child")?.name ?? null;
+          schedule.push({ time: ev.time || "09:00", child, activity: ev.title, location: ev.location || null, event_id: ev.id });
+        }
+        // If splitInfo exists but adult is the collect adult, skip here — collect leg added below
       });
+
+    // Add collect legs where this adult is the collector
+    for (const [evId, splitInfo] of splitLegs.entries()) {
+      if (splitInfo.collectAdultId === adult.id) {
+        schedule.push({
+          time: splitInfo.endTime,
+          child: splitInfo.child,
+          activity: splitInfo.title,
+          location: splitInfo.location,
+          event_id: evId,
+          leg: "collect",
+        });
+      }
+    }
+
+    schedule.sort((a, b) => _toMins(a.time) - _toMins(b.time));
     return { adult: adult.name, can_drive: true, schedule, free_windows: [] };
   });
 
@@ -463,6 +551,7 @@ function solveJuggleOnDevice(
     events: juggleEvents, conflicts, adult_plans: adultPlans,
     travel_estimates: [], least_painful_version: { applicable: false },
     smart_note: smartNote, solvedAt: Date.now(),
+    splitResolutions: splitResolutions.length > 0 ? splitResolutions : undefined,
   };
 }
 
@@ -517,6 +606,7 @@ function blankDraft(): Omit<FamilyEvent, "id"> {
     isAppointment: false,
     assignedAdult: "",
     priority: "must",
+    requiresAdultPresence: false,
   };
 }
 
@@ -954,27 +1044,43 @@ function JuggleResultsContent({
                 </View>
                 {plan.schedule.map((s, i) => {
                   const evtForTime = (juggleResult.events ?? []).find((e) => e.id === s.event_id);
-                  // FIX 1 — collapse "11:30–11:30" to "11:30"
-                  const timeDisplay =
-                    !evtForTime?.end_time || evtForTime.end_time === s.time
+                  // For split legs, always show just the leg time (no end-time range)
+                  const timeDisplay = s.leg
+                    ? s.time
+                    : !evtForTime?.end_time || evtForTime.end_time === s.time
                       ? s.time
                       : `${s.time}–${evtForTime.end_time}`;
-                  // FIX 3 — pick-up entries show the child's venue, not the travel origin
+                  // For split legs: show contextual label and venue
+                  const activityLabel = s.leg === "drop-off"
+                    ? `Drop off${s.child ? ` ${s.child}` : ""}`
+                    : s.leg === "collect"
+                    ? `Collect${s.child ? ` ${s.child}` : ""}`
+                    : s.activity;
+                  const legContext = s.leg === "drop-off"
+                    ? `at ${s.activity}${s.location ? `, ${s.location}` : ""}`
+                    : s.leg === "collect"
+                    ? `from ${s.activity}${s.location ? `, ${s.location}` : ""}`
+                    : null;
                   const actLower = s.activity.toLowerCase();
                   const isPickup =
                     actLower.includes("pick up") ||
                     actLower.includes("pickup") ||
                     actLower.includes("collect");
-                  const displayLocation =
-                    isPickup && evtForTime?.location ? evtForTime.location : s.location;
+                  const displayLocation = s.leg
+                    ? null // leg context already includes location
+                    : isPickup && evtForTime?.location ? evtForTime.location : s.location;
                   return (
                   <View key={i} style={styles.juggleScheduleRow}>
                     <View style={styles.juggleTimePill}>
                       <Text style={styles.juggleTimePillText}>{timeDisplay}</Text>
                     </View>
                     <View style={{ flex: 1, gap: 1 }}>
-                      <Text style={styles.juggleScheduleActivity}>{s.activity}</Text>
-                      {s.child ? <Text style={styles.juggleScheduleChild}>with {s.child}</Text> : null}
+                      <Text style={styles.juggleScheduleActivity}>{activityLabel}</Text>
+                      {legContext ? (
+                        <Text style={styles.juggleScheduleChild}>{legContext}</Text>
+                      ) : (
+                        s.child ? <Text style={styles.juggleScheduleChild}>with {s.child}</Text> : null
+                      )}
                       {displayLocation ? <Text style={styles.juggleScheduleLocation}>{displayLocation}</Text> : null}
                     </View>
                   </View>
@@ -1122,24 +1228,61 @@ function JuggleResultsContent({
         );
       })}
 
-      {/* ── 5. Worth knowing (smart_note) ── */}
-      {juggleResult.smart_note ? (
-        <View style={{
-          backgroundColor: PLUM + "12", borderRadius: 12,
-          padding: 14, borderLeftWidth: 3, borderLeftColor: PLUM,
-        }}>
-          <Text style={{ fontSize: 11, fontFamily: "Inter_700Bold", color: PLUM, letterSpacing: 0.8, marginBottom: 4 }}>
-            WORTH KNOWING
-          </Text>
-          <Text style={{ fontSize: 13, fontFamily: "Inter_400Regular", color: PLUM, lineHeight: 19 }}>
-            {juggleResult.smart_note
-              .replace(" — see below.", ".")
-              .replace(" — see below", "")
-              .replace(", see below.", ".")
-              .replace(", see below", "")}
-          </Text>
-        </View>
-      ) : null}
+      {/* ── 5. Worth knowing — shows split details, unresolved conflict, or nothing ── */}
+      {(() => {
+        const splits = juggleResult.splitResolutions ?? [];
+        // Truly unresolved: no handoff candidate found (suggested_contacts empty)
+        const unresolved = conflicts.filter((c) => c.suggested_contacts.length === 0);
+
+        if (splits.length > 0) {
+          // Case (a): split resolved — show one card per split
+          return (
+            <View style={{ gap: 8 }}>
+              {splits.map((sr, idx) => (
+                <View key={idx} style={{
+                  backgroundColor: TEAL + "12", borderRadius: 12,
+                  padding: 14, borderLeftWidth: 3, borderLeftColor: TEAL,
+                }}>
+                  <Text style={{ fontSize: 11, fontFamily: "Inter_700Bold", color: TEAL, letterSpacing: 0.8, marginBottom: 4 }}>
+                    WORTH KNOWING
+                  </Text>
+                  <Text style={{ fontSize: 13, fontFamily: "Inter_400Regular", color: "#2B2B2B", lineHeight: 20 }}>
+                    {`We've split ${sr.eventTitle} — ${sr.dropOffAdult} drops ${sr.child ?? "off"} at ${sr.startTime}, ${sr.collectAdult} collects at ${sr.endTime}. Timing is ${sr.timing} — ${sr.timingNote}`}
+                  </Text>
+                </View>
+              ))}
+            </View>
+          );
+        }
+
+        if (unresolved.length > 0) {
+          // Case (b): conflict couldn't be resolved — show description + carpool prompt
+          const c = unresolved[0]!;
+          return (
+            <View style={{
+              backgroundColor: PLUM + "12", borderRadius: 12,
+              padding: 14, borderLeftWidth: 3, borderLeftColor: PLUM,
+            }}>
+              <Text style={{ fontSize: 11, fontFamily: "Inter_700Bold", color: PLUM, letterSpacing: 0.8, marginBottom: 4 }}>
+                WORTH KNOWING
+              </Text>
+              <Text style={{ fontSize: 13, fontFamily: "Inter_400Regular", color: PLUM, lineHeight: 20 }}>
+                {c.recommendation || c.description}
+              </Text>
+              {carpoolContacts.length === 0 && (
+                <TouchableOpacity onPress={onClose} style={{ marginTop: 10 }} activeOpacity={0.8}>
+                  <Text style={{ color: PLUM, fontFamily: "Inter_600SemiBold", fontSize: 13 }}>
+                    + Add to crew — save someone who could help →
+                  </Text>
+                </TouchableOpacity>
+              )}
+            </View>
+          );
+        }
+
+        // Case (c): everything resolved cleanly — no card
+        return null;
+      })()}
 
       {/* ── 5b. Simple week note (passive, no CTA) ── */}
       {(() => {
@@ -2255,6 +2398,36 @@ function AddEventSheet({
                 </TouchableOpacity>
               </View>
             </View>
+
+            {/* Does an adult need to stay? — only for non-appointment events with children */}
+            {!draft.isAppointment && members.some((m) => m.role === "child") && (
+              <View style={styles.formField}>
+                <Text style={styles.formLabel}>Does an adult need to stay?</Text>
+                <View style={{ flexDirection: "row", gap: 8 }}>
+                  {([
+                    { val: true,  label: "Yes" },
+                    { val: false, label: "No — drop off & collect" },
+                  ] as const).map(({ val, label }) => {
+                    const active = (draft.requiresAdultPresence ?? false) === val;
+                    return (
+                      <TouchableOpacity
+                        key={label}
+                        style={[styles.repeatChip, active && styles.repeatChipSelected, val === false && { flex: 1 }]}
+                        onPress={() => { Keyboard.dismiss(); setField("requiresAdultPresence", val); }}
+                        activeOpacity={0.75}
+                      >
+                        <Text style={[styles.repeatChipText, active && styles.repeatChipTextSelected]}>
+                          {label}
+                        </Text>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </View>
+                <Text style={[styles.formHint, { marginTop: 6 }]}>
+                  For younger kids, swimming lessons, anything where an adult needs to be there.
+                </Text>
+              </View>
+            )}
 
             {/* Location */}
             <View style={[styles.formField, { zIndex: 20 }]}>
