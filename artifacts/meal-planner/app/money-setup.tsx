@@ -457,25 +457,50 @@ export default function MoneySetupScreen() {
                   activeOpacity={0.7}
                   style={styles.autoCalcOverrideBtn}
                 >
-                  <Text style={styles.autoCalcOverrideBtnText}>Edit →</Text>
+                  <Text style={styles.autoCalcOverrideBtnText}>Edit bills →</Text>
                 </TouchableOpacity>
               </View>
               <Text style={styles.autoCalcValue}>
                 {currencySymbol}{billsAutoMonthly.toLocaleString()} /month
               </Text>
-              <View style={[styles.autoCalcPill, { marginTop: 4 }]}>
-                <Text style={styles.autoCalcPillText}>from your bills ✓</Text>
+              <View style={{ flexDirection: "row", alignItems: "center", gap: 8, marginTop: 4, flexWrap: "wrap" }}>
+                <View style={styles.autoCalcPill}>
+                  <Text style={styles.autoCalcPillText}>from your bills ✓</Text>
+                </View>
+                <TouchableOpacity
+                  onPress={() => setBillsAutoOverride(true)}
+                  activeOpacity={0.7}
+                  hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                >
+                  <Text style={{ fontSize: 12, fontFamily: "Inter_400Regular", color: "#999", textDecorationLine: "underline" }}>
+                    Enter manually instead
+                  </Text>
+                </TouchableOpacity>
               </View>
             </View>
           ) : (
-            <MoneyField
-              label="Bills, loans & regular payments"
-              sublabel="Electricity, rates, loan repayments, insurance — monthly total."
-              value={billsLoans}
-              onChange={setBillsLoans}
-              currencySymbol={currencySymbol}
-              frequencyVariant="monthly"
-            />
+            <View>
+              <MoneyField
+                label="Bills, loans & regular payments"
+                sublabel="Electricity, rates, loan repayments, insurance — monthly total."
+                value={billsLoans}
+                onChange={setBillsLoans}
+                currencySymbol={currencySymbol}
+                frequencyVariant="monthly"
+              />
+              {billsAutoMonthly !== null && (
+                <TouchableOpacity
+                  onPress={() => setBillsAutoOverride(false)}
+                  activeOpacity={0.7}
+                  style={{ marginTop: 6 }}
+                  hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                >
+                  <Text style={{ fontSize: 12, fontFamily: "Inter_400Regular", color: "#999", textDecorationLine: "underline" }}>
+                    Use my bills total instead ({currencySymbol}{billsAutoMonthly.toLocaleString()}/month)
+                  </Text>
+                </TouchableOpacity>
+              )}
+            </View>
           )}
           <View style={[styles.divider, { backgroundColor: C.border }]} />
 
