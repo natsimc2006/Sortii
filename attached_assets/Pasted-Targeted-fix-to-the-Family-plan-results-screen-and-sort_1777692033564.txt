@@ -1,0 +1,138 @@
+Targeted fix to the Family plan results screen 
+and sorting logic. Read fully before writing code.
+
+──────────────────────────────────────
+PROBLEM TO FIX
+──────────────────────────────────────
+The sorter currently assigns a split event 
+to one adult for the full duration even when 
+that adult has a conflicting event at the 
+same time and/or location.
+
+It is not checking BOTH of:
+  a) Time availability at each leg independently
+  b) Location feasibility 
+     (adult cannot be in two locations 
+     simultaneously even if times partially 
+     allow it)
+
+──────────────────────────────────────
+FIX 1 — LOCATION CONFLICT DETECTION
+──────────────────────────────────────
+When evaluating whether an adult can cover 
+a leg of an event, check BOTH:
+
+  a) Is the adult free at that time?
+     (no other event overlapping that timeslot)
+
+  b) Is the adult physically able to be there?
+     If the adult has another event ending 
+     within 15 minutes of this leg starting 
+     AND the locations are different strings
+     → flag as location conflict, 
+       do not assign this leg to this adult
+
+Apply this check independently to:
+  - Drop-off leg (start time)
+  - Collect leg (end time)
+
+──────────────────────────────────────
+FIX 2 — CORRECT SPLIT ASSIGNMENT LOGIC
+──────────────────────────────────────
+For any event where requiresAdultPresence 
+is false (splittable), use this assignment 
+order:
+
+Drop-off leg:
+  1. Check original assigned adult first
+  2. If they fail time OR location check,
+     try other available adults in order
+  3. Assign drop-off to first adult who passes
+
+Collect leg:
+  1. Check original assigned adult first
+  2. If they fail, try other adults
+  3. Assign collect to first adult who passes
+
+The drop-off adult and collect adult CAN 
+be different people — this is the intended 
+behaviour.
+
+──────────────────────────────────────
+FIX 3 — PLAN TABLE DISPLAY
+──────────────────────────────────────
+When an event is split between two adults, 
+render TWO rows in the plan table:
+
+Row 1:
+  [start time]  [drop-off adult]  
+  "Drop off [child] · [event] · [location]"
+  [⇄ Swap] button
+
+Row 2:
+  [end time]  [collect adult]  
+  "Collect [child] · [event] · [location]"
+  [⇄ Swap] button
+
+Each row is independent. Swap on row 1 only 
+affects the drop-off assignment. Swap on 
+row 2 only affects the collect assignment.
+
+When not split (requiresAdultPresence true, 
+or one adult covers full event):
+  Render as single row, same as current.
+  Still show [⇄ Swap] button.
+
+──────────────────────────────────────
+FIX 4 — SWAP BEHAVIOUR
+──────────────────────────────────────
+When user taps [⇄ Swap] on any row:
+  Show the other available adults as options
+  (all adults in the household who are not 
+  already assigned to a conflicting event 
+  at that specific time)
+  
+  If no other adult is conflict-free:
+    Show all adults with a ⚠️ flag:
+    "[Name] — has [event] at this time"
+    Allow override — user may know something 
+    the system doesn't
+
+  On selection, update that leg's assignment 
+  and re-render that row only. Do not 
+  re-run the full sort.
+
+──────────────────────────────────────
+FIX 5 — WHO'S GOT WHAT CARDS
+──────────────────────────────────────
+Update each adult's summary card to show 
+split legs correctly:
+
+If adult has a drop-off leg:
+  Show as: [time]  "Drop off [child] · [location]"
+
+If adult has a collect leg:  
+  Show as: [time]  "Collect [child] · [location]"
+
+These should appear in chronological order 
+within each adult's card alongside their 
+other events.
+
+──────────────────────────────────────
+SAFETY RULES
+──────────────────────────────────────
+1. Default requiresAdultPresence to false 
+   for any event missing this field.
+2. The 15-minute location buffer is a 
+   minimum — do not make it configurable 
+   yet, just hardcode 15.
+3. Do not change Money, Meals, Bills, 
+   or Shopping screens.
+4. Do not add new packages.
+5. Swap state is local — does not re-trigger 
+   the AI sort, only updates the display 
+   assignment for that leg.
+6. After completing confirm:
+   - How location conflict is detected
+   - The exact split assignment order used
+   - Every file modified

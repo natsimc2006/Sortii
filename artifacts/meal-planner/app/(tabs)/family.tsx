@@ -976,7 +976,7 @@ function JuggleResultsContent({
 
   return (
     <View style={{ flex: 1 }}>
-    <ScrollView style={{ flex: 1 }} contentContainerStyle={{ gap: 0, paddingBottom: 120 }}>
+    <ScrollView style={{ flex: 1 }} contentContainerStyle={{ gap: 0, paddingBottom: 24 }}>
       {/* ── 1. Hero dashboard ── */}
       <View style={[styles.resultDashboard, { backgroundColor: dashBg, borderBottomColor: dashAccent + "22" }]}>
         {/* Coloured accent bar */}
@@ -4205,16 +4205,6 @@ export default function FamilyScreen() {
               onViewLastPlan={() => setFamilyStep("results")}
             />
 
-            {/* Persistent "Add another event" button — always visible when events exist */}
-            <TouchableOpacity
-              style={styles.addAnotherBtn}
-              onPress={openAddEvent}
-              activeOpacity={0.85}
-            >
-              <Feather name="plus" size={15} color="#fff" />
-              <Text style={styles.addAnotherBtnText}>Add another event</Text>
-            </TouchableOpacity>
-
             {/* ANYTHING WE SHOULD KNOW? — global free-text context for Claude */}
             <View style={{ marginTop: 8 }}>
               <Text style={{
@@ -4280,6 +4270,29 @@ export default function FamilyScreen() {
 
       {/* ── Saved toast — appears above sticky bar ── */}
       <SavedToast visible={!!savedBanner} />
+
+      {/* ── Floating "Add another event" — always visible when family is set up ── */}
+      {hasMembers && (
+        <View style={{
+          paddingHorizontal: 20,
+          paddingTop: 10,
+          paddingBottom: hasEvents ? 10 : TAB_BAR_HEIGHT + Math.max(insets.bottom, 0) + 10,
+          backgroundColor: BG,
+          borderTopWidth: 1,
+          borderTopColor: "#F0EBE3",
+        }}>
+          <TouchableOpacity
+            style={styles.addAnotherBtn}
+            onPress={openAddEvent}
+            activeOpacity={0.85}
+          >
+            <Feather name="plus" size={15} color="#fff" />
+            <Text style={styles.addAnotherBtnText}>
+              {hasEvents ? "Add another event" : "Add first event"}
+            </Text>
+          </TouchableOpacity>
+        </View>
+      )}
 
       {/* ── Sticky bar — See the plan + Re-sort when events exist ── */}
       {hasEvents && (
