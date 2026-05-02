@@ -923,26 +923,49 @@ function JuggleResultsContent({
     [adultPlans, allScheduleItems, resolvedAssignments]
   );
 
-  // Apply swapOverrides to actually move items between adult cards so the display updates
+  // Apply swapOverrides to actually move items between adult cards.
+  // Also handles manual leg splits: if a non-split item has a leg-specific override
+  // (event_id:drop-off or event_id:collect), split it into two virtual leg rows.
   const swappedAdultPlans: JuggleAdultPlan[] = React.useMemo(() => {
     const overrides = juggleResult.swapOverrides ?? {};
     if (Object.keys(overrides).length === 0) return displayAdultPlans;
-    // Seed empty buckets for every adult in the plan
     const buckets = new Map<string, JuggleAdultPlan>();
     displayAdultPlans.forEach((p) => buckets.set(p.adult, { ...p, schedule: [] }));
-    // Route each item to the overridden adult (or keep original)
+
     displayAdultPlans.forEach((plan) => {
       plan.schedule.forEach((s) => {
-        const legKey = s.leg ? `${s.event_id}:${s.leg}` : s.event_id;
-        const targetAdult = overrides[legKey] ?? overrides[s.event_id] ?? plan.adult;
-        const target = buckets.get(targetAdult) ?? buckets.get(plan.adult)!;
-        target.schedule.push(s);
+        const dropOffKey = `${s.event_id}:drop-off`;
+        const collectKey = `${s.event_id}:collect`;
+        // Manual leg split: user picked leg-specific overrides on a non-split item
+        const isManualSplit = !s.leg && (!!overrides[dropOffKey] || !!overrides[collectKey]);
+
+        if (isManualSplit) {
+          // Find end time for the collect leg
+          const evtForEndTime = (juggleResult.events ?? []).find((e) => e.id === s.event_id);
+          const collectTime = evtForEndTime?.end_time ?? s.time;
+
+          // Drop-off leg → assigned adult
+          const dropOffAdult = overrides[dropOffKey] ?? overrides[s.event_id] ?? plan.adult;
+          const dropOffTarget = buckets.get(dropOffAdult) ?? buckets.get(plan.adult)!;
+          dropOffTarget.schedule.push({ ...s, leg: "drop-off" as const });
+
+          // Collect leg → assigned adult
+          const collectAdult = overrides[collectKey] ?? overrides[s.event_id] ?? plan.adult;
+          const collectTarget = buckets.get(collectAdult) ?? buckets.get(plan.adult)!;
+          collectTarget.schedule.push({ ...s, leg: "collect" as const, time: collectTime });
+        } else {
+          const legKey = s.leg ? `${s.event_id}:${s.leg}` : s.event_id;
+          const targetAdult = overrides[legKey] ?? overrides[s.event_id] ?? plan.adult;
+          const target = buckets.get(targetAdult) ?? buckets.get(plan.adult)!;
+          target.schedule.push(s);
+        }
       });
     });
+
     const result = Array.from(buckets.values());
     result.forEach((p) => p.schedule.sort((a, b) => a.time.localeCompare(b.time)));
     return result;
-  }, [displayAdultPlans, juggleResult.swapOverrides]);
+  }, [displayAdultPlans, juggleResult.swapOverrides, juggleResult.events]);
 
   const planRows = displayAdultPlans.flatMap((p) =>
     p.schedule.map((s) => {
@@ -974,6 +997,8 @@ function JuggleResultsContent({
 
   const [swapRow, setSwapRow]   = useState<typeof planRows[0] | null>(null);
   const [swapPick, setSwapPick] = useState<string>("");
+  // "full" swaps whole event; "drop-off"/"collect" apply a leg-specific manual split
+  const [swapLegMode, setSwapLegMode] = useState<"full" | "drop-off" | "collect">("full");
 
   const adultMembers = members.filter((m) => m.role === "adult");
 
@@ -1476,6 +1501,37 @@ function JuggleResultsContent({
                 : `${swapRow.activity}${swapRow.child ? ` · ${swapRow.child}` : ""}${swapRow.time ? ` · ${swapRow.time}` : ""}`}
             </Text>
           )}
+          {/* Leg selector — only shown for non-split events with a distinct end time */}
+          {swapRow && !swapRow.leg && swapRow.endTime && swapRow.endTime !== swapRow.time && (
+            <View style={{
+              flexDirection: "row", backgroundColor: "#F2F2F0",
+              borderRadius: 10, padding: 3, gap: 2,
+            }}>
+              {(["full", "drop-off", "collect"] as const).map((mode) => {
+                const label = mode === "full" ? "Whole event" : mode === "drop-off" ? "Drop-off only" : "Collect only";
+                const active = swapLegMode === mode;
+                return (
+                  <TouchableOpacity
+                    key={mode}
+                    onPress={() => setSwapLegMode(mode)}
+                    style={{
+                      flex: 1, paddingVertical: 8, borderRadius: 8,
+                      alignItems: "center",
+                      backgroundColor: active ? "#fff" : "transparent",
+                    }}
+                    activeOpacity={0.7}
+                  >
+                    <Text style={{
+                      fontSize: 11, fontFamily: active ? "Inter_600SemiBold" : "Inter_400Regular",
+                      color: active ? "#1C1C1E" : "#999",
+                    }}>
+                      {label}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+          )}
           <View style={{ gap: 8 }}>
             {adultMembers.map((adult) => {
               const selected = swapPick === adult.name;
@@ -1535,9 +1591,17 @@ function JuggleResultsContent({
             <TouchableOpacity
               onPress={() => {
                 if (swapRow && swapPick && onSwapApplied) {
-                  onSwapApplied(swapRow.legKey, swapPick);
+                  // For already-split leg rows use the existing legKey directly.
+                  // For non-split rows, apply the leg mode chosen by the user.
+                  const applyKey = swapRow.leg
+                    ? swapRow.legKey
+                    : swapLegMode === "full"
+                    ? swapRow.legKey
+                    : `${swapRow.event_id}:${swapLegMode}`;
+                  onSwapApplied(applyKey, swapPick);
                 }
                 setSwapRow(null);
+                setSwapLegMode("full");
               }}
               style={{
                 flex: 1, paddingVertical: 14, borderRadius: 10,
