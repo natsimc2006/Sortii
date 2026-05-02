@@ -798,18 +798,37 @@ export default function BillsScreen() {
             </View>
           ))
         )}
-        <View style={{ marginTop: 16 }}>
-          <SavingsTipCard
-            tipId="tip_energy"
-            icon="⚡"
-            title="Your energy bill is probably higher than it needs to be."
-            body="Step 1 — compare every plan with no sales spin. Step 2 — switch via ShopBack and earn up to $200 cashback on top."
-            primaryLabel="Compare all plans (no bias) →"
-            primaryUrl="https://www.energymadeeasy.gov.au"
-            secondaryLabel="Switch via ShopBack — earn cashback →"
-            secondaryUrl="https://www.shopback.com.au/energy"
-          />
-        </View>
+        {bills.length > 0 && bills.some((b) => {
+          try {
+            const cat = (b.category ?? "").toLowerCase();
+            const title = (b.title ?? "").toLowerCase();
+            return (
+              cat === "utility" ||
+              cat === "utilities" ||
+              cat === "energy" ||
+              title.includes("electric") ||
+              title.includes("energy") ||
+              title.includes("gas") ||
+              title.includes("power") ||
+              title.includes("utility")
+            );
+          } catch {
+            return false;
+          }
+        }) && (
+          <View style={{ marginTop: 16 }}>
+            <SavingsTipCard
+              tipId="tip_energy"
+              icon="⚡"
+              title="When did you last compare your energy provider?"
+              body="Most households on a default tariff are overpaying. If it's been over 12 months, it's worth a 2-minute check. Step 1 — compare every plan with no sales spin. Step 2 — switch via ShopBack and earn up to $200 cashback on top."
+              primaryLabel="Compare all plans (no bias) →"
+              primaryUrl="https://www.energymadeeasy.gov.au"
+              secondaryLabel="Switch via ShopBack — earn cashback →"
+              secondaryUrl="https://www.shopback.com.au/energy"
+            />
+          </View>
+        )}
       </ScrollView>
 
       {/* FAB */}

@@ -1,0 +1,79 @@
+This is a small follow-up change to the energy tip 
+card on the Bills screen only. Do not touch any 
+other files.
+
+──────────────────────────────────────
+CHANGE 1 — UPDATE THE TRIGGER CONDITION
+──────────────────────────────────────
+File: artifacts/meal-planner/app/(tabs)/bills.tsx
+
+Currently the energy tip (tip_energy) shows 
+regardless of what bills the user has added.
+
+Update the condition so the tip only renders when 
+BOTH of the following are true:
+
+  a) The tip has not been dismissed (existing 
+     AsyncStorage logic — do not change this)
+
+  b) At least one bill exists in the user's bill 
+     list where the bill's category, type, or name 
+     suggests it is a utility bill. Check ALL of 
+     the following on each bill object (any one 
+     match across any bill = show tip):
+       - bill.category === 'utility'
+       - bill.category === 'utilities'
+       - bill.type === 'utility'
+       - bill.type === 'utilities'
+       - bill.category === 'energy'
+       - bill.type === 'energy'
+       - bill.name?.toLowerCase().includes('electric')
+       - bill.name?.toLowerCase().includes('energy')
+       - bill.name?.toLowerCase().includes('gas')
+       - bill.name?.toLowerCase().includes('power')
+       - bill.name?.toLowerCase().includes('utility')
+       - bill.label?.toLowerCase().includes('electric')
+       - bill.label?.toLowerCase().includes('energy')
+       - bill.label?.toLowerCase().includes('gas')
+       - bill.label?.toLowerCase().includes('power')
+
+  If no bills exist at all, do not show the tip.
+  If bills exist but none match utility conditions, 
+  do not show the tip.
+  If the bill list data is unavailable or throws, 
+  default to NOT showing the tip.
+
+  Inspect the existing bills data structure in 
+  bills.tsx before writing the condition — use 
+  the actual field names found in that file.
+
+──────────────────────────────────────
+CHANGE 2 — UPDATE THE COPY ONLY
+──────────────────────────────────────
+Update the props passed to SavingsTipCard on the 
+Bills screen to use this new copy:
+
+- title: 'When did you last compare your 
+  energy provider?'
+- body: 'Most households on a default tariff are 
+  overpaying. If it\'s been over 12 months, it\'s 
+  worth a 2-minute check. Step 1 — compare every 
+  plan with no sales spin. Step 2 — switch via 
+  ShopBack and earn up to $200 cashback on top.'
+
+All other props stay the same (tipId, icon, 
+primaryLabel, primaryUrl, secondaryLabel, 
+secondaryUrl).
+
+──────────────────────────────────────
+SAFETY RULES
+──────────────────────────────────────
+1. Only modify bills.tsx — no other files.
+2. Do not change SavingsTipCard.tsx.
+3. Do not change any existing bill logic, 
+   state, or UI.
+4. Do not add any new packages.
+5. After completing, confirm:
+   - The exact field names found on bill objects
+   - Which conditions you used in the final check
+   - That no other files were modified
