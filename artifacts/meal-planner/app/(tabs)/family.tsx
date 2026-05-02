@@ -758,7 +758,39 @@ function JuggleResultsContent({
   const conflicts     = juggleResult.conflicts ?? [];
   const travelEstimates = (juggleResult.travel_estimates ?? []) as TravelEstimate[];
   const swapOverrides = juggleResult.swapOverrides ?? {};
-  const planRows = adultPlans.flatMap((p) =>
+
+  // Fix 1 — build display-only resolved assignments from conflict handoff suggestions.
+  // When a conflict has a suggested_contact, that contact takes the first involved event
+  // for display purposes.  Nothing in state or the algorithm is changed.
+  const resolvedAssignments = React.useMemo(() => {
+    const map = new Map<string, string>();
+    conflicts.forEach((c) => {
+      if (c.recommendation && c.suggested_contacts.length > 0 && c.involved_events.length > 0) {
+        map.set(c.involved_events[0]!, c.suggested_contacts[0]!);
+      }
+    });
+    return map;
+  }, [conflicts]);
+
+  const allScheduleItems = React.useMemo(() =>
+    adultPlans.flatMap((p) => p.schedule.map((s) => ({ ...s, originalAdult: p.adult }))),
+    [adultPlans]
+  );
+
+  const displayAdultPlans: JuggleAdultPlan[] = React.useMemo(() =>
+    adultPlans.map((plan) => ({
+      ...plan,
+      schedule: allScheduleItems
+        .filter((s) => {
+          const reassignedTo = resolvedAssignments.get(s.event_id);
+          return reassignedTo ? reassignedTo === plan.adult : s.originalAdult === plan.adult;
+        })
+        .map(({ originalAdult: _oa, ...rest }) => rest),
+    })),
+    [adultPlans, allScheduleItems, resolvedAssignments]
+  );
+
+  const planRows = displayAdultPlans.flatMap((p) =>
     p.schedule.map((s) => {
       const evtItem = (juggleResult.events ?? []).find((e) => e.id === s.event_id);
       return {
@@ -909,10 +941,10 @@ function JuggleResultsContent({
       <View style={{ paddingHorizontal: 16, gap: 16, paddingTop: 18 }}>
 
       {/* ── 2. WHO'S DOING THE RUNNING ── */}
-      {adultPlans.length > 0 && (
+      {displayAdultPlans.length > 0 && (
         <View style={{ gap: 10 }}>
           <Text style={styles.juggleSectionLabel}>WHO'S GOT WHAT</Text>
-          {adultPlans.map((plan) => {
+          {displayAdultPlans.map((plan) => {
             const member = members.find((m) => m.name === plan.adult);
             return (
               <View key={plan.adult} style={[styles.juggleAdultCard, { borderLeftColor: member?.color ?? TEAL }]}>
@@ -1075,8 +1107,12 @@ function JuggleResultsContent({
             }]}
           >
             <Text style={[styles.juggleConflictLabel, { color: TEAL }]}>SORTED ✓</Text>
-            <Text style={styles.juggleConflictDesc}>{c.description}</Text>
-            <Text style={[styles.juggleConflictRec, { color: TEAL }]}>{c.recommendation}</Text>
+            <Text style={[styles.juggleConflictRec, { color: TEAL }]}>
+              {c.recommendation
+                .replace(" — they could ", " — they'll ")
+                .replace(", they could ", ", they'll ")
+                .replace("they could ", "they'll ")}
+            </Text>
           </View>
         ) : (
           <View key={i} style={styles.juggleConflictCard}>
@@ -1096,7 +1132,11 @@ function JuggleResultsContent({
             WORTH KNOWING
           </Text>
           <Text style={{ fontSize: 13, fontFamily: "Inter_400Regular", color: PLUM, lineHeight: 19 }}>
-            {juggleResult.smart_note}
+            {juggleResult.smart_note
+              .replace(" — see below.", ".")
+              .replace(" — see below", "")
+              .replace(", see below.", ".")
+              .replace(", see below", "")}
           </Text>
         </View>
       ) : null}

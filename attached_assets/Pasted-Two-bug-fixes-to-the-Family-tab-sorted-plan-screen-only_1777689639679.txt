@@ -1,0 +1,67 @@
+Two bug fixes to the Family tab sorted plan 
+screen only. Do not touch any other screens 
+or files.
+
+FILE: locate the family plan results screen 
+(the screen showing WHO'S GOT WHAT, SORTED, 
+WORTH KNOWING cards).
+
+──────────────────────────────────────
+FIX 1 — MAKE INFERRED PLAN THE ACTUAL PLAN
+──────────────────────────────────────
+Currently when the AI sorting logic identifies 
+a resolution to a conflict (e.g. dad collects 
+Izzy instead of mum), it writes this as a note 
+in the SORTED card but does not update the 
+plan assignment table.
+
+Update the logic so that:
+a) When the sorter identifies a reassignment 
+   as the resolution, that reassignment becomes 
+   the entry in the plan table — not the 
+   original assignment.
+b) The SORTED card copy changes from explaining 
+   what COULD happen to confirming what HAS 
+   been decided. Use past tense / confirmation 
+   framing e.g. "We've moved [event] to [person] 
+   — [reason in one sentence]."
+c) The plan table row reflects the resolved 
+   assignment, not the original one.
+
+Do not change the sorting algorithm itself — 
+only change how the resolved output is displayed.
+
+──────────────────────────────────────
+FIX 2 — "SEE BELOW" WITH NOTHING BELOW
+──────────────────────────────────────
+The WORTH KNOWING card currently renders copy 
+that says "1 overlap to sort — see below" (or 
+similar) but there is no content below it that 
+addresses the overlap.
+
+Find where this copy is generated and fix it 
+by doing ONE of the following — choose whichever 
+is architecturally simpler:
+
+Option A: If the overlap detail content exists 
+but is not rendering below the WORTH KNOWING 
+card, fix the render order so it appears 
+immediately below.
+
+Option B: If no overlap detail content exists 
+below, remove the "see below" reference from 
+the WORTH KNOWING copy entirely. Replace with 
+a self-contained description of the overlap 
+and resolution, no forward reference needed.
+
+Do not use "see below" in any copy unless 
+content actually renders below that card.
+
+──────────────────────────────────────
+SAFETY RULES
+──────────────────────────────────────
+1. Only modify the family plan results screen.
+2. Do not change the sorting/AI logic itself.
+3. Do not change any other screens or files.
+4. After completing, confirm which option 
+   you chose for Fix 2 and why.
