@@ -923,6 +923,27 @@ function JuggleResultsContent({
     [adultPlans, allScheduleItems, resolvedAssignments]
   );
 
+  // Apply swapOverrides to actually move items between adult cards so the display updates
+  const swappedAdultPlans: JuggleAdultPlan[] = React.useMemo(() => {
+    const overrides = juggleResult.swapOverrides ?? {};
+    if (Object.keys(overrides).length === 0) return displayAdultPlans;
+    // Seed empty buckets for every adult in the plan
+    const buckets = new Map<string, JuggleAdultPlan>();
+    displayAdultPlans.forEach((p) => buckets.set(p.adult, { ...p, schedule: [] }));
+    // Route each item to the overridden adult (or keep original)
+    displayAdultPlans.forEach((plan) => {
+      plan.schedule.forEach((s) => {
+        const legKey = s.leg ? `${s.event_id}:${s.leg}` : s.event_id;
+        const targetAdult = overrides[legKey] ?? overrides[s.event_id] ?? plan.adult;
+        const target = buckets.get(targetAdult) ?? buckets.get(plan.adult)!;
+        target.schedule.push(s);
+      });
+    });
+    const result = Array.from(buckets.values());
+    result.forEach((p) => p.schedule.sort((a, b) => a.time.localeCompare(b.time)));
+    return result;
+  }, [displayAdultPlans, juggleResult.swapOverrides]);
+
   const planRows = displayAdultPlans.flatMap((p) =>
     p.schedule.map((s) => {
       const evtItem = (juggleResult.events ?? []).find((e) => e.id === s.event_id);
@@ -1078,10 +1099,10 @@ function JuggleResultsContent({
       <View style={{ paddingHorizontal: 16, gap: 16, paddingTop: 18 }}>
 
       {/* ── 2. WHO'S DOING THE RUNNING ── */}
-      {displayAdultPlans.length > 0 && (
+      {swappedAdultPlans.length > 0 && (
         <View style={{ gap: 10 }}>
           <Text style={styles.juggleSectionLabel}>WHO'S GOT WHAT</Text>
-          {displayAdultPlans.map((plan) => {
+          {swappedAdultPlans.map((plan) => {
             const member = members.find((m) => m.name === plan.adult);
             return (
               <View key={plan.adult} style={[styles.juggleAdultCard, { borderLeftColor: member?.color ?? TEAL }]}>
@@ -1116,10 +1137,10 @@ function JuggleResultsContent({
                   const displayLocation = s.leg
                     ? null // leg context already includes location
                     : isPickup && evtForTime?.location ? evtForTime.location : s.location;
-                  // FIX 3: Build leg-specific swap key and resolve current assignment
+                  // FIX 3: Build leg-specific swap key; swapped = any override exists for this item
                   const rowLegKey = s.leg ? `${s.event_id}:${s.leg}` : s.event_id;
                   const rowAdult = swapOverrides[rowLegKey] ?? swapOverrides[s.event_id] ?? plan.adult;
-                  const rowSwapped = rowAdult !== plan.adult;
+                  const rowSwapped = !!(swapOverrides[rowLegKey] ?? swapOverrides[s.event_id]);
                   return (
                   <View key={i} style={[styles.juggleScheduleRow, { alignItems: "flex-start" }]}>
                     <View style={styles.juggleTimePill}>
