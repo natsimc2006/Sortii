@@ -4209,10 +4209,22 @@ export default function FamilyScreen() {
                   if (day) (apptsByDay[day] = apptsByDay[day] ?? []).push(a);
                 }
                 const allDays = ALL_DAYS.filter(
-                  (d) => (result?.eventsByDay[d]?.length ?? 0) > 0 || (apptsByDay[d]?.length ?? 0) > 0
+                  (d) =>
+                    state.events.some((e) => e.day === d) ||
+                    (result?.eventsByDay[d]?.length ?? 0) > 0 ||
+                    (apptsByDay[d]?.length ?? 0) > 0
                 );
                 return allDays.map((day) => {
-                  const famEvs = result?.eventsByDay[day] ?? [];
+                  const famEvs =
+                    result?.eventsByDay[day]?.length
+                      ? result.eventsByDay[day]
+                      : state.events
+                          .filter((e) => e.day === day)
+                          .sort((a, b) => {
+                            const [ah = 0, am = 0] = a.time.split(":").map(Number);
+                            const [bh = 0, bm = 0] = b.time.split(":").map(Number);
+                            return (ah * 60 + am) - (bh * 60 + bm);
+                          });
                   const dayAppts = apptsByDay[day] ?? [];
                   const isWeekend = day === "Saturday" || day === "Sunday";
                   return (
@@ -4613,8 +4625,8 @@ export default function FamilyScreen() {
       {/* ── Saved toast — appears above sticky bar ── */}
       <SavedToast visible={!!savedBanner} />
 
-      {/* ── Floating "Add another event" — always visible when family is set up ── */}
-      {hasMembers && (
+      {/* ── Floating "Add another event" — always visible when there's anything on the page ── */}
+      {(hasMembers || hasEvents) && (
         <View style={{
           paddingHorizontal: 20,
           paddingTop: 10,
