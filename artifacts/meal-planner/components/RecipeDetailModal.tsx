@@ -5,6 +5,7 @@ import {
   Modal,
   Platform,
   ScrollView,
+  Share,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -176,7 +177,7 @@ export function RecipeDetailModal({ recipe, onClose }: RecipeDetailModalProps) {
   const { preferences } = usePlanner();
   const [expandedSteps, setExpandedSteps] = useState<Set<number>>(new Set());
   const [heroImgError, setHeroImgError] = useState(false);
-  const { src: heroImgSrc, refresh: refreshHeroImage, refreshing: heroRefreshing } = useRecipeImage(recipe?.id ?? "", recipe?.name ?? "", recipe?.imageUrl);
+  const { src: heroImgSrc } = useRecipeImage(recipe?.id ?? "", recipe?.name ?? "", recipe?.imageUrl);
 
   if (!recipe) return null;
 
@@ -218,6 +219,41 @@ export function RecipeDetailModal({ recipe, onClose }: RecipeDetailModalProps) {
           <Feather name="x" size={20} color={hasHero ? "#fff" : C.text} />
         </TouchableOpacity>
 
+        {/* Floating share button */}
+        <TouchableOpacity
+          onPress={() => {
+            const ingredientLines = recipe.ingredients
+              .map((ing) => `• ${ing.name} — ${formatQty(ing.quantity)} ${ing.unit}`.trim())
+              .join("\n");
+            const stepLines = recipe.instructions
+              .map((step, i) => `${i + 1}. ${step}`)
+              .join("\n");
+            Share.share({
+              title: recipe.name,
+              message: [
+                recipe.name,
+                recipe.description ? `\n${recipe.description}` : "",
+                `\nServes ${recipe.baseServings} · ${recipe.cookTimeMinutes} min`,
+                `\nIngredients:\n${ingredientLines}`,
+                `\nMethod:\n${stepLines}`,
+                "\n\nShared from Sortii 🌿",
+              ]
+                .filter(Boolean)
+                .join(""),
+            });
+          }}
+          style={[
+            styles.floatingShareBtn,
+            {
+              top: Platform.OS === "web" ? 16 : insets.top + 12,
+              backgroundColor: hasHero ? "rgba(0,0,0,0.45)" : C.chipBg,
+            },
+          ]}
+          activeOpacity={0.8}
+        >
+          <Feather name="share" size={18} color={hasHero ? "#fff" : C.text} />
+        </TouchableOpacity>
+
         {/* Single scroll — hero image, title, meta, ingredients and steps all scroll together */}
         <ScrollView
           contentContainerStyle={[
@@ -235,18 +271,6 @@ export function RecipeDetailModal({ recipe, onClose }: RecipeDetailModalProps) {
                 resizeMode="cover"
                 onError={() => setHeroImgError(true)}
               />
-              {/* Refresh photo button — small floating pill over the image */}
-              <TouchableOpacity
-                onPress={refreshHeroImage}
-                disabled={heroRefreshing}
-                style={styles.refreshPhotoBtn}
-                activeOpacity={0.8}
-              >
-                <Feather name="refresh-cw" size={12} color="#fff" />
-                <Text style={styles.refreshPhotoBtnText}>
-                  {heroRefreshing ? "Refreshing…" : "Refresh photo"}
-                </Text>
-              </TouchableOpacity>
             </View>
           )}
 
@@ -391,6 +415,16 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     zIndex: 10,
   },
+  floatingShareBtn: {
+    position: "absolute",
+    right: 60,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    alignItems: "center",
+    justifyContent: "center",
+    zIndex: 10,
+  },
   scrollContent: {
     flexGrow: 1,
   },
@@ -402,23 +436,6 @@ const styles = StyleSheet.create({
   heroImage: {
     width: "100%",
     height: "100%",
-  },
-  refreshPhotoBtn: {
-    position: "absolute",
-    bottom: 10,
-    right: 12,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 5,
-    backgroundColor: "rgba(0,0,0,0.45)",
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 20,
-  },
-  refreshPhotoBtnText: {
-    color: "#fff",
-    fontSize: 11,
-    fontFamily: "Inter_500Medium",
   },
   header: {
     paddingHorizontal: 20,

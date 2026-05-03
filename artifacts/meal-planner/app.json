@@ -11,7 +11,7 @@
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/images/splash-icon.png",
+      "image": "./assets/images/sortii-logo-yourweek.png",
       "resizeMode": "contain",
       "backgroundColor": "#F9FAF9"
     },

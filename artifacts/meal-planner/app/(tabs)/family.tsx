@@ -1311,10 +1311,23 @@ function JuggleResultsContent({
                       <Text style={{ fontFamily: "Inter_400Regular", fontSize: 12, color: TEXT_MUTED }}>
                         {c.name} is in {c.childName}'s carpool — worth a message.
                       </Text>
-                    ) : c.phone ? (
-                      <Text style={{ fontFamily: "Inter_400Regular", fontSize: 12, color: TEXT_MUTED }}>
-                        {c.phone}
-                      </Text>
+                    ) : null}
+                    {c.phone ? (
+                      <TouchableOpacity
+                        onPress={() => {
+                          Alert.alert(c.name, c.phone, [
+                            { text: "📞 Call", onPress: () => Linking.openURL(`tel:${c.phone}`) },
+                            { text: "💬 Send SMS", onPress: () => Linking.openURL(`sms:${c.phone}`) },
+                            { text: "Cancel", style: "cancel" },
+                          ]);
+                        }}
+                        activeOpacity={0.7}
+                        hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
+                      >
+                        <Text style={{ fontFamily: "Inter_500Medium", fontSize: 12, color: TEAL, textDecorationLine: "underline" }}>
+                          {c.phone}
+                        </Text>
+                      </TouchableOpacity>
                     ) : null}
                   </View>
                   <Text style={{ color: TEAL, fontFamily: "Inter_600SemiBold", fontSize: 13 }}>
@@ -2276,6 +2289,7 @@ function AddEventSheet({
   onAddCarpoolContact,
   onClose,
   onSave,
+  defaultWeek = 0,
 }: {
   visible: boolean;
   members: FamilyMember[];
@@ -2283,13 +2297,15 @@ function AddEventSheet({
   carpoolContacts: CarpoolContact[];
   onAddCarpoolContact: (c: CarpoolContact) => void;
   onClose: () => void;
-  onSave: (draft: Omit<FamilyEvent, "id">) => void;
+  onSave: (draft: Omit<FamilyEvent, "id">, weekOffset: number) => void;
+  defaultWeek?: number;
 }) {
   const insets = useSafeAreaInsets();
   const slideY   = useRef(new Animated.Value(600)).current;
   const overlayOp = useRef(new Animated.Value(0)).current;
 
   const [draft, setDraft] = useState<Omit<FamilyEvent, "id">>(blankDraft);
+  const [weekOffset, setWeekOffset]               = useState(defaultWeek);
   const [errors, setErrors] = useState<string[]>([]);
   const [showDiscard, setShowDiscard] = useState(false);
   const [timePickerVisible, setTimePickerVisible] = useState(false);
@@ -2324,6 +2340,7 @@ function AddEventSheet({
 
   useEffect(() => {
     if (visible) {
+      setWeekOffset(defaultWeek);
       setDraft(initialDraft ? { ...blankDraft(), ...initialDraft } : blankDraft());
       setErrors([]);
       setCarpoolEntryName("");
@@ -2394,7 +2411,7 @@ function AddEventSheet({
       driverId: undefined,
       assignedAdult: correctedAssignedAdult,
       originOverride: !startingFromHome && customOrigin.trim() ? customOrigin.trim() : undefined,
-    });
+    }, weekOffset);
   }
 
   if (!visible) return null;
@@ -2478,6 +2495,49 @@ function AddEventSheet({
               )}
             </View>
 
+            {/* Which week? — pick this or next week first */}
+            <View style={styles.formField}>
+              <Text style={styles.formLabel}>Which week?</Text>
+              <View style={{ flexDirection: "row", gap: 8 }}>
+                {([{ val: 0, label: "This week" }, { val: 1, label: "Next week" }] as const).map(({ val, label }) => {
+                  const active = weekOffset === val;
+                  return (
+                    <TouchableOpacity
+                      key={val}
+                      style={[styles.repeatChip, active && styles.repeatChipSelected]}
+                      onPress={() => { Keyboard.dismiss(); setWeekOffset(val); }}
+                      activeOpacity={0.75}
+                    >
+                      <Text style={[styles.repeatChipText, active && styles.repeatChipTextSelected]}>
+                        {label}
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
+            </View>
+
+            {/* Day — now above title so when/where comes before what */}
+            <View style={styles.formField}>
+              <Text style={styles.formLabel}>Which day?</Text>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                <View style={{ flexDirection: "row", gap: 6 }}>
+                  {ALL_DAYS.map((d) => (
+                    <TouchableOpacity
+                      key={d}
+                      style={[styles.dayChip, draft.day === d && styles.dayChipSelected]}
+                      onPress={() => { Keyboard.dismiss(); setField("day", d); }}
+                      activeOpacity={0.75}
+                    >
+                      <Text style={[styles.dayChipText, draft.day === d && styles.dayChipTextSelected]}>
+                        {DAY_ABBR[d]}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              </ScrollView>
+            </View>
+
             {/* Title */}
             <View style={styles.formField}>
               <Text style={styles.formLabel}>What's on?</Text>
@@ -2550,27 +2610,6 @@ function AddEventSheet({
                 </View>
               );
             })()}
-
-            {/* Day */}
-            <View style={styles.formField}>
-              <Text style={styles.formLabel}>Which day?</Text>
-              <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                <View style={{ flexDirection: "row", gap: 6 }}>
-                  {ALL_DAYS.map((d) => (
-                    <TouchableOpacity
-                      key={d}
-                      style={[styles.dayChip, draft.day === d && styles.dayChipSelected]}
-                      onPress={() => { Keyboard.dismiss(); setField("day", d); }}
-                      activeOpacity={0.75}
-                    >
-                      <Text style={[styles.dayChipText, draft.day === d && styles.dayChipTextSelected]}>
-                        {DAY_ABBR[d]}
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
-                </View>
-              </ScrollView>
-            </View>
 
             {/* Times */}
             <View style={styles.formField}>
@@ -3613,7 +3652,7 @@ export default function FamilyScreen() {
     setSavedBanner(null);
   }
 
-  async function handleSaveEvent(draft: Omit<FamilyEvent, "id">) {
+  async function handleSaveEvent(draft: Omit<FamilyEvent, "id">, weekOffset: number = sortWeek) {
     const wasEditing  = !!editingEvent;
     const prevCount   = state.events.length;
     const savedId     = editingEvent?.id ?? Date.now().toString();
@@ -3637,7 +3676,7 @@ export default function FamilyScreen() {
     if (draft.isAppointment) {
       const apptId = `fam_${savedId}`;
       // Pin the appointment to the correct calendar week (this or next) based on sortWeek
-      const date   = dateForDayInWeek(draft.day as DayOfWeek, sortWeek);
+      const date   = dateForDayInWeek(draft.day as DayOfWeek, weekOffset);
       const person = draft.assignedAdult ||
         draft.personIds.map((pid) => state.members.find((m) => m.id === pid)?.name).filter(Boolean).join(", ") || "";
       const newAppt: Appointment = {
@@ -4696,6 +4735,7 @@ export default function FamilyScreen() {
           onAddCarpoolContact={handleAddCarpoolContact}
           onClose={() => { setShowForm(false); setEditingEvent(null); }}
           onSave={handleSaveEvent}
+          defaultWeek={sortWeek}
         />
       )}
 
