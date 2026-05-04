@@ -94,7 +94,7 @@ export interface PlanPreferences {
   leftoversMode: "none" | "cook-once";
   mealVariety: 3 | 5 | 7;
   cookingStyle: "mixed" | "one-pan" | "air-fryer" | "oven-based" | "no-preference";
-  cuisinePreference: "mixed" | "italian" | "asian" | "mexican" | "aussie";
+  cuisinePreference: "mixed" | "italian" | "asian" | "mexican" | "classics";
   exclusions: string[];
   mealCoverage: "dinner-only" | "lunch-dinner";
   weekendOverrides: WeekendOverrides;
@@ -269,8 +269,8 @@ function matchesCuisine(r: Recipe, cuisine: string): boolean {
       return /stir.fry|noodle|fried rice|teriyaki|pad |laksa|mee |thai|korean|japanese|satay|ramen|sushi|dumpling|wok|aglio|asian|szechuan|prawn.*soy/.test(text);
     case "mexican":
       return /taco|burrito|quesadilla|nachos|fajita|enchilada|mexican|jalape/.test(text);
-    case "aussie":
-      return /schnitzel|barramundi|fish.and.chip|fish & chip|sausage.*bake|tray bake.*sausage|schnitzel|pie|fish chip|aussie/.test(text);
+    case "classics":
+      return /schnitzel|barramundi|fish.and.chip|fish & chip|sausage.*bake|tray bake.*sausage|pie|fish chip|aussie|banger|shepherd|cottage pie|roast|jacket potato|sausage roll|toad.in.the.hole|bubble.*squeak|beef stew|sunday roast|mash/.test(text);
     default:
       return true;
   }

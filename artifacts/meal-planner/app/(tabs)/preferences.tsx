@@ -548,7 +548,7 @@ export default function PreferencesScreen() {
                 { label: "Italian", value: "italian" },
                 { label: "Asian", value: "asian" },
                 { label: "Mexican", value: "mexican" },
-                { label: "Aussie Classics", value: "aussie" },
+                { label: "Classics", value: "classics" },
               ]}
               value={prefs.cuisinePreference ?? "mixed"}
               onSelect={(v) => update("cuisinePreference", v)}
