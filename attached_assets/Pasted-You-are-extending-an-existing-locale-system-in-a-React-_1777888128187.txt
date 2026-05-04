@@ -1,0 +1,217 @@
+You are extending an existing locale system in a React Native / Expo app (Sortii) 
+to cover new modules that have been added since the original locale layer was built. 
+The recipe/meal planner locale layer already works — DO NOT touch it.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+SAFETY RULES — READ BEFORE STARTING
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. DO NOT modify any existing meal planner, recipe, or shopping list screens or logic.
+2. DO NOT rename, delete, or restructure utils/locale.ts — extend it only.
+3. DO NOT modify utils/recipeService.ts.
+4. DO NOT change any existing AsyncStorage keys.
+5. DO NOT guess import paths — check the actual file structure first.
+6. If you are unsure which file a screen lives in, STOP and list the files you 
+   found and ask which one to use before proceeding.
+7. After each phase, STOP and report what you did before moving to the next phase.
+8. If a currency amount currently renders as a hardcoded "$" symbol anywhere in 
+   the Bills, Activities, or Appointments screens, update it to use the locale 
+   config — but do not change any other logic in those screens.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PHASE 1 — READ FIRST, TOUCH NOTHING
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Before writing any code:
+
+1a. Open utils/locale.ts and read the full existing file. Report back:
+    - What the current Locale type looks like
+    - What functions already exist (getLocale, etc.)
+    - What it currently exports
+
+1b. Find and list the screen files for:
+    - Bills / bill tracking screen
+    - Family activity / juggle screen
+    - Appointments screen
+    Report the exact file paths for each.
+
+1c. In each of those three screen files, find and report:
+    - Every place a currency symbol ("$" or "£") appears hardcoded
+    - Every place a bill type name is hardcoded (e.g. "Council rates", "NBN", 
+      "Internet", "Electricity")
+    - Every place a school year label appears (e.g. "Kindy", "Year 7", "Year 12")
+    - Any existing import of utils/locale.ts
+
+STOP after Phase 1. Report your findings. Do not proceed until confirmed.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PHASE 2 — EXTEND utils/locale.ts
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Add the following to utils/locale.ts WITHOUT removing or changing anything 
+that already exists in the file.
+
+Add this export below the existing exports:
+
+───────────────────────────────────────
+export const getLocaleConfig = (locale: Locale) => ({
+
+  currency: {
+    symbol: locale === 'AU' ? '$' : '£',
+    code: locale === 'AU' ? 'AUD' : 'GBP',
+    format: (amount: number) =>
+      locale === 'AU'
+        ? `$${amount.toFixed(2)}`
+        : `£${amount.toFixed(2)}`,
+  },
+
+  bills: {
+    councilLabel: locale === 'AU' ? 'Council rates' : 'Council tax',
+    internetLabel: locale === 'AU' ? 'NBN / Internet' : 'Broadband',
+    defaultBillTypes: locale === 'AU'
+      ? [
+          'Electricity',
+          'Gas',
+          'Water rates',
+          'Council rates',
+          'NBN / Internet',
+          'Insurance',
+        ]
+      : [
+          'Electricity',
+          'Gas',
+          'Water rates',
+          'Council tax',
+          'Broadband',
+          'Insurance',
+        ],
+    councilCycle: locale === 'AU' ? 'quarterly' : 'monthly',
+  },
+
+  activities: {
+    foundationLabel: locale === 'AU' ? 'Kindy / Prep' : 'Reception',
+    seniorSchoolEnd: locale === 'AU' ? 12 : 13,
+    termLabel: 'Term',
+  },
+
+  supermarkets: {
+    primary: locale === 'AU' ? 'Woolworths' : 'Tesco',
+    secondary: locale === 'AU' ? 'Coles' : "Sainsbury's",
+    budget: 'Aldi',
+  },
+
+});
+───────────────────────────────────────
+
+After adding this, confirm:
+- The existing locale.ts exports are all still present and unchanged
+- The new export compiles without TypeScript errors
+- Nothing else in the file was modified
+
+STOP after Phase 2. Report confirmation. Do not proceed until confirmed.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PHASE 3 — UPDATE THE BILLS SCREEN
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+In the Bills screen file identified in Phase 1:
+
+3a. Add these imports at the top (only if not already present):
+    import { getLocale, getLocaleConfig } from '../utils/locale';
+    (Adjust the relative path to match the actual file location.)
+
+3b. Inside the component, before the return statement, add:
+    const locale = getLocale();
+    const localeConfig = getLocaleConfig(locale);
+
+3c. Replace ONLY these specific things — do not change any other logic:
+
+    - Any hardcoded "$" currency symbol used to display a dollar amount → 
+      use localeConfig.currency.symbol instead
+    - Any hardcoded list of bill types (if the screen has a default list or 
+      picker of bill categories) → replace with localeConfig.bills.defaultBillTypes
+    - The label "Council rates" if hardcoded → localeConfig.bills.councilLabel
+    - The label "NBN" or "NBN / Internet" if hardcoded → localeConfig.bills.internetLabel
+
+3d. DO NOT change:
+    - Any state management, AsyncStorage calls, or data shape
+    - Any styling or layout
+    - Any other screen logic
+
+STOP after Phase 3. Report exactly what lines were changed. Do not proceed until confirmed.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PHASE 4 — UPDATE THE ACTIVITIES SCREEN
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+In the Family Activity / Juggle screen file identified in Phase 1:
+
+4a. Add these imports at the top (only if not already present):
+    import { getLocale, getLocaleConfig } from '../utils/locale';
+    (Adjust relative path to match.)
+
+4b. Inside the component, before the return statement, add:
+    const locale = getLocale();
+    const localeConfig = getLocaleConfig(locale);
+
+4c. Replace ONLY these specific things:
+
+    - Any hardcoded "$" currency symbol used to display activity costs → 
+      localeConfig.currency.symbol
+    - The label "Kindy" or "Kindy / Prep" if it appears as a hardcoded 
+      school year option → localeConfig.activities.foundationLabel
+    - Any hardcoded "Year 12" used as the maximum school year in a 
+      list or picker → localeConfig.activities.seniorSchoolEnd
+
+4d. DO NOT change:
+    - Any state, AsyncStorage, navigation, or data logic
+    - Any styling or layout
+    - Any activity input fields or form logic
+
+STOP after Phase 4. Report exactly what lines were changed. Do not proceed until confirmed.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PHASE 5 — UPDATE THE APPOINTMENTS SCREEN
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+In the Appointments screen file identified in Phase 1:
+
+5a. Add these imports at the top (only if not already present):
+    import { getLocale, getLocaleConfig } from '../utils/locale';
+    (Adjust relative path to match.)
+
+5b. Inside the component, before the return statement, add:
+    const locale = getLocale();
+    const localeConfig = getLocaleConfig(locale);
+
+5c. Replace ONLY this:
+    - Any hardcoded "$" currency symbol used to display a cost or fee amount → 
+      localeConfig.currency.symbol
+
+5d. If there are NO currency amounts displayed in the Appointments screen, 
+    skip the import and report that no changes were needed.
+
+5e. DO NOT change anything else.
+
+STOP after Phase 5. Report what was changed or skipped.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PHASE 6 — FINAL VERIFICATION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+6a. Confirm the app still compiles without errors.
+
+6b. Confirm the following files were NOT modified:
+    - utils/recipeService.ts
+    - Any meal planner screen
+    - Any recipe screen
+    - Any shopping list screen
+
+6c. List every file that WAS modified in this session.
+
+6d. Confirm that getLocaleConfig is now imported and called in:
+    - Bills screen ✓ / ✗
+    - Activities screen ✓ / ✗
+    - Appointments screen ✓ / ✗ (or "skipped — no currency amounts")
+
+Report all of the above. Done.

@@ -31,3 +31,55 @@ export function storeLocale(locale: AppLocale): void {
     localStorage.setItem('sortii_locale', locale);
   } catch {}
 }
+
+export function getLocale(): AppLocale {
+  return getStoredLocale() ?? 'AU';
+}
+
+export const getLocaleConfig = (locale: AppLocale) => ({
+
+  currency: {
+    symbol: locale === 'AU' ? '$' : '£',
+    code: locale === 'AU' ? 'AUD' : 'GBP',
+    format: (amount: number) =>
+      locale === 'AU'
+        ? `$${amount.toFixed(2)}`
+        : `£${amount.toFixed(2)}`,
+  },
+
+  bills: {
+    councilLabel: locale === 'AU' ? 'Council rates' : 'Council tax',
+    internetLabel: locale === 'AU' ? 'NBN / Internet' : 'Broadband',
+    defaultBillTypes: locale === 'AU'
+      ? [
+          'Electricity',
+          'Gas',
+          'Water rates',
+          'Council rates',
+          'NBN / Internet',
+          'Insurance',
+        ]
+      : [
+          'Electricity',
+          'Gas',
+          'Water rates',
+          'Council tax',
+          'Broadband',
+          'Insurance',
+        ],
+    councilCycle: locale === 'AU' ? 'quarterly' : 'monthly',
+  },
+
+  activities: {
+    foundationLabel: locale === 'AU' ? 'Kindy / Prep' : 'Reception',
+    seniorSchoolEnd: locale === 'AU' ? 12 : 13,
+    termLabel: 'Term',
+  },
+
+  supermarkets: {
+    primary: locale === 'AU' ? 'Woolworths' : 'Tesco',
+    secondary: locale === 'AU' ? 'Coles' : "Sainsbury's",
+    budget: 'Aldi',
+  },
+
+});

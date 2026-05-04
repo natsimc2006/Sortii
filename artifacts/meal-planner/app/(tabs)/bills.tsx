@@ -27,6 +27,7 @@ import {
   loadBills,
   saveBills,
 } from "@/utils/billStore";
+import { getLocale, getLocaleConfig } from "@/utils/locale";
 
 // ── Colour tokens ──────────────────────────────────────────────────────────────
 const TEAL      = "#2A8F88";
@@ -285,6 +286,8 @@ const typeSelS = StyleSheet.create({
 // ── BillCard ──────────────────────────────────────────────────────────────────
 interface BillCardProps { bill: Bill; onPress: () => void; onMarkPaid: () => void; }
 function BillCard({ bill, onPress, onMarkPaid }: BillCardProps) {
+  const locale = getLocale();
+  const localeConfig = getLocaleConfig(locale);
   const { label, color } = statusDisplay(bill);
   const color2 = catColor(bill.category);
   const typeDot = bill.billType === "recurring" ? TEAL : GOLD;
@@ -304,7 +307,7 @@ function BillCard({ bill, onPress, onMarkPaid }: BillCardProps) {
           </View>
         </View>
         <View style={{ alignItems: "flex-end", gap: 8 }}>
-          <Text style={styles.billAmount}>${bill.amount.toFixed(2)}</Text>
+          <Text style={styles.billAmount}>{localeConfig.currency.symbol}{bill.amount.toFixed(2)}</Text>
           {!bill.isPaid && (
             <TouchableOpacity onPress={onMarkPaid} style={styles.markPaidBtn} activeOpacity={0.7}>
               <Text style={styles.markPaidText}>Mark paid</Text>
@@ -323,6 +326,8 @@ type Filter   = "all" | "upcoming" | "overdue" | "paid";
 export default function BillsScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const locale = getLocale();
+  const localeConfig = getLocaleConfig(locale);
 
   const [bills,      setBills]      = useState<Bill[]>([]);
   const [view,       setView]       = useState<BillView>("overview");
@@ -654,7 +659,7 @@ export default function BillsScreen() {
 
           <View style={[styles.detailPanel, { borderLeftColor: color }]}>
             <Text style={styles.detailTitle}>{selected.title}</Text>
-            <Text style={styles.detailAmount}>${selected.amount.toFixed(2)}</Text>
+            <Text style={styles.detailAmount}>{localeConfig.currency.symbol}{selected.amount.toFixed(2)}</Text>
             <Text style={styles.detailMeta}>Due {formatDateFull(selected.dueDate)}</Text>
             {selected.assignedTo ? (
               <Text style={[styles.detailMeta, { color: TEAL }]}>Assigned to {selected.assignedTo}</Text>
@@ -735,7 +740,7 @@ export default function BillsScreen() {
         </View>
         <View style={[styles.summaryChip, { backgroundColor: GOLD + "18" }]}>
           <Text style={[styles.summaryChipNum, { color: GOLD }]}>
-            ${dueThisWeekTotal.toFixed(0)}
+            {localeConfig.currency.symbol}{dueThisWeekTotal.toFixed(0)}
           </Text>
           <Text style={styles.summaryChipLabel}>Due this week</Text>
         </View>

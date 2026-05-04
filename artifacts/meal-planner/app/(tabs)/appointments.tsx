@@ -23,6 +23,7 @@ import {
 import { Calendar } from "react-native-calendars";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { getLocale, getLocaleConfig } from "@/utils/locale";
 import {
   Appointment,
   AvailabilityBlock,
@@ -378,6 +379,8 @@ interface ApptCardProps {
   onPress: () => void;
 }
 function ApptCard({ appt, busyPersons, onPress }: ApptCardProps) {
+  const locale = getLocale();
+  const localeConfig = getLocaleConfig(locale);
   const color   = categoryColor(appt.category);
   const prep    = needsPrep(appt);
   const timeStr = fmt12h(appt.startTime) + (appt.endTime ? `–${fmt12h(appt.endTime)}` : "");
@@ -404,7 +407,7 @@ function ApptCard({ appt, busyPersons, onPress }: ApptCardProps) {
           <View style={{ flexDirection: "row", gap: 6, marginTop: hasCost || hasAvail ? 4 : 0 }}>
             {hasCost ? (
               <View style={styles.apptFlagChip}>
-                <Text style={styles.apptFlagText}>💰 ${appt.appointmentCost!.toFixed(0)}</Text>
+                <Text style={styles.apptFlagText}>💰 {localeConfig.currency.symbol}{appt.appointmentCost!.toFixed(0)}</Text>
               </View>
             ) : null}
             {hasAvail ? (
@@ -593,6 +596,8 @@ type Filter   = "all" | "today" | "week" | "next_week" | "needs_prep";
 export default function AppointmentsScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const locale = getLocale();
+  const localeConfig = getLocaleConfig(locale);
 
   // ── Manual appointment state ───────────────────────────────────────────────
   const [items,       setItems]       = useState<Appointment[]>([]);
@@ -1489,7 +1494,7 @@ export default function AppointmentsScreen() {
           {selected.reminderEnabled && <StatusChip label="Reminder on" color={PLUM} />}
           {selected.recurringEnabled && <StatusChip label="Recurring" color={GOLD} />}
           {selected.appointmentCost && selected.appointmentCost > 0 && (
-            <StatusChip label={`Cost $${selected.appointmentCost.toFixed(0)}`} color={GOLD} />
+            <StatusChip label={`Cost ${localeConfig.currency.symbol}${selected.appointmentCost.toFixed(0)}`} color={GOLD} />
           )}
           {selected.availabilityBlock && selected.availabilityBlock.personIds.length > 0 && (
             <StatusChip label="Availability flagged" color={TEAL} />
@@ -1508,7 +1513,7 @@ export default function AppointmentsScreen() {
         {selected.appointmentCost && selected.appointmentCost > 0 ? (
           <View style={styles.detailSection}>
             <Text style={styles.detailSectionLabel}>COST</Text>
-            <Text style={styles.detailBody}>${selected.appointmentCost.toFixed(2)} — one-off cost for this appointment.</Text>
+            <Text style={styles.detailBody}>{localeConfig.currency.symbol}{selected.appointmentCost.toFixed(2)} — one-off cost for this appointment.</Text>
           </View>
         ) : null}
 
