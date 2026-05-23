@@ -1,0 +1,298 @@
+You are extending the Sortii locale system to display price bands 
+on meal cards and update cost copy across the planner. 
+The recipe data, planner logic, and shopping list calculations 
+must NOT be changed — only how prices are displayed.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+SAFETY RULES — READ BEFORE STARTING
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. DO NOT modify any recipe data, recipes.json, or recipeService.ts.
+2. DO NOT change any cost calculation logic — only how the result is displayed.
+3. DO NOT change any AsyncStorage keys or data structures.
+4. DO NOT remove or replace the existing cost display entirely — 
+   you are changing the format and adding a band label alongside it.
+5. DO NOT modify any screen not explicitly named in these instructions.
+6. Check file paths from the actual file structure before assuming 
+   any import path. Do not guess.
+7. STOP after each phase and report before proceeding.
+8. If you cannot find where the meal card cost is rendered, 
+   STOP and list what you found — do not guess and proceed.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PHASE 1 — READ FIRST, TOUCH NOTHING
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Before writing any code:
+
+1a. Open utils/locale.ts and confirm:
+    - getLocaleConfig() exists and is exported
+    - getPriceBand() does NOT yet exist
+    - AppLocale type exists
+    Report the current exports list.
+
+1b. Find and report the file path for:
+    - The meal card component (the component that renders 
+      an individual recipe/meal in the weekly planner)
+    - The weekly planner screen (the screen that shows the 
+      full week of meals)
+    - The shopping list screen
+
+1c. In the meal card component, find and report:
+    - The exact line(s) where costPerServe (or equivalent) 
+      is displayed as text
+    - What the current rendered format looks like 
+      (e.g. `$8.50` or `${cost}/serve` or similar)
+    - Whether the component receives locale as a prop or 
+      would need to call detectLocale() internally
+
+1d. In the weekly planner screen, find and report:
+    - Where the weekly total cost is displayed
+    - The current format of that total (e.g. `Est. $68 this week`)
+
+1e. In the shopping list screen, find and report:
+    - Whether there is any existing cost disclaimer or 
+      footer text near the total
+    - Where the total cost renders
+
+STOP after Phase 1. Report all findings. Do not proceed until confirmed.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PHASE 2 — EXTEND utils/locale.ts
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Make two additions to utils/locale.ts. 
+Do not change anything that already exists in the file.
+
+ADDITION 1 — add a `pricing` key inside the object 
+returned by getLocaleConfig():
+
+───────────────────────────────────────
+pricing: {
+  bands: [
+    {
+      key: 'budget',
+      emoji: '💚',
+      label: 'Budget feed',
+      maxPerServe: locale === 'AU' ? 3 : 2,
+      color: '#2A8F88',
+      tint: '#E6F3F0',
+    },
+    {
+      key: 'mid',
+      emoji: '🟡',
+      label: 'Easy mid',
+      maxPerServe: locale === 'AU' ? 6 : 4,
+      color: '#D29A22',
+      tint: '#F6E6BA',
+    },
+    {
+      key: 'generous',
+      emoji: '🟠',
+      label: 'Worth it',
+      maxPerServe: locale === 'AU' ? 10 : 7,
+      color: '#C47B2B',
+      tint: '#FAE8D4',
+    },
+    {
+      key: 'splash',
+      emoji: '🔴',
+      label: 'Splash out',
+      maxPerServe: null,
+      color: '#B86557',
+      tint: '#F7E9E8',
+    },
+  ],
+  disclaimerShort: locale === 'AU'
+    ? 'Costs are estimates based on Woolworths / Coles prices, updated quarterly.'
+    : "Costs are estimates based on Tesco / Sainsbury's prices, updated quarterly.",
+  editHint: "Set your local price — we'll remember it.",
+  editConfirm: 'Saved. Your prices now.',
+  weeklyTotalPrefix: 'Around',
+  pricePrefix: '~',
+},
+───────────────────────────────────────
+
+ADDITION 2 — add this exported helper function 
+BELOW the getLocaleConfig export:
+
+───────────────────────────────────────
+export const getPriceBand = (
+  costPerServe: number,
+  locale: AppLocale
+) => {
+  const { bands } = getLocaleConfig(locale).pricing;
+  return (
+    bands.find(b => b.maxPerServe !== null && costPerServe < b.maxPerServe)
+    ?? bands[bands.length - 1]
+  );
+};
+───────────────────────────────────────
+
+After adding both, confirm:
+- All existing exports in locale.ts are still present and unchanged
+- getLocaleConfig now includes a `pricing` key
+- getPriceBand is exported
+- File compiles without TypeScript errors
+
+STOP after Phase 2. Report confirmation. Do not proceed until confirmed.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PHASE 3 — UPDATE THE MEAL CARD COMPONENT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+In the meal card component file identified in Phase 1:
+
+3a. Add to imports (only if not already present):
+    import { detectLocale, getLocaleConfig, getPriceBand } 
+      from '[correct relative path]/utils/locale';
+
+3b. Inside the component, before the return statement, add:
+    const locale = detectLocale();
+    const localeConfig = getLocaleConfig(locale);
+    const band = getPriceBand(
+      recipe.costPerServe ?? recipe.estimatedCostPerServe ?? 0, 
+      locale
+    );
+
+    Use whatever the actual prop name is for cost per serve 
+    based on Phase 1 findings — do not guess.
+
+3c. Replace the existing cost display with this pattern:
+
+    BEFORE (approximate — match to actual current code):
+      <Text>${costPerServe}/serve</Text>
+
+    AFTER:
+      <View style={{
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: band.tint,
+        borderRadius: 20,
+        paddingHorizontal: 10,
+        paddingVertical: 3,
+        alignSelf: 'flex-start',
+        gap: 4,
+      }}>
+        <Text style={{ fontSize: 12 }}>{band.emoji}</Text>
+        <Text style={{
+          fontSize: 12,
+          fontWeight: '600',
+          color: band.color,
+        }}>
+          {localeConfig.pricing.pricePrefix}
+          {localeConfig.currency.symbol}
+          {(recipe.costPerServe ?? 0).toFixed(2)}/serve
+        </Text>
+      </View>
+
+    Match the prop names exactly to what was found in Phase 1.
+    Do not change any other part of the meal card layout.
+    Do not change card dimensions, image display, title, or 
+    any other element.
+
+3d. Confirm:
+    - Only the cost display line was changed
+    - The band pill renders emoji + ~$X.XX/serve format
+    - No other card elements were modified
+
+STOP after Phase 3. Report exactly what changed. 
+Do not proceed until confirmed.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PHASE 4 — UPDATE THE WEEKLY TOTAL DISPLAY
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+In the weekly planner screen identified in Phase 1:
+
+4a. Add to imports (only if not already present):
+    import { detectLocale, getLocaleConfig } 
+      from '[correct relative path]/utils/locale';
+
+4b. Inside the component, before the return statement, add:
+    const locale = detectLocale();
+    const localeConfig = getLocaleConfig(locale);
+
+4c. Find the weekly total cost display and update it so that:
+
+    BEFORE (approximate):
+      `Est. $${weeklyTotal} this week`
+      OR
+      `$${weeklyTotal} this week`
+
+    AFTER:
+      `${localeConfig.pricing.weeklyTotalPrefix} 
+       ${localeConfig.currency.symbol}${weeklyTotal.toFixed(2)} this week`
+
+    Which renders as: "Around $68.00 this week"
+
+    Match to the actual variable name for the weekly total 
+    found in Phase 1. Do not change the calculation — 
+    only the display string.
+
+4d. DO NOT change any other part of the planner screen.
+
+STOP after Phase 4. Report exactly what changed.
+Do not proceed until confirmed.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PHASE 5 — UPDATE THE SHOPPING LIST DISCLAIMER
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+In the shopping list screen identified in Phase 1:
+
+5a. Add to imports (only if not already present):
+    import { detectLocale, getLocaleConfig } 
+      from '[correct relative path]/utils/locale';
+
+5b. Inside the component, before the return statement, add:
+    const locale = detectLocale();
+    const localeConfig = getLocaleConfig(locale);
+
+5c. Find where the shopping list total renders at the bottom 
+    of the screen. Directly below the total display, add 
+    this disclaimer text element:
+
+    <Text style={{
+      fontSize: 11,
+      color: '#999999',
+      textAlign: 'center',
+      marginTop: 4,
+      paddingHorizontal: 16,
+    }}>
+      {localeConfig.pricing.disclaimerShort}
+    </Text>
+
+    If there is already a disclaimer or footer text in 
+    this location, STOP and report what it says 
+    before making any change.
+
+5d. DO NOT change the total calculation, any list items, 
+    or any other part of the shopping list screen.
+
+STOP after Phase 5. Report exactly what changed.
+Do not proceed until confirmed.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PHASE 6 — FINAL VERIFICATION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+6a. Confirm the app compiles without errors.
+
+6b. Confirm the following files were NOT modified:
+    - utils/recipeService.ts
+    - recipes.json or any recipe data file
+    - bills.tsx
+    - appointments.tsx
+    - family.tsx
+
+6c. List every file modified in this session.
+
+6d. Confirm each change is active:
+    - utils/locale.ts — pricing config added ✓ / ✗
+    - utils/locale.ts — getPriceBand exported ✓ / ✗
+    - Meal card — band pill renders ✓ / ✗
+    - Weekly planner — "Around $X" format ✓ / ✗
+    - Shopping list — disclaimer text added ✓ / ✗
+
+Report all of the above. Done.
