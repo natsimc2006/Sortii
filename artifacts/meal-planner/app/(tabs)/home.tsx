@@ -54,6 +54,7 @@ interface JuggleResult {
   adult_lists: Record<string, string>;
   unassigned_events: string[];
   solvedAt: number;
+  events?: unknown[];
 }
 
 const allRecipes = allRecipesRaw as { id: string; name: string }[];
@@ -230,7 +231,7 @@ export default function HomeTab() {
       const uid = getCurrentUserId();
       const [familyState, nudgeResult, , savedJuggle, appts, bills, appleConnRaw, googleConnRaw, pushedRaw, tipDismissed, crossSellRaw] = await Promise.all([
         loadFamilyState(),
-        computeNudge(currentPlan, allRecipes),
+        computeNudge(currentPlan as any, allRecipes),
         recordAppOpen(),
         AsyncStorage.getItem(juggleKey()),
         loadAppointments(),
@@ -940,6 +941,7 @@ export default function HomeTab() {
           apptsTodayTomorrow={apptsTodayTomorrow}
           tonightsDinner={tonightRecipe?.name ?? null}
           formatMoney={formatMoneyRound}
+          dinnersPlanned={plannedCount}
           onBack={() => setShowOverwhelm(false)}
           onSeeEverything={() => { setShowOverwhelm(false); router.push("/(tabs)" as any); }}
         />

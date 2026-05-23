@@ -70,7 +70,7 @@ export async function signInWithGoogleAuth(): Promise<AuthUser | null> {
 export async function signInWithAppleAuth(): Promise<AuthUser | null> {
   if (Platform.OS !== "ios") return null;
   try {
-    const AppleAuth = await import("expo-apple-authentication");
+    const AppleAuth = require("expo-apple-authentication");
     const isAvail = await (AppleAuth as any).isAvailableAsync?.();
     if (!isAvail) return null;
 

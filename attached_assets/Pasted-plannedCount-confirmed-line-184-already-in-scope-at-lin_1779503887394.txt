@@ -1,0 +1,125 @@
+plannedCount confirmed — line 184, already in scope at line 937.
+
+Proceed with all phases using the fixes below.
+Apply phases in order, STOP after each and report.
+
+━━━━━━━━━━━━━━━━━━━━━━━━
+PHASE 2 — home.tsx (4 fixes)
+━━━━━━━━━━━━━━━━━━━━━━━━
+
+FIX 1 — MealPlanEntry / PlanEntry cast (Error 1)
+At line 233 where computeNudge(currentPlan, allRecipes) 
+is called, change to:
+  computeNudge(currentPlan as any as PlanEntry[], allRecipes)
+Do not import PlanEntry — use `as any as PlanEntry[]` 
+to avoid importing a private type from nudgeEngine.ts.
+Do not change nudgeEngine.ts.
+
+FIX 2 — Add events to local JuggleResult (Errors 2 & 3)
+In the local JuggleResult interface at lines 48–57 
+in home.tsx, add one optional field:
+  events?: unknown[];
+Do not import from family.tsx.
+Do not change how events is accessed at line 586.
+
+FIX 3 — dinnersPlanned missing from OverwhelmModal (Error 4)
+At line 937, add dinnersPlanned to the <OverwhelmModal> call:
+  dinnersPlanned={plannedCount}
+Do not change OverwhelmModal.tsx.
+
+STOP after Phase 2. List every line changed in home.tsx.
+Confirm OverwhelmModal.tsx and nudgeEngine.ts were not touched.
+Do not proceed until confirmed.
+
+━━━━━━━━━━━━━━━━━━━━━━━━
+PHASE 3 — meals.tsx and planner.tsx (Errors 5 & 6)
+━━━━━━━━━━━━━━━━━━━━━━━━
+
+Both files have the identical pattern:
+  setPreferences({ budgetLevel: next });
+
+In BOTH files, replace with the spread pattern:
+  setPreferences({ ...preferences, budgetLevel: next });
+
+Where `preferences` is the current preferences object 
+from usePlanner(). Confirm that `preferences` is already 
+destructured from usePlanner() in both files before applying.
+If it is not destructured, add it to the existing 
+usePlanner() destructure — do not add a new hook call.
+
+Do not change anything else in either file.
+
+STOP after Phase 3. Report the exact line changed 
+in each file. Do not proceed until confirmed.
+
+━━━━━━━━━━━━━━━━━━━━━━━━
+PHASE 4 — saved.tsx and goal-setup.tsx (Errors 7 & 8)
+━━━━━━━━━━━━━━━━━━━━━━━━
+
+FIX 7 — saved.tsx icon name
+At line 88, change:
+  <Feather name="folder-open" .../>
+to:
+  <Feather name="folder" .../>
+One word change. Nothing else in saved.tsx.
+
+FIX 8 — delete stale colors.ts scaffold file
+Delete constants/colors.ts (lowercase c, 204 bytes).
+Before deleting, confirm zero files in the project 
+import from @/constants/colors (lowercase).
+Run a grep across the project: 
+  grep -r "constants/colors" --include="*.ts" --include="*.tsx"
+If any file imports it, STOP and report.
+If grep returns nothing, delete the file.
+Do not touch constants/Colors.ts (uppercase C).
+
+STOP after Phase 4. Report what changed and confirm 
+colors.ts deletion result. Do not proceed until confirmed.
+
+━━━━━━━━━━━━━━━━━━━━━━━━
+PHASE 5 — authStore.ts (Error 9)
+━━━━━━━━━━━━━━━━━━━━━━━━
+
+At line 73 inside the Platform.OS iOS-only block, 
+change the dynamic import to a require:
+
+BEFORE:
+  const AppleAuth = await import("expo-apple-authentication");
+
+AFTER:
+  const AppleAuth = require("expo-apple-authentication");
+
+Remove the await keyword — require is synchronous.
+All existing (AppleAuth as any) casts stay unchanged.
+Do not install the package.
+Do not change any other line in authStore.ts.
+
+STOP after Phase 5. Report the exact line changed.
+Do not proceed until confirmed.
+
+━━━━━━━━━━━━━━━━━━━━━━━━
+PHASE 6 — FINAL VERIFICATION
+━━━━━━━━━━━━━━━━━━━━━━━━
+
+6a. Run a full TypeScript check.
+    Report the complete error list.
+    Target: 0 errors.
+
+6b. Confirm these files were NOT modified:
+    - utils/locale.ts
+    - utils/recipeService.ts
+    - components/OverwhelmModal.tsx
+    - utils/nudgeEngine.ts
+    - constants/Colors.ts (uppercase)
+    - recipes.json
+
+6c. List every file modified or deleted this session.
+
+6d. Confirm no runtime logic was changed — only:
+    - Type annotations and casts
+    - One spread operator addition
+    - One icon name string
+    - One stale file deleted (colors.ts)
+    - One await import changed to require
+
+Report all of the above and close out.

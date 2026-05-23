@@ -85,7 +85,7 @@ export default function SavedPlansScreen() {
             onPress={() => handleLoad(item)}
             style={[styles.actionBtnPrimary, { backgroundColor: C.primary }]}
           >
-            <Feather name="folder-open" size={14} color="#fff" />
+            <Feather name="folder" size={14} color="#fff" />
             <Text style={styles.actionBtnPrimaryText}>Open</Text>
           </TouchableOpacity>
           <TouchableOpacity
