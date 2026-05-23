@@ -82,4 +82,59 @@ export const getLocaleConfig = (locale: AppLocale) => ({
     budget: 'Aldi',
   },
 
+  pricing: {
+    bands: [
+      {
+        key: 'budget',
+        emoji: '💚',
+        label: 'Budget feed',
+        maxPerServe: locale === 'AU' ? 3 : 2,
+        color: '#2A8F88',
+        tint: '#E6F3F0',
+      },
+      {
+        key: 'mid',
+        emoji: '🟡',
+        label: 'Easy mid',
+        maxPerServe: locale === 'AU' ? 6 : 4,
+        color: '#D29A22',
+        tint: '#F6E6BA',
+      },
+      {
+        key: 'generous',
+        emoji: '🟠',
+        label: 'Worth it',
+        maxPerServe: locale === 'AU' ? 10 : 7,
+        color: '#C47B2B',
+        tint: '#FAE8D4',
+      },
+      {
+        key: 'splash',
+        emoji: '🔴',
+        label: 'Splash out',
+        maxPerServe: null,
+        color: '#B86557',
+        tint: '#F7E9E8',
+      },
+    ],
+    disclaimerShort: locale === 'AU'
+      ? 'Costs are estimates based on Woolworths / Coles prices, updated quarterly.'
+      : "Costs are estimates based on Tesco / Sainsbury's prices, updated quarterly.",
+    editHint: "Set your local price — we'll remember it.",
+    editConfirm: 'Saved. Your prices now.',
+    weeklyTotalPrefix: 'Around',
+    pricePrefix: '~',
+  },
+
 });
+
+export const getPriceBand = (
+  costPerServe: number,
+  locale: AppLocale
+) => {
+  const { bands } = getLocaleConfig(locale).pricing;
+  return (
+    bands.find(b => b.maxPerServe !== null && costPerServe < b.maxPerServe)
+    ?? bands[bands.length - 1]
+  );
+};
