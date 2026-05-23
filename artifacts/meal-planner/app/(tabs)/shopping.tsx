@@ -1,6 +1,7 @@
 import { Feather } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { SavingsTipCard } from "@/components/SavingsTipCard";
+import { getLocale, getLocaleConfig } from "@/utils/locale";
 import * as Clipboard from "expo-clipboard";
 import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
@@ -84,6 +85,8 @@ export default function ShoppingScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const C = Colors.light;
+  const locale = getLocale();
+  const localeConfig = getLocaleConfig(locale);
 
   const [qtys, setQtys] = useState<Record<string, number>>({});
   const [checked, setChecked] = useState<Set<string>>(new Set());
@@ -510,6 +513,15 @@ export default function ShoppingScreen() {
           <Text style={[styles.title, { color: C.text }]}>Shopping List</Text>
           <Text style={[styles.subtitle, { color: C.textSecondary }]}>
             {totalVisible} items · Est. {estimatedCostBand}
+          </Text>
+          <Text style={{
+            fontSize: 11,
+            color: '#999999',
+            textAlign: 'center',
+            marginTop: 4,
+            paddingHorizontal: 16,
+          }}>
+            {localeConfig.pricing.disclaimerShort}
           </Text>
         </View>
         {totalChecked > 0 && !clearConfirm && (
