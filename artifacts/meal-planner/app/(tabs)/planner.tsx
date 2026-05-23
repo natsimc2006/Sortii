@@ -1132,7 +1132,7 @@ export default function PlannerScreen() {
 
             {activeChip === "cost" && (
               <>
-                <Text style={[styles.quickEditTitle, { color: C.text }]}>Weekly grocery estimate</Text>
+                <Text style={[styles.quickEditTitle, { color: C.text }]}>Your week, roughly</Text>
                 <View style={[styles.costEstimatePill, { backgroundColor: C.tealTint }]}>
                   <Text style={[styles.costEstimateValue, { color: C.primary }]}>{estimatedCostBand}</Text>
                   <Text style={[styles.costEstimateNote, { color: C.textSecondary }]}>estimated for your plan</Text>
