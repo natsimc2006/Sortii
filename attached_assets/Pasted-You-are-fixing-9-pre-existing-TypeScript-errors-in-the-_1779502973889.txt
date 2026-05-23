@@ -1,0 +1,230 @@
+You are fixing 9 pre-existing TypeScript errors in the Sortii app.
+These are type errors only — no logic, no behaviour, and no UI 
+should change. You are making the TypeScript compiler happy, 
+nothing else.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+SAFETY RULES — READ BEFORE STARTING
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. Fix type errors only. Do not change any runtime logic, 
+   state management, calculations, or UI rendering.
+2. Do not add new features, refactor, or reorganise any file.
+3. Do not modify any file not explicitly listed in these instructions.
+4. If fixing a type error requires changing logic rather than 
+   just types — STOP and report. Do not proceed with a logic change.
+5. Do not change any AsyncStorage keys, context structure, 
+   or data shapes that are used at runtime.
+6. Read each file before touching it. Report what you find 
+   before proposing a fix.
+7. STOP after each phase and report before proceeding.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PHASE 1 — READ AND DIAGNOSE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Before touching anything, read each affected file and 
+report the following for each error:
+
+ERROR 1 — home.tsx TS2345 MealPlanEntry[] / PlanEntry[]
+- Where is MealPlanEntry defined? Which file?
+- Where is PlanEntry defined? Which file?
+- What is the mismatch — which function or prop 
+  expects one type but receives the other?
+- Are these two separate types or the same type 
+  with a naming inconsistency?
+
+ERROR 2 & 3 — home.tsx TS2339 .events on JuggleResult (×2)
+- What is the JuggleResult type currently defined as?
+- Which file defines it?
+- Does JuggleResult actually have an events property 
+  at runtime, just not in the type definition?
+- Show the two lines where .events is accessed.
+
+ERROR 4 — home.tsx TS2741 dinnersPlanned missing
+- Which type or interface is missing the dinnersPlanned property?
+- Where is that type defined?
+- Is dinnersPlanned used at runtime or is it a 
+  genuinely unused property?
+
+ERROR 5 — meals.tsx TS2345 budgetLevel shape mismatch
+- What shape does budgetLevel currently have in the type?
+- What shape is being passed at the error line?
+- Show the exact line causing the error.
+
+ERROR 6 — planner.tsx TS2345 budgetLevel shape mismatch
+- Same questions as Error 5 — is this the same 
+  budgetLevel type or a different one?
+- Show the exact line causing the error.
+
+ERROR 7 — saved.tsx TS2322 "folder-open" icon type
+- What is the icon type definition?
+- Is "folder-open" simply not in the allowed 
+  icon name union type?
+- What is the nearest valid icon name?
+
+ERROR 8 — goal-setup.tsx TS1149 colors.ts casing
+- What is the import statement currently?
+- What is the actual filename casing on disk?
+
+ERROR 9 — authStore.ts TS2307 expo-apple-authentication
+- Is the expo-apple-authentication package installed?
+- Run: ls node_modules | grep apple
+- Is this used in production code paths or only 
+  in a platform-specific iOS block?
+
+STOP after Phase 1. Report all findings for all 9 errors.
+Do not propose fixes yet. Do not proceed until confirmed.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PHASE 2 — FIXES: home.tsx
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Fix all four home.tsx errors (Errors 1–4) based on 
+Phase 1 findings. Await confirmation of approach 
+from Phase 1 before writing any fix.
+
+General rules for each fix type:
+
+For MealPlanEntry / PlanEntry mismatch (Error 1):
+- If these are the same shape with different names, 
+  add a type alias so one extends or equals the other.
+  Do not rename either type globally — other files 
+  may depend on them.
+- If they are genuinely different shapes, cast at 
+  the call site only using `as` — do not change 
+  the underlying data.
+
+For .events on JuggleResult (Errors 2 & 3):
+- If events exists at runtime but not in the type, 
+  add events to the JuggleResult type definition 
+  in whichever file defines it.
+- If the type is auto-generated or imported from 
+  a library, add a local extension type in home.tsx only.
+- Do not change how events is used — only make 
+  the type aware it exists.
+
+For dinnersPlanned missing (Error 4):
+- If dinnersPlanned is used at runtime, add it 
+  to the relevant interface with the correct type.
+- If it is genuinely unused, add it as optional 
+  (dinnersPlanned?: number) to satisfy the type 
+  without breaking anything.
+
+STOP after Phase 2. Report every line changed 
+across home.tsx and any type definition files touched.
+Do not proceed until confirmed.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PHASE 3 — FIXES: meals.tsx and planner.tsx
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Fix Errors 5 and 6 — budgetLevel shape mismatch 
+in meals.tsx and planner.tsx.
+
+- If budgetLevel is the same type in both files, 
+  fix the type definition once in the shared 
+  location — do not duplicate the fix.
+- If they are separate instances, fix each 
+  call site independently.
+- Do not change how budgetLevel is calculated 
+  or used at runtime.
+- A cast (`as`) at the call site is acceptable 
+  if the shapes are compatible at runtime but 
+  the types don't align.
+
+STOP after Phase 3. Report every line changed.
+Do not proceed until confirmed.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PHASE 4 — FIXES: saved.tsx and goal-setup.tsx
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Fix Errors 7 and 8.
+
+For saved.tsx "folder-open" icon (Error 7):
+- If "folder-open" is not in the icon type union, 
+  replace it with the nearest valid icon name 
+  that is in the allowed set.
+- Visually equivalent is the goal — check for 
+  "folder", "folder-outline", or similar.
+- Do not change anything else in saved.tsx.
+
+For goal-setup.tsx colors.ts casing (Error 8):
+- Fix the import statement casing to match 
+  the actual filename on disk exactly.
+- One character change only. Nothing else.
+
+STOP after Phase 4. Report every line changed.
+Do not proceed until confirmed.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PHASE 5 — FIX: authStore.ts
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Fix Error 9 — expo-apple-authentication not found.
+
+Based on Phase 1 findings, apply exactly one 
+of these fixes:
+
+OPTION A — Package is missing from node_modules:
+  Run: npx expo install expo-apple-authentication
+  Do not change authStore.ts.
+
+OPTION B — Package exists but types are missing:
+  Run: npm install --save-dev @types/expo-apple-authentication
+  (if such a package exists — check first)
+
+OPTION C — Used only in an iOS platform block:
+  Wrap the import in a platform check:
+  
+  import { Platform } from 'react-native';
+  
+  Then replace the direct import with a 
+  dynamic require inside the iOS-only block:
+  
+  const AppleAuthentication = Platform.OS === 'ios'
+    ? require('expo-apple-authentication')
+    : null;
+  
+  Only use Option C if the usage is already 
+  inside a Platform.OS === 'ios' block.
+
+OPTION D — Import can be made optional with a type-only import:
+  Change to: import type { ... } from 'expo-apple-authentication'
+  Only if the import is used for types only, 
+  not for runtime values.
+
+Report which option applies based on Phase 1 
+findings and apply it.
+
+STOP after Phase 5. Report what was done.
+Do not proceed until confirmed.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PHASE 6 — FINAL VERIFICATION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+6a. Run a full TypeScript check and report 
+    the complete error list.
+    Target: 0 errors.
+    If any errors remain, report them — do not 
+    attempt further fixes without confirmation.
+
+6b. Confirm these files were NOT modified:
+    - utils/locale.ts
+    - utils/recipeService.ts
+    - recipes.json
+    - components/RecipeDetailModal.tsx
+    - app/(tabs)/bills.tsx
+    - app/(tabs)/shopping.tsx
+    - app/(tabs)/appointments.tsx
+    - app/(tabs)/family.tsx
+
+6c. List every file modified this session.
+
+6d. Confirm no runtime logic was changed —
+    only type definitions, type annotations, 
+    import statements, and icon name strings.
+
+Report all of the above and close out.
