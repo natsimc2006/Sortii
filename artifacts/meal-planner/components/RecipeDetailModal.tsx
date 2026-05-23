@@ -16,6 +16,7 @@ import Colors from "@/constants/Colors";
 import { Recipe, getApproxCostPerServe, scaleQuantity } from "@/constants/recipes";
 import { usePlanner } from "@/context/PlannerContext";
 import { toImageSource, useRecipeImage } from "@/hooks/useRecipeImage";
+import { getLocale, getLocaleConfig, getPriceBand } from "@/utils/locale";
 
 interface RecipeDetailModalProps {
   recipe: Recipe | null;
@@ -184,6 +185,9 @@ export function RecipeDetailModal({ recipe, onClose }: RecipeDetailModalProps) {
   const householdSize = preferences.householdSize;
   const costPerServe = getApproxCostPerServe(recipe);
   const scaleFactor = householdSize !== recipe.baseServings;
+  const locale = getLocale();
+  const localeConfig = getLocaleConfig(locale);
+  const band = getPriceBand(costPerServe, locale);
 
   const toggleStep = (i: number) => {
     setExpandedSteps((prev) => {
@@ -297,7 +301,25 @@ export function RecipeDetailModal({ recipe, onClose }: RecipeDetailModalProps) {
               <MetaBadge icon="users" label={`Serves ${recipe.baseServings}`} />
               <MetaBadge icon="bar-chart-2" label={recipe.difficulty} />
               <MetaBadge icon="layers" label={recipe.cookingStyle} />
-              <MetaBadge icon="dollar-sign" label={`~$${costPerServe.toFixed(2)}/serve`} />
+              <View style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                backgroundColor: band.tint,
+                borderRadius: 20,
+                paddingHorizontal: 10,
+                paddingVertical: 3,
+                alignSelf: 'flex-start',
+                gap: 4,
+              }}>
+                <Text style={{ fontSize: 12 }}>{band.emoji}</Text>
+                <Text style={{
+                  fontSize: 12,
+                  fontWeight: '600',
+                  color: band.color,
+                }}>
+                  {localeConfig.pricing.pricePrefix}{localeConfig.currency.symbol}{costPerServe.toFixed(2)}/serve
+                </Text>
+              </View>
               {recipe.leftoversFriendly && (
                 <MetaBadge icon="refresh-cw" label="Leftovers" />
               )}
