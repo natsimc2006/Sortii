@@ -1,0 +1,28 @@
+kind = "video"
+previewPath = "/sortii-project-video/"
+title = "Sortii Project Video"
+description = "A concise animated product showcase for Sortii, presenting how the app brings meals, money, bills, appointments, and family planning into one calmer weekly flow."
+version = "1.0.0"
+id = "artifacts/sortii-project-video"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/sortii-project-video/" ]
+localPort = 21289
+
+[services.development]
+run = "pnpm --filter @workspace/sortii-project-video run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/sortii-project-video", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/sortii-project-video/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "21289"
+BASE_PATH = "/sortii-project-video/"

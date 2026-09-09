@@ -29,27 +29,32 @@ id = "mKqJJqq5sUuSP3hWqgzsp"
 uri = "file://scripts/recipes-for-pricing.json"
 type = "unspecified"
 title = "recipes-for-pricing.json — 250 recipes for AI pricing pass"
+logical_id = "18e61518-b762-43b2-a814-be0c7f72dc35"
 
 [[outputs]]
 id = "rjpri8iDJicPnY9DVZi32"
 uri = "file://scripts/recipes-pricing-output.json"
 type = "unspecified"
 title = "recipes-pricing-output.json — AI-generated prices for 250 recipes"
+logical_id = "107e08cd-0470-47de-b0b2-4a2fced5614e"
 
 [[outputs]]
 id = "NTopD53MCSupPad_vDPkT"
 uri = "file://artifacts/meal-planner/data/recipes.json"
 type = "unspecified"
 title = "recipes.json (275 recipes)"
+logical_id = "3c0b5a59-98ea-4d06-b7c4-a09b364413b8"
 
 [[outputs]]
 id = "SQ7Tb71uHAe__IQ4NgsyQ"
 uri = "file://.local/exports/sortii-money-page-rules.md"
 type = "text"
 title = "Sortii — Money Page Rules & Logic"
+logical_id = "d79bcf70-d162-4f6a-baad-78e32e162efd"
 
 [[outputs]]
 id = "TUhJi6Cd18-8t_Jub9Zg8"
 uri = "file://artifacts/meal-planner/data/image_url_checklist.csv"
 type = "table"
 title = "Recipe Image URL Checklist"
+logical_id = "882bb0b1-72eb-4f16-8096-f6d0cf097f89"
