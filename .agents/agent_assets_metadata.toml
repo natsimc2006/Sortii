@@ -58,3 +58,10 @@ uri = "file://artifacts/meal-planner/data/image_url_checklist.csv"
 type = "table"
 title = "Recipe Image URL Checklist"
 logical_id = "882bb0b1-72eb-4f16-8096-f6d0cf097f89"
+
+[[outputs]]
+id = "f-cznw3PH_d3LeQ2E4gYf"
+uri = "file://artifacts/sortii-project-video/public/audio/bg_music.mp3"
+type = "audio"
+title = "Sortii background music"
+description = "Generated music: Warm playful lo-fi instrumental background music scoring a vertical lifestyle productivity app reveal. Soft marimba, muted hand percussion, warm bass, light acoustic plucks, 94 BPM, …"

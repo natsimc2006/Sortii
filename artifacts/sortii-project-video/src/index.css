@@ -1,30 +1,38 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap');
 @import 'tailwindcss';
 
-/* REPLACE THESE -- define your own palette and fonts for each video */
 :root {
-  --color-primary: #000000;
-  --color-secondary: #6b7280;
-  --color-accent: #3b82f6;
+  --color-teal: #2A8F88;
+  --color-gold: #D29A22;
+  --color-plum: #5E3A4C;
+  --color-cream: #F7F3EB;
+  --color-white: #ffffff;
+  --color-dark: #22161E;
 
-  --color-bg-light: #ffffff;
-  --color-bg-dark: #0f172a;
-  --color-bg-muted: #f8fafc;
+  --color-primary: var(--color-teal);
+  --color-secondary: var(--color-plum);
+  --color-accent: var(--color-gold);
 
-  --color-text-primary: #111827;
-  --color-text-secondary: #6b7280;
-  --color-text-muted: #9ca3af;
-  --color-text-inverse: #ffffff;
+  --color-bg-light: var(--color-cream);
+  --color-bg-dark: var(--color-plum);
+  --color-bg-muted: #EBE5D9;
 
-  --color-success: #10b981;
-  --color-warning: #f59e0b;
-  --color-error: #ef4444;
+  --color-text-primary: var(--color-dark);
+  --color-text-secondary: var(--color-plum);
+  --color-text-muted: #856E7B;
+  --color-text-inverse: var(--color-cream);
 
-  --font-display: 'Space Grotesk', sans-serif;
-  --font-body: 'DM Sans', sans-serif;
-  --font-mono: 'JetBrains Mono', monospace;
+  --font-display: 'Outfit', sans-serif;
+  --font-body: 'Outfit', sans-serif;
+  --font-serif: 'Playfair Display', serif;
 }
 
 @theme inline {
+  --color-teal: var(--color-teal);
+  --color-gold: var(--color-gold);
+  --color-plum: var(--color-plum);
+  --color-cream: var(--color-cream);
+  
   --color-primary: var(--color-primary);
   --color-secondary: var(--color-secondary);
   --color-accent: var(--color-accent);
@@ -35,12 +43,10 @@
   --color-text-secondary: var(--color-text-secondary);
   --color-text-muted: var(--color-text-muted);
   --color-text-inverse: var(--color-text-inverse);
-  --color-success: var(--color-success);
-  --color-warning: var(--color-warning);
-  --color-error: var(--color-error);
+  
   --font-display: var(--font-display);
   --font-body: var(--font-body);
-  --font-mono: var(--font-mono);
+  --font-serif: var(--font-serif);
 }
 
 body {
@@ -84,4 +90,8 @@ body {
 
 .video-media-frame[data-media-position='left'] > :is(img, video) {
   object-position: left;
+}
+
+.clip-diagonal {
+  clip-path: polygon(0 0, 100% 0, 100% 85%, 0% 100%);
 }

@@ -1,4 +1,5 @@
 kind = "video"
+videoAspectRatio = "9:16"
 previewPath = "/sortii-project-video/"
 title = "Sortii Project Video"
 description = "A concise animated product showcase for Sortii, presenting how the app brings meals, money, bills, appointments, and family planning into one calmer weekly flow."
