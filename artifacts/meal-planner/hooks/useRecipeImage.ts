@@ -1,27 +1,25 @@
 /**
  * useRecipeImage hook
  * ───────────────────
- * Returns the best available image source for a recipe, plus a refresh callback.
+ * Returns the best available image source for a recipe.
  *
- * Priority order (see unsplashImages.ts for full logic):
+ * Priority order:
  *   1. Locally bundled asset (require()) — always wins, no network needed
- *   2. Pinned URL (curated overrides in unsplashImages.ts)
- *   3. AsyncStorage cached URL
- *   4. TheMealDB existingUrl (dish-matched, preferred over Unsplash search)
- *   5. Live Unsplash fetch (fallback for recipes with no TheMealDB URL)
+ *   2. The recipe's own imageUrl (Sortii-hosted photo, see utils/recipeImages.ts)
+ *   3. null → no image, show the placeholder
  *
  * Return type is `number | string | null`:
  *   - number  → local require() asset (use directly as <Image source={...} />)
  *   - string  → remote URI (wrap as <Image source={{ uri: ... }} />)
- *   - null    → no image available yet (show placeholder)
+ *   - null    → no image available (show placeholder)
  *
  * Usage:
- *   const { src, refresh, refreshing } = useRecipeImage(recipe.id, recipe.name, recipe.imageUrl);
+ *   const { src } = useRecipeImage(recipe.id, recipe.name, recipe.imageUrl);
  *   <Image source={toImageSource(src)} ... />
  */
 
-import { useCallback, useEffect, useRef, useState } from "react";
-import { getRecipeImage, refreshRecipeImage } from "@/utils/unsplashImages";
+import { useEffect, useRef, useState } from "react";
+import { getRecipeImage } from "@/utils/recipeImages";
 import { getLocalRecipeImage } from "@/utils/localRecipeImages";
 
 export type RecipeImageSource = number | string | null;
@@ -37,8 +35,6 @@ export function toImageSource(
 
 export interface UseRecipeImageResult {
   src: RecipeImageSource;
-  refreshing: boolean;
-  refresh: () => Promise<void>;
 }
 
 export function useRecipeImage(
@@ -48,9 +44,8 @@ export function useRecipeImage(
 ): UseRecipeImageResult {
   const localAsset = getLocalRecipeImage(recipeName);
   const [imageSource, setImageSource] = useState<RecipeImageSource>(
-    localAsset !== undefined ? localAsset : null
+    localAsset !== undefined ? localAsset : existingUrl?.trim() || null
   );
-  const [refreshing, setRefreshing] = useState(false);
   const cancelledRef = useRef(false);
 
   useEffect(() => {
@@ -61,27 +56,12 @@ export function useRecipeImage(
       return;
     }
 
-    async function load() {
-      const url = await getRecipeImage(recipeId, recipeName, existingUrl);
+    getRecipeImage(recipeId, recipeName, existingUrl).then((url) => {
       if (!cancelledRef.current) setImageSource(url);
-    }
+    });
 
-    load();
     return () => { cancelledRef.current = true; };
   }, [recipeId, recipeName, existingUrl, localAsset]);
 
-  const refresh = useCallback(async () => {
-    // Local assets are always correct — nothing to refresh
-    if (localAsset !== undefined) return;
-
-    setRefreshing(true);
-    try {
-      const url = await refreshRecipeImage(recipeId, recipeName, existingUrl);
-      if (!cancelledRef.current) setImageSource(url);
-    } finally {
-      setRefreshing(false);
-    }
-  }, [recipeId, recipeName, existingUrl, localAsset]);
-
-  return { src: imageSource, refreshing, refresh };
+  return { src: imageSource };
 }
