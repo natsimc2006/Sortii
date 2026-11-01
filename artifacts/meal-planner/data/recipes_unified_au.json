@@ -55207,6 +55207,9 @@
       "Pour in wine and cook 2 mins, then add tomatoes and fennel seeds.",
       "Simmer 25 mins until thick. Season to taste.",
       "Cook pasta per packet. Serve ragù over pasta with parmesan."
+    ],
+    "locale": [
+      "AU"
     ]
   },
   {
@@ -55284,6 +55287,9 @@
       "Pour sauce over chicken. Add sliced onion around chicken.",
       "Cover and bake 40 mins, removing lid for last 10 mins to caramelise.",
       "Serve with rice and steamed greens."
+    ],
+    "locale": [
+      "AU"
     ]
   },
   {
@@ -55292,7 +55298,7 @@
     "description": "Tender pork belly in a sticky, sweet and salty Vietnamese-style caramel sauce",
     "baseServings": 4,
     "cookTimeMinutes": 40,
-    "difficulty": "medium",
+    "difficulty": "moderate",
     "cookingStyle": "stovetop",
     "healthTags": [
       "standard"
@@ -55373,6 +55379,9 @@
       "Pour in fish sauce, coconut water and pepper. Bring to a boil.",
       "Simmer 25–30 mins until sauce is thick and pork is tender.",
       "Serve over steamed rice, garnished with spring onions."
+    ],
+    "locale": [
+      "AU"
     ]
   },
   {
@@ -55475,6 +55484,9 @@
       "Sauté sliced mushrooms and onion in butter until golden.",
       "Add stock, Worcestershire and cornflour mixed with cold water. Stir until thickened.",
       "Return patties to pan, simmer 8 mins. Serve with mashed potato."
+    ],
+    "locale": [
+      "AU"
     ]
   },
   {
@@ -55483,7 +55495,7 @@
     "description": "Pork shoulder braised with apple, cider and cream — a warming European-inspired one-pot",
     "baseServings": 4,
     "cookTimeMinutes": 75,
-    "difficulty": "medium",
+    "difficulty": "moderate",
     "cookingStyle": "oven",
     "healthTags": [
       "standard"
@@ -55577,6 +55589,9 @@
       "Cover and cook in oven at 160°C for 50 mins.",
       "Core and slice apples, add to casserole and cook 15 mins more.",
       "Stir in cream, adjust seasoning. Serve with mashed potato."
+    ],
+    "locale": [
+      "AU"
     ]
   },
   {
@@ -55673,6 +55688,9 @@
       "Brown mince with onion and garlic in oil, breaking up.",
       "Add soy sauce, oyster sauce and sesame oil. Stir well.",
       "Add frozen peas, cook 2 mins. Serve over rice."
+    ],
+    "locale": [
+      "AU"
     ]
   },
   {
@@ -55774,6 +55792,9 @@
       "Lay prosciutto on cling film, spread duxelles, place beef at edge and roll tightly. Chill 30 mins.",
       "Wrap in puff pastry, seal with egg wash and chill 15 mins.",
       "Bake at 200°C for 25 mins for medium-rare. Rest 10 mins before slicing."
+    ],
+    "locale": [
+      "AU"
     ]
   },
   {
@@ -55793,7 +55814,7 @@
     "leftoversFriendly": true,
     "mealType": "dinner",
     "estimatedCostBand": "high",
-    "proteinType": "veal",
+    "proteinType": "beef",
     "cuisineType": "italian",
     "seasonTags": [
       "winter",
@@ -55887,6 +55908,9 @@
       "Add wine, reduce by half. Add tomatoes and stock.",
       "Return shanks, cover and braise at 160°C for 2 hours until tender.",
       "Make gremolata: mix lemon zest, parsley and garlic. Serve over saffron risotto topped with gremolata."
+    ],
+    "locale": [
+      "AU"
     ]
   },
   {
@@ -55895,7 +55919,7 @@
     "description": "Golden-seared sea scallops with brown butter, garlic and lemon — elegant and quick",
     "baseServings": 2,
     "cookTimeMinutes": 15,
-    "difficulty": "medium",
+    "difficulty": "moderate",
     "cookingStyle": "stovetop",
     "healthTags": [
       "healthy",
@@ -55971,6 +55995,9 @@
       "Sear scallops 90 seconds per side until golden. Remove.",
       "Reduce heat, add butter and garlic. Cook until butter is nutty brown.",
       "Add lemon juice and capers. Spoon over scallops. Garnish with parsley."
+    ],
+    "locale": [
+      "AU"
     ]
   },
   {
@@ -56060,6 +56087,9 @@
       "Add prawns and cook 1–2 mins per side until pink. Remove.",
       "Add wine to pan, reduce by half. Add cream and simmer 3 mins.",
       "Return prawns, add lemon juice and parsley. Serve with crusty bread."
+    ],
+    "locale": [
+      "AU"
     ]
   },
   {
@@ -56068,7 +56098,7 @@
     "description": "Slow-roasted pork belly with perfect crackling and rich pan jus — a show-stopping roast",
     "baseServings": 6,
     "cookTimeMinutes": 180,
-    "difficulty": "medium",
+    "difficulty": "moderate",
     "cookingStyle": "oven",
     "healthTags": [
       "standard"
@@ -56142,6 +56172,9 @@
       "Roast at 240°C for 30 mins for crackling, then reduce to 160°C.",
       "Roast a further 2 hours until meat is very tender.",
       "Rest 15 mins, carve and serve with apple sauce and roast vegetables."
+    ],
+    "locale": [
+      "AU"
     ]
   },
   {
@@ -56150,7 +56183,7 @@
     "description": "Classic French braised beef with mushrooms, bacon lardons and red wine — slow-cooked perfection",
     "baseServings": 6,
     "cookTimeMinutes": 180,
-    "difficulty": "medium",
+    "difficulty": "moderate",
     "cookingStyle": "oven",
     "healthTags": [
       "standard"
@@ -56257,6 +56290,9 @@
       "Return beef, add marinade and stock. Bring to a boil.",
       "Cover and braise in oven at 160°C for 2–2.5 hours.",
       "Add mushrooms and pearl onions for last 30 mins. Serve with crusty bread."
+    ],
+    "locale": [
+      "AU"
     ]
   },
   {
@@ -56347,6 +56383,9 @@
       "Brush salmon with Dijon mustard. Press herb crust on top.",
       "Bake 15–18 mins until crust is golden and fish flakes easily.",
       "Serve with lemon wedges and salad."
+    ],
+    "locale": [
+      "AU"
     ]
   },
   {
@@ -56456,6 +56495,9 @@
       "Add blended vegetables and tomato paste, cook 2 mins.",
       "Add crushed tomatoes, simmer 20 mins until thick.",
       "Cook spaghetti per packet. Serve sauce over pasta with parmesan."
+    ],
+    "locale": [
+      "AU"
     ]
   },
   {
@@ -56475,7 +56517,7 @@
     "leftoversFriendly": false,
     "mealType": "dinner",
     "estimatedCostBand": "low",
-    "proteinType": "vegetarian",
+    "proteinType": "none",
     "cuisineType": "italian",
     "seasonTags": [
       "all"
@@ -56545,6 +56587,9 @@
       "Spread tomato paste on each half. Scatter mozzarella.",
       "Let kids add their favourite toppings.",
       "Bake 10–12 mins until cheese is melted and golden."
+    ],
+    "locale": [
+      "AU"
     ]
   },
   {
@@ -56564,7 +56609,7 @@
     "leftoversFriendly": true,
     "mealType": "dinner",
     "estimatedCostBand": "low",
-    "proteinType": "vegetarian",
+    "proteinType": "none",
     "cuisineType": "australian",
     "seasonTags": [
       "all"
@@ -56623,6 +56668,9 @@
       "Mix broccoli, cheese, eggs, breadcrumbs, garlic powder and spring onion.",
       "Form into small patties and place on tray.",
       "Bake 18–20 mins until golden. Serve with tomato sauce."
+    ],
+    "locale": [
+      "AU"
     ]
   },
   {
@@ -56720,6 +56768,9 @@
       "Add oyster sauce, soy sauce and sesame oil. Stir well.",
       "Separate lettuce into cups. Spoon mince into cups.",
       "Top with spring onions and serve immediately."
+    ],
+    "locale": [
+      "AU"
     ]
   },
   {
@@ -56739,7 +56790,7 @@
     "leftoversFriendly": false,
     "mealType": "dinner",
     "estimatedCostBand": "low",
-    "proteinType": "vegetarian",
+    "proteinType": "none",
     "cuisineType": "australian",
     "seasonTags": [
       "all"
@@ -56806,6 +56857,9 @@
       "Heat a non-stick pan and melt butter.",
       "Cook spoonfuls of batter 2–3 mins per side until golden.",
       "Serve with sour cream and sweet chilli sauce."
+    ],
+    "locale": [
+      "AU"
     ]
   },
   {
@@ -56814,7 +56868,7 @@
     "description": "Rich miso-based broth with ramen noodles, tofu, corn and soft-boiled egg alternatives",
     "baseServings": 4,
     "cookTimeMinutes": 40,
-    "difficulty": "medium",
+    "difficulty": "moderate",
     "cookingStyle": "stovetop",
     "healthTags": [
       "vegan",
@@ -56826,7 +56880,7 @@
     "leftoversFriendly": false,
     "mealType": "dinner",
     "estimatedCostBand": "medium",
-    "proteinType": "plant",
+    "proteinType": "none",
     "cuisineType": "japanese",
     "seasonTags": [
       "all"
@@ -56918,6 +56972,9 @@
       "Simmer garlic and ginger in stock 5 mins. Whisk in miso and soy sauce.",
       "Cook ramen per packet. Blanch bok choy in broth.",
       "Divide noodles among bowls. Ladle broth over. Top with tofu, corn, bok choy, spring onions and nori."
+    ],
+    "locale": [
+      "AU"
     ]
   },
   {
@@ -56939,7 +56996,7 @@
     "leftoversFriendly": true,
     "mealType": "dinner",
     "estimatedCostBand": "low",
-    "proteinType": "plant",
+    "proteinType": "none",
     "cuisineType": "indian",
     "seasonTags": [
       "all"
@@ -57027,6 +57084,9 @@
       "Simmer 15 mins until sauce thickens.",
       "Add roasted eggplant and cherry tomatoes. Simmer 5 mins.",
       "Top with fresh coriander. Serve with basmati rice."
+    ],
+    "locale": [
+      "AU"
     ]
   },
   {
@@ -57047,7 +57107,7 @@
     "leftoversFriendly": true,
     "mealType": "dinner",
     "estimatedCostBand": "low",
-    "proteinType": "plant",
+    "proteinType": "none",
     "cuisineType": "american",
     "seasonTags": [
       "all"
@@ -57140,6 +57200,9 @@
       "Add spices and cook 1 min. Add tomatoes, rice and stock.",
       "Bring to a boil, reduce heat, cover and cook 20 mins.",
       "Stir in beans and heat through. Season and serve."
+    ],
+    "locale": [
+      "AU"
     ]
   },
   {
@@ -57160,7 +57223,7 @@
     "leftoversFriendly": true,
     "mealType": "dinner",
     "estimatedCostBand": "low",
-    "proteinType": "plant",
+    "proteinType": "none",
     "cuisineType": "middle-eastern",
     "seasonTags": [
       "autumn",
@@ -57244,6 +57307,9 @@
       "Simmer 20 mins until lentils are completely soft. Blend half if desired.",
       "Squeeze in lemon juice, season generously.",
       "Serve with flatbread, topped with coriander and a drizzle of oil."
+    ],
+    "locale": [
+      "AU"
     ]
   },
   {
@@ -57263,7 +57329,7 @@
     "leftoversFriendly": true,
     "mealType": "dinner",
     "estimatedCostBand": "medium",
-    "proteinType": "plant",
+    "proteinType": "none",
     "cuisineType": "american",
     "seasonTags": [
       "all"
@@ -57338,6 +57404,9 @@
       "Cook pasta per packet.",
       "Pour sauce into a pan and warm over medium heat until thickened.",
       "Drain pasta and stir into sauce. Season to taste."
+    ],
+    "locale": [
+      "AU"
     ]
   },
   {
@@ -57359,7 +57428,7 @@
     "leftoversFriendly": true,
     "mealType": "dinner",
     "estimatedCostBand": "low",
-    "proteinType": "plant",
+    "proteinType": "none",
     "cuisineType": "indian",
     "seasonTags": [
       "all"
@@ -57442,6 +57511,9 @@
       "Add tomatoes and coconut milk. Simmer 15 mins.",
       "Add roasted cauliflower and simmer 5 mins.",
       "Cook rice per packet. Serve curry over rice."
+    ],
+    "locale": [
+      "AU"
     ]
   },
   {
@@ -57463,7 +57535,7 @@
     "leftoversFriendly": true,
     "mealType": "dinner",
     "estimatedCostBand": "low",
-    "proteinType": "plant",
+    "proteinType": "none",
     "cuisineType": "african",
     "seasonTags": [
       "all"
@@ -57546,6 +57618,9 @@
       "Add tomatoes, coconut milk and peanut butter. Stir to combine.",
       "Simmer 20 mins until sweet potato is tender.",
       "Add chickpeas, heat through. Serve with rice and coriander."
+    ],
+    "locale": [
+      "AU"
     ]
   },
   {
@@ -57554,7 +57629,7 @@
     "description": "Lentil and butternut pumpkin curry with warm Parsi-inspired spices and coconut",
     "baseServings": 4,
     "cookTimeMinutes": 45,
-    "difficulty": "medium",
+    "difficulty": "moderate",
     "cookingStyle": "one-pot",
     "healthTags": [
       "vegetarian",
@@ -57567,7 +57642,7 @@
     "leftoversFriendly": true,
     "mealType": "dinner",
     "estimatedCostBand": "low",
-    "proteinType": "plant",
+    "proteinType": "none",
     "cuisineType": "indian",
     "seasonTags": [
       "all"
@@ -57650,6 +57725,9 @@
       "Add cubed pumpkin, rinsed lentils, stock and coconut milk.",
       "Simmer 25 mins until lentils and pumpkin are very soft.",
       "Stir in spinach and lemon juice. Season and serve with naan."
+    ],
+    "locale": [
+      "AU"
     ]
   },
   {
@@ -57669,7 +57747,7 @@
     "leftoversFriendly": true,
     "mealType": "dinner",
     "estimatedCostBand": "medium",
-    "proteinType": "vegetarian",
+    "proteinType": "none",
     "cuisineType": "italian",
     "seasonTags": [
       "all"
@@ -57751,6 +57829,9 @@
       "Mix ricotta with egg, half the parmesan and salt.",
       "Layer in a baking dish: sauce, pasta, ricotta mixture, mozzarella. Repeat.",
       "Top with remaining parmesan. Bake 30 mins until bubbling and golden."
+    ],
+    "locale": [
+      "AU"
     ]
   },
   {
@@ -57770,7 +57851,7 @@
     "leftoversFriendly": false,
     "mealType": "dinner",
     "estimatedCostBand": "medium",
-    "proteinType": "vegetarian",
+    "proteinType": "none",
     "cuisineType": "indian",
     "seasonTags": [
       "all"
@@ -57852,6 +57933,9 @@
       "Add cumin seeds and garam masala. Cook 1 min.",
       "Add tomatoes and simmer 10 mins. Stir in cream.",
       "Add spinach and halloumi. Serve with basmati rice."
+    ],
+    "locale": [
+      "AU"
     ]
   },
   {
@@ -57871,7 +57955,7 @@
     "leftoversFriendly": false,
     "mealType": "dinner",
     "estimatedCostBand": "medium",
-    "proteinType": "vegetarian",
+    "proteinType": "none",
     "cuisineType": "australian",
     "seasonTags": [
       "spring",
@@ -57942,6 +58026,9 @@
       "Toast burger buns. Spread herb mayo on bases.",
       "Layer rocket, halloumi, roasted capsicum and sliced avocado.",
       "Season with salt and pepper and serve immediately."
+    ],
+    "locale": [
+      "AU"
     ]
   },
   {
@@ -58043,6 +58130,9 @@
       "Whisk peanut butter, sweet chilli, soy, lime juice and cooking water into a sauce.",
       "Toss noodles, chicken, beansprouts and sauce together.",
       "Serve topped with spring onions and roasted peanuts."
+    ],
+    "locale": [
+      "AU"
     ]
   },
   {
@@ -58132,6 +58222,9 @@
       "Add stock, cream and thyme. Simmer 3 mins.",
       "Stir in parmesan. Return chicken and simmer 3 mins.",
       "Serve with mashed potato or pasta."
+    ],
+    "locale": [
+      "AU"
     ]
   },
   {
@@ -58215,6 +58308,9 @@
       "Fry fillets in butter 3 mins per side until golden. Remove.",
       "Add garlic to pan, cook 1 min. Add lemon juice and capers.",
       "Spoon butter sauce over fish. Top with parsley. Serve with salad."
+    ],
+    "locale": [
+      "AU"
     ]
   },
   {
@@ -58298,6 +58394,9 @@
       "Preheat air fryer to 200°C.",
       "Cook chops 8–10 mins, flipping halfway, until internal temp 63°C.",
       "Rest 3 mins. Serve with lemon, chips and salad."
+    ],
+    "locale": [
+      "AU"
     ]
   },
   {
@@ -58399,6 +58498,9 @@
       "Warm flatbreads in the oven or dry pan.",
       "Spread hummus over bowls. Top with chicken, diced cucumber and tomato.",
       "Drizzle with oil and parsley. Serve with flatbread."
+    ],
+    "locale": [
+      "AU"
     ]
   },
   {
@@ -58495,6 +58597,9 @@
       "Add garlic, chilli and fennel seeds. Cook 1 min.",
       "Add tomatoes, simmer 10 mins. Season.",
       "Toss with drained pasta. Serve with parmesan and basil."
+    ],
+    "locale": [
+      "AU"
     ]
   },
   {
@@ -58590,6 +58695,9 @@
       "Add tomatoes, olives and capers. Simmer 10 mins.",
       "Toss with pasta and a splash of pasta water.",
       "Serve with parsley and crusty bread."
+    ],
+    "locale": [
+      "AU"
     ]
   },
   {
@@ -58610,7 +58718,7 @@
     "leftoversFriendly": false,
     "mealType": "dinner",
     "estimatedCostBand": "low",
-    "proteinType": "plant",
+    "proteinType": "none",
     "cuisineType": "middle-eastern",
     "seasonTags": [
       "all"
@@ -58686,6 +58794,9 @@
       "Toast bread.",
       "Spread yoghurt on toast. Top with chickpeas.",
       "Drizzle with oil and squeeze of lemon. Scatter chilli flakes."
+    ],
+    "locale": [
+      "AU"
     ]
   },
   {
@@ -58706,7 +58817,7 @@
     "leftoversFriendly": true,
     "mealType": "dinner",
     "estimatedCostBand": "low",
-    "proteinType": "plant",
+    "proteinType": "none",
     "cuisineType": "indian",
     "seasonTags": [
       "all"
@@ -58788,6 +58899,9 @@
       "Add onion, garlic and ginger. Cook until golden.",
       "Pour tarka over lentils. Add lemon juice and season.",
       "Serve with basmati rice and coriander."
+    ],
+    "locale": [
+      "AU"
     ]
   },
   {
@@ -58890,6 +59004,9 @@
       "Add pasta and stir. Cook uncovered 12 mins, stirring occasionally.",
       "Remove from heat and stir through cheese until melted.",
       "Top with sliced pickles and serve."
+    ],
+    "locale": [
+      "AU"
     ]
   },
   {
@@ -58909,7 +59026,7 @@
     "leftoversFriendly": false,
     "mealType": "dinner",
     "estimatedCostBand": "low",
-    "proteinType": "vegetarian",
+    "proteinType": "none",
     "cuisineType": "asian",
     "seasonTags": [
       "all"
@@ -58973,6 +59090,9 @@
       "Toss with soy sauce and sesame oil. Remove from heat.",
       "Fry eggs in another pan to desired doneness.",
       "Serve rice topped with fried egg and spring onions."
+    ],
+    "locale": [
+      "AU"
     ]
   },
   {
@@ -58981,7 +59101,7 @@
     "description": "Creamy chicken and vegetable filling under a golden puff pastry lid — freeze the extras",
     "baseServings": 6,
     "cookTimeMinutes": 75,
-    "difficulty": "medium",
+    "difficulty": "moderate",
     "cookingStyle": "oven",
     "healthTags": [
       "standard"
@@ -59087,6 +59207,9 @@
       "Return chicken. Add peas and corn. Simmer until thick.",
       "Transfer to pie dish. Top with pastry, seal edges, brush with egg wash.",
       "Bake at 200°C for 25–30 mins until golden."
+    ],
+    "locale": [
+      "AU"
     ]
   },
   {
@@ -59107,7 +59230,7 @@
     "leftoversFriendly": true,
     "mealType": "dinner",
     "estimatedCostBand": "low",
-    "proteinType": "plant",
+    "proteinType": "none",
     "cuisineType": "middle-eastern",
     "seasonTags": [
       "autumn",
@@ -59191,6 +59314,9 @@
       "Pour in stock. Bring to a boil, simmer 30 mins.",
       "Blend until smooth. Add lemon juice and season.",
       "Freeze in portions. Reheat with a swirl of yoghurt."
+    ],
+    "locale": [
+      "AU"
     ]
   },
   {
@@ -59286,6 +59412,9 @@
       "Remove pork, shred, then spread on baking tray.",
       "Spoon over some cooking juices. Grill 5 mins until edges are crispy.",
       "Serve in tacos with salsa, pickled onion and coriander."
+    ],
+    "locale": [
+      "AU"
     ]
   },
   {
@@ -59306,7 +59435,7 @@
     "leftoversFriendly": false,
     "mealType": "dinner",
     "estimatedCostBand": "low",
-    "proteinType": "vegetarian",
+    "proteinType": "none",
     "cuisineType": "italian",
     "seasonTags": [
       "all"
@@ -59370,6 +59499,9 @@
       "Toss gnocchi with pesto, spinach and reserved water.",
       "Add halved cherry tomatoes and heat through 1 min.",
       "Serve topped with parmesan and toasted pine nuts."
+    ],
+    "locale": [
+      "AU"
     ]
   },
   {
@@ -59389,7 +59521,7 @@
     "leftoversFriendly": false,
     "mealType": "dinner",
     "estimatedCostBand": "medium",
-    "proteinType": "vegetarian",
+    "proteinType": "none",
     "cuisineType": "italian",
     "seasonTags": [
       "all"
@@ -59465,6 +59597,9 @@
       "Add fresh ravioli and cherry tomatoes, toss gently.",
       "Tear mozzarella over the top. Scatter parmesan.",
       "Bake 20 mins until bubbling and golden. Top with fresh basil."
+    ],
+    "locale": [
+      "AU"
     ]
   },
   {
@@ -59560,6 +59695,9 @@
       "Brown sausages in a pan 5 mins. Add hoisin, soy and sesame oil.",
       "Cook 3 mins until glazed.",
       "Serve over rice with pickled cucumber, spring onions and sesame seeds."
+    ],
+    "locale": [
+      "AU"
     ]
   },
   {
@@ -59667,6 +59805,9 @@
       "Cover with foil and bake 20 mins.",
       "Remove foil, add prawns, cherry tomatoes and olives. Bake 10 mins.",
       "Crumble feta over top. Scatter parsley and serve from the dish."
+    ],
+    "locale": [
+      "AU"
     ]
   },
   {
@@ -59773,6 +59914,9 @@
       "Brown beef mince in a wok over high heat.",
       "Pour sauce over and cook 2 mins until caramelised.",
       "Serve over rice with sliced cucumber, spring onions and sesame seeds."
+    ],
+    "locale": [
+      "AU"
     ]
   },
   {
@@ -59863,6 +60007,9 @@
       "Spread mayo over fish fillets. Press parmesan crust on top.",
       "Bake 14–16 mins until crust is golden and fish flakes easily.",
       "Serve with chips and salad."
+    ],
+    "locale": [
+      "AU"
     ]
   },
   {
@@ -59958,6 +60105,9 @@
       "Mix teriyaki and orange juice. Add to pork with garlic. Cook 2 mins.",
       "Add bok choy and noodles. Toss to combine.",
       "Serve topped with sesame seeds and spring onions."
+    ],
+    "locale": [
+      "AU"
     ]
   },
   {
@@ -60059,6 +60209,9 @@
       "Pour into a baking dish. Add broccolini, capsicum and kaffir lime leaves.",
       "Nestle fish fillets in the sauce.",
       "Bake 18–20 mins until fish is cooked. Scatter coriander. Serve with rice."
+    ],
+    "locale": [
+      "AU"
     ]
   },
   {
@@ -60161,6 +60314,9 @@
       "Shred cabbage finely. Slice avocado.",
       "Warm taco shells. Fill with cabbage, chicken and avocado.",
       "Serve with sour cream and lime wedges."
+    ],
+    "locale": [
+      "AU"
     ]
   },
   {
@@ -60246,6 +60402,9 @@
       "Place salmon on lined baking tray. Spoon glaze over each fillet.",
       "Bake 12–14 mins until salmon is just cooked and glaze is sticky.",
       "Garnish with coriander. Serve with steamed jasmine rice and greens."
+    ],
+    "locale": [
+      "AU"
     ]
   },
   {
@@ -60266,7 +60425,7 @@
     "leftoversFriendly": false,
     "mealType": "dinner",
     "estimatedCostBand": "medium",
-    "proteinType": "vegetarian",
+    "proteinType": "none",
     "cuisineType": "mediterranean",
     "seasonTags": [
       "spring",
@@ -60350,6 +60509,9 @@
       "Grill or BBQ 4–5 mins per side until charred.",
       "Mix yoghurt with mint, garlic and lemon juice.",
       "Serve skewers with mint yoghurt, flatbread and salad."
+    ],
+    "locale": [
+      "AU"
     ]
   },
   {
@@ -60371,7 +60533,7 @@
     "leftoversFriendly": true,
     "mealType": "dinner",
     "estimatedCostBand": "medium",
-    "proteinType": "vegetarian",
+    "proteinType": "none",
     "cuisineType": "mediterranean",
     "seasonTags": [
       "all"
@@ -60453,6 +60615,9 @@
       "Whisk olive oil, lemon juice and honey for dressing.",
       "Combine quinoa, roasted veg, chickpeas and rocket in a bowl.",
       "Drizzle dressing over. Crumble feta on top."
+    ],
+    "locale": [
+      "AU"
     ]
   },
   {
@@ -60574,7 +60739,10 @@
     "kidFriendlyScore": 2,
     "costPerServeAUD": 6.5,
     "costPerServeGBP": 4.2,
-    "source": "https://www.recipetineats.com/pulled-pork-with-bbq-sauce/"
+    "source": "https://www.recipetineats.com/pulled-pork-with-bbq-sauce/",
+    "locale": [
+      "AU"
+    ]
   },
   {
     "id": "r394",
@@ -60683,128 +60851,10 @@
     "kidFriendlyScore": 1,
     "costPerServeAUD": 12,
     "costPerServeGBP": 7.8,
-    "source": "https://www.bbcgoodfood.com/recipes/slow-cooker-leg-lamb"
-  },
-  {
-    "id": "r395",
-    "name": "Slow Cooker Beef Stew",
-    "description": "Rich and hearty beef stew with tender chunks of chuck, potatoes and carrots. Throw it all in and come home to dinner.",
-    "baseServings": 6,
-    "cookTimeMinutes": 480,
-    "difficulty": "easy",
-    "cookingStyle": "mixed",
-    "healthTags": [
-      "standard"
-    ],
-    "budgetTags": [
-      "budget",
-      "standard"
-    ],
-    "leftoversFriendly": true,
-    "batchCook": true,
-    "mealType": "dinner",
-    "estimatedCostBand": "low",
-    "ingredients": [
-      {
-        "name": "Chuck steak or gravy beef",
-        "quantity": 1000,
-        "unit": "g",
-        "category": "proteins"
-      },
-      {
-        "name": "Potatoes",
-        "quantity": 600,
-        "unit": "g",
-        "category": "vegetables"
-      },
-      {
-        "name": "Carrots",
-        "quantity": 3,
-        "unit": "whole",
-        "category": "vegetables"
-      },
-      {
-        "name": "Onion",
-        "quantity": 2,
-        "unit": "whole",
-        "category": "vegetables"
-      },
-      {
-        "name": "Celery",
-        "quantity": 2,
-        "unit": "stalks",
-        "category": "vegetables"
-      },
-      {
-        "name": "Beef stock",
-        "quantity": 500,
-        "unit": "ml",
-        "category": "pantry"
-      },
-      {
-        "name": "Tomato paste",
-        "quantity": 3,
-        "unit": "tbsp",
-        "category": "pantry"
-      },
-      {
-        "name": "Worcestershire sauce",
-        "quantity": 2,
-        "unit": "tbsp",
-        "category": "condiments"
-      },
-      {
-        "name": "Garlic",
-        "quantity": 3,
-        "unit": "cloves",
-        "category": "herbs"
-      },
-      {
-        "name": "Plain flour",
-        "quantity": 3,
-        "unit": "tbsp",
-        "category": "pantry"
-      },
-      {
-        "name": "Dried thyme",
-        "quantity": 1,
-        "unit": "tsp",
-        "category": "herbs"
-      },
-      {
-        "name": "Bay leaves",
-        "quantity": 2,
-        "unit": "whole",
-        "category": "herbs"
-      },
-      {
-        "name": "Olive oil",
-        "quantity": 2,
-        "unit": "tbsp",
-        "category": "condiments"
-      }
-    ],
-    "instructions": [
-      "Cut beef into 4cm chunks. Toss in flour seasoned with salt and pepper.",
-      "Heat oil in a pan over high heat. Brown beef in batches and transfer to slow cooker.",
-      "Roughly chop onion, carrots, celery and potatoes. Add to slow cooker with garlic.",
-      "Mix stock, tomato paste and Worcestershire sauce and pour over.",
-      "Add thyme and bay leaves. Stir to combine.",
-      "Cook on LOW for 8 hours or HIGH for 5 hours until beef is fall-apart tender.",
-      "Remove bay leaves. Taste and season. Serve with crusty bread or mashed potato."
-    ],
-    "proteinType": "beef",
-    "cuisineType": "australian",
-    "seasonTags": [
-      "autumn",
-      "winter"
-    ],
-    "familyStyle": true,
-    "kidFriendly": true,
-    "kidFriendlyScore": 2,
-    "costPerServeAUD": 5,
-    "costPerServeGBP": 3.2,
-    "source": "https://www.bbcgoodfood.com/recipes/slow-cooker-beef-stew"
+    "source": "https://www.bbcgoodfood.com/recipes/slow-cooker-leg-lamb",
+    "locale": [
+      "AU"
+    ]
   },
   {
     "id": "r396",
@@ -60894,7 +60944,10 @@
     "kidFriendlyScore": 2,
     "costPerServeAUD": 3.8,
     "costPerServeGBP": 2.5,
-    "source": "https://www.goodlifeeats.com/shredded-crock-pot-slow-cooker-chicken/"
+    "source": "https://www.goodlifeeats.com/shredded-crock-pot-slow-cooker-chicken/",
+    "locale": [
+      "AU"
+    ]
   },
   {
     "id": "r397",
@@ -61002,7 +61055,10 @@
     "kidFriendlyScore": 1,
     "costPerServeAUD": 4.5,
     "costPerServeGBP": 2.9,
-    "source": "https://www.recipetineats.com/slow-cooker-crispy-chinese-shredded-chicken/"
+    "source": "https://www.recipetineats.com/slow-cooker-crispy-chinese-shredded-chicken/",
+    "locale": [
+      "AU"
+    ]
   },
   {
     "id": "r398",
@@ -61115,7 +61171,10 @@
     "kidFriendlyScore": 2,
     "costPerServeAUD": 7,
     "costPerServeGBP": 4.5,
-    "source": "https://www.dinnerin321.com/slow-cooker-pulled-beef/"
+    "source": "https://www.dinnerin321.com/slow-cooker-pulled-beef/",
+    "locale": [
+      "AU"
+    ]
   },
   {
     "id": "r399",
@@ -61241,7 +61300,10 @@
     "kidFriendlyScore": 2,
     "costPerServeAUD": 7.5,
     "costPerServeGBP": 4.8,
-    "source": "https://www.recipetineats.com/slow-cooked-shredded-beef-ragu-pasta/"
+    "source": "https://www.recipetineats.com/slow-cooked-shredded-beef-ragu-pasta/",
+    "locale": [
+      "AU"
+    ]
   },
   {
     "id": "r400",
@@ -61356,7 +61418,10 @@
     "kidFriendlyScore": 2,
     "costPerServeAUD": 8,
     "costPerServeGBP": 5.2,
-    "source": "https://www.recipetineats.com/slow-cooker-pork-loin-roast/"
+    "source": "https://www.recipetineats.com/slow-cooker-pork-loin-roast/",
+    "locale": [
+      "AU"
+    ]
   },
   {
     "id": "r401",
@@ -61485,6 +61550,9 @@
     "kidFriendlyScore": 1,
     "costPerServeAUD": 6.5,
     "costPerServeGBP": 4.2,
-    "source": "https://www.recipetineats.com/pork-carnitas-mexican-slow-cooker-pulled-pork/"
+    "source": "https://www.recipetineats.com/pork-carnitas-mexican-slow-cooker-pulled-pork/",
+    "locale": [
+      "AU"
+    ]
   }
 ]
