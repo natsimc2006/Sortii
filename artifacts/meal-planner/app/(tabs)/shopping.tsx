@@ -444,6 +444,33 @@ export default function ShoppingScreen() {
     return text;
   };
 
+  // Plain version for pasting into supermarket apps, list apps or search boxes:
+  // one item per line, still in aisle order, no headers, quantities or footer.
+  const buildPlainListText = () => {
+    const seen = new Set<string>();
+    const lines: string[] = [];
+    const add = (name: string) => {
+      const clean = name.trim();
+      const key = clean.toLowerCase();
+      if (clean && !seen.has(key)) {
+        seen.add(key);
+        lines.push(clean);
+      }
+    };
+    for (const cat of activeCats) {
+      for (const item of byCategory[cat] || []) add(item.name);
+    }
+    uncheckedExtras.forEach((e) => add(e.name));
+    return lines.join("\n");
+  };
+
+  const handleCopyPlain = async () => {
+    await Clipboard.setStringAsync(buildPlainListText());
+    setShareOpen(false);
+    setShareSubView(null);
+    showToast("Copied. One item per line.");
+  };
+
   const handleOpenNotes = async () => {
     const text = buildListText();
     await Clipboard.setStringAsync(text);
@@ -805,6 +832,17 @@ export default function ShoppingScreen() {
 
           {shareSubView === null ? (
             <>
+              <TouchableOpacity style={[styles.sheetOption, { borderColor: C.cardBorder }]} onPress={handleCopyPlain}>
+                <View style={[styles.sheetOptionIcon, { backgroundColor: C.chipBg }]}>
+                  <Feather name="copy" size={20} color={C.primary} />
+                </View>
+                <View style={styles.flex}>
+                  <Text style={[styles.sheetOptionTitle, { color: C.text }]}>Copy plain list</Text>
+                  <Text style={[styles.sheetOptionSub, { color: C.textSecondary }]}>One item per line. Paste into any shopping app.</Text>
+                </View>
+                <Feather name="chevron-right" size={18} color={C.textMuted} />
+              </TouchableOpacity>
+
               <TouchableOpacity style={[styles.sheetOption, { borderColor: C.cardBorder }]} onPress={handleOpenNotes}>
                 <View style={[styles.sheetOptionIcon, { backgroundColor: C.chipBg }]}>
                   <Feather name="edit-3" size={20} color={C.primary} />
