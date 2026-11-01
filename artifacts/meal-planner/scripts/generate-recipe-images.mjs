@@ -85,6 +85,38 @@ const SURFACES = [
   "a warm cream linen tablecloth",
   "a pale honed marble benchtop",
   "a weathered light timber bench",
+  "a dusty blue-grey painted timber table",
+  "white tiles with warm grey grout",
+  "a warm sandstone-coloured stone benchtop",
+  "a woven rattan placemat on a pale timber table",
+  "a dark walnut timber table",
+  "a soft blush-pink linen tablecloth",
+];
+
+// Glaze colour for ceramic and stoneware vessels, so similar dishes don't look identical
+const GLAZES = [
+  "white",
+  "speckled oatmeal",
+  "sage-green glazed",
+  "charcoal matte",
+  "soft blue glazed",
+  "honey-brown glazed",
+];
+
+// Finishes for vessels that aren't glazed ceramic
+const FINISHES = {
+  board: ["light timber", "dark timber", "olive wood", "pale marble"],
+  tray: ["white enamel", "cream enamel with a blue rim", "dark speckled enamel", "well-used aluminium"],
+  pot: ["black cast-iron", "deep red enamelled cast-iron", "teal enamelled cast-iron", "cream enamelled cast-iron"],
+  skillet: ["black cast-iron", "dark blue enamelled cast-iron", "well-seasoned carbon steel"],
+};
+
+// Weighted towards closer crops so less background shows and the food leads
+const FRAMINGS = [
+  "Framed close, with the dish filling most of the frame",
+  "Framed close, with the dish filling most of the frame",
+  "Framed tightly on the food, the edge of the dish just visible",
+  "Framed a little wider, so some of the table setting shows",
 ];
 
 const TEXTILES = [
@@ -137,12 +169,22 @@ function pick(list, id, salt) {
 
 export function buildSetup(recipe) {
   const text = `${recipe.name} ${recipe.description} ${recipe.cookingStyle}`.toLowerCase();
-  const { vessel, angle } = VESSELS.find((v) => v.test.test(text));
+  const match = VESSELS.find((v) => v.test.test(text));
+  const angle = match.angle;
+  const glaze = pick(GLAZES, recipe.id, "glaze");
+  let vessel = match.vessel.replace(/\b(?:speckled )?(stoneware|ceramic)\b/, `${glaze} $1`);
+  const finish = (key) => pick(FINISHES[key], recipe.id, "finish");
+  vessel = vessel
+    .replace("a timber serving board", `a ${finish("board")} serving board`)
+    .replace("a well-used enamel roasting tray", `a ${finish("tray")} roasting tray`)
+    .replace("a cast-iron casserole pot", `a ${finish("pot")} casserole pot`)
+    .replace("a cast-iron skillet", `a ${finish("skillet")} skillet`);
   const ingredientsText = recipe.ingredients.join(" ").toLowerCase();
   const props = PROP_RULES.filter((p) => p.test.test(ingredientsText)).map((p) => p.prop);
   const sideProp = props.length ? props[hash(recipe.id, "prop") % props.length] : null;
   return {
     surface: pick(SURFACES, recipe.id, "surface"),
+    framing: pick(FRAMINGS, recipe.id, "framing"),
     vessel,
     angle,
     props: [sideProp, pick(TEXTILES, recipe.id, "textile"), pick(UTENSILS, recipe.id, "utensil")].filter(Boolean),
@@ -162,7 +204,7 @@ export function buildPrompt(recipe, setup = buildSetup(recipe)) {
   return [
     `Realistic home-cooked food photo of ${recipe.name}.`,
     what,
-    `Served ${setup.vessel} on ${setup.surface}. Shot ${setup.angle}.`,
+    `Served ${setup.vessel} on ${setup.surface}. Shot ${setup.angle}. ${setup.framing}.`,
     `Beside it: ${setup.props.join(", ")}.`,
     "Soft natural daylight, warm and inviting colour, gentle shadows.",
     "Generous realistic family portion, homely and slightly imperfect, not restaurant styling.",
