@@ -56,12 +56,22 @@ const SAMPLE_IDS = ["r001", "r003", "r008", "r058", "uk_shepherds_pie"];
 
 // ── Recipes ──────────────────────────────────────────────────────────────────
 
+// Some UK rows only have a code like "milk_semi_skimmed_4pt"; turn it into "Milk semi skimmed"
+function labelFromKey(key) {
+  if (!key) return "";
+  const words = String(key)
+    .split("_")
+    .filter((w) => !/^\d+(pk|pt|kg|g|ml|l)?$/i.test(w));
+  const text = words.join(" ");
+  return text.charAt(0).toUpperCase() + text.slice(1);
+}
+
 function loadRecipes() {
   const au = JSON.parse(fs.readFileSync(AU_FILE, "utf8")).map((r) => ({
     id: r.id,
     name: r.name,
     description: r.description || "",
-    ingredients: (r.ingredientsAU || r.ingredients || []).map((i) => i.name),
+    ingredients: (r.ingredientsAU || r.ingredients || []).map((i) => i?.name || ""),
     cookingStyle: r.cookingStyle || "",
     file: "au",
   }));
@@ -69,7 +79,7 @@ function loadRecipes() {
     id: r.recipeId,
     name: r.title,
     description: "",
-    ingredients: (r.ingredientRows || []).map((i) => i.ingredientLabel),
+    ingredients: (r.ingredientRows || []).map((i) => i.ingredientLabel || labelFromKey(i.ingredientKey)),
     cookingStyle: "",
     file: "uk",
   }));
@@ -193,6 +203,7 @@ export function buildSetup(recipe) {
 
 export function buildPrompt(recipe, setup = buildSetup(recipe)) {
   const ingredients = recipe.ingredients
+    .filter((n) => typeof n === "string" && n.trim())
     .map((n) => n.replace(/^budget\s+/i, "").trim())
     .map((n) => n.charAt(0).toUpperCase() + n.slice(1))
     .filter((n) => n && !STAPLES.test(n))
@@ -296,9 +307,9 @@ async function runGenerate(recipes, { force }) {
   async function worker() {
     while (queue.length) {
       const r = queue.shift();
-      const setup = buildSetup(r);
-      const prompt = buildPrompt(r, setup);
       try {
+        const setup = buildSetup(r);
+        const prompt = buildPrompt(r, setup);
         const img = await shrink(await generateImage(prompt));
         fs.writeFileSync(imagePath(r.id), img);
         manifest[r.id] = { name: r.name, prompt, setup, model: MODEL, quality: QUALITY, generatedAt: new Date().toISOString() };
