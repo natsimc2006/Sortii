@@ -1030,26 +1030,31 @@
     "ingredientRows": [
       {
         "ingredientKey": "penne_pasta",
+        "ingredientLabel": "Penne pasta",
         "quantity": 300,
         "unit": "g"
       },
       {
         "ingredientKey": "milk_semi_skimmed_4pt",
+        "ingredientLabel": "Semi-skimmed milk",
         "quantity": 400,
         "unit": "ml"
       },
       {
         "ingredientKey": "cheddar_mature_400",
+        "ingredientLabel": "Mature cheddar",
         "quantity": 200,
         "unit": "g"
       },
       {
         "ingredientKey": "butter",
+        "ingredientLabel": "Butter",
         "quantity": 40,
         "unit": "g"
       },
       {
         "ingredientKey": "plain_flour",
+        "ingredientLabel": "Plain flour",
         "quantity": 40,
         "unit": "g"
       }
@@ -1074,26 +1079,31 @@
     "ingredientRows": [
       {
         "ingredientKey": "beef_mince_5",
+        "ingredientLabel": "Lean minced beef (5% fat)",
         "quantity": 400,
         "unit": "g"
       },
       {
         "ingredientKey": "noodles_egg",
+        "ingredientLabel": "Egg noodles",
         "quantity": 300,
         "unit": "g"
       },
       {
         "ingredientKey": "peppers_3pk",
+        "ingredientLabel": "Peppers",
         "quantity": 2,
         "unit": "each"
       },
       {
         "ingredientKey": "spring_onions_bunch",
+        "ingredientLabel": "Spring onions",
         "quantity": 1,
         "unit": "bunch"
       },
       {
         "ingredientKey": "soy_sauce",
+        "ingredientLabel": "Soy sauce",
         "quantity": 40,
         "unit": "ml"
       }
@@ -1118,26 +1128,31 @@
     "ingredientRows": [
       {
         "ingredientKey": "beef_mince_10",
+        "ingredientLabel": "Minced beef 10% fat",
         "quantity": 500,
         "unit": "g"
       },
       {
         "ingredientKey": "wraps_8",
+        "ingredientLabel": "Tortilla wraps",
         "quantity": 1,
         "unit": "pack"
       },
       {
         "ingredientKey": "lettuce",
+        "ingredientLabel": "Lettuce",
         "quantity": 1,
         "unit": "each"
       },
       {
         "ingredientKey": "cucumber",
+        "ingredientLabel": "Cucumber",
         "quantity": 1,
         "unit": "each"
       },
       {
         "ingredientKey": "mayonnaise",
+        "ingredientLabel": "Mayonnaise",
         "quantity": 50,
         "unit": "ml"
       }
@@ -1162,21 +1177,25 @@
     "ingredientRows": [
       {
         "ingredientKey": "chicken_breast_fresh",
+        "ingredientLabel": "Chicken breast fillets",
         "quantity": 500,
         "unit": "g"
       },
       {
         "ingredientKey": "wraps_8",
+        "ingredientLabel": "Tortilla wraps",
         "quantity": 1,
         "unit": "pack"
       },
       {
         "ingredientKey": "lettuce",
+        "ingredientLabel": "Lettuce",
         "quantity": 1,
         "unit": "each"
       },
       {
         "ingredientKey": "mayonnaise",
+        "ingredientLabel": "Mayonnaise",
         "quantity": 40,
         "unit": "ml"
       }
@@ -1201,16 +1220,19 @@
     "ingredientRows": [
       {
         "ingredientKey": "eggs_free_range_12",
+        "ingredientLabel": "Eggs",
         "quantity": 4,
         "unit": "each"
       },
       {
         "ingredientKey": "bread_loaf",
+        "ingredientLabel": "Bread loaf",
         "quantity": 4,
         "unit": "slices"
       },
       {
         "ingredientKey": "butter",
+        "ingredientLabel": "Butter",
         "quantity": 10,
         "unit": "g"
       }
@@ -1234,11 +1256,13 @@
     "ingredientRows": [
       {
         "ingredientKey": "sausages_pork",
+        "ingredientLabel": "Pork sausages",
         "quantity": 300,
         "unit": "g"
       },
       {
         "ingredientKey": "baked_beans",
+        "ingredientLabel": "Baked beans",
         "quantity": 1,
         "unit": "tin"
       }
@@ -1263,11 +1287,13 @@
     "ingredientRows": [
       {
         "ingredientKey": "noodles_egg",
+        "ingredientLabel": "Egg noodles",
         "quantity": 100,
         "unit": "g"
       },
       {
         "ingredientKey": "eggs_free_range_12",
+        "ingredientLabel": "Eggs",
         "quantity": 1,
         "unit": "each"
       }
@@ -1291,21 +1317,25 @@
     "ingredientRows": [
       {
         "ingredientKey": "sausages_pork",
+        "ingredientLabel": "Pork sausages",
         "quantity": 600,
         "unit": "g"
       },
       {
         "ingredientKey": "potatoes_white_2kg",
+        "ingredientLabel": "White potatoes",
         "quantity": 800,
         "unit": "g"
       },
       {
         "ingredientKey": "peppers_3pk",
+        "ingredientLabel": "Peppers",
         "quantity": 2,
         "unit": "each"
       },
       {
         "ingredientKey": "olive_oil",
+        "ingredientLabel": "Olive oil",
         "quantity": 25,
         "unit": "ml"
       }
@@ -1330,21 +1360,25 @@
     "ingredientRows": [
       {
         "ingredientKey": "chicken_breast_fresh",
+        "ingredientLabel": "Chicken breast fillets",
         "quantity": 500,
         "unit": "g"
       },
       {
         "ingredientKey": "rice_white",
+        "ingredientLabel": "Long grain rice",
         "quantity": 300,
         "unit": "g"
       },
       {
         "ingredientKey": "onions",
+        "ingredientLabel": "Onions",
         "quantity": 150,
         "unit": "g"
       },
       {
         "ingredientKey": "stock_cubes_chicken_10",
+        "ingredientLabel": "Stock cube",
         "quantity": 1,
         "unit": "each"
       }
@@ -1369,21 +1403,25 @@
     "ingredientRows": [
       {
         "ingredientKey": "chicken_breast_fresh",
+        "ingredientLabel": "Chicken breast fillets",
         "quantity": 600,
         "unit": "g"
       },
       {
         "ingredientKey": "potatoes_white_2kg",
+        "ingredientLabel": "White potatoes",
         "quantity": 1000,
         "unit": "g"
       },
       {
         "ingredientKey": "carrots",
+        "ingredientLabel": "Carrots",
         "quantity": 300,
         "unit": "g"
       },
       {
         "ingredientKey": "peas_frozen",
+        "ingredientLabel": "Frozen peas",
         "quantity": 200,
         "unit": "g"
       }
@@ -1407,16 +1445,19 @@
     "ingredientRows": [
       {
         "ingredientKey": "chicken_breast_fresh",
+        "ingredientLabel": "Chicken breast fillets",
         "quantity": 500,
         "unit": "g"
       },
       {
         "ingredientKey": "couscous",
+        "ingredientLabel": "Couscous",
         "quantity": 250,
         "unit": "g"
       },
       {
         "ingredientKey": "peppers_3pk",
+        "ingredientLabel": "Peppers",
         "quantity": 2,
         "unit": "each"
       }
@@ -1440,21 +1481,25 @@
     "ingredientRows": [
       {
         "ingredientKey": "chicken_breast_fresh",
+        "ingredientLabel": "Chicken breast fillets",
         "quantity": 500,
         "unit": "g"
       },
       {
         "ingredientKey": "noodles_egg",
+        "ingredientLabel": "Egg noodles",
         "quantity": 300,
         "unit": "g"
       },
       {
         "ingredientKey": "mixed_veg_frozen",
+        "ingredientLabel": "Frozen mixed vegetables",
         "quantity": 300,
         "unit": "g"
       },
       {
         "ingredientKey": "soy_sauce",
+        "ingredientLabel": "Soy sauce",
         "quantity": 40,
         "unit": "ml"
       }
@@ -1478,21 +1523,25 @@
     "ingredientRows": [
       {
         "ingredientKey": "penne_pasta",
+        "ingredientLabel": "Penne pasta",
         "quantity": 350,
         "unit": "g"
       },
       {
         "ingredientKey": "passata",
+        "ingredientLabel": "Passata",
         "quantity": 500,
         "unit": "g"
       },
       {
         "ingredientKey": "onions",
+        "ingredientLabel": "Onions",
         "quantity": 100,
         "unit": "g"
       },
       {
         "ingredientKey": "cheddar_mature_400",
+        "ingredientLabel": "Mature cheddar",
         "quantity": 50,
         "unit": "g"
       }

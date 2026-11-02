@@ -2,7 +2,7 @@
  * localRecipeImages.ts
  * ────────────────────
  * Maps recipe names (lowercase) to bundled local assets via require().
- * These always win over Unsplash, TheMealDB, or any cached URL.
+ * These always win over the hosted image in the recipe data.
  *
  * To add a new pinned image:
  *   1. Drop the file into assets/images/recipes/

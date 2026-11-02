@@ -1,7 +1,6 @@
 import { Feather } from "@expo/vector-icons";
 import React, { useRef, useState } from "react";
 import {
-  Alert,
   Animated,
   StyleSheet,
   Text,
@@ -27,7 +26,7 @@ export function RecipeCard({
 }: RecipeCardProps) {
   const C = Colors.light;
   const [imgError, setImgError] = useState(false);
-  const { src: imgSrc, refresh: refreshImage, refreshing } = useRecipeImage(recipe.id, recipe.name, recipe.imageUrl);
+  const { src: imgSrc } = useRecipeImage(recipe.id, recipe.name, recipe.imageUrl);
   const imgOpacity = useRef(new Animated.Value(0)).current;
 
   const handleImageLoad = () => {
@@ -38,23 +37,6 @@ export function RecipeCard({
     }).start();
   };
 
-  const handleLongPress = () => {
-    Alert.alert(
-      "Photo not right?",
-      `Try a different photo for "${recipe.name}"?`,
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Refresh photo",
-          onPress: () => {
-            setImgError(false);
-            refreshImage();
-          },
-        },
-      ],
-    );
-  };
-
   const cookIcon =
     recipe.cookingStyle === "air-fryer"
       ? "wind"
@@ -62,13 +44,11 @@ export function RecipeCard({
         ? "layers"
         : "coffee";
 
-  const showImage = imgSrc !== null && !imgError && !refreshing;
+  const showImage = imgSrc !== null && !imgError;
 
   return (
     <TouchableOpacity
       onPress={onPress}
-      onLongPress={handleLongPress}
-      delayLongPress={500}
       activeOpacity={0.85}
       style={[
         styles.card,
@@ -79,9 +59,7 @@ export function RecipeCard({
     >
       <View style={styles.header}>
         <View style={[styles.iconBox, { backgroundColor: C.chipBg }]}>
-          {refreshing ? (
-            <Feather name="refresh-cw" size={18} color={C.primary} />
-          ) : showImage ? (
+          {showImage ? (
             <Animated.Image
               source={toImageSource(imgSrc)!}
               style={[styles.thumbnail, { opacity: imgOpacity }]}
